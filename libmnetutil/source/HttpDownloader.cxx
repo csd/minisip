@@ -131,7 +131,7 @@ int HttpDownloader::fetch(std::string request, std::ostream & bodyStream) {
 
 			if (bodyStr != NULL) {
 				// Found boundary
-				headerStream.write(buffer, bodyStr - buffer);
+				headerStream.write(buffer, (int)(bodyStr - (char*)buffer));
 				// Error checking!
 				if (headerStream.fail()) {
 					return 0;
@@ -208,11 +208,11 @@ void HttpDownloader::parseUrl() {
 
 void HttpDownloader::split(std::string data, std::string token, std::vector<std::string> &res, int maxChars)
 {
-	int count = 0;
+	size_t count = 0;
 	size_t lastpos = 0;
-	int tokenlen = token.length();
+	size_t tokenlen = token.length();
 	size_t pos = data.find(token,lastpos);
-	while(std::string::npos != pos && ((maxChars > 0 && pos < maxChars) || maxChars <= 0))
+	while(std::string::npos != pos && ((maxChars > 0 && (int)pos < maxChars) || maxChars <= 0))
 	{
 		count = pos - lastpos;
 		res.push_back(data.substr(lastpos,count));
@@ -233,7 +233,7 @@ std::string HttpDownloader::trim(std::string s) {
 	size_t trimLeftPos = s.find_first_not_of(" \n\t\r");
 	size_t trimRightPos = s.find_last_not_of(" \n\t\r");
 	size_t pos = 0;
-	int len = 0;
+	size_t len = 0;
 
 	if (trimLeftPos != std::string::npos)
 		pos = trimLeftPos;

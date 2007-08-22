@@ -34,6 +34,7 @@
 #include<sstream>
 #include<set>
 
+#pragma warning (disable: 4251)
 
 /**
  * Normal operation:

@@ -86,7 +86,7 @@ std::vector<MRef<Certificate*> > CertificateFinder::find(const std::string subje
 		if (USE_CERTIFICATE_CACHE != CERTCACHEUSE_NONE) {
 			stats->cacheQueries++;
 			ret = cacheManager->findCertificates(subjectUri, issuer);
-			mdbg("ucd") << "    Found certificates in local cache: " << ret.size() << std::endl;
+			mdbg("ucd") << "    Found certificates in local cache: " << (int)ret.size() << std::endl;
 			if (!ret.empty()){
 				return ret;
 			} else {
@@ -114,7 +114,7 @@ std::vector<MRef<Certificate*> > CertificateFinder::find(const std::string subje
 
 			LdapUrl url(sias.at(0));
 			ret = downloadFromLdap(url, subjectUri, issuer, typeCrossCert);
-			mdbg("ucd") << "    Found certificates using SIA: " << ret.size() << std::endl;
+			mdbg("ucd") << "    Found certificates using SIA: " << (int)ret.size() << std::endl;
 			if (!ret.empty()) {
 				return ret;
 			}
@@ -140,7 +140,7 @@ std::vector<MRef<Certificate*> > CertificateFinder::find(const std::string subje
 		LdapUrl url(server);
 		ret = downloadFromLdap(url, subjectUri, issuer, typeCrossCert);
 
-		mdbg("ucd") << "    Found certificates using SRV: " << ret.size() << std::endl;
+		mdbg("ucd") << "    Found certificates using SRV: " << (int)ret.size() << std::endl;
 		stats->dnsSrvQueries++;
 
 		if (!ret.empty()) {
@@ -170,7 +170,7 @@ std::vector<MRef<Certificate*> > CertificateFinder::find(const std::string subje
 			guessName = "ldap." + curAltNamesDomains.at(0);
 
 			ret = downloadFromLdap(LdapUrl("ldap://" + guessName), subjectUri, issuer, typeCrossCert);
-			mdbg("ucd") << "    Found certificates using domain name guessing (guess:" << guessName << "): " << ret.size() << std::endl;
+			mdbg("ucd") << "    Found certificates using domain name guessing (guess:" << guessName << "): " << (int)ret.size() << std::endl;
 			if (!ret.empty()) {
 				effort = MAX_EFFORT;
 				return ret;
@@ -285,7 +285,7 @@ std::vector<MRef<Certificate*> > CertificateFinder::downloadFromLdap(const LdapU
 			} catch (LdapException & ex) {
 				mdbg("ucd") << "    LdapException: " << ex.what() << std::endl;
 			}
-			mdbg("ucd") << "    " << result.size() << " entries found" << std::endl;
+			mdbg("ucd") << "    " << (int)result.size() << " entries found" << std::endl;
 
 			if (result.size() == 0)
 				if (stats != NULL) stats->ldapQueriesNoResult++;

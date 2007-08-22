@@ -50,7 +50,7 @@ SipHeaderFactoryFuncPtr sipHeaderCSeqFactory=cseqFactory;
 const string sipHeaderValueCSeqTypeStr = "CSeq";
 
 SipHeaderValueCSeq::SipHeaderValueCSeq(const string &build_from):SipHeaderValue(SIP_HEADER_TYPE_CSEQ,sipHeaderValueCSeqTypeStr){
-	unsigned maxlen=build_from.size();
+	unsigned maxlen=(unsigned)build_from.size();
 	unsigned i=0;
 
 	while (i<maxlen && isWS(build_from[i]))

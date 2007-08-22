@@ -102,7 +102,7 @@ void SipLayerTransaction::addTransaction(MRef<SipTransaction*> t){
 
 void SipLayerTransaction::removeTransaction(string tid){
 	transactions[tid]->freeStateMachine();
-	int n = transactions.erase(tid);
+	int n = (int)transactions.erase(tid);
 	massert(n==1);
 }
 

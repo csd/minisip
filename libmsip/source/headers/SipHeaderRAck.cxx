@@ -51,7 +51,7 @@ const string sipHeaderValueRAckTypeStr = "RAck";
 
 SipHeaderValueRAck::SipHeaderValueRAck(const string &build_from):SipHeaderValue(SIP_HEADER_TYPE_RACK,sipHeaderValueRAckTypeStr){
 	unsigned i=0;
-	unsigned maxi=build_from.size()-1;
+	unsigned maxi=(unsigned)build_from.size()-1;
 	while (i<=maxi && isWS(build_from[i]))
 		i++;
 	

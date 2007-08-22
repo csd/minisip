@@ -40,6 +40,23 @@ class CertificateChain;
 class certificate;
 class CertificateSet;
 
+/*
+ITgk is an interface implemented by KeyAgreement.
+KeyAgreementDH inherits the methods in the interface
+both via DHBase and KeyAgreement. MSVC warns that
+the version inherited from DHBase is used.
+
+ ITgk
+ ! !  
+ ! KeyAgreement
+ DHBase   !
+    !     !
+  KeyAgreementDH
+
+  We turn off the warning for this situation so that not every
+  compile that includes this file gets those warnings.
+*/
+#pragma warning (disable: 4250)
 
 class LIBMIKEY_API PeerCertificates {
 	public:

@@ -253,10 +253,10 @@ SipRequest::SipRequest(string &build_from): SipMessage(build_from){
 }
 
 void SipRequest::init(string &build_from){
-	int start = 0;
-	int pos;
-	int pos2;
-	int end = 0;
+	size_t start = 0;
+	size_t pos;
+	size_t pos2;
+	size_t end = 0;
 	//int length = build_from.length();
 	string requestLine;
 

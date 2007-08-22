@@ -41,8 +41,8 @@ void LdapDownloader::fetch() {
 			std::vector<std::string> attrs = url.getAttributes();
 			entries = conn->find(url.getDn(), url.getFilter(), attrs, url.getScope());
 			isLoaded = true;
-		} catch (LdapNotConnectedException & e) {
-		} catch (LdapException & e) {
+		} catch (LdapNotConnectedException & /*e*/) {
+		} catch (LdapException & /*e*/) {
 		}
 	}
 }
@@ -60,11 +60,11 @@ char* LdapDownloader::getChars(int *length) {
 				try {
 					std::string firstAttrValue = entry->getAttrValueString(attrs.at(0));
 
-					*length = firstAttrValue.length();
+					*length = (int)firstAttrValue.length();
 					char* res = new char[*length];
 					memcpy(res, firstAttrValue.c_str(), *length);
 					return res;
-				} catch (LdapAttributeNotFoundException & e) {
+				} catch (LdapAttributeNotFoundException & /*e*/) {
 					/*
 					 * Could not find the first named attribute amongst the string
 					 * attributes. Try to find the same attribute name in the
@@ -78,7 +78,7 @@ char* LdapDownloader::getChars(int *length) {
 							memcpy(res, firstAttrValues.at(0)->value, *length);
 							return res;
 						}
-					} catch (LdapAttributeNotFoundException & e) {
+					} catch (LdapAttributeNotFoundException & /*e*/) {
 						/*
 						 * Could not find attribute in collection of binary attributes
 						 * either. This is very odd and should be be able to happen!
@@ -104,7 +104,7 @@ std::vector<std::string> LdapDownloader::saveToFiles(std::string attr, std::stri
 				std::vector< MRef<LdapEntryBinaryValue*> > binaryData = entry->getAttrValuesBinary(attr);
 
 				for (size_t i=0; i<binaryData.size(); i++) {
-					std::string fileName = nextFilename(filenameBase, i+1);
+					std::string fileName = nextFilename(filenameBase, (int)i+1);
 					std::ofstream file(fileName.c_str());
 					if (file.good()) {
 						MRef<LdapEntryBinaryValue*> val = binaryData.at(i);
@@ -115,7 +115,7 @@ std::vector<std::string> LdapDownloader::saveToFiles(std::string attr, std::stri
 					if (onlyFirst && i==0)
 						break;
 				}
-			} catch (LdapAttributeNotFoundException & e) {
+			} catch (LdapAttributeNotFoundException & /*e*/) {
 
 			}
 		}
@@ -145,7 +145,7 @@ std::string LdapDownloader::getString(std::string attr) throw (LdapAttributeNotF
 			MRef<LdapEntry*> entry = entries.at(0);
 			try {
 				return entry->getAttrValueString(attr);
-			} catch (LdapAttributeNotFoundException & e) {
+			} catch (LdapAttributeNotFoundException & /*e*/) {
 				throw;
 			}
 		}
@@ -164,7 +164,7 @@ MRef<LdapEntryBinaryValue*> LdapDownloader::getBinary(std::string attr) throw (L
 				if (vals.size() > 0) {
 					return vals.at(0);
 				}
-			} catch (LdapAttributeNotFoundException & e) {
+			} catch (LdapAttributeNotFoundException & /*e*/) {
 				throw;
 			}
 		}

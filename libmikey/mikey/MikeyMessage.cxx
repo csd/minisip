@@ -331,7 +331,8 @@ vector<byte_t> MikeyPayloads::buildSignData( size_t sigLength,
 
 	byte_t * start = rawMessageData();
 	byte_t * end = start;
-	uint32_t diff=rawMessageLength() - sigLength;
+	int diff=rawMessageLength() - (int)sigLength;
+	assert(diff>=0);
 	end+=diff;
 
 	signData.insert( signData.end(), start, end);
@@ -378,7 +379,7 @@ void MikeyPayloads::addSignaturePayload( MRef<SipSim*> sim,
 
 	signData = buildSignData( GUESSED_SIGNATURE_LENGTH, addIdsAndT );
 
-	if (!sim->getSignature( &signData.front(), signData.size(), 
+	if (!sim->getSignature( &signData.front(), (int)signData.size(), 
 			 signature, signatureLength, true )){
 		throw MikeyException( "Could not perform digital signature of the message" );
 	}
@@ -388,7 +389,7 @@ void MikeyPayloads::addSignaturePayload( MRef<SipSim*> sim,
 		sign->setSigData(signature, signatureLength); // the length needs to be set to the correct value
 		signData = buildSignData( signatureLength, addIdsAndT );
 
-		sim->getSignature( &signData.front(), signData.size(),
+		sim->getSignature( &signData.front(), (int)signData.size(),
 				signature, signatureLength, true );
 	}
 
@@ -426,7 +427,7 @@ void MikeyPayloads::addSignaturePayload( MRef<Certificate *> cert,
 
 	signData = buildSignData( GUESSED_SIGNATURE_LENGTH, addIdsAndT );
 
-	if (cert->signData( &signData.front(), signData.size(),
+	if (cert->signData( &signData.front(), (int)signData.size(),
 			 signature, &signatureLength )){
 		throw MikeyException( "Could not perform digital signature of the message" );
 	}
@@ -437,7 +438,7 @@ void MikeyPayloads::addSignaturePayload( MRef<Certificate *> cert,
 		sign->setSigData(signature, signatureLength); // the length needs to be set to the correct value
 		signData = buildSignData( signatureLength, addIdsAndT );
 
-		cert->signData( &signData.front(), signData.size(),
+		cert->signData( &signData.front(), (int)signData.size(),
 				 signature, &signatureLength );
 	}
 
@@ -931,7 +932,7 @@ bool MikeyPayloads::verifySignature( MRef<Certificate*> cert,
 
 	signData = buildSignData( sig->sigLength(), addIdsAndT );
 
-	int res = cert->verifSign( &signData.front(), signData.size(),
+	int res = cert->verifSign( &signData.front(), (int)signData.size(),
 				    sig->sigData(),
 				    sig->sigLength() );
 	return res > 0;
@@ -1150,7 +1151,7 @@ void MikeyPayloads::addId( const string &theId ){
 	}
 
 	MikeyPayloadID* initId =
-		new MikeyPayloadID( type, id.size(), (byte_t*)id.c_str() );
+		new MikeyPayloadID( type, (int)id.size(), (byte_t*)id.c_str() );
 	addPayload( initId );
 }
 

@@ -96,7 +96,7 @@ STUNAttribute *STUNAttribute::parseAttribute(unsigned char *data, int /*maxLengt
     ret = new STUNAttributeChangedAddress(length,&data[4]);
     break;
   case STUNAttribute::CHANGE_REQUEST:
-    ret = new STUNAttributeChangeRequest(length,&data[4]);
+    ret = new STUNAttributeChangeRequest(&data[4], length);
     break;
   case STUNAttribute::USERNAME:
     ret = new STUNAttributeUsername(length,&data[4]);

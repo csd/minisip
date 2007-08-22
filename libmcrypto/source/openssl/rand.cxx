@@ -28,14 +28,14 @@
 
 bool Rand::randomize(void *buffer, size_t length)
 {
-	return RAND_bytes((unsigned char*)buffer, length);
+	return RAND_bytes((unsigned char*)buffer, (int)length) != 0;
 }
 
 bool Rand::randomize(void * buffer, size_t length, MRef<SipSim *> sim)
 {
 	unsigned char * tempBufferPtr = new unsigned char[16];
-	int index = 0;
-	int left = length;
+	size_t index = 0;
+	size_t left = length;
 	while(left > 16){
 		if(sim->getRandomValue(tempBufferPtr, 16)){
 			memcpy(&((unsigned char *)buffer)[index], tempBufferPtr, 16);

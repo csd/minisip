@@ -198,9 +198,9 @@ int SocketServer::buildFdSet( fd_set *set, int pipeFd )
 }
 
 #ifdef WIN32
-static int createTcpPipe( int fds[2] )
+static int createTcpPipe( uint32_t fds[2] )
 {
-	SOCKET sd;
+	uint32_t sd;
 	struct sockaddr_in sa;
 	socklen_t sz = sizeof(sa);
 	u_long nonBlocking = 1;
@@ -257,7 +257,7 @@ static int createTcpPipe( int fds[2] )
 #endif	// WIN32
 
 void SocketServer::createSignalPipe(){
-	int pipeFds[2] = {-1,-1};
+	uint32_t pipeFds[2] = {-1,-1};
 
 	if( fdSignal >= 0 ){
 		close( fdSignal );

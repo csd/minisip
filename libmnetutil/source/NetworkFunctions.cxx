@@ -703,7 +703,7 @@ vector<MRef<NetworkInterface*> > NetworkFunctions::getInterfaces()
 string NetworkFunctions::getInterfaceOf( string ipStr ) {
 	vector<MRef<NetworkInterface*> > ifaces;
 	vector<MRef<NetworkInterface*> >::iterator iter;
-	bool isIpv6 = ipStr.find(':');
+	bool isIpv6 = ipStr.find(':')!=string::npos;
 	
 	ifaces = NetworkFunctions::getInterfaces();
 	for( iter = ifaces.begin(); iter != ifaces.end(); iter++ ){

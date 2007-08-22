@@ -73,7 +73,7 @@ const struct in6_addr in6addr_any = {{IN6ADDR_ANY_INIT}};
 
 using namespace std;
 
-#define MAKE_UINT16(x,y) ((x)<<8+(y))
+#define MAKE_UINT16(x,y) (((x)<<8)+(y))
 
 #ifdef HAVE_GETADDRINFO
 void initIp6Address( const string &ipaddr, struct sockaddr_in6 *sockaddress,

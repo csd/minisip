@@ -36,10 +36,10 @@
 
 #include<libmsip/SipRequest.h>
 #include<libmsip/SipStack.h>
+#include<libmsip/SipAuthenticationDigest.h>
 
 class SipTransaction;
 class SipDialogConfig;
-class SipAuthenticationDigest;
 
 
 /**

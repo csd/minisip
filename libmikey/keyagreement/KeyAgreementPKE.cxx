@@ -59,7 +59,7 @@ int KeyAgreementPKE::getEnvelopeKeyLength(){
 
 void KeyAgreementPKE::setEnvelopeKey( const byte_t *aEnvKey,
 				      size_t aEnvKeyLength ){
-	setPSK( aEnvKey, aEnvKeyLength );
+	setPSK( aEnvKey, (int)aEnvKeyLength );
 }
 	
 MikeyMessage* KeyAgreementPKE::createMessage(){

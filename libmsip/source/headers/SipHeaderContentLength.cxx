@@ -54,7 +54,7 @@ SipHeaderValueContentLength::SipHeaderValueContentLength(const string &build_fro
 		: SipHeaderValue(SIP_HEADER_TYPE_CONTENTLENGTH,sipHeaderValueContentLengthTypeStr)
 {
 	unsigned i=0;
-	unsigned len = build_from.length();
+	unsigned len = (unsigned)build_from.length();
 	while (isWS(build_from[i]))
 		i++;
 	string num="";

@@ -529,11 +529,11 @@ void Mikey::createKeyAgreement( int type )
 			}
 
 			if( type == KEY_AGREEMENT_TYPE_PSK ){
-				ka = new KeyAgreementPSK(psk, psk_len);
+				ka = new KeyAgreementPSK(psk, (int)psk_len);
 			}
 			else{
 				KeyAgreementDHHMAC *kaDH =
-					new KeyAgreementDHHMAC(psk, psk_len);
+					new KeyAgreementDHHMAC(psk, (int)psk_len);
 				if( isInitiator() ){
 					kaDH->setGroup( DH_GROUP_OAKLEY5 );
 				}

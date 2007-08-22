@@ -36,6 +36,8 @@
 #include<libmutil/Exception.h>
 #include<libmutil/CacheItem.h>
 
+#pragma warning (disable: 4251)
+
 class Certificate;
 #if 0
 #define CERT_DB_ITEM_TYPE_OTHER  0

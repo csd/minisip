@@ -48,7 +48,7 @@ SipHeaderValueRSeq::SipHeaderValueRSeq(const string &build_from)
 		: SipHeaderValue(SIP_HEADER_TYPE_RSEQ,sipHeaderValueRSeqTypeStr)
 {
 	unsigned i=0;
-	unsigned len=build_from.size();
+	unsigned len=(unsigned)build_from.size();
 	while (isWS(build_from[i]))
 		i++;
 	string num="";
@@ -64,7 +64,7 @@ SipHeaderValueRSeq::SipHeaderValueRSeq(const string &build_from)
 		throw SipExceptionInvalidMessage("SipHeaderValueRSeq malformed");
 	}
 #ifdef _MSC_VER
-	seq=_atoi64(num.c_str());
+	seq=(uint32_t)_atoi64(num.c_str());
 #else
 	seq=atoll(num.c_str());
 #endif

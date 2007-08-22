@@ -357,7 +357,7 @@ MRef<CertificateSetItem*> CertificateSet::addFile(std::string file) {
 		item->setImportMethod(CertificateSetItem::IMPORTMETHOD_FILE);
 		item->setImportParameter(uri.getString());
 		return item;
-	} catch (CertificateException & ex) {
+	} catch (CertificateException & /*ex*/) {
 	}
 	return MRef<CertificateSetItem*>();
 }

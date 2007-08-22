@@ -338,7 +338,7 @@ std::vector<std::string> CertificatePathFinderUcd::candidateUpPaths(MRef<Certifi
 	interested in what lies *above* curCert.domain.
 	*/
 
-	mdbg("ucd") << "    tempCurrent.size()=" << tempCurrent.size() << ", tempTo.size()=" << tempTo.size() << std::endl;
+	mdbg("ucd") << "    tempCurrent.size()=" << (int)tempCurrent.size() << ", tempTo.size()=" << (int)tempTo.size() << std::endl;
 
 	if (tempCurrent.size() > 0)
 		tempCurrent.erase(tempCurrent.begin());
@@ -388,7 +388,7 @@ std::vector<std::string> CertificatePathFinderUcd::candidateCrossPaths(MRef<Cert
 	std::vector<std::string>::iterator nameIter;
 	std::vector<std::string> resDomains;
 
-	mdbg("ucd") << "    Certificate belonging to " << toCert->getCn() << " has " << altNames.size() << " subjectAltNames" << std::endl;
+	mdbg("ucd") << "    Certificate belonging to " << toCert->getCn() << " has " << (int)altNames.size() << " subjectAltNames" << std::endl;
 	/*
 	For each of the alt. names we calculate all possible "parent name". Note that it is
 	VERY unlikely that a CA certificate has multiple alternative names, an end-user may

@@ -52,7 +52,7 @@ void FileSystemUtils::directoryContentsInternal(std::string dir, bool includeSub
 	std::string dirComplete = dir + "\\*.*";
 	// start the finder -- on error _findfirsti64() will return -1, otherwise if no
 	// error it returns a handle greater than -1.
-	long h = _findfirsti64(dirComplete.c_str(), &data);
+	intptr_t h = _findfirsti64(dirComplete.c_str(), &data);
 	if(h >= 0) {
 		//FILELIST thisList;
 		// add empty FILELIST structure to the linked list argument

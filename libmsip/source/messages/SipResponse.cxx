@@ -86,9 +86,9 @@ SipResponse::SipResponse( int32_t status,
 //TODO: This constructor needs rewriting (re-use from sipmessage)
 SipResponse::SipResponse(string &resp): SipMessage(resp)
 {
-	int len = resp.size();
+	size_t len = resp.size();
 
-	int i =0;
+	size_t i =0;
 
 	//If stream transport we should allow whitespace before the start
 	//of the message
@@ -101,7 +101,7 @@ SipResponse::SipResponse(string &resp): SipMessage(resp)
 	}
 	i+=7;
 
-	int afterws=i;
+	size_t afterws=i;
 	while ( afterws<len && resp[afterws]!='\0' && (resp[afterws]==' ' || resp[afterws]=='\t'))
 		afterws++;
 	

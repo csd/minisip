@@ -32,7 +32,7 @@
 
 #define HASH_SHA1 1
 
-class SipSim : public virtual MObject {
+class LIBMCRYPTO_API SipSim : public virtual MObject {
 
 public:
 
