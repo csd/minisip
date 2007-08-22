@@ -38,6 +38,7 @@
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipMessage.h>
 #include<libmsip/SipSocketServer.h>
+#include<libmsip/SipCommandDispatcher.h>
 
 #include<list>
 

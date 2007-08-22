@@ -63,8 +63,11 @@ SipHeaderValueRSeq::SipHeaderValueRSeq(const string &build_from)
 	if (num.size()==0 || i<len ){ 
 		throw SipExceptionInvalidMessage("SipHeaderValueRSeq malformed");
 	}
-
+#ifdef _MSC_VER
+	seq=_atoi64(num.c_str());
+#else
 	seq=atoll(num.c_str());
+#endif
 }
 
 SipHeaderValueRSeq::SipHeaderValueRSeq(uint32_t n)

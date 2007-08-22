@@ -28,6 +28,7 @@
 #include<libmsip/libmsip_config.h>
 
 #include<libmsip/SipSMCommand.h>
+#include<libmsip/SipAuthenticationDigest.h>
 
 #include<list>
 #include<libmutil/Mutex.h>

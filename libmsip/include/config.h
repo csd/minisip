@@ -24,10 +24,10 @@
 #define CONFIG_H
 
 /* Compilation time configuration */
-#ifndef _WIN32_WCE
-#	include"compilation_config.h"
-#else
+#if defined(_WIN32_WCE) || defined(_MSC_VER)
 #	include"compilation_config_w32_wce.h"
+#else
+#	include"compilation_config.h"
 #endif
 
 #ifndef LIBMSIP_EXPORTS
@@ -44,6 +44,7 @@
 #ifdef _MSC_VER
 	#define WIN32
 	#pragma warning (disable: 4251)
+	#pragma warning (disable: 4290)
 
 	#ifndef LIBMSIP_EXPORTS
 		#error Visual Studio is not set up correctly to compile libmutil to a .dll (LIBMSIP_EXPORTS not defined).
