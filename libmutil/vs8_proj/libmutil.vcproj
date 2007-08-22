@@ -266,6 +266,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\include\libmutil\SipUri.h"
+				>
+			</File>
+			<File
 				RelativePath="..\include\libmutil\StateMachine.h"
 				>
 			</File>
@@ -383,6 +387,10 @@
 			</File>
 			<File
 				RelativePath="..\source\SemaphoreWin32.cxx"
+				>
+			</File>
+			<File
+				RelativePath="..\source\SipUri.cxx"
 				>
 			</File>
 			<File
