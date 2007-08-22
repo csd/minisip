@@ -37,8 +37,8 @@
 #include<libmikey/MikeyPayloadSIGN.h>
 
 #include<libmikey/KeyAgreement.h>
-#include<libmikey/KeyAgreementDH.h>
-#include<libmikey/KeyAgreementPSK.h>
+//#include<libmikey/KeyAgreementDH.h>
+//#include<libmikey/KeyAgreementPSK.h>
 #include<libmcrypto/cert.h>
 
 #include<list>
@@ -69,11 +69,14 @@ class aes;
 class SipSim;
 class Certificate;
 class CertificateSet;
+class KeyAgreement;
 class KeyAgreementDH;
 class KeyAgreementDHHMAC;
 class KeyAgreementPKE;
+class KeyAgreementPSK;
 class KeyAgreementRSAR;
 class MikeyPayloadID;
+class MikeyMessage;
 
 class LIBMIKEY_API MikeyPayloads: public MObject{
 	public:

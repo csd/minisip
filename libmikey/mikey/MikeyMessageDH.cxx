@@ -36,6 +36,7 @@
 #include<libmikey/MikeyPayloadCERT.h>
 #include<libmikey/MikeyPayloadDH.h>
 #include<libmikey/MikeyPayloadERR.h>
+#include<libmikey/KeyAgreementDH.h>
 #include<libmcrypto/SipSim.h>
 #include<libmcrypto/rand.h>
 

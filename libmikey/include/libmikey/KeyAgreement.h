@@ -34,6 +34,7 @@
 #include<libmutil/MemObject.h>
 #include<libmikey/KeyValidity.h>
 #include<libmikey/MikeyCsIdMap.h>
+#include<libmikey/MikeyMessage.h>
 #include<libmcrypto/SipSim.h>
 
 #include<iostream>
@@ -52,6 +53,7 @@
 #define KEY_AGREEMENT_TYPE_DHHMAC 3
 #define KEY_AGREEMENT_TYPE_RSA_R 4
 
+class MikeyMessage;
 
 // Class to hold Security Policy (SP) info
 class LIBMIKEY_API Policy_type {
@@ -66,7 +68,6 @@ class LIBMIKEY_API Policy_type {
 	private:
 };
 
-class LIBMIKEY_API MikeyMessage;
 
 class LIBMIKEY_API ITgk{
 	public:

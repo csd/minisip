@@ -27,8 +27,8 @@
 
 #include<libmikey/libmikey_config.h>
 
-#include<libmikey/KeyAgreement.h>
 #include<libmcrypto/SipSim.h>
+#include<libmikey/KeyAgreement.h>
 
 #define DH_GROUP_OAKLEY5 0
 #define DH_GROUP_OAKLEY1 1
@@ -39,6 +39,7 @@ class OakleyDH;
 class CertificateChain;
 class certificate;
 class CertificateSet;
+
 
 class LIBMIKEY_API PeerCertificates {
 	public:
@@ -58,7 +59,7 @@ class LIBMIKEY_API PeerCertificates {
 		MRef<CertificateSet *> certDbPtr;
 };
 
-class LIBMIKEY_API KeyAgreementDHBase: virtual public ITgk{
+class LIBMIKEY_API KeyAgreementDHBase : virtual public ITgk {
 	public:
 		KeyAgreementDHBase(MRef<SipSim* > sim);
 		~KeyAgreementDHBase();
@@ -82,6 +83,7 @@ class LIBMIKEY_API KeyAgreementDHBase: virtual public ITgk{
 		byte_t * publicKeyPtr;
 		int publicKeyLengthValue;
 };
+
 
 class LIBMIKEY_API KeyAgreementDH : public KeyAgreement,
 				    public KeyAgreementDHBase,
