@@ -47,6 +47,7 @@
 	#endif
 
 	#pragma warning (disable: 4251)
+	#pragma warning (disable: 4290)
 
 	#ifndef LIBMCRYPTO_EXPORTS
 		#error Visual Studio is not set up correctly to compile libcrypto to a .dll (LIBMCRYPTO_EXPORTS not defined).
