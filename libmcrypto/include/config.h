@@ -24,10 +24,11 @@
 #define CONFIG_H
 
 /* Compilation time configuration */
-#ifndef _WIN32_WCE
+//#ifndef _WIN32_WCE
+#ifndef _MSC_VER
 #	include"compilation_config.h"
 #else
-#	include"compilation_config_w32_wce.h"
+#	include"compilation_config_win32.h"
 #endif
 
 #ifndef LIBMCRYPTO_EXPORTS
@@ -40,7 +41,11 @@
 #include<libmutil/mtypes.h>
 
 #ifdef _MSC_VER
-	#define WIN32
+
+	#ifndef WIN32
+		#define WIN32
+	#endif
+
 	#pragma warning (disable: 4251)
 
 	#ifndef LIBMCRYPTO_EXPORTS

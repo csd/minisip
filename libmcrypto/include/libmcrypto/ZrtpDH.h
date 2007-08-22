@@ -25,7 +25,7 @@
 
 #include <libmcrypto/config.h>
 
-#include <stdint.h>
+#include <libmutil/mtypes.h>
 
 /**
  * Implementation of Diffie-Helman for ZRTP

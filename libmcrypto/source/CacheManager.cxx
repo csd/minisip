@@ -61,7 +61,7 @@ MRef<DirectorySetItem*> CacheManager::findDirectory(const std::string domain, co
 	std::vector<MRef<DirectorySetItem*> > res;
 	if (defaultSet.length() == 0) {
 		// Scan all directory sets
-		for (std::map<const std::string, MRef<DirectorySet*> >::iterator i = directorySets.begin(); i != directorySets.end(); i++) {
+		for (std::map<std::string, MRef<DirectorySet*> >::iterator i = directorySets.begin(); i != directorySets.end(); i++) {
 			res = i->second->findItemsPrioritized(domain);
 			if (!res.empty()) {
 				mdbg("ucd") << "$$$ End of " << __FUNCTION__ << std::endl;
@@ -152,7 +152,7 @@ std::vector<MRef<Certificate*> > CacheManager::findCertificates(const std::strin
 
 	if (defaultSet.length() == 0) {
 		// Scan all directory sets
-		for (std::map<const std::string, MRef<CertificateSet*> >::iterator i = certificateSets.begin(); i != certificateSets.end(); i++) {
+		for (std::map<std::string, MRef<CertificateSet*> >::iterator i = certificateSets.begin(); i != certificateSets.end(); i++) {
 			tempRes = i->second->findItems(searchText, issuer);
 			if (!tempRes.empty()) {
 				for (iRes = tempRes.begin(); iRes != tempRes.end(); iRes++) {

@@ -34,7 +34,7 @@
 #include<libmnetutil/StreamSocket.h>
 #include<libmcrypto/cert.h>
 
-class LIBMNETUTIL_API TLSSocket : public StreamSocket {
+class LIBMCRYPTO_API TLSSocket : public StreamSocket {
 	public:
 		virtual ~TLSSocket();
 

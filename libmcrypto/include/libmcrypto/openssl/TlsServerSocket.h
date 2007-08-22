@@ -31,7 +31,7 @@
 
 #include<openssl/ssl.h>
 
-class LIBMNETUTIL_API OsslServerSocket : public TLSServerSocket {
+class LIBMCRYPTO_API OsslServerSocket : public TLSServerSocket {
 
 	public:
 		OsslServerSocket( bool use_ipv6, int32_t listen_port, MRef<OsslCertificate *> cert, MRef<OsslCertificateSet *> cert_db=NULL);

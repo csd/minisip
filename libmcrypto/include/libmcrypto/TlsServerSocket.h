@@ -32,7 +32,7 @@
 #include<libmnetutil/ServerSocket.h>
 #include<libmcrypto/cert.h>
 
-class LIBMNETUTIL_API TLSServerSocket : public ServerSocket {
+class LIBMCRYPTO_API TLSServerSocket : public ServerSocket {
 
 	public:
 		virtual ~TLSServerSocket();

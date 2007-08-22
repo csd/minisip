@@ -225,13 +225,25 @@ char *uuid_to_str(uuid_t *u, char *buf, size_t size)
     char tmp[UUID_STRLEN+1];
     size_t pos;
 
-    pos = snprintf(tmp, sizeof(tmp), "%8.8lx-%4.4x-%4.4x-%2.2x%2.2x-",
+    pos = 
+#ifdef _MSC_VER
+	    _snprintf
+#else
+	    snprintf
+#endif
+		(tmp, sizeof(tmp), "%8.8lx-%4.4x-%4.4x-%2.2x%2.2x-",
 		   u->time_low, u->time_mid,
 		   u->time_hi_and_version, u->clock_seq_hi_and_reserved,
 		   u->clock_seq_low);
-    for (i = 0; i < 6; i++)
-        pos += snprintf(tmp + pos, sizeof(tmp) - pos, "%2.2x", u->node[i]);
-
+    for (i = 0; i < 6; i++){
+        pos += 
+#ifdef _MSC_VER
+		_snprintf
+#else
+		snprintf
+#endif		
+			(tmp + pos, sizeof(tmp) - pos, "%2.2x", u->node[i]);
+    }
     strncpy(buf, tmp, size);
     return buf;
 }

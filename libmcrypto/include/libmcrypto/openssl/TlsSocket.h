@@ -79,7 +79,7 @@ template class __declspec(dllexport) MRef<CertificateSet*>;
 #endif
 #endif
 
-class LIBMNETUTIL_API OsslSocket : public TLSSocket {
+class LIBMCRYPTO_API OsslSocket : public TLSSocket {
 	public:
 		OsslSocket(std::string addr, int32_t port, void * &ssl_ctx,
 			MRef<OsslCertificate *> cert = NULL,

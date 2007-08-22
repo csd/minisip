@@ -499,13 +499,16 @@ vector<string> OsslCertificate::getAltName( SubjectAltName type ){
 			ia5 = name->d.ia5;
 
 			size_t len = ASN1_STRING_length( ia5 );
-			char buf[ len + 1 ];
+
+			char *buf = new char[len + 1];
+
 			strncpy( buf, (const char*)ASN1_STRING_data( ia5 ),
 				 len );
 
 			string str( buf, len );
 
 			output.push_back( str );
+			delete []buf;
 		}
 
 	}
@@ -575,7 +578,7 @@ vector<string> OsslCertificate::getSubjectInfoAccess() {
 
 		size_t len = ASN1_STRING_length( ia5 );
 
-		char buf[ len + 1 ];
+		char *buf = new char[ len + 1 ];
 		strncpy( buf, (const char*)ASN1_STRING_data( ia5 ),
 			 len );
 
@@ -585,6 +588,7 @@ vector<string> OsslCertificate::getSubjectInfoAccess() {
 		//}
 
 		ACCESS_DESCRIPTION_free(ad);
+		delete []buf;
 
 	}
 

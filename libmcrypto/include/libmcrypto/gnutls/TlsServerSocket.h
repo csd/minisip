@@ -31,7 +31,7 @@
 #include<libmcrypto/TlsServerSocket.h>
 #include<libmcrypto/gnutls/cert.h>
 
-class LIBMNETUTIL_API GnutlsServerSocket : public TLSServerSocket {
+class LIBMCRYPTO_API GnutlsServerSocket : public TLSServerSocket {
 
 	public:
 		GnutlsServerSocket( bool use_ipv6, int32_t listen_port,

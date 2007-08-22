@@ -40,7 +40,7 @@
 
 #include<gnutls/gnutls.h>
 
-class LIBMNETUTIL_API GnutlsSocket : public TLSSocket {
+class LIBMCRYPTO_API GnutlsSocket : public TLSSocket {
 	public:
 		GnutlsSocket( IPAddress &addr, int32_t port,
 			      MRef<GtlsCertificateSet *> cert_db=NULL,
