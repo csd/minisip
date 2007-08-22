@@ -27,7 +27,7 @@
 #include <iostream>
 #include <libmutil/stringutils.h>
 
-#ifdef _MSC_VER
+#ifdef WIN32
 #include <windows.h>
 #include <winldap.h>
 #else

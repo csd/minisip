@@ -24,14 +24,14 @@
 #define NETWORKFUNCTIONSWIN32_H
 
 #include<libmnetutil/libmnetutil_config.h>
-#ifdef HAVE_IPHLPAPI_H
-# include<iphlpapi.h>
-#endif
 //#ifdef HAVE_WS2TCPIP_H
 //# include<ws2tcpip.h>
 //#endif
 #include<winsock2.h>
 #include<windows.h>
+#ifdef HAVE_IPHLPAPI_H
+# include<iphlpapi.h>
+#endif
 #include<ws2tcpip.h>
 
 extern HINSTANCE hiphlpapi;
