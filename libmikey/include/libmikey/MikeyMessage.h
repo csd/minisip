@@ -69,6 +69,7 @@ class aes;
 class SipSim;
 class Certificate;
 class CertificateSet;
+class KeyAgreementDH;
 class KeyAgreementDHHMAC;
 class KeyAgreementPKE;
 class KeyAgreementRSAR;

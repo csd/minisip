@@ -32,7 +32,9 @@
 
 #include<assert.h>
 
-#ifndef _MSC_VER
+#ifdef _MSC_VER
+#	include<Winsock2.h>
+#else
 #	include<time.h>
 #	include<sys/time.h>
 #endif

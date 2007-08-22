@@ -15,9 +15,12 @@ KeyAgreementPKE::KeyAgreementPKE( MRef<CertificateChain*> cert,
 	int envKeyLength = 112;
 
 	//envelope key to encrypt KEMAC payload
-	byte_t envKey[ envKeyLength ];
+	//byte_t envKey[ envKeyLength ];
+	byte_t *envKey = new byte_t[ envKeyLength ];
 	Rand::randomize( envKey, envKeyLength );
 	setPSK( envKey, envKeyLength );
+	
+	delete []envKey;
 
 	//verification set
 	setV(1);
@@ -31,9 +34,12 @@ KeyAgreementPKE::KeyAgreementPKE( MRef<CertificateChain *> cert,
 	int envKeyLength = 112;
 
 	//envelope key to encrypt KEMAC payload
-	byte_t envKey[ envKeyLength ];
+	//byte_t envKey[ envKeyLength ];
+	byte_t *envKey = new byte_t[ envKeyLength ];
+
 	Rand::randomize( envKey, envKeyLength );
 	setPSK( envKey, envKeyLength );
+	delete []envKey;
 }
 
 KeyAgreementPKE::~KeyAgreementPKE(){

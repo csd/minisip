@@ -228,4 +228,10 @@ class LIBMIKEY_API KeyAgreement : public MObject,
 		std::string peerUriValue;
 };
 
+//If we don't include MikeyMessage, then any user
+//of this header file will not compile without including
+//it.
+#include<libmikey/MikeyMessage.h>
+
+
 #endif

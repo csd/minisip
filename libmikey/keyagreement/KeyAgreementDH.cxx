@@ -30,7 +30,7 @@
 #include<libmikey/MikeyMessage.h>
 #include<libmcrypto/OakleyDH.h>
 #include<libmcrypto/SipSim.h>
-
+#include<algorithm>
 
 #ifdef SCSIM_SUPPORT
 #include<libmcrypto/SipSimSmartCardGD.h>

@@ -26,10 +26,12 @@
 #define CONFIG_H
 
 /* Compilation time configuration */
-#ifndef _WIN32_WCE
-#	include"compilation_config.h"
-#else
+//#ifndef _WIN32_WCE
+#if defined(_MSC_VER) || defined(_WIN32_WCE)
 #	include"compilation_config_w32_wce.h"
+#	pragma warning (disable: 4290)
+#else
+#	include"compilation_config.h"
 #endif
 
 #ifndef LIBMIKEY_EXPORTS
