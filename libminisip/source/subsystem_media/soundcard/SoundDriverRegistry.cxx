@@ -26,7 +26,7 @@
 
 #include<libminisip/media/soundcard/SoundDriverRegistry.h>
 #include<libmutil/dbg.h>
-#include"FileSoundDriver.h"
+#include<libminisip/media/soundcard/FileSoundDriver.h>
 
 // #ifdef PORTAUDIO_SUPPORT
 // #include<libminisip/media/soundcard/PortAudioDriver.h>

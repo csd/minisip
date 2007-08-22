@@ -25,7 +25,7 @@
 
 #include<config.h>
 
-#include"FileSoundDevice.h"
+#include<libminisip/media/soundcard/FileSoundDevice.h>
 
 #include<sys/types.h>
 #include<sys/stat.h>

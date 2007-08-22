@@ -27,8 +27,8 @@
 #include<libminisip/media/soundcard/SoundDriverRegistry.h>
 #include<libmutil/MPlugin.h>
 
-#include"FileSoundDriver.h"
-#include"FileSoundDevice.h"
+#include<libminisip/media/soundcard/FileSoundDriver.h>
+#include<libminisip/media/soundcard/FileSoundDevice.h>
 
 using namespace std;
 
