@@ -169,6 +169,6 @@ class LIBMUTIL_API SipUri : public MObject{
 		std::map<std::string, std::string> parameters;
 };
 
-std::ostream& operator << (std::ostream& os, const SipUri& uri);
+LIBMUTIL_API std::ostream& operator << (std::ostream& os, const SipUri& uri);
 
 #endif
