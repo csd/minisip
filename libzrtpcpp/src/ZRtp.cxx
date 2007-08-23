@@ -20,6 +20,8 @@
  * Authors: Werner Dittmann <Werner.Dittmann@t-online.de>
  */
 
+#include "config.h"
+
 #include <libmcrypto/ZrtpDH.h>
 #include <libmcrypto/hmac256.h>
 #include <libmcrypto/sha256.h>

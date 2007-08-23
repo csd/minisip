@@ -53,7 +53,7 @@ AC_CHECK_HEADERS([stdlib.h string.h pthread.h])
 AC_C_CONST
 
 # Checks for library functions.
-AC_FUNC_MALLOC
+dnl AC_FUNC_MALLOC
 AC_CHECK_FUNCS([srandom random srand rand])
 
 AC_SUBST(CRYPTOBACKEND)
