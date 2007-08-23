@@ -21,7 +21,7 @@
  * Authors: Werner Dittmann <Werner.Dittmann@t-online.de>
  */
 
-// #include<config.h>
+#include<config.h>
 
 #include <openssl/crypto.h>
 #include <openssl/bio.h>
