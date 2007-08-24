@@ -21,6 +21,8 @@ Description: Minisip SIP User Agent library - shared library
  Minisip SIP User Agent library
  .
  This package contains the libminisip0 runtime library.
+ .
+  Homepage: http://www.minisip.org/
 
 Package: libminisip-dev
 Architecture: any
@@ -32,6 +34,8 @@ Description: Minisip SIP User Agent library - development files
  .
  This package contains the header files and static library needed to
  compile applications that use libminisip0.
+ .
+  Homepage: http://www.minisip.org/
 
 Package: libminisip-video0
 Section: libs
@@ -41,6 +45,8 @@ Description: Minisip video support - shared library
  The libminisip-video library implements H.263-1998 video codec
  .
  This package contains the libminisip-video0 runtime library.
+ .
+  Homepage: http://www.minisip.org/
 
 Package: libminisip-video-dev
 Architecture: any
@@ -51,6 +57,8 @@ Description: Minisip video support - development files
  .
  This package contains the header files and static library needed to
  compile applications that use libminisip-video0.
+ .
+  Homepage: http://www.minisip.org/
 
 Package: minisip-plugins
 Section: libs
@@ -62,6 +70,8 @@ Description: Various plugins for plugins
  * GSM codec plugin.
  * Speex codec plugin.
  * Float audio rate conversion plugin.
+ .
+  Homepage: http://www.minisip.org/
 
 Package: minisip-video
 Section: libs
@@ -74,6 +84,8 @@ Description: Video plugins for Minisip
  * Video4linux grabber
  * IEEE1394 digital camera grabber
  * X11, SDL and Xv video output drivers
+ .
+  Homepage: http://www.minisip.org/
 
 Package: minisip-gconf
 Section: libs
@@ -81,4 +93,5 @@ Architecture: any
 Depends: ${shlibs:Depends}
 Description: GConf support for Minisip
  The minisip-gconf contains a GConf plugin for Minisip.
-
+ .
+  Homepage: http://www.minisip.org/

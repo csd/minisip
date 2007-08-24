@@ -20,3 +20,5 @@ Description: SIP user agent, with security enhancements
  additional security, such as encryption and authentication, by using
  the SRTP (RFC3711) and MIKEY (RFC 3830) protocols. It uses GTK+ for
  the graphical interface.
+ .
+  Homepage: http://www.minisip.org/
