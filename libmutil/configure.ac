@@ -129,7 +129,7 @@ AC_CHECK_HEADERS([malloc.h stdlib.h string.h unistd.h pthread.h termios.h semaph
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_HEADER_TIME
-
+AM_MINISIP_CHECK_TIME
 AM_MINISIP_CHECK_NOTHING
 AM_MINISIP_CHECK_COMPLETE
 

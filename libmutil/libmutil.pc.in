@@ -10,4 +10,4 @@ Description: Minisip Utility Toolkit Implementation Library (MUTIL)
 Version: @VERSION@
 Libs: -L${libdir} -lmutil
 Libs.private: @LIBS@
-Cflags: -I${includedir}
+Cflags: -I${includedir} @EXTERNAL_CFLAGS@

@@ -139,6 +139,7 @@ AC_DEFINE(USE_STL, [], [STL enabled])
 dnl		fi ])
 PKG_PROG_PKG_CONFIG
 AM_MINISIP_VERSION_INIT
+dnl AM_MINISIP_CHECK_TIME
 ])
 # End of AM_MINISIP_PACKAGE_INIT
 #
@@ -213,6 +214,33 @@ AM_CONDITIONAL(TEST_SUITE, test x${enable_test_suite} = xyes)
 # End of AM_MINISIP_ENABLE_TEST_SUITE
 #
 
+# AM_MINISIP_CHECK_TIME
+# ----------------------------------
+AC_DEFUN([AM_MINISIP_CHECK_TIME],[
+	AC_HEADER_TIME
+	AC_CHECK_TYPE([struct timezone],[
+		EXTERNAL_CFLAGS="$EXTERNAL_CFLAGS -DHAVE_STRUCT_TIMEZONE"
+	],,[dnl
+#if TIME_WITH_SYS_TIME
+# include <sys/time.h>
+# include <time.h>
+#else
+# if HAVE_SYS_TIME_H
+#  include <sys/time.h>
+# else
+#  include <time.h>
+# endif
+#endif
+	])
+
+	AC_CHECK_FUNC([gettimeofday],[
+		EXTERNAL_CFLAGS="$EXTERNAL_CFLAGS -DHAVE_GETTIMEOFDAY"
+	])
+
+	AC_SUBST(EXTERNAL_CFLAGS)
+])
+# End of AM_MINISIP_CHECK_TIME
+#
 
 dnl  =================================================================
 dnl               minisip `configure --with-m*` argument macros
@@ -404,6 +432,7 @@ AC_DEFUN([AM_MINISIP_CHECK_COMPLETE],[
 	])
 # End of AC_MINISIP_CHECK_COMPLETE
 #
+
 
 dnl  =================================================================
 dnl                          libmutil macros

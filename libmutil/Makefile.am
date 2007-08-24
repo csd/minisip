@@ -8,7 +8,7 @@ INCLUDES = $(LTDLINCL)
 
 pkgconfig_DATA = libmutil.pc
 
-AM_CPPFLAGS = -I$(top_srcdir)/include
+AM_CPPFLAGS = -I$(top_srcdir)/include $(EXTERNAL_CFLAGS)
 
 lib_LTLIBRARIES = libmutil.la
 libmutil_la_CXXFLAGS = $(PTHREAD_CFLAGS)

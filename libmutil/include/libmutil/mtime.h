@@ -36,20 +36,26 @@
 	#ifdef __MINGW32__
 	#	include<sys/time.h>
 	#endif
+
+	#ifndef HAVE_STRUCT_TIMEZONE
 	/* Emulate gettimeofday (Ulrich Leodolter, 1/11/95).  */
 	struct timezone{
 			int tz_minuteswest;     /* Minutes west of GMT.  */
 			int tz_dsttime;     /* Nonzero if DST is ever in effect.  */
 	};
+	#endif	// HAVE_STRUCT_TIMEZONE
 
 	#ifdef _WIN32_WCE
 	//MS EVC++ 4.0 defines struct timeval in winsock.h and winsock2.h ... 
 	//it is sad, but we include winsock2.h just to obtain this structure ... 
 		#include<winsock2.h>
 	#endif
+
+	#ifndef HAVE_GETTIMEOFDAY
 extern "C" {
 	LIBMUTIL_API void gettimeofday (struct timeval *tv, struct timezone *tz);
 }
+	#endif	// HAVE_GETTIMEOFDAY
 #endif
 
 LIBMUTIL_API uint64_t mtime();

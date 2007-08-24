@@ -50,6 +50,7 @@ LIBMUTIL_API uint64_t mtime(){
 }
 
 
+#ifndef HAVE_GETTIMEOFDAY
 extern "C" {
 LIBMUTIL_API
 	void gettimeofday (struct timeval *tv, struct timezone *tz){
@@ -74,6 +75,7 @@ LIBMUTIL_API
 		}
 	}
 }
+#endif	// HAVE_GETTIMEOFDAY
 
 LIBMUTIL_API int msleep(int32_t ms){
 	Sleep(ms); //function returns void
