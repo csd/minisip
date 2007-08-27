@@ -56,7 +56,9 @@ the version inherited from DHBase is used.
   We turn off the warning for this situation so that not every
   compile that includes this file gets those warnings.
 */
+#ifndef _MSC_VER
 #pragma warning (disable: 4250)
+#endif
 
 class LIBMIKEY_API PeerCertificates {
 	public:

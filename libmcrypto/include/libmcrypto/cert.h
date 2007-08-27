@@ -36,7 +36,9 @@
 #include<libmutil/Exception.h>
 #include<libmutil/CacheItem.h>
 
+#ifdef _MSC_VER
 #pragma warning (disable: 4251)
+#endif
 
 class Certificate;
 #if 0
