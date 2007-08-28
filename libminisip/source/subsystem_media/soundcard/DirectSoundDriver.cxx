@@ -36,7 +36,6 @@ static const char DRIVER_PREFIX[] = "dsound";
 static std::list<std::string> pluginList;
 static int initialized;
 
-
 extern "C" LIBMINISIP_API
 std::list<std::string> *mdsound_LTX_listPlugins( MRef<Library*> lib ){
 	if( !initialized ){
@@ -70,11 +69,11 @@ static BOOL CALLBACK dsEnumCallback(LPGUID guid, LPCSTR description,
 
 	if( guid ){
 		unsigned char *stringUuid = NULL;
-		if( UuidToString(guid, &stringUuid) != RPC_S_OK ){
+		if( UuidToStringA(guid, &stringUuid) != RPC_S_OK ){
 			return true;
 		}
 		uuid = string( (const char*) stringUuid );
-		RpcStringFree( &stringUuid );
+		RpcStringFreeA( &stringUuid );
 	}
 	else{
 		uuid = "0";
@@ -104,11 +103,11 @@ static BOOL CALLBACK dsEnumCaptureCallback(LPGUID guid, LPCSTR description,
 std::vector<SoundDeviceName> DirectSoundDriver::getDeviceNames() const {
 	std::vector<SoundDeviceName> names;
 
-	if( DirectSoundEnumerate( dsEnumPlaybackCallback, &names ) != DS_OK ){
+	if( DirectSoundEnumerateA( dsEnumPlaybackCallback, &names ) != DS_OK ){
 		cerr << "DirectSoundDriver::getDeviceNames DirectSoundEnumerate failed" << endl;
 	}
 
-	if( DirectSoundCaptureEnumerate( dsEnumCaptureCallback, &names ) != DS_OK ){
+	if( DirectSoundCaptureEnumerateA( dsEnumCaptureCallback, &names ) != DS_OK ){
 		cerr << "DirectSoundDriver::getDeviceNames DirectSoundEnumerate failed" << endl;
 	}
 

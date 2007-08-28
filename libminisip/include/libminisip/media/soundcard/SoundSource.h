@@ -174,7 +174,7 @@ It has a circular buffer object, where we keep the audio samples.
 The mutation from mono input to stereo output, and from
 input frequency to output frequency is done in push/getSound().
 */
-class BasicSoundSource: public SoundSource{
+class LIBMINISIP_API BasicSoundSource: public SoundSource{
         public:
 		/**
 		* Implementation of very simple queueing algorithm.

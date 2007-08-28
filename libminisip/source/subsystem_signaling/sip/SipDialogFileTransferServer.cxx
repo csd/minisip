@@ -126,7 +126,7 @@ bool SipDialogFileTransferServer::a0_start_trying_receiveINVITE(const SipSMComma
 			sendTrying();
 
 			std::vector<MRef<SdpHeader*> > header = sdp->getHeaders();
-			for(int i=0; i<header.size(); i++){
+			for(int i=0; i<(int)header.size(); i++){
 				
 				MRef<SdpHeader*> one = header[i];
 				if(one->getType() == SDP_HEADER_TYPE_M){
@@ -193,7 +193,7 @@ bool SipDialogFileTransferServer::a1_trying_receiving_accept(const SipSMCommand 
 		MRef<SdpPacket *> lastSdp = dynamic_cast<SdpPacket*>(*contentInv);
 
 		std::vector<MRef<SdpHeader*> > headers = lastSdp->getHeaders();
-		for(int i=0; i<headers.size(); i++){
+		for(int i=0; i<(int)headers.size(); i++){
 
 			MRef<SdpHeader*> oneHeader = headers[i];
 			

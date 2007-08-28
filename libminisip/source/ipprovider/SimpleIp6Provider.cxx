@@ -26,6 +26,7 @@
 #include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
 #include<libmnetutil/NetworkFunctions.h>
 #include<libmnetutil/UDPSocket.h>
+#include<algorithm>
 
 using namespace std;
 

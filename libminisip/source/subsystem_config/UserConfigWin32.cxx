@@ -27,6 +27,7 @@
 #include<shlobj.h>
 #include<io.h>
 #include<sys/stat.h>
+#include<direct.h>
 
 using namespace std;
 

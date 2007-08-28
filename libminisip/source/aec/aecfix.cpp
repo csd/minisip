@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#include <libminisip/aecfix.h>
+#include <libminisip/media/aec/aecfix.h>
 
 #if 1
 /* Vector Dot Product */

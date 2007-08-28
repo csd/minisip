@@ -30,8 +30,7 @@
 #include<libmutil/MemObject.h>
 #include<libmutil/Mutex.h>
 
-#include<libminisip/media/Session.h>
-
+class Session;
 
 class LIBMINISIP_API SessionRegistry{
 	friend class Session;
@@ -47,5 +46,8 @@ class LIBMINISIP_API SessionRegistry{
 		std::list<MRef<Session *> > sessions;
 		Mutex sessionsLock;
 };
+
+#include<libminisip/media/Session.h>
+
 
 #endif

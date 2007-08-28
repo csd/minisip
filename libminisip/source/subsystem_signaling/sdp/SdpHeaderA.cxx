@@ -86,7 +86,7 @@ void SdpHeaderA::getAttFromFileSelector(){
 	int iter;
 	int counter=0;
 
-	for(iter=15; iter<strlen(attributes.c_str()); iter++){
+	for(iter=15; iter<(int)strlen(attributes.c_str()); iter++){
 		if(attributes[iter] == ':')
 			counter++;
 	}
@@ -105,7 +105,7 @@ void SdpHeaderA::getAttFromFileSelector(){
 
 		if( attributes.substr(pos, 4) == "name"){
 			name = true;
-			searchname = attributes.find('"',pos2+2);
+			searchname = (int)attributes.find('"',pos2+2);
 			//cerr<<searchname<<endl;
 			filename = ( attributes.substr(pos2+2,(searchname-pos2-2)) );
 			//cerr<<filename<<endl;
@@ -113,7 +113,7 @@ void SdpHeaderA::getAttFromFileSelector(){
 		else;
 		if( attributes.substr(pos, 4) == "type"){
 			type = true;
-			searchtype = attributes.find(" ",pos2);
+			searchtype = (int)attributes.find(" ",pos2);
 			//cerr<<searchtype<<endl;
 			filetype = ( attributes.substr(pos2+1,(searchtype-pos2)) );
 			//cerr<<filetype<<endl;
@@ -121,7 +121,7 @@ void SdpHeaderA::getAttFromFileSelector(){
 		else;
 		if( attributes.substr(pos, 4) == "size"){
 			size = true;
-			searchsize = attributes.find(" ", pos2);
+			searchsize = (int)attributes.find(" ", pos2);
 			//cerr<<searchsize<<endl;
 			filesizes = ( attributes.substr(pos2+1,(searchsize-pos2)) );
 			//cerr<<filesizes<<endl;
@@ -129,7 +129,7 @@ void SdpHeaderA::getAttFromFileSelector(){
 		else;
 		if( attributes.substr(pos, 4) == "hash"){
 			hash = true;
-			poshash = attributes.find( ":", pos2+1);
+			poshash = (int)attributes.find( ":", pos2+1);
 			hashused = ( attributes.substr(pos2+1,poshash-pos2-1));
 			hashforfile = ( attributes.substr(poshash+1,(strlen(attributes.c_str())-poshash)) );
 			//cerr<<"used hash "<<hashused<<endl;
@@ -146,7 +146,7 @@ void SdpHeaderA::getAttFromFileSelector(){
 string SdpHeaderA::getAttributeValue(){
 	if( getAttributeType() == "property" )
 		return attributes;
-	uint32_t pos = attributes.find( ":" );
+	uint32_t pos = (int)attributes.find( ":" );
 	if( attributes.length() <= pos + 1 )
 	{
 		cerr << "Invalid a field in SDP packet" << endl;

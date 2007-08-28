@@ -115,7 +115,7 @@ void RtpHeader::addCSRC(int c){
 
 
 int RtpHeader::size(){
-	int s = 12+4*CSRC.size();
+	int s = 12+4*(int)CSRC.size();
 	
 #ifdef TCP_FRIENDLY
 	s+=8; // 4(rtt)+4(sendts)

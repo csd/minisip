@@ -30,6 +30,7 @@
 
 
 #include<libminisip/media/soundcard/SoundRecorderCallback.h>
+#include<libminisip/media/soundcard/AudioMixer.h>
 class SoundIOPLCInterface;
 
 #include<libmutil/Mutex.h>
@@ -37,8 +38,6 @@ class SoundIOPLCInterface;
 
 #include<list>
 #include<string>
-
-class AudioMixer;
 
 class SoundSource;
 

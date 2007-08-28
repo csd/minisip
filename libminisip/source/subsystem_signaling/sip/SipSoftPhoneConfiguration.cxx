@@ -62,6 +62,8 @@
 
 #include<libminisip/config/OnlineConfBackend.h>
 
+#include<algorithm>
+
 //update both!!!! the str define is to avoid including itoa.h
 #define CONFIG_FILE_VERSION_REQUIRED 3
 #define CONFIG_FILE_VERSION_REQUIRED_STR "3"
@@ -356,7 +358,7 @@ void SipSoftPhoneConfiguration::save(){
 	for( idx=0,  iter = startupActions.begin();
 			iter != startupActions.end();
 			iter++, idx++ ) {
-		int pos;
+		size_t pos;
 		string cmdActionsPath = string("startup_cmd[")+itoa(idx)+"]/";
 		pos = (*iter).find(' ');
 		string cmd = (*iter).substr( 0, pos );

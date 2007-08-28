@@ -28,12 +28,11 @@
 #include<libminisip/libminisip_config.h>
 
 #include<libminisip/media/Media.h>
+#include<libminisip/media/soundcard/SoundSource.h>
 
 #ifdef AEC_SUPPORT
 #include<libminisip/media/aec/aec.h>		//hanning
 #endif
-
-#include<libminisip/media/soundcard/SoundSource.h>
 
 class AudioMediaSource;
 class SilenceSensor;

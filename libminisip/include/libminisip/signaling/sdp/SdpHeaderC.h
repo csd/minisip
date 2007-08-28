@@ -36,10 +36,9 @@
 #include<libminisip/libminisip_config.h>
 
 #include<libminisip/signaling/sdp/SdpHeader.h>
+#include<libmnetutil/IPAddress.h>
 
 #include<string>
-
-class IPAddress;
 
 class LIBMINISIP_API SdpHeaderC : public SdpHeader{
 	public:

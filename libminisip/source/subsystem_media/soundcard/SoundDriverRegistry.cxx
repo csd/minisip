@@ -28,6 +28,8 @@
 #include<libmutil/dbg.h>
 #include<libminisip/media/soundcard/FileSoundDriver.h>
 
+#include<algorithm>
+
 // #ifdef PORTAUDIO_SUPPORT
 // #include<libminisip/media/soundcard/PortAudioDriver.h>
 // #endif

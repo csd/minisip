@@ -231,7 +231,7 @@ bool SipDialogFileTransferClient::a2_trying_transfering_200OK(const SipSMCommand
 		}else{
 			std::vector<MRef<SdpHeader *> > respHeader = respSdp->getHeaders();
 
-			for(int i=0; i<respHeader.size(); i++){
+			for(int i=0; i<(int)respHeader.size(); i++){
 				
 				MRef<SdpHeader*> one = respHeader[i];
 				

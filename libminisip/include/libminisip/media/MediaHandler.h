@@ -29,10 +29,11 @@
 
 #include<libmutil/MemObject.h>
 
-#include<libminisip/media/Media.h>
 #include<libminisip/media/AudioMedia.h>
-#include<libminisip/media/MediaStream.h>
+#include<libminisip/media/Media.h>
+/*#include<libminisip/media/MediaStream.h>*/
 #include<libminisip/media/Session.h>
+#include<libminisip/media/SessionRegistry.h>
 #include<libminisip/ipprovider/IpProvider.h>
 #include<libmutil/CommandString.h>
 #include<libmutil/MessageRouter.h>
@@ -40,6 +41,7 @@
 
 class SipSoftPhoneConfiguration;
 class IpProvider;
+class AudioMedia;
 
 
 class LIBMINISIP_API MediaHandler : public virtual MObject, public SessionRegistry, public CommandReceiver {

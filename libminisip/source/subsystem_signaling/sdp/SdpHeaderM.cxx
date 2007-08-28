@@ -178,7 +178,7 @@ void SdpHeaderM::addFormat(int32_t f){
 }
 
 int32_t SdpHeaderM::getNrFormats(){
-	return formats.size();
+	return (int32_t)formats.size();
 }
 
 int32_t SdpHeaderM::getFormat(int32_t i){

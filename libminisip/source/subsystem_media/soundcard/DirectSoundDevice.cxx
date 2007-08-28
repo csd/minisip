@@ -58,7 +58,7 @@ DirectSoundDevice::DirectSoundDevice( string device ):SoundDevice( device ){
 
 	if( device != "0" ){
 		unsigned char *stringUuid = (unsigned char*)device.c_str();
-		if( UuidFromString( stringUuid, &deviceGuid ) == RPC_S_OK ){
+		if( UuidFromStringA( stringUuid, &deviceGuid ) == RPC_S_OK ){
 			inputDevice = &deviceGuid;
 			outputDevice = &deviceGuid;
 		}

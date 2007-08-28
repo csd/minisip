@@ -37,6 +37,10 @@
 #include<libmutil/Thread.h>
 #include<libminisip/MinisipExceptions.h>
 
+#ifdef _MSC_VER
+#include<compilation_config_w32_wce.h>
+#endif
+
 #ifndef WIN32
 #	ifdef DEBUG_OUTPUT
 #		include<signal.h>

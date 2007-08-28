@@ -27,11 +27,12 @@
 #define CONFIG_H
 
 /* Compilation time configuration */
-#ifndef _WIN32_WCE
-#	include"compilation_config.h"
-#else
+#if defined(_WIN32_WCE) || defined(_MSC_VER)
 //#	pragma message("include for wince .............................. ")
+#	pragma warning (disable: 4290)
 #	include"compilation_config_w32_wce.h"
+#else
+#	include"compilation_config.h"
 #endif
 
 #include<libmutil/mtypes.h>

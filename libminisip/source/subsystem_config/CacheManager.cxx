@@ -33,7 +33,7 @@ MRef<DirectorySetItem*> CacheManager::findDirectory(const std::string domain, co
 		// Scan all directory sets
 		//std::map<const std::string, MRef<DirectorySet*> >::iterator i = directorySets.begin();
 		//while (i != directorySets.end()) {
-		for (std::map<const std::string, MRef<DirectorySet*> >::iterator i = directorySets.begin(); i != directorySets.end(); i++) {
+		for (std::map<std::string, MRef<DirectorySet*> >::iterator i = directorySets.begin(); i != directorySets.end(); i++) {
 			res = i->second->findItemsPrioritized(domain);
 			if (!res.empty())
 				return res.front();

@@ -1,7 +1,7 @@
 #ifndef _MINISIPLIB_COMPILATION_CONFIG
 #define _MINISIPLIB_COMPILATION_CONFIG
 
-#ifdef _WIN32_WCE
+#if defined(_WIN32_WCE) || defined(_MSC_VER) 
 /* Debug output */
 #define DEBUG_OUTPUT 
 
@@ -51,19 +51,19 @@ This is for the GetAdaptersInfo ...
 #define OPENSSL_NO_KRB5 
 
 /* Name of package */
-#define PACKAGE "libmnetutil"
+#define PACKAGE "libminisip"
 
 /* Define to the address where bug reports for this package should be sent. */
 #define PACKAGE_BUGREPORT "eliasson@imit.kth.se"
 
 /* Define to the full name of this package. */
-#define PACKAGE_NAME "libmnetutil"
+#define PACKAGE_NAME "libminisip"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libmnetutil 0.3"
+#define PACKAGE_STRING "libminisip 0.3"
 
 /* Define to the one symbol short name of this package. */
-#define PACKAGE_TARNAME "libmnetutil"
+#define PACKAGE_TARNAME "libminisip"
 
 /* Define to the version of this package. */
 #define PACKAGE_VERSION "0.3"

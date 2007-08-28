@@ -29,10 +29,10 @@
 
 #include<libminisip/media/MediaStream.h>
 #include<libminisip/media/soundcard/SoundRecorderCallback.h>
+#include<libminisip/media/soundcard/FileSoundDevice.h>
 
 template <class T> class MRef;
 class MediaStreamReceiver;
-class FileSoundDevice;
 class AudioMedia;
 class RtpReceiver;
 class IpProvider;

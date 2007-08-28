@@ -218,3 +218,5 @@ class LIBMINISIP_API MediaRegistry : public MPluginRegistry, public MSingleton<M
 };
 
 #endif
+
+#include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>

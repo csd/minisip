@@ -43,7 +43,7 @@
 #include<string>
 #include<list>
 
-class SoundSource;
+#include<libminisip/media/soundcard/SoundSource.h>
 
 /**
 Class AudioMixer (abstract).

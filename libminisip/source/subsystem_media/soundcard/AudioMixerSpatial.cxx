@@ -123,7 +123,7 @@ bool AudioMixerSpatial::setSourcesPosition(
 // 		cerr << "CESC: MixSpatial:adding: newPosition = " << itoa(newPosition) << endl;
 		sortSoundSourceList( sources );
 		for( it = sources.begin(), sourceIdx = 1; it != sources.end(); it++, sourceIdx++ ) {
-			int pos = spAudio->assignPos(sourceIdx, sources.size() );
+			int pos = spAudio->assignPos(sourceIdx, (int)sources.size() );
 #ifdef DEBUG_OUTPUT
 			cerr << "AudioMixerSpatial::setSourcesPosition: adding: set source id = " << 
 					itoa((*it)->getId() ) << endl <<
@@ -134,7 +134,7 @@ bool AudioMixerSpatial::setSourcesPosition(
 	} else { //we have just removed a source ...
 		//sources are still sorted correctly ... simply reassing the positions ... 
 		for( it = sources.begin(), sourceIdx = 1; it != sources.end(); it++, sourceIdx++ ) {
-			int pos = spAudio->assignPos(sourceIdx, sources.size() );
+			int pos = spAudio->assignPos(sourceIdx, (int)sources.size() );
 #ifdef DEBUG_OUTPUT
 			cerr << "AudioMixerSpatial::setSourcesPosition:removing: set source id = " << 
 					itoa((*it)->getId() ) << endl <<
