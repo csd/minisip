@@ -43,7 +43,7 @@ std::list<std::string> *milbc_LTX_listPlugins( MRef<Library *> lib ){
 }
 
 extern "C" MILBC_API
-MRef<MPlugin *> milbc_LTX_getPlugin( MRef<Library *> lib ){
+MPlugin * milbc_LTX_getPlugin( MRef<Library *> lib ){
 	return new ILBCCodec( lib );
 }
 

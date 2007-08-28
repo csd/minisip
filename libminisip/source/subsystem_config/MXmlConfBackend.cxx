@@ -49,7 +49,7 @@ std::list<std::string> *mxmlconf_LTX_listPlugins( MRef<Library*> lib ){
 }
 
 extern "C" LIBMINISIP_API
-MRef<MPlugin *> mxmlconf_LTX_getPlugin( MRef<Library*> lib ){
+MPlugin * mxmlconf_LTX_getPlugin( MRef<Library*> lib ){
 	return new MXmlConfigPlugin( lib );
 }
 

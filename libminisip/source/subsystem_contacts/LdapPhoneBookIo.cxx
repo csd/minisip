@@ -51,7 +51,7 @@ std::list<std::string> *ldappb_LTX_listPlugins( MRef<Library *> lib ){
 }
 
 extern "C"
-MRef<MPlugin *> ldappb_LTX_getPlugin( MRef<Library *> lib ){
+MPlugin * ldappb_LTX_getPlugin( MRef<Library *> lib ){
 	return new LdapPhoneBookIoDriver( lib );
 }
 

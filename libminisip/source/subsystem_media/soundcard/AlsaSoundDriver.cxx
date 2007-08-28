@@ -48,7 +48,7 @@ std::list<std::string> *malsa_LTX_listPlugins( MRef<Library*> lib ){
 }
 
 extern "C" LIBMINISIP_API
-MRef<MPlugin *> malsa_LTX_getPlugin( MRef<Library*> lib ){
+MPlugin * malsa_LTX_getPlugin( MRef<Library*> lib ){
 	return new AlsaSoundDriver( lib );
 }
 

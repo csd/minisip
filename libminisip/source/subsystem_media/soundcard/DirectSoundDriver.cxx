@@ -48,7 +48,7 @@ std::list<std::string> *mdsound_LTX_listPlugins( MRef<Library*> lib ){
 }
 
 extern "C" LIBMINISIP_API
-MRef<MPlugin *> mdsound_LTX_getDirectSoundPlugin( MRef<Library*> lib ){
+MPlugin * mdsound_LTX_getDirectSoundPlugin( MRef<Library*> lib ){
 	return new DirectSoundDriver( lib );
 }
 

@@ -49,7 +49,7 @@ std::list<std::string> *mportaudio_LTX_listPlugins( MRef<Library*> lib ){
 }
 
 extern "C" LIBMINISIP_API
-MRef<MPlugin *> mportaudio_LTX_getPortAudioPlugin( MRef<Library*> lib ){
+MPlugin * mportaudio_LTX_getPortAudioPlugin( MRef<Library*> lib ){
 	return new PortAudioDriver( lib );
 }
 

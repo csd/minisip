@@ -57,7 +57,7 @@ std::list<std::string> *onlineconf_LTX_listPlugins( MRef<Library*> lib ){
 }
 
 extern "C" LIBMINISIP_API
-MRef<MPlugin *> onlineconf_LTX_getPlugin( MRef<Library*> lib ){
+MPlugin * onlineconf_LTX_getPlugin( MRef<Library*> lib ){
 	return new OnlineMXmlConfigPlugin( lib );
 }
 

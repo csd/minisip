@@ -49,12 +49,12 @@ std::list<std::string> *mg711_LTX_listPlugins( MRef<Library *> lib ){
 }
 
 extern "C"
-MRef<MPlugin *> mg711_LTX_getPlugin( MRef<Library *> lib ){
+MPlugin * mg711_LTX_getPlugin( MRef<Library *> lib ){
 	return new G711Codec( lib, G711U );
 }
 
 extern "C"
-MRef<MPlugin *> mg711_LTX_getPluginG711a( MRef<Library *> lib ){
+MPlugin * mg711_LTX_getPluginG711a( MRef<Library *> lib ){
 	return new G711Codec( lib, G711A );
 }
 

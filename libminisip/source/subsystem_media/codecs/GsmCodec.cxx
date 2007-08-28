@@ -46,7 +46,7 @@ std::list<std::string> *mgsm_LTX_listPlugins( MRef<Library *> lib ){
 }
 
 extern "C" LIBMINISIP_API
-MRef<MPlugin *> mgsm_LTX_getPlugin( MRef<Library *> lib ){
+MPlugin * mgsm_LTX_getPlugin( MRef<Library *> lib ){
 	return new GsmCodec( lib );
 }
 

@@ -60,7 +60,7 @@ std::list<std::string> *mvideo_LTX_listPlugins( MRef<Library*> lib ){
 }
 
 extern "C" LIBMINISIP_API
-MRef<MPlugin *> mvideo_LTX_getPlugin( MRef<Library*> lib ){
+MPlugin * mvideo_LTX_getPlugin( MRef<Library*> lib ){
 	return new VideoPlugin( lib );
 }
 

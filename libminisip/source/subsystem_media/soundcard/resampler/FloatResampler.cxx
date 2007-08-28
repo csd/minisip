@@ -46,7 +46,7 @@ std::list<std::string> *mfloat_resampler_LTX_listPlugins( MRef<Library*> lib ){
 }
 
 extern "C" LIBMINISIP_API
-MRef<MPlugin *> mfloat_resampler_LTX_getPlugin( MRef<Library*> lib ){
+MPlugin * mfloat_resampler_LTX_getPlugin( MRef<Library*> lib ){
 	return new FloatResamplerPlugin( lib );
 }
 

@@ -54,7 +54,7 @@ std::list<std::string> *mxmlpb_LTX_listPlugins( MRef<Library *> lib ){
 }
 
 extern "C"
-MRef<MPlugin *> mxmlpb_LTX_getPlugin( MRef<Library *> lib ){
+MPlugin * mxmlpb_LTX_getPlugin( MRef<Library *> lib ){
 	return new MXmlPhoneBookIoDriver( lib );
 }
 #endif

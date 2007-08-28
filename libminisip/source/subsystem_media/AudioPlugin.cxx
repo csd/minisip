@@ -48,8 +48,8 @@ std::list<std::string> *maudio_LTX_listPlugins( MRef<Library*> lib ){
 }
 
 extern "C"
-MRef<MPlugin *> *maudio_LTX_getPlugin( MRef<Library*> lib ){
-	return &plugin;
+MPlugin * maudio_LTX_getPlugin( MRef<Library*> lib ){
+	return /*&plugin*/ *plugin;
 }
 
 AudioPlugin::AudioPlugin( MRef<Library*> lib ): MediaPlugin( lib ){

@@ -51,7 +51,7 @@ std::list<std::string> *msdl_LTX_listPlugins( MRef<Library*> lib ){
 }
 
 extern "C" LIBMINISIP_API
-MRef<MPlugin *> msdl_LTX_getPlugin( MRef<Library*> lib ){
+MPlugin * msdl_LTX_getPlugin( MRef<Library*> lib ){
 	return new SdlPlugin( lib );
 }
 

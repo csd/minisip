@@ -54,7 +54,7 @@ std::list<std::string> *mgconf_LTX_listPlugins( MRef<Library*> lib ){
 }
 
 extern "C" LIBMINISIP_API
-MRef<MPlugin *> mgconf_LTX_getPlugin( MRef<Library*> lib ){
+MPlugin * mgconf_LTX_getPlugin( MRef<Library*> lib ){
 	return new GConfigPlugin( lib );
 }
 

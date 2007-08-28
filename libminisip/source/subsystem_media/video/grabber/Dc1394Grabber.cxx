@@ -57,7 +57,7 @@ std::list<std::string> *mdc1394_LTX_listPlugins( MRef<Library*> lib ){
 }
 
 extern "C" LIBMINISIP_API
-MRef<MPlugin *> mdc1394_LTX_getPlugin( MRef<Library*> lib ){
+MPlugin * mdc1394_LTX_getPlugin( MRef<Library*> lib ){
 	return new Dc1394Plugin( lib );
 }
 

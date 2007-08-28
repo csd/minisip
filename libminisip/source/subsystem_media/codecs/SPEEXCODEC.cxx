@@ -46,7 +46,7 @@ std::list<std::string> *mspeex_LTX_listPlugins( MRef<Library *> lib ){
 }
 
 extern "C" LIBMINISIP_API
-MRef<MPlugin *> mspeex_LTX_getPlugin( MRef<Library *> lib ){
+MPlugin * mspeex_LTX_getPlugin( MRef<Library *> lib ){
 	return new SpeexCodec( lib );
 }
 

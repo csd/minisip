@@ -45,7 +45,7 @@ std::list<std::string> *mxv_LTX_listPlugins( MRef<Library*> lib ){
 }
 
 extern "C" LIBMINISIP_API
-MRef<MPlugin *> mxv_LTX_getPlugin( MRef<Library*> lib ){
+MPlugin * mxv_LTX_getPlugin( MRef<Library*> lib ){
 	return  new XvPlugin( lib );
 }
 
