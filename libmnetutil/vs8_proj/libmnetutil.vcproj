@@ -191,6 +191,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\source\DnsNaptr.cxx"
+				>
+			</File>
+			<File
 				RelativePath="..\source\Downloader.cxx"
 				>
 			</File>
@@ -374,6 +378,10 @@
 			</File>
 			<File
 				RelativePath="..\include\libmnetutil\DirectorySetItem.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\libmnetutil\DnsNaptr.h"
 				>
 			</File>
 			<File

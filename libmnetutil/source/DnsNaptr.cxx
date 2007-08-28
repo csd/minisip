@@ -27,6 +27,7 @@
 #ifdef HAVE_REGEX_H
 #include<regex.h>
 #endif
+#include<algorithm>
 
 using namespace std;
 
