@@ -32,6 +32,7 @@ AC_ARG_WITH(gnutls,
 
 if test "${with_gnutls}" = "yes"; then
     AM_LIBMCRYPTO_CHECK_GNUTLS([HAVE_GNUTLS=yes],[HAVE_GNUTLS=no])
+    PKG_CHECK_MODULES([GNUTLS_EXTRA],[gnutls-extra],[HAVE_GNUTLS_EXTRA=yes],[HAVE_GNUTLS_EXTRA=no])
     have_sha256=${HAVE_GNUTLS}
 fi
 AM_CONDITIONAL(HAVE_GNUTLS, test "x${HAVE_GNUTLS}" = "xyes")
@@ -72,8 +73,12 @@ AC_ARG_ENABLE(srp,
         [enables TLS-SRP support]),
     [ if test "${enable_srp}" = "yes"
       then
-        AC_DEFINE(ENABLE_SRP, [], [TLS-SRP support is enabled])
-	ENABLE_SRP="yes"
+        if test "$HAVE_GNUTLS_EXTRA" = "yes"; then
+          AC_DEFINE(ENABLE_SRP, [], [TLS-SRP support is enabled])
+	  ENABLE_SRP="yes"
+        else
+          AC_MSG_ERROR([TLS-SRP support requires GNU TLS extra])
+        fi
       fi  
       ])
 AM_CONDITIONAL(ENABLE_SRP, test "${ENABLE_SRP}" = "yes" )
