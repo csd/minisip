@@ -25,6 +25,7 @@
 
 #include"MinisipTextUI.h"
 #include<libminisip/Minisip.h>
+#include<libminisip/gui/ConsoleDebugger.h>
 
 using namespace std;
 

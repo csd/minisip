@@ -28,6 +28,10 @@
 #include<libmutil/dbg.h>
 #include<libminisip/media/soundcard/FileSoundDriver.h>
 
+#ifdef _MSC_VER
+#include"DirectSoundDriver.h"
+#endif
+
 #include<algorithm>
 
 // #ifdef PORTAUDIO_SUPPORT
@@ -52,6 +56,9 @@ static void dumpAllNames( MRef<SoundDriverRegistry*> instance ){
 
 SoundDriverRegistry::SoundDriverRegistry(){
 	registerPlugin( new FileSoundDriver( NULL ) );
+#ifdef _MSC_VER
+	registerPlugin( new DirectSoundDriver(NULL) );
+#endif
 }
 
 const std::vector< MRef<SoundDriver*> > &SoundDriverRegistry::getDrivers() const{
