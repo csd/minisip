@@ -41,14 +41,18 @@ Library::Library(const string &path_):path(path_){
 	refCount++;
 	handle = new HMODULE;
 	*((HMODULE*)handle) = LoadLibrary( path.c_str() );
-
+	if ( (*((HMODULE*)handle))==NULL){
+		delete handle;
+		handle = NULL;
+	}	
 }
 
 Library::~Library(){
-	massert(handle);
-	BOOL ok = FreeLibrary( *((HMODULE*)handle) );
-	massert(ok);
-	handle = NULL;
+	if (handle){
+		BOOL ok = FreeLibrary( *((HMODULE*)handle) );
+		massert(ok);
+		handle = NULL;
+	}
 	refCount--;
 }
 

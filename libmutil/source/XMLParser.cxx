@@ -105,6 +105,8 @@ void XMLParser::addValue(XMLNode *cur, const char *path, string &value, int32_t 
 		while (part[ii]!='['){
 			sindex= part[ii]+sindex;
 			ii--;
+			if (i==0)
+				throw XMLException("Parse error in key: Missing '['?");
 		}
 		part = part.substr(0,ii);
 		index = atoi(sindex.c_str());

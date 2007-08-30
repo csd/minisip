@@ -202,7 +202,7 @@ LIBMUTIL_API string itoa(int64_t i){
 	for (int j=0; j<16; j++)
 		buf[j]=0;
 #ifdef _MSC_VER
-	_snprintf_s( buf, 30, 29, "%11d", i);
+	_snprintf_s( buf, 30, 29, "%lld", i);
 #else
 	snprintf(buf, 30, "%lld",i);
 #endif

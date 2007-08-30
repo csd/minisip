@@ -34,8 +34,13 @@ Exception::Exception(const Exception &e):
 		msg(e.msg), 
 		stackDepth(e.stackDepth)
 {
+#ifdef HAVE_EXECINFO_H
 	stack = new void*[MAX_STACK_TRACE_DEPTH];
 	memcpy(stack, e.stack, MAX_STACK_TRACE_DEPTH*sizeof(void*));
+#else
+	stack = NULL;
+	stackDepth = -1;
+#endif
 }
 
 /**
