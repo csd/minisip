@@ -7,8 +7,6 @@ using namespace std;
 
 SipSimSoft::SipSimSoft(MRef<CertificateChain*> chain, MRef<CertificateSet*> cas)
 {
-	massert(chain);
-	massert(chain->getFirst());
 	certChain = chain;
 	ca_set = cas;
 }
