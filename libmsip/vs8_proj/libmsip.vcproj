@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\include;..\..\libmcrypto\include;..\..\libmnetutil\include;..\..\libmutil\include"
-				PreprocessorDefinitions="LIBMSIP_EXPORTS"
+				PreprocessorDefinitions="LIBMSIP_EXPORTS;DEBUG_OUTPUT"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"

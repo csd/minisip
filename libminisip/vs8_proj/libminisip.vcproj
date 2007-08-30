@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\include;..\..\libmsip\include;..\..\libmikey\include;..\..\libmnetutil\include;..\..\libmutil\include;..\..\libmcrypto\include;..\..\libmstun\include;&quot;C:\Program Files\Microsoft DirectX SDK (August 2007)\Include&quot;"
-				PreprocessorDefinitions="LIBMINISIP_EXPORTS"
+				PreprocessorDefinitions="LIBMINISIP_EXPORTS;DEBUG_OUTPUT"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"

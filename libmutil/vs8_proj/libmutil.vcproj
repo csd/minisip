@@ -39,7 +39,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="../include"
-				PreprocessorDefinitions="LIBMUTIL_EXPORTS"
+				PreprocessorDefinitions="LIBMUTIL_EXPORTS;DEBUG_OUTPUT"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -200,7 +200,6 @@
 				RelativePath="..\include\libmutil\dbg.h"
 				>
 			</File>
-
 			<File
 				RelativePath="..\include\libmutil\Exception.h"
 				>
@@ -374,11 +373,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\mtimeWin32.cxx"
+				RelativePath="..\source\MPluginWin32.cxx"
 				>
 			</File>
 			<File
-				RelativePath="..\source\MPluginWin32.cxx"
+				RelativePath="..\source\mtimeWin32.cxx"
 				>
 			</File>
 			<File

@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\include;..\..\libmnetutil\include;..\..\libmutil\include;..\..\openssl\inc32"
-				PreprocessorDefinitions="LIBMCRYPTO_EXPORTS;WINDOWS;WIN32"
+				PreprocessorDefinitions="LIBMCRYPTO_EXPORTS;WINDOWS;WIN32;DEBUG_OUTPUT"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -179,6 +179,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\source\aes.cxx"
+				>
+			</File>
+			<File
 				RelativePath="..\source\openssl\aes.cxx"
 				>
 				<FileConfiguration
@@ -201,15 +205,15 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\source\aes.cxx"
-				>
-			</File>
-			<File
 				RelativePath="..\source\base64.cxx"
 				>
 			</File>
 			<File
 				RelativePath="..\source\CacheManager.cxx"
+				>
+			</File>
+			<File
+				RelativePath="..\source\cert.cxx"
 				>
 			</File>
 			<File
@@ -235,10 +239,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\source\cert.cxx"
-				>
-			</File>
-			<File
 				RelativePath="..\source\CertificateFinder.cxx"
 				>
 			</File>
@@ -256,6 +256,10 @@
 			</File>
 			<File
 				RelativePath="..\source\openssl\hmac256.cxx"
+				>
+			</File>
+			<File
+				RelativePath="..\source\init.cxx"
 				>
 			</File>
 			<File
@@ -279,10 +283,6 @@
 						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
 					/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\source\init.cxx"
-				>
 			</File>
 			<File
 				RelativePath="..\source\openssl\OakleyDH.cxx"
@@ -407,11 +407,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\include\libmcrypto\openssl\cert.h"
+				RelativePath="..\include\libmcrypto\cert.h"
 				>
 			</File>
 			<File
-				RelativePath="..\include\libmcrypto\cert.h"
+				RelativePath="..\include\libmcrypto\openssl\cert.h"
 				>
 			</File>
 			<File
@@ -443,11 +443,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\include\libmcrypto\openssl\init.h"
+				RelativePath="..\include\libmcrypto\init.h"
 				>
 			</File>
 			<File
-				RelativePath="..\include\libmcrypto\init.h"
+				RelativePath="..\include\libmcrypto\openssl\init.h"
 				>
 			</File>
 			<File
@@ -503,15 +503,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\include\libmcrypto\TlsServerSocket.h"
-				>
-			</File>
-			<File
 				RelativePath="..\include\libmcrypto\openssl\TlsServerSocket.h"
 				>
 			</File>
 			<File
-				RelativePath="..\include\libmcrypto\openssl\TlsSocket.h"
+				RelativePath="..\include\libmcrypto\TlsServerSocket.h"
 				>
 			</File>
 			<File
@@ -519,15 +515,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\include\libmcrypto\openssl\TlsSocket.h"
+				>
+			</File>
+			<File
 				RelativePath="..\include\libmcrypto\uninst_config.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\uuid\uuid.h"
+				RelativePath="..\include\libmcrypto\uuid.h"
 				>
 			</File>
 			<File
-				RelativePath="..\include\libmcrypto\uuid.h"
+				RelativePath="..\source\uuid\uuid.h"
 				>
 			</File>
 			<File

@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\include;..\..\libmnetutil\include;..\..\libmutil\include"
-				PreprocessorDefinitions="LIBMSTUN_EXPORTS"
+				PreprocessorDefinitions="LIBMSTUN_EXPORTS;DEBUG_OUTPUT"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -201,11 +201,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\include\libmstun\config.h"
+				RelativePath="..\include\config.h"
 				>
 			</File>
 			<File
-				RelativePath="..\include\config.h"
+				RelativePath="..\include\libmstun\config.h"
 				>
 			</File>
 			<File
