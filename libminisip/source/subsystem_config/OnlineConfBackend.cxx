@@ -23,7 +23,7 @@
 
 #include<stdlib.h>
 #include<libminisip/config/OnlineConfBackend.h>
-#include<libmnetutil/TlsSrpSocket.h>
+#include<libmcrypto/TlsSrpSocket.h>
 #include<libmcrypto/cert.h>
 #include<libmnetutil/NetworkException.h>
 #include <vector>
@@ -228,11 +228,11 @@ void OnlineConfBack::uploadReq(string user, string type, string data)
 	tls->write(header + mimeheaders);
 }
 
-certificate*  OnlineConfBack::getOnlineCert()
+Certificate*  OnlineConfBack::getOnlineCert()
 {
 	return cert;
 }
-void OnlineConfBack::setOnlineCert(certificate *cer)
+void OnlineConfBack::setOnlineCert(Certificate *cer)
 {
 	cert=cer;
 }

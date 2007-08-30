@@ -31,7 +31,7 @@
 using namespace std;
 
 class TlsSrpSocket;
-class certificate;
+class Certificate;
 struct contdata
 {   
 	char *data;
@@ -51,13 +51,13 @@ class LIBMINISIP_API OnlineConfBack
 		{
 			return usrname;
 		}
-		void setOnlineCert(certificate *cer);
-		certificate * getOnlineCert();
+		void setOnlineCert(Certificate *cer);
+		Certificate * getOnlineCert();
 		string attachFile(string mimeheader, string data);
 	private:
 		string readHttpHeader();
 		string usrname;
 		TlsSrpSocket *tls;
-		certificate *cert;
+		Certificate *cert;
 };
 #endif
