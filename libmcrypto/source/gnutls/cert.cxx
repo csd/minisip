@@ -89,14 +89,13 @@ Certificate* Certificate::load( unsigned char * der_cert,
 	return new GtlsCertificate( der_cert, length );
 }
 
-#if 0
 // TODO
 Certificate* Certificate::load( unsigned char * certData,
 				int length,
 				std::string path ){
-	return new GtlsCertificate( certData, length, path );
+	throw CertificateExceptionInit( "Unimplemented" );
+// 	return new GtlsCertificate( certData, length, path );
 }
-#endif
 
 CertificateChain* CertificateChain::create(){
 	return new GtlsCertificateChain();
