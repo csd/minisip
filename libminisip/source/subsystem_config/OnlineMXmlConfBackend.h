@@ -32,7 +32,8 @@
 
 #include<libminisip/config/ConfBackend.h>
 #include<vector>
-using namespace std;
+
+class Gui;
 class XMLFileParser;
 class XMLstringParser;
 class OnlineMXmlConfBackend : public ConfBackend {
@@ -76,7 +77,8 @@ class OnlineMXmlConfigPlugin : public ConfigPlugin{
 		 * 		of on the local device.
 		 * @param arg	Currently not used by this backend.
 		 */
-		virtual MRef<ConfBackend *> createBackend(MRef<Gui*> gui, const std::string &arg=NULL)const;
+		virtual MRef<ConfBackend *> createBackend(const std::string &configFilePath=NULL)const;
+// 		virtual MRef<ConfBackend *> createBackend(MRef<Gui*> gui, const std::string &arg=NULL)const;
 
 		virtual std::string getMemObjectType() const { return "OnlineMXmlConfigPlugin"; }
 

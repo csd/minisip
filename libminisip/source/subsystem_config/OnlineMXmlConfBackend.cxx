@@ -33,7 +33,8 @@
 #include<libmutil/stringutils.h>
 
 #include<stdlib.h>
-#include<libmnetutil/TlsSrpSocket.h>
+#include<libmcrypto/TlsException.h>
+#include<libmcrypto/TlsSrpSocket.h>
 #include<libmcrypto/cert.h>
 #include<libmnetutil/NetworkException.h>
 #include <vector>
@@ -98,12 +99,12 @@ OnlineMXmlConfBackend::OnlineMXmlConfBackend(){
 	if(success>0 && res.size()>1)
 	{
 
-		certificate *cert = certificate::load((unsigned char *)res.at(0)->data,(size_t) res.at(0)->size,
+		Certificate *cert = Certificate::load((unsigned char *)res.at(0)->data,(size_t) res.at(0)->size,
 				"httpsrp:///"+user + "/credentials/cert.pem" );
 		if (cert != NULL)
 		{
-			cert->set_encpk(res.at(1)->data, res.at(1)->size,pass,"httpsrp:///"+user + "/credentials/pkkey.pem");
-			//cout<<"COMMON NAME ********: "<<cert->get_name()<<endl;
+			cert->setEncpk(res.at(1)->data, res.at(1)->size,pass,"httpsrp:///"+user + "/credentials/pkkey.pem");
+			//cout<<"COMMON NAME ********: "<<cert->getName()<<endl;
 			conf->setOnlineCert(cert);
 		}
 		else{
@@ -123,11 +124,11 @@ OnlineMXmlConfBackend::OnlineMXmlConfBackend(){
 	if(success>0 && error ==0 )
 		{
 			if(res.size()>2){
-				certificate *cert = conf->getOnlineCert();
+				Certificate *cert = conf->getOnlineCert();
 				int outsize =0;
 				unsigned char outbuf[res.at(2)->size];
 
-				int ret =cert->denvelope_data((unsigned char*)(res.at(2)->data), res.at(2)->size , 
+				int ret =cert->denvelopeData((unsigned char*)(res.at(2)->data), res.at(2)->size , 
 				outbuf, &outsize,(unsigned char*)(res.at(1)->data), res.at(1)->size, 
 				(unsigned char*)(res.at(0)->data));
 				
@@ -156,7 +157,7 @@ OnlineMXmlConfBackend::OnlineMXmlConfBackend(){
 			cout<<pars->xmlstring()<<endl;
 		}
 		catch(XMLException &exc ){
-			mdbg << "OnlineMXmlConfBackend caught XMLException: " << exc.what() << end;
+			mdbg << "OnlineMXmlConfBackend caught XMLException: " << exc.what() << endl;
 			cerr << "Caught XMLException" << endl;
 			throw ConfBackendException();
 		}
@@ -177,14 +178,14 @@ OnlineConfBack* OnlineMXmlConfBackend::getConf()
 void OnlineMXmlConfBackend::commit(){
 	string commit;
 	commit = pars->xmlstring();
-	certificate *cert= conf->getOnlineCert();
+	Certificate *cert= conf->getOnlineCert();
 
 	int retsize =0, enckeylgth=0;
 	unsigned char buf[commit.size()+128];
 	unsigned char key[256];
 	unsigned char *iv;
 	if(cert!=NULL){
-		cert->envelope_data((unsigned char*)commit.c_str(), commit.size(), buf, &retsize,key, &enckeylgth, &iv);
+		cert->envelopeData((unsigned char*)commit.c_str(), commit.size(), buf, &retsize,key, &enckeylgth, &iv);
 		string enckod =conf->base64Encode((char*)buf, retsize);
 		string ivstr = conf->base64Encode((char*)iv, 16);
 		string keystr = conf->base64Encode((char*)key, enckeylgth);
@@ -201,7 +202,7 @@ void OnlineMXmlConfBackend::save( const std::string &key, const std::string &val
 		pars->changeValue( key, value );
 	}
 	catch( XMLException &exc ){
-		mdbg << "OnlineMXmlConfBackend caught XMLException: " << exc.what() << end;
+		mdbg << "OnlineMXmlConfBackend caught XMLException: " << exc.what() << endl;
 		throw ConfBackendException();
 	}
 
@@ -212,7 +213,7 @@ void OnlineMXmlConfBackend::save( const std::string &key, const int32_t value ){
 		pars->changeValue( key, itoa( value ) );
 	}
 	catch( XMLException &exc ){
-		mdbg << "OnlineMXmlConfBackend caught XMLException: " << exc.what() << end;
+		mdbg << "OnlineMXmlConfBackend caught XMLException: " << exc.what() << endl;
 		throw ConfBackendException();
 	}
 }
@@ -225,7 +226,7 @@ std::string OnlineMXmlConfBackend::loadString( const std::string &key, const std
 		ret = pars->getValue( key, defaultValue );
 	}
 	catch( XMLException &exc ){
-		mdbg << "OnlineMXmlConfBackend caught XMLException: " << exc.what() << end;
+		mdbg << "OnlineMXmlConfBackend caught XMLException: " << exc.what() << endl;
 		throw ConfBackendException();
 	}
 
@@ -241,7 +242,7 @@ int32_t OnlineMXmlConfBackend::loadInt( const std::string &key,
 		ret = pars->getIntValue( key, defaultValue );
 	}
 	catch( XMLException &exc ){
-		mdbg << "OnlineMXmlConfBackend caught XMLException: " << exc.what() << end;
+		mdbg << "OnlineMXmlConfBackend caught XMLException: " << exc.what() << endl;
 		throw ConfBackendException();
 	}
 
@@ -255,7 +256,8 @@ string OnlineMXmlConfBackend::getDefaultConfigFilename(){
 OnlineMXmlConfigPlugin::OnlineMXmlConfigPlugin( MRef<Library *> lib ): ConfigPlugin( lib ){
 }
 
-MRef<ConfBackend *> OnlineMXmlConfigPlugin::createBackend(MRef<Gui*> gui, const string &)const{
+MRef<ConfBackend *> OnlineMXmlConfigPlugin::createBackend(const std::string &configFilePath)const{
+// MRef<ConfBackend *> OnlineMXmlConfigPlugin::createBackend(MRef<Gui*> gui, const string &)const{
 	return new OnlineMXmlConfBackend();
 }
 
