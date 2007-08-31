@@ -137,9 +137,14 @@ Dbg& Dbg::operator<<(long long ll){
 	return (*this)<<itoa(ll);
 }
 
-Dbg& Dbg::operator<<(char c){
+Dbg& Dbg::operator<<(const char c){
 	return (*this)<<std::string("")+c;
 }
+
+Dbg& Dbg::operator<<(const char *c){
+	return (*this)<<std::string(c);
+}
+
 
 Dbg& Dbg::operator<<(void *p){
 	return (*this)<<(long long)p;

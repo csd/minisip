@@ -87,7 +87,8 @@ public:
 	Dbg &operator<<( int );
 	Dbg &operator<<( unsigned int );
 	Dbg &operator<<( long long );
-	Dbg &operator<<( char );
+	Dbg &operator<<( const char );
+	Dbg &operator<<( const char *);
 	Dbg &operator<<( void *);
 
 	LIBMUTIL_DEPRECATED
