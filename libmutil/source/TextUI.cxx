@@ -37,6 +37,7 @@
 
 #if defined WIN32 || defined _MSC_VER
 #include<conio.h>
+#include<Windows.h>
 #endif
 
 #ifdef _MSC_VER
@@ -111,10 +112,24 @@ int TextUI::makeStdinNonblocking(){
 	}
 	return 0;
 #else
-	//#ifdef WIN32
-	//#warning nonblockin_stdin unimplemented on Win32
-	//#endif
-	return -1;
+#if defined(WIN32) || defined(_MSC_VER)
+	HANDLE console = GetStdHandle(STD_INPUT_HANDLE);
+	if (!console){
+		merr << "Error: could not get input handle"<<endl;
+		return -1;
+	}
+	DWORD oldMode;
+	if (!GetConsoleMode(console, &oldMode)){
+		merr << "Error: could not get console mode"<<endl;
+		return -1;
+	}
+	DWORD mode = oldMode & ~ENABLE_LINE_INPUT & ~ENABLE_ECHO_INPUT;
+	if (!SetConsoleMode(console, mode)){
+		cerr << "Error: could not set console mode"<<endl;
+		return -1;
+	}
+	return 0;
+#endif
 #endif
 }
 
@@ -131,10 +146,28 @@ void TextUI::restoreStdinBlocking(){
 			merror("tcsetattr");
 		}
 	}
-#endif	
+#else
+#if defined(WIN32) || defined(_MSC_VER) 
+	HANDLE console = GetStdHandle(STD_INPUT_HANDLE);
+	if (!console){
+		cerr << "Error: could get console handle"<<endl;
+		return;
+	}
+	DWORD oldMode;
+	if (!GetConsoleMode(console, &oldMode)){
+		cerr << "Error: could get console mode"<<endl;
+		return;
+	}
+	DWORD mode = oldMode | ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT;
+	if (!SetConsoleMode(console, mode)){
+		cerr << "Error: could not restore console mode"<<endl;
+	}
+#endif
+#endif
 }
 
 TextUI::TextUI() : maxHints(2000),isAskingDialogQuestion(false){
+
 #ifdef HAVE_TERMIOS_H
 	terminalSavedState = new struct termios;
 #else
@@ -246,7 +279,11 @@ int readChar(){
 	int ret;
 	char tmpc;
 #if defined WIN32 || defined _MSC_VER
-	tmpc = getchar();
+//	tmpc = getchar();
+	int n;
+	if (!ReadConsole(GetStdHandle(STD_INPUT_HANDLE),&tmpc,1,(LPDWORD)&n, NULL)){
+		cerr << "Console Error: error reading from stdin"<<endl;
+	}	
 	err=1;
 #else
 	err = read(STDIN_FILENO, &tmpc, 1);
@@ -260,8 +297,10 @@ int readChar(){
 	if (tmpc==27){
 		char c1,c2;
 #if defined WIN32 || defined _MSC_VER
-		c1 = getchar();
-		c2 = getchar();
+		//c1 = getchar();
+		ReadConsole(GetStdHandle(STD_INPUT_HANDLE),&c1,1,(LPDWORD)&n, NULL);
+		//c2 = getchar();
+		ReadConsole(GetStdHandle(STD_INPUT_HANDLE),&c2,1,(LPDWORD)&n, NULL);
 		err=1;
 #else
 		read(STDIN_FILENO, &c1, 1);
