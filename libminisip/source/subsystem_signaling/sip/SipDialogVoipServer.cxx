@@ -440,12 +440,12 @@ bool SipDialogVoipServer::isMatchingPrack( MRef<SipMessage*> provisional,
 }
 
 bool SipDialogVoipServer::a3008_100rel_ringing_PRACK( const SipSMCommand &command){
-	if( use100Rel &&
-	    lastProvisional &&
-	    !transitionMatch("PRACK", 
+	if( ! (use100Rel &&
+	       lastProvisional &&
+	       transitionMatch("PRACK", 
 			     command, 
 			     SipSMCommand::transaction_layer, 
-			     SipSMCommand::dialog_layer) ){
+			     SipSMCommand::dialog_layer) ) ){
 		return false;
 	}
 
@@ -509,11 +509,11 @@ bool SipDialogVoipServer::a3009_any_any_ResendTimer1xx( const SipSMCommand &comm
 }
 
 bool SipDialogVoipServer::a3010_any_any_PRACK( const SipSMCommand &command){
-	if( use100Rel &&
-	    !transitionMatch("PRACK", 
+	if( ! (use100Rel &&
+	       transitionMatch("PRACK", 
 			     command, 
 			     SipSMCommand::transaction_layer, 
-			     SipSMCommand::dialog_layer) ){
+			     SipSMCommand::dialog_layer) ) ){
 		return false;
 	}
 		
