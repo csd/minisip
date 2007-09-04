@@ -121,7 +121,16 @@ MRef<SipRequest*> SipRequest::createSipMessageCancel( MRef<SipRequest*> r )
 			case SIP_HEADER_TYPE_CALLID:
 				add=true;
 				break;
-			case SIP_HEADER_TYPE_ROUTE:
+
+			// CANCEL requests must have the same branch
+			// parameter as the transaction it cancels.
+			// If CANCEL packets are treated as any other
+			// request, then they would be assigned a random
+			// branch. When we create the CANCEL request (how)
+			// we therefore copy the Via header to indicate
+			// which transaction it cancels. The
+			// transport layer must make sure to not add it again.
+			case SIP_HEADER_TYPE_VIA:
 			case SIP_HEADER_TYPE_AUTHORIZATION:
 			case SIP_HEADER_TYPE_PROXYAUTHORIZATION:
 				add=true;

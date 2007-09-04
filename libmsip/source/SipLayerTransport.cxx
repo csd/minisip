@@ -488,6 +488,11 @@ void SipLayerTransport::addViaHeader( MRef<SipMessage*> pack,
 	if( !socket )
 		return;
 
+	//The Via header for CANCEL requests
+	//is added when the packet is created
+	if (pack->getType()=="CANCEL")
+		return;
+
 	transport = getSocketTransport( socket );
 
 	getIpPort( server, socket, ip, port );
