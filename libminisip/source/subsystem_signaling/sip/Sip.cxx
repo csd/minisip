@@ -304,14 +304,23 @@ void Sip::run(){
 #ifdef DEBUG_OUTPUT
 		mout << BOLD << "init 8.1/9: Starting UDP transport worker thread" << PLAIN << endl;
 #endif
-		sipstack->startUdpServer();
+		try{
+			sipstack->startUdpServer();
+		}catch(NetworkException &e){
+			//FIXME: This happens when binding to the IPv6 address
+			merr << "Error: Failed to create to UDP socket: "<< e.what()<<endl;
+		}
 
 		if (phoneconfig->tcp_server){
 #ifdef DEBUG_OUTPUT
 			mout << BOLD << "init 8.2/9: Starting TCP transport worker thread" << PLAIN << endl;
 #endif
 
-			sipstack->startTcpServer();
+			try{
+				sipstack->startTcpServer();
+			}catch(NetworkException &e){
+				merr << "Error: Failed to create TCP socket"<<endl;
+			}
 
 		}
 
@@ -324,13 +333,18 @@ void Sip::run(){
 #ifdef DEBUG_OUTPUT
 				mout << BOLD << "init 8.3/9: Starting TLS transport worker thread" << PLAIN << endl;
 #endif
-				sipstack->startTlsServer();
+				try{
+					sipstack->startTlsServer();
+				}catch(NetworkException &e){
+					merr << "Error: Failed to create TLS socket"<<endl;
+				}
+
 			}
 		}
 	}
-	catch( NetworkException & exc ){
-		cerr << "ERROR: Exception thrown when creating"
-			"TCP/TLS servers." << endl;
+	catch( Exception & exc ){
+		cerr << "ERROR: Exception thrown when creating "
+			"UDP/TCP/TLS servers." << endl;
 		cerr << exc.what() << endl;
 	}
 
