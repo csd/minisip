@@ -23,15 +23,20 @@
 
 #include <config.h>
 #include <libmnetutil/LdapUrl.h>
+#include <libmnetutil/LdapException.h>
 
 #include <iostream>
 #include <libmutil/stringutils.h>
+
+#ifdef ENABLE_LDAP
 
 #ifdef WIN32
 #include <windows.h>
 #include <winldap.h>
 #else
 #include <ldap.h>
+#endif
+
 #endif
 
 LdapUrl::LdapUrl(std::string url) {
