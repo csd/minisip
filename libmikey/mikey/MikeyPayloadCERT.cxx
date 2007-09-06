@@ -45,7 +45,7 @@ MikeyPayloadCERT::MikeyPayloadCERT( int type, MRef<Certificate *> cert ){
 	this->type = type;
 	this->certLengthValue = cert->getDerLength();
 	this->certDataPtr = new byte_t[ certLengthValue ];
-	size_t size = certLengthValue;
+	unsigned int size = certLengthValue;
 	cert->getDer( this->certDataPtr, &size );
 }
 
