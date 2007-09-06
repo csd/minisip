@@ -35,8 +35,12 @@
 #endif
 
 LdapUrl::LdapUrl(std::string url) {
+#ifdef ENABLE_LDAP
 	clear(); // Reset URL parts to default values
 	setUrl(url); // Parse supplied URL
+#else
+	throw LdapException("LDAP support not enabled");
+#endif
 }
 
 LdapUrl::LdapUrl() {
@@ -44,6 +48,7 @@ LdapUrl::LdapUrl() {
 }
 
 void LdapUrl::clear() {
+#ifdef ENABLE_LDAP
 	host = "";
 	port = LDAP_PORT;
 	filter = "(objectClass=*)";
@@ -52,6 +57,9 @@ void LdapUrl::clear() {
 	validUrl = false;
 	attributes = std::vector<std::string>();
 	extensions = std::vector<LdapUrlExtension>();
+#else
+	throw LdapException("LDAP support not enabled");
+#endif
 }
 
 bool LdapUrl::isValid() const {
@@ -59,7 +67,7 @@ bool LdapUrl::isValid() const {
 }
 
 std::string LdapUrl::getString() const {
-
+#ifdef ENABLE_LDAP
 	// Start off with the schema and host name
 	std::string url("ldap://");
 	url += host;
@@ -109,6 +117,9 @@ std::string LdapUrl::getString() const {
 	}
 
 	return url;
+#else
+	throw LdapException("LDAP support not enabled");
+#endif
 }
 bool LdapUrl::isUnreservedChar(char in) const {
 	char* alphabetUnreserved = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~";
@@ -129,6 +140,7 @@ bool LdapUrl::isReservedChar(char in) const {
 }
 
 void LdapUrl::setUrl(const std::string url) {
+#ifdef ENABLE_LDAP
 	std::string::size_type lastPos = 0, pos = 0, posTemp = 0;
 
 	if (strCaseCmp(url.substr(0, 7).c_str(), "ldap://") == 0) {
@@ -204,9 +216,10 @@ void LdapUrl::setUrl(const std::string url) {
 	} else {
 		validUrl = false;
 	}
+#endif
 }
 void LdapUrl::printDebug() {
-
+#ifdef ENABLE_LDAP
 	std::cerr <<  "     VALID?      " << (validUrl ? "yes" : "NO") << std::endl;
 
 	std::cerr <<  "     Host:       [" << host << "]" << std::endl;
@@ -226,6 +239,9 @@ void LdapUrl::printDebug() {
 	std::cerr <<  "     DN:         [" << dn << "]" << std::endl;
 
 	std::cerr <<  "     Scope:      [" << (scope == LDAP_SCOPE_BASE ? "base" : (scope == LDAP_SCOPE_ONELEVEL ? "one" : "sub")) << "]" << std::endl;
+#else
+	throw LdapException("LDAP support not enabled");
+#endif
 }
 
 bool LdapUrl::hasCriticalExtension() const {
@@ -288,6 +304,7 @@ std::string LdapUrl::encodeChar(const char in) const {
 	res += binToHex(reinterpret_cast<const unsigned char*>(&in), sizeof(in));
 	return res;
 }
+
 char LdapUrl::decodeChar(const std::string in) const {
 	if (in.length() == 3) {
 		return (charToNum(in[1]) << 4) + (charToNum(in[2]));
@@ -318,6 +335,7 @@ std::string LdapUrl::percentEncode(const std::string & in, bool escapeComma, boo
 	}
 	return res;
 }
+
 std::string LdapUrl::percentDecode(const std::string & in) const {
 	std::string res;
 	for (size_t i=0; i < in.length(); i++) {
@@ -329,3 +347,4 @@ std::string LdapUrl::percentDecode(const std::string & in) const {
 	}
 	return res;
 }
+
