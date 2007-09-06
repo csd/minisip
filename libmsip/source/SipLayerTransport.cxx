@@ -201,11 +201,11 @@ MRef<SipMessage*> SipMessageParser::feed( uint8_t udata ){
 					memcpy(&tmp[0], buffer , 11);
 					ts.save(tmp);
 #endif
+					init();
 					MRef<SipMessage*> msg = SipMessage::createMessage( messageString );
 #ifdef ENABLE_TS
 					ts.save("createMessage end");
 #endif
-					init();
 					return msg;
 					
 					//return SipMessage::createMessage( messageString );
