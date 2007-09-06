@@ -28,8 +28,8 @@
 
 #include<libmnetutil/NetworkException.h>
 #include<libmnetutil/DatagramSocket.h>
-#include<libmsip/SipSocketServer.h>
-#include<libmsip/SipLayerTransport.h>
+#include"SipSocketServer.h"
+#include"SipLayerTransport.h"
 
 using namespace std;
 

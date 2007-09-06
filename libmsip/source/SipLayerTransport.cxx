@@ -26,7 +26,7 @@
 
 #include<config.h>
 
-#include<libmsip/SipLayerTransport.h>
+#include"SipLayerTransport.h"
 
 #include<errno.h>
 #include<stdio.h>
@@ -53,7 +53,7 @@
 #include<libmutil/dbg.h>
 #include<libmutil/stringutils.h>
 #include<libmsip/SipCommandString.h>
-#include<libmsip/SipCommandDispatcher.h>
+#include"SipCommandDispatcher.h"
 #include<libmsip/SipHeaderFrom.h>
 
 #include<cctype>

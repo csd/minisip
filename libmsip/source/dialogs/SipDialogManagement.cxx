@@ -31,8 +31,8 @@
 
 #include<libmsip/SipDialogManagement.h>
 #include<libmsip/SipStack.h>
-#include<libmsip/SipStackInternal.h>
-#include<libmsip/SipCommandDispatcher.h>
+#include"../SipStackInternal.h"
+#include"../SipCommandDispatcher.h"
 
 #ifdef DEBUG_OUTPUT
 #include<libmutil/dbg.h>

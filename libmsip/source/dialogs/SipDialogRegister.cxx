@@ -25,13 +25,11 @@
 #include<config.h>
 
 
-#include<libmsip/SipTransaction.h>
 #include<libmsip/SipStack.h>
 #include<libmsip/SipDialogConfig.h>
 #include<libmsip/SipDialogRegister.h>
-#include<libmsip/SipCommandDispatcher.h>
+#include"../SipCommandDispatcher.h"
 #include<libmsip/SipTransitionUtils.h>
-#include<libmsip/SipTransactionNonInviteClient.h>
 #include<libmsip/SipRequest.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipHeaderContact.h>

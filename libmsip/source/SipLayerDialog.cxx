@@ -26,11 +26,11 @@
 #include<config.h>
 
 #include<libmsip/SipDialog.h>
-#include<libmsip/SipLayerDialog.h>
+#include"SipLayerDialog.h"
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipCommandString.h>
-#include<libmsip/SipCommandDispatcher.h>
-#include<libmsip/SipStackInternal.h>
+#include"SipCommandDispatcher.h"
+#include"SipStackInternal.h"
 
 using namespace std;
 

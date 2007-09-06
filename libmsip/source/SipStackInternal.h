@@ -30,8 +30,8 @@
 #include<libmsip/SipDialogConfig.h>
 #include<libmsip/SipTimers.h>
 
-#include<libmsip/SipLayerTransport.h>
-#include<libmsip/SipTransaction.h>
+#include"SipLayerTransport.h"
+#include"transactions/SipTransaction.h"
 #include<libmcrypto/cert.h>
 #include<libmutil/MessageRouter.h>
 #include<libmutil/TimeoutProvider.h>

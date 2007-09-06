@@ -84,8 +84,8 @@
 #include<config.h>
 
 #include<libmutil/massert.h>
-#include<libmsip/SipTransactionNonInviteClient.h>
-#include<libmsip/SipCommandDispatcher.h>
+#include"SipTransactionNonInviteClient.h"
+#include"../SipCommandDispatcher.h"
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipTransitionUtils.h>
 #include<libmsip/SipCommandString.h>

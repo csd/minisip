@@ -30,9 +30,9 @@
 #include<libmsip/SipHeaderContact.h>
 #include<libmsip/SipHeaderFrom.h>
 #include<libmsip/SipHeaderTo.h>
-#include<libmsip/SipTransaction.h>
+#include"../transactions/SipTransaction.h"
 #include<libmsip/SipStack.h>
-#include<libmsip/SipStackInternal.h>
+#include"../SipStackInternal.h"
 #include<libmsip/SipDialogConfig.h>
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipAuthenticationDigest.h>
@@ -49,7 +49,7 @@
 #include<libmsip/SipHeaderProxyAuthenticate.h>
 #include<libmsip/SipHeaderProxyAuthorization.h>
 #include<libmsip/SipHeaderWWWAuthenticate.h>
-#include<libmsip/SipCommandDispatcher.h>
+#include"../SipCommandDispatcher.h"
 #include<libmutil/CommandString.h>
 #include<libmutil/termmanip.h>
 

@@ -37,8 +37,8 @@
 #include<libmcrypto/cert.h>
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipMessage.h>
-#include<libmsip/SipSocketServer.h>
-#include<libmsip/SipCommandDispatcher.h>
+#include"SipSocketServer.h"
+#include"SipCommandDispatcher.h"
 
 #include<list>
 

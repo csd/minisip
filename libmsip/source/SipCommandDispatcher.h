@@ -34,10 +34,10 @@
 #include<libmutil/MessageRouter.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/minilist.h>
-#include<libmsip/SipTransaction.h>
-#include<libmsip/SipLayerDialog.h>
-#include<libmsip/SipLayerTransaction.h>
-#include<libmsip/SipLayerTransport.h>
+#include"transactions/SipTransaction.h"
+#include"SipLayerDialog.h"
+#include"SipLayerTransaction.h"
+#include"SipLayerTransport.h"
 #include<libmsip/SipStack.h>
 
 class SipStackInternal;
@@ -136,6 +136,6 @@ class SipCommandDispatcher : public MObject{
 };
 
 #include<libmsip/SipDialog.h>
-#include<libmsip/SipStackInternal.h>
+#include"SipStackInternal.h"
 
 #endif

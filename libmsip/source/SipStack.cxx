@@ -22,10 +22,10 @@
 */
 #include<config.h>
 #include<libmsip/SipStack.h>
-#include<libmsip/SipStackInternal.h>
+#include"SipStackInternal.h"
 
-#include<libmsip/SipLayerTransport.h>
-#include<libmsip/SipCommandDispatcher.h>
+#include"SipLayerTransport.h"
+#include"SipCommandDispatcher.h"
 #include<libmsip/SipMessageContentIM.h>
 #include<libmsip/SipMessageContentMime.h>
 #include<libmutil/Timestamp.h>

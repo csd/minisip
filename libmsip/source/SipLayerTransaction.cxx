@@ -25,10 +25,10 @@
 
 #include<config.h>
 
-#include<libmsip/SipLayerTransaction.h>
-#include<libmsip/SipTransaction.h>
+#include"SipLayerTransaction.h"
+#include"transactions/SipTransaction.h"
 #include<libmsip/SipCommandString.h>
-#include<libmsip/SipCommandDispatcher.h>
+#include"SipCommandDispatcher.h"
 
 using namespace std;
 

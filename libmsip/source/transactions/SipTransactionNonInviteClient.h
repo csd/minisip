@@ -38,7 +38,7 @@
 #include<libmsip/libmsip_config.h>
 
 #include<libmsip/SipSMCommand.h>
-#include<libmsip/SipTransaction.h>
+#include"SipTransaction.h"
 
 class SipDialog;
 class SipRequest;

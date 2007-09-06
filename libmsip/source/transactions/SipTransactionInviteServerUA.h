@@ -38,7 +38,7 @@
 #include<libmsip/libmsip_config.h>
 
 #include<libmsip/SipSMCommand.h>
-#include<libmsip/SipTransactionInviteServer.h>
+#include"SipTransactionInviteServer.h"
 
 class SipResponse;
 

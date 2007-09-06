@@ -33,10 +33,10 @@
 #include<config.h>
 
 #include<libmutil/massert.h>
-#include<libmsip/SipTransactionNonInviteServer.h>
+#include"SipTransactionNonInviteServer.h"
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipTransitionUtils.h>
-#include<libmsip/SipCommandDispatcher.h>
+#include"../SipCommandDispatcher.h"
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipDialogConfig.h>

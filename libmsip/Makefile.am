@@ -22,15 +22,21 @@ endif OS_WIN
 msip_src =           source/SipDialogConfig.cxx \
 		     source/SipAuthenticationDigest.cxx \
 		     source/SipStack.cxx \
+		     source/SipStackInternal.h \
 		     source/SipStackInternal.cxx \
+		     source/SipLayerDialog.h \
 		     source/SipLayerDialog.cxx \
+		     source/SipLayerTransaction.h \
 		     source/SipLayerTransaction.cxx \
                      source/messages/SipMessage.cxx \
                      source/messages/SipResponse.cxx \
                      source/messages/SipRequest.cxx \
 		     source/SipUtils.cxx \
+		     source/SipCommandDispatcher.h \
 		     source/SipCommandDispatcher.cxx \
+		     source/SipLayerTransport.h \
 		     source/SipLayerTransport.cxx \
+		     source/SipSocketServer.h \
 		     source/SipSocketServer.cxx \
 		     source/SipSMCommand.cxx \
 		     source/SipCommandString.cxx \
@@ -38,11 +44,17 @@ msip_src =           source/SipDialogConfig.cxx \
 		     source/SipMessageContentIM.cxx \
 		     source/SipMessageContentFactory.cxx \
 		     source/SipMessageContentMime.cxx \
+		     source/transactions/SipTransaction.h \
                      source/transactions/SipTransaction.cxx \
+		     source/transactions/SipTransactionNonInviteClient.h \
 		     source/transactions/SipTransactionNonInviteClient.cxx \
+		     source/transactions/SipTransactionNonInviteServer.h \
 		     source/transactions/SipTransactionNonInviteServer.cxx \
+		     source/transactions/SipTransactionInviteClient.h \
 		     source/transactions/SipTransactionInviteClient.cxx \
+		     source/transactions/SipTransactionInviteServer.h \
 		     source/transactions/SipTransactionInviteServer.cxx \
+		     source/transactions/SipTransactionInviteServerUA.h \
 		     source/transactions/SipTransactionInviteServerUA.cxx \
                      source/dialogs/SipTransitionUtils.cxx \
 		     source/dialogs/SipDialog.cxx \

@@ -33,19 +33,19 @@
 #include<config.h>
 
 
-#include<libmsip/SipTransaction.h>
-#include<libmsip/SipStackInternal.h>
-#include<libmsip/SipCommandDispatcher.h>
+#include"SipTransaction.h"
+#include"../SipStackInternal.h"
+#include"../SipCommandDispatcher.h"
 #include<libmsip/SipHeaderVia.h>
-#include<libmsip/SipLayerTransport.h>
+#include"../SipLayerTransport.h"
 #include<libmsip/SipCommandString.h>
 #include<libmutil/dbg.h>
 
-#include<libmsip/SipTransactionInviteClient.h>
-#include<libmsip/SipTransactionInviteServer.h>
-#include<libmsip/SipTransactionInviteServerUA.h>
-#include<libmsip/SipTransactionNonInviteServer.h>
-#include<libmsip/SipTransactionNonInviteClient.h>
+#include"SipTransactionInviteClient.h"
+#include"SipTransactionInviteServer.h"
+#include"SipTransactionInviteServerUA.h"
+#include"SipTransactionNonInviteServer.h"
+#include"SipTransactionNonInviteClient.h"
 #include<libmsip/SipTransitionUtils.h>
 
 using namespace std;

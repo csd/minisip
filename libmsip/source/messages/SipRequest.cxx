@@ -36,7 +36,7 @@
 #include<libmsip/SipStack.h>
 #include<libmsip/SipRequest.h>
 #include<libmsip/SipException.h>
-#include<libmsip/SipCommandDispatcher.h>
+#include"../SipCommandDispatcher.h"
 #include<libmsip/SipMessageContentIM.h>
 #include<libmsip/SipHeader.h>
 #include<libmsip/SipHeaderRoute.h>
@@ -271,12 +271,12 @@ void SipRequest::init(string &build_from){
 
 	// Skip white space
 	start = build_from.find_first_not_of( ' ', start );
-	if( start == (int)string::npos ){
+	if( (int)start == (int)string::npos ){
 		throw SipExceptionInvalidMessage("SipRequest malformed - first line did not contain any non whitespace character");
 	}
 
 	end = build_from.find_first_of( "\r\n", start );
-	if( end == (int)string::npos ){
+	if( (int)end == (int)string::npos ){
 		throw SipExceptionInvalidMessage("SipRequest malformed - only one line");
 	}
 
@@ -289,7 +289,7 @@ void SipRequest::init(string &build_from){
 
 	// Parse method
 	pos = requestLine.find( ' ', start );
-	if( pos == (int)string::npos ){
+	if( (int)pos == (int)string::npos ){
 		throw SipExceptionInvalidMessage("SipRequest malformed - could not find method");
 	}
 
@@ -300,7 +300,7 @@ void SipRequest::init(string &build_from){
 
 	// Parse version
 	pos2 = requestLine.rfind( ' ', end - 1 );
-	if( pos2 == (int)string::npos ){
+	if( (int)pos2 == (int)string::npos ){
 		throw SipExceptionInvalidMessage("SipRequest malformed - request line did not contain space between method and version");
 	}
 

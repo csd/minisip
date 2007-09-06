@@ -40,7 +40,7 @@
 #include<libmutil/MemObject.h>
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipDialogConfig.h>
-#include<libmsip/SipLayerTransport.h>
+#include"../SipLayerTransport.h"
 
 class SipDialog;
 class SipMessage;
