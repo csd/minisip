@@ -37,7 +37,7 @@
 
 #if defined WIN32 || defined _MSC_VER
 #include<conio.h>
-#include<Windows.h>
+#include<windows.h>
 #endif
 
 #ifdef _MSC_VER
