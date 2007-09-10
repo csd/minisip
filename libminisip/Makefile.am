@@ -102,10 +102,9 @@ if P2T_SUPPORT
 			source/subsystem_signaling/p2t/P2T.cxx
 endif
 
-libmsrp_src = 
 if MSRP_SUPPORT
 libmsrp_src = source/subsystem_media/msrp/MSRPMessage.cxx \
- 		source/subsystem_media/msrp/MSRPMessage.h \
+		source/subsystem_media/msrp/MSRPMessage.h \
 		source/subsystem_signaling/sip/SipDialogFileTransferClient.cxx \
 		source/subsystem_signaling/sip/SipDialogFileTransferClient.h \
 		source/subsystem_signaling/sip/SipDialogFileTransferServer.cxx \
@@ -254,9 +253,11 @@ if VIDEO_SUPPORT
 lib_LTLIBRARIES += libminisip_video.la
 libminisip_video_la_CPPFLAGS = $(AM_CPPFLAGS) $(AVCODEC_CPPFLAGS)	\
 		$(FFMPEG_CFLAGS)
-libminisip_video_la_LDFLAGS = $(AVCODEC_LDFLAGS)
+libminisip_video_la_LDFLAGS = $(MINISIP_LIBRARY_LDFLAGS)	\
+		$(RELOC_LDFLAGS) $(AVCODEC_LDFLAGS)
 libminisip_video_la_SOURCES = $(libvideo_src)
-libminisip_video_la_LIBADD = $(libvideo_libadd) $(FFMPEG_LIBS)
+libminisip_video_la_LIBADD = $(libvideo_libadd) $(FFMPEG_LIBS)	\
+		libminisip.la $(MUTIL_LIBS)
 
 plugins_LTLIBRARIES += mvideo.la
 mvideo_la_CPPFLAGS = $(AM_CPPFLAGS) $(AVCODEC_CPPFLAGS) $(FFMPEG_CFLAGS)

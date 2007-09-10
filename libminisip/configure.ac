@@ -314,6 +314,9 @@ dnl first check for libavcodec
 	  AC_CHECK_LIB([avcodec], [main], [], [AC_MSG_ERROR(
 	    [Could not locate libavcodec, required for video features.])])
 
+	  AC_CHECK_FUNCS([img_convert], [], [AC_MSG_ERROR(
+	    [Could not find img_convert in libavcodec, required for video features.])])
+
 	  AC_CHECK_LIB([z], [main], [], [AC_MSG_ERROR(
 	    [Could not find zlib, required by libavcodec.])])
 
