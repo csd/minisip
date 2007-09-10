@@ -133,7 +133,7 @@ private:
 	std::set< std::string > includeSet;
 	std::set< std::string > excludeSet;
 	bool filterBlocking;
-	Mutex *setLock;
+	Mutex *lock;
 	bool printName;
 };
 

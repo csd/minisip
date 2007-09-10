@@ -52,16 +52,16 @@ Dbg::Dbg(std::string name_, bool error_output, bool isEnabled):
 		debugHandler(NULL),
 		defaultInclude(true),
 		filterBlocking(false),
-		setLock(NULL),
+		lock(NULL),
 		printName(false)
 
 {
-	setLock = new Mutex;
+	lock = new Mutex;
 }
 
 Dbg::~Dbg(){
-	delete setLock;
-	setLock=NULL;
+	delete lock;
+	lock=NULL;
 }
 
 void Dbg::setPrintStreamName(bool b){
@@ -78,11 +78,14 @@ bool Dbg::getEnabled(){
 
 Dbg &Dbg::operator<<(const std::string& s){
 
+	lock->lock();
+
 	bool doFlush = s.size()>0 && (s[s.size()-1]=='\n');
 	str += s;
 
 	if ( (!enabled || filterBlocking) && doFlush){
 		str="";
+		lock->unlock();
 		return *this;
 	}
 
@@ -96,7 +99,9 @@ Dbg &Dbg::operator<<(const std::string& s){
 		}
 
 		if (debugHandler!=NULL){
+			lock->unlock();
 			debugHandler->displayMessage(prefix+str,0);
+			lock->lock();
 			str="";
 		}else{
 			if (error_out){
@@ -107,20 +112,25 @@ Dbg &Dbg::operator<<(const std::string& s){
 			str="";
 		}
 	}
+	lock->unlock();
 	return *this;
 }
 
 Dbg &Dbg::operator<<( std::ostream&(*)(std::ostream&) ){
 	(*this)<<"\n";
+	lock->lock();
 	curClass="";
 	updateFilter();
+	lock->unlock();
 	return (*this);
 }
 
 Dbg &Dbg::operator<<(const DbgEndl &){
 	(*this)<<"\n";
+	lock->lock();
 	curClass="";
 	updateFilter();
+	lock->unlock();
 	return (*this);
 }
 
@@ -168,34 +178,36 @@ void Dbg::setExternalHandler(DbgHandler * dh){
  *  a/b
  * result: true
  */
-static bool inSet( std::set< std::string > &set, std::string filter, Mutex *setLock ){
-	setLock->lock();
+static bool inSet( std::set< std::string > &set, std::string filter){
 	std::set< std::string >::const_iterator i;
 	for (i=set.begin() ; i!=set.end(); i++){
 		std::string setfilt = (*i);
 		if ( setfilt[0]=='/' )
 			setfilt = setfilt.substr(1);
 		if ( filter.substr(0,setfilt.size()) == setfilt ){
-			setLock->unlock();
 			return true;
 		}
 	}
-	setLock->unlock();
 	return false;
 }
 
+/**
+ * Note: this method is not thread safe (lock before calling this method).
+ */
 void Dbg::updateFilter(){
-	if (inSet( excludeSet, curClass, setLock ))
+	if (inSet( excludeSet, curClass))
 		filterBlocking=true;
-	else if (inSet( includeSet, curClass, setLock ))
+	else if (inSet( includeSet, curClass))
 		filterBlocking=false;
 	else 
 		filterBlocking = ! defaultInclude;
 }
 
 Dbg& Dbg::operator()(std::string oClass){
+	lock->lock();
 	curClass = oClass;
 	updateFilter();
+	lock->unlock();
 	return *this;
 }
 
@@ -215,7 +227,7 @@ Dbg& Dbg::operator()(std::string oClass){
  *   then the resulting set contains
  *      b
  */
-static void removeStartingWith( std::set< std::string > &set, std::string filter, Mutex *setLock ){
+static void removeStartingWith( std::set< std::string > &set, std::string filter ){
 	std::set< std::string >::iterator i;
 	if (filter.size()<=0)
 		return;
@@ -226,7 +238,6 @@ static void removeStartingWith( std::set< std::string > &set, std::string filter
 	if (filter[filter.size()-1]=='/')
 		filter = filter.substr(0, filter.size()-1);
 
-	setLock->lock();
 	for (i=set.begin() ; i!=set.end(); i++){
 		std::string tmp = (*i);
 		if ( tmp[0]=='/' )
@@ -238,40 +249,35 @@ static void removeStartingWith( std::set< std::string > &set, std::string filter
 		if (i==set.end())
 			break;
 	}
-	setLock->unlock();
 }
 
 void Dbg::include(std::string s){
 
+	lock->lock();
 	enabled=true;
 	if (s==""){
 		defaultInclude=true;
-		setLock->lock();
 		includeSet.clear();
 		excludeSet.clear();
-		setLock->unlock();
 	}else{
-		setLock->lock();
 		includeSet.insert(s);
-		setLock->unlock();
-		removeStartingWith(excludeSet, s, setLock);
+		removeStartingWith(excludeSet, s);
 	}
 	updateFilter();
+	lock->unlock();
 }
 
 void Dbg::exclude(std::string s){
+	lock->lock();
 	if (s==""){
 		defaultInclude=false;
-		setLock->lock();
 		includeSet.clear();
 		excludeSet.clear();
-		setLock->unlock();
 	}else{
-		setLock->lock();
 		excludeSet.insert(s);
-		setLock->unlock();
-		removeStartingWith(includeSet, s, setLock);
+		removeStartingWith(includeSet, s);
 	}
 	updateFilter();
+	lock->unlock();
 }
 
