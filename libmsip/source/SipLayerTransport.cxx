@@ -561,9 +561,9 @@ static bool lookupDestIpPort(const SipUri &uri, const string &transport,
 
 	if( addr.size()>0 ){
 		if( IPAddress::isNumeric( addr ) ){
+			res = true;
 			if( !port ){
 				port = getDefaultPort( transport );
-				res = true;
 			}
 		}
 		// Not numeric	
