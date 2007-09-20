@@ -56,8 +56,16 @@ NetworkException::NetworkException( int errorNr ):errorNumber(errorNr){
 	#else
 		char buf[256];
 		buf[0]=0;
-		const char *res = strerror_r( errorNumber, buf, sizeof( buf ) );
-		msg = string( res );
+		#if defined(GNU)
+		int ret = strerror_r( errorNumber, buf, sizeof( buf ) );
+		msg = string( buf );
+
+		#else
+		if (strerror_r( errorNumber, buf, sizeof( buf ) ))
+			msg="Unknown error";
+		else
+			msg = string( buf );
+		#endif
 	#endif
 };
 
