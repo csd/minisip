@@ -1061,20 +1061,19 @@ string Session::getDebugString() {
 	else 
 		ret += "; silencedSources = false";	
 
-	MRef<CallRecorder *> cr = dynamic_cast<CallRecorder *>(*callRecorder);
-	if( cr ) {
+	if( callRecorder ) {
+		MRef<CallRecorder *> cr = dynamic_cast<CallRecorder *>(*callRecorder);
 		ret += "\n          ";
 		cr = dynamic_cast<CallRecorder *>( *callRecorder );
 		ret += "; " + cr->getDebugString();
-	}
-	
+	}	
 	for( std::list< MRef<MediaStreamReceiver *> >::iterator it = mediaStreamReceivers.begin();
 				it != mediaStreamReceivers.end(); it++ ) {
-		ret += "\n" + (*it)->getDebugString();
+		ret += "\n          " + (*it)->getDebugString();
 	}
 	for( std::list< MRef<MediaStreamSender *> >::iterator it2 =  mediaStreamSenders.begin();
 				it2 !=  mediaStreamSenders.end(); it2++ ) {
-		ret += "\n" + (*it2)->getDebugString();
+		ret += "\n          " + (*it2)->getDebugString();
 	}
 	return ret;
 }
