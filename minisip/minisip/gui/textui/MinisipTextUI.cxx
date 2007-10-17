@@ -61,7 +61,12 @@ MinisipTextUI::MinisipTextUI(): TextUI(), autoanswer(false){
 	addCommand("hangup");
 	addCommand("hide packets");
 	addCommand("register");
+#ifdef DEBUG_OUTPUT
 	addCommand("show packets");
+	addCommand("show state media");
+	addCommand("show state memory");
+	addCommand("show state sip");
+#endif
 	addCommand("cmd");
 	addCommand("transfer");
 	addCommand("refuse");
@@ -257,7 +262,6 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 		inCall=false;
 	}
 	
-
 	
 	if (cmd.getOp()==SipCommandString::transport_error && !p2tmode){
 		handled=true;
@@ -712,6 +716,25 @@ void MinisipTextUI::guiExecute(string cmd){
 		config->sipStack->setDebugPrintPackets(false);
 		displayMessage("SIP messages will NOT be displayed on the screen", blue);
 		handled=true;
+	}
+
+	if (command =="show state media"){
+		handled=true;
+		displayMessage("Media debug state:");
+		CommandString print_debug("", MediaCommandString::session_debug);
+		sendCommand("media",print_debug);
+	}
+
+	if (command=="show state sip"){
+		handled=true;
+		displayMessage("Signalling debug state:");
+		displayMessage( config->sipStack->getStackStatusDebugString() );
+	}
+
+	if (command=="show state memory"){
+		handled=true;
+		displayMessage("Memory debug state:");
+		showMem();
 	}
 #endif
 	
