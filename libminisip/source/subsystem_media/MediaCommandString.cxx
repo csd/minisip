@@ -36,3 +36,6 @@ const string MediaCommandString::session_debug="session_debug";
 const string MediaCommandString::set_session_sound_settings="set_session_sound_settings";
 
 const string MediaCommandString::reload="reload";
+
+const string MediaCommandString::audio_forwarding_enable="audio_forwarding_enable";
+const string MediaCommandString::audio_forwarding_disable="audio_forwarding_disable";

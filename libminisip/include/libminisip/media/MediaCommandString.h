@@ -51,6 +51,12 @@ class LIBMINISIP_API MediaCommandString{
 		*/
 		static const std::string reload;
 		
+		/**
+		 * Audio forwarding means that the UA acts as a conference
+		 * server, and forwards the audio of the participants.
+		 */
+		static const std::string audio_forwarding_enable;
+		static const std::string audio_forwarding_disable;
 		
 	
 };
