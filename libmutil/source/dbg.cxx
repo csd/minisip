@@ -252,10 +252,10 @@ static void removeStartingWith( std::set< std::string > &set, std::string filter
 }
 
 void Dbg::include(std::string s){
-
+	s=trim(s);
 	lock->lock();
 	enabled=true;
-	if (s==""){
+	if (s=="" || s=="/"){
 		defaultInclude=true;
 		includeSet.clear();
 		excludeSet.clear();
@@ -268,8 +268,9 @@ void Dbg::include(std::string s){
 }
 
 void Dbg::exclude(std::string s){
+	s = trim(s);
 	lock->lock();
-	if (s==""){
+	if (s=="" || s=="/"){
 		defaultInclude=false;
 		includeSet.clear();
 		excludeSet.clear();

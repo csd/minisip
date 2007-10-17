@@ -754,7 +754,7 @@ void MinisipTextUI::guiExecute(string cmd){
 
 	if (command.substr(0,10)=="filter out"){
 		string f = trim(command.substr(10));
-		mdbg.include(f);
+		mdbg.exclude(f);
 		handled=true;
 	}
 
