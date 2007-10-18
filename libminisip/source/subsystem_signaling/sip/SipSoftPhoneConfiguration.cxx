@@ -370,9 +370,9 @@ void SipSoftPhoneConfiguration::save(){
 
 #ifdef VIDEO_SUPPORT
 	backend->save( "video_device", videoDevice );
+#endif
 	backend->save( "frame_width", frameWidth );
 	backend->save( "frame_height", frameHeight );
-#endif
 
 	list<string>::iterator iCodec;
 	uint8_t iC = 0;
@@ -811,9 +811,11 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 #ifdef VIDEO_SUPPORT
 	videoDevice = backend->loadString( "video_device", "" );
 	cerr << "Loaded video_device" << videoDevice << endl;
+#endif
+	//Even if we can't send video, we might be able to display it.
+	//Therefore this is not within the VIDEO_SUPPORT ifdef
 	frameWidth = backend->loadInt( "frame_width", 176 );
 	frameHeight = backend->loadInt( "frame_height", 144 );
-#endif
 
 	sipStackConfig->use100Rel = backend->loadBool("use_100rel");
 	useAnat = backend->loadBool("use_anat");
