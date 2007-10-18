@@ -65,7 +65,8 @@
 
 using namespace std;
 
-RtpReceiver::RtpReceiver( MRef<IpProvider *> ipProvider){
+RtpReceiver::RtpReceiver( MRef<IpProvider *> ipProvider, string cid) : callId(cid)
+{
 
 	socket = NULL;
 
@@ -235,7 +236,7 @@ void RtpReceiver::run(){
 			//notify the mediaStreams of the timeout
 			for( i = mediaStreams.begin();
 					i != mediaStreams.end(); i++ ){
-				(*i)->handleRtpPacket( NULL, NULL );
+				(*i)->handleRtpPacket( NULL, callId, NULL );
 			}
 			continue;
 		}
@@ -260,7 +261,7 @@ void RtpReceiver::run(){
 			//printf( "|" );
                     for( iC = codecs.begin(); iC != codecs.end(); iC ++ ){
                         if ( (*iC)->getSdpMediaType() == packet->getHeader().getPayloadType() ) {
-                            (*i)->handleRtpPacket( packet, from );
+                            (*i)->handleRtpPacket( packet, callId, from );
                             found = 1;
                             //printf( "~" );
                             break;

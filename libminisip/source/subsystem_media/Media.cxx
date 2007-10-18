@@ -48,7 +48,7 @@ Media::Media(){
 // pn430 Function rewritten for multicodec
 //Media::Media( MRef<Codec *> codec ):codec(codec){
 //}
-Media::Media( MRef<Codec *> codec ){
+Media::Media(MRef<Codec *> codec ){
 	codecList.push_back(codec);
 	//selectedCodec = codec;
 }
@@ -58,6 +58,19 @@ Media::Media( std::list<MRef<Codec *> > codecListing ){
 	codecList = codecListing;
 	//selectedCodec = defaultCodec;
 }
+
+Media::~Media(){
+
+}
+
+void Media::setMediaHandler(MRef<MediaHandler*> reg){
+	mediaHandler=reg;
+}
+
+MRef<MediaHandler*> Media::getMediaHandler(){
+	return mediaHandler;
+}
+
 
 
 // pn507 Added for being able to change the current codec
@@ -95,11 +108,13 @@ void Media::unRegisterMediaSender( MRef<MediaStreamSender *> sender ){
 	sendersLock.unlock();
 }
 
+#if 0
 void Media::registerMediaSource( uint32_t ssrc ){
 }
 
 void Media::unRegisterMediaSource( uint32_t ssrc ){
 }
+#endif
 
 void Media::sendData( byte_t * data, uint32_t length, uint32_t ts, bool marker ){
 	list< MRef<MediaStreamSender *> >::iterator i;

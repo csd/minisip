@@ -37,7 +37,7 @@
 
 using namespace std;
 
-SoundSource::SoundSource(int id):sourceId(id){
+SoundSource::SoundSource(int id, string cId):sourceId(id),callid(cId){
 // 	leftch = NULL;
 // 	rightch = NULL;
 // 	lookupright = NULL;
@@ -63,12 +63,13 @@ void SoundSource::setPos(int32_t p){
 }
 
 BasicSoundSource::BasicSoundSource(int32_t id,
+				string callId,
 				SoundIOPLCInterface *plc,
 				int32_t position,
 				uint32_t oFreq,
 				uint32_t oDurationMs,
 				uint32_t oNChannels):
-		SoundSource(id),
+		SoundSource(id, callId),
 		plcProvider(plc)   {
 	this->oNChannels = oNChannels;
         

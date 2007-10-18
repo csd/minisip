@@ -29,7 +29,7 @@
 
 using namespace std;
 
-FileSoundSource::FileSoundSource(string filename, 
+FileSoundSource::FileSoundSource(string callId, string filename, 
 					uint32_t id, 
 					uint32_t inputFreq,
 					uint32_t inputNChannels,
@@ -37,7 +37,7 @@ FileSoundSource::FileSoundSource(string filename,
 					uint32_t outputDurationMs,
 					uint32_t outputNChannels,
 					bool rep):
-					SoundSource(id), 
+					SoundSource( id, callId ), 
 					enabled(false),
 					repeat(rep),
 					index(0) {
@@ -105,10 +105,10 @@ FileSoundSource::FileSoundSource(string filename,
 }
 
 
-FileSoundSource::FileSoundSource(short *rawaudio, 
+FileSoundSource::FileSoundSource(string callid, short *rawaudio, 
 					int samples, 
 					bool rep):
-							SoundSource(0),
+							SoundSource(0,callid),
 							audio(rawaudio),
 							nSamples(samples),
 							enabled(false),

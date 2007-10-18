@@ -45,6 +45,7 @@ class KeyAgreement;
 class UDPSocket;
 class SdpHeaderM;
 class IpProvider;
+class Media;
 
 /**
  * Abstract class that implements common functions to a
@@ -85,6 +86,8 @@ class LIBMINISIP_API MediaStream : public MObject{
 
 		virtual std::string getMemObjectType() const {return "MediaStream";}
 		bool disabled;
+
+		std::string getCallId(){return callId;}
 
 		/**
 		 * Used to query the port on which the media is received for
@@ -158,7 +161,8 @@ class LIBMINISIP_API MediaStream : public MObject{
 
 	protected:
 		MRef<CryptoContext *> getCryptoContext( uint32_t ssrc, uint16_t seq_no );
-		MediaStream( MRef<Media *> );
+		MediaStream( std::string callId, MRef<Media *> );
+		std::string callId;
 		MRef<Media *> media;
 		uint32_t csbId;
 
@@ -193,7 +197,8 @@ class LIBMINISIP_API MediaStreamReceiver : public MediaStream{
 		 * used to obtain contact IP address and port in NAT
 		 * traversal mechanism
 		 */
-		MediaStreamReceiver( MRef<Media *> media,
+		MediaStreamReceiver( std::string callId,
+				MRef<Media *> media,
 				MRef<RtpReceiver *> rtpReceiver,
 				MRef<RtpReceiver *> rtp6Receiver = NULL );
 
@@ -236,7 +241,7 @@ class LIBMINISIP_API MediaStreamReceiver : public MediaStream{
 		 * playback.
 		 * @param packet the (S)RTP packet to handle
 		 */
-		virtual void handleRtpPacket( MRef<SRtpPacket *> packet, MRef<IPAddress *> from );
+		virtual void handleRtpPacket( MRef<SRtpPacket *> packet, std::string callId, MRef<IPAddress *> from );
 
 		/**
 		 * Returns a unique identifier for this Receiver. Used
@@ -288,7 +293,7 @@ class LIBMINISIP_API MediaStreamReceiver : public MediaStream{
 		uint32_t id;
 		uint16_t externalPort;
 
-		void gotSsrc( uint32_t ssrc );
+		void gotSsrc( uint32_t ssrc, std::string callId );
 
 		std::list<uint32_t> ssrcList;
 		Mutex ssrcListLock;
@@ -313,7 +318,8 @@ class LIBMINISIP_API MediaStreamSender : public MediaStream{
 		 * to which the data should be sent. If NULL a new one
 		 * is created
 		 */
-		MediaStreamSender( MRef<Media *> media,
+		MediaStreamSender( std::string callId,
+				   MRef<Media *> media,
 				   MRef<UDPSocket *> senderSock=NULL,
 				   MRef<UDPSocket *> sender6Sock=NULL );
 

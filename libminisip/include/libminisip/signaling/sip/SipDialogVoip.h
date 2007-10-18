@@ -63,6 +63,7 @@ class LIBMINISIP_API SipDialogVoip: public SipDialog{
 		virtual bool handleCommand(const SipSMCommand &command);
 
 	
+		void setMediaSession(MRef<Session*>s);
 		MRef<Session *> getMediaSession();
 
 	protected:

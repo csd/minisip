@@ -601,10 +601,14 @@ CommandString DefaultDialogHandler::handleCommandResp(string subsystem, const Co
 		id->unlock();
 	}
 
-	MRef<Session *> mediaSession = mediaHandler->createSession( id );
 	
-	MRef<SipDialog*> voipCall = new SipDialogVoipClient(sipStack, id, phoneconf->useSTUN, phoneconf->useAnat, mediaSession); 
-	sipStack->addDialog(voipCall);
+	MRef<SipDialogVoip*> voipCall = new SipDialogVoipClient(sipStack, id, phoneconf->useSTUN, phoneconf->useAnat, NULL); 
+
+	MRef<Session *> mediaSession = mediaHandler->createSession( id, voipCall->getCallId() );
+	voipCall->setMediaSession( mediaSession );
+
+	sipStack->addDialog(*voipCall);
+
 	CommandString inv(voipCall->getCallId(), SipCommandString::invite, user);
 #ifdef ENABLE_TS
 	ts.save( TMP );

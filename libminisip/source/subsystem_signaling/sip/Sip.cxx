@@ -171,7 +171,7 @@ string Sip::confjoin(string &user, minilist<ConfMember> *conflist, string confId
 
 
 	MRef<Session *> mediaSession = 
-		mediaHandler->createSession( /*securityConfig*/ identity );
+		mediaHandler->createSession( /*securityConfig*/ identity, "" );
 
 	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(dynamic_cast<ConfMessageRouter*>(*sipstack->getConfCallback()), sipstack, identity, phoneconfig, mediaSession, conflist, confId, "")); 
 
@@ -260,7 +260,7 @@ string Sip::confconnect(string &user, string confId){
 
 
 MRef<Session *> mediaSession = 
-		mediaHandler->createSession( /*securityConfig*/ identity );
+		mediaHandler->createSession( /*securityConfig*/ identity, "" );
 
 	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(dynamic_cast<ConfMessageRouter*>(*sipstack->getConfCallback()), sipstack, identity, phoneconfig, mediaSession, confId)); 
 

@@ -45,6 +45,7 @@
 #include<libminisip/media/codecs/Codec.h>
 
 #include<libminisip/media/CallRecorder.h>
+#include<libminisip/media/SessionRegistry.h>
 
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"
@@ -78,6 +79,8 @@ void MediaHandler::init(){
 		if( mediaPlugin ){
 			MRef<Media *> m = mediaPlugin->createMedia( config );
 			MRef<AudioMedia *> audio = dynamic_cast<AudioMedia *>( *m );
+
+			m->setMediaHandler(this);
 
 			if( m ){
 				registerMedia( m );
@@ -120,13 +123,13 @@ MRef<Session *> MediaHandler::createSession( MRef<SipIdentity*> id, string callI
 
 		if( m->receive ){
 			if( ipProvider )
-				rtpReceiver = new RtpReceiver( ipProvider );
+				rtpReceiver = new RtpReceiver( ipProvider, callId );
 
 			if( ip6Provider )
-				rtp6Receiver = new RtpReceiver( ip6Provider );
+				rtp6Receiver = new RtpReceiver( ip6Provider, callId );
 
 			MRef<MediaStreamReceiver *> rStream;
-			rStream = new MediaStreamReceiver( m, rtpReceiver, rtp6Receiver );
+			rStream = new MediaStreamReceiver( callId, m, rtpReceiver, rtp6Receiver );
 			session->addMediaStreamReceiver( rStream );
 			if( (*i) == this->audioMedia ) {
 				CallRecorder * cr;
@@ -148,11 +151,11 @@ MRef<Session *> MediaHandler::createSession( MRef<SipIdentity*> id, string callI
 		
 		if( m->send ){
 		    if( !rtpReceiver && !ipProvider.isNull() ){
-			rtpReceiver = new RtpReceiver( ipProvider );
+			rtpReceiver = new RtpReceiver( ipProvider, callId );
 		    }
 
 		    if( !rtp6Receiver && !ip6Provider.isNull() ){
-		      rtp6Receiver = new RtpReceiver( ip6Provider );
+		      rtp6Receiver = new RtpReceiver( ip6Provider, callId );
 		    }
 
 		    MRef<UDPSocket *> sock;
@@ -164,7 +167,7 @@ MRef<Session *> MediaHandler::createSession( MRef<SipIdentity*> id, string callI
 			    sock6 = rtp6Receiver->getSocket();
 
 		    MRef<MediaStreamSender *> sStream;
-		    sStream = new MediaStreamSender( m, sock, sock6 );
+		    sStream = new MediaStreamSender( callId, m, sock, sock6 );
 		    session->addMediaStreamSender( sStream );
 #ifdef ZRTP_SUPPORT
 		    if(/*securityConfig.use_zrtp*/ id->use_zrtp) {
@@ -225,6 +228,17 @@ void MediaHandler::handleCommand(string subsystem, const CommandString& command 
 	#endif
 		return;
 	}
+
+	if( command.getOp() == MediaCommandString::audio_forwarding_enable){
+		audioMedia->setAudioForwarding(true);
+		return;
+	}
+
+	if( command.getOp() == MediaCommandString::audio_forwarding_disable){
+		audioMedia->setAudioForwarding(false);
+		return;
+	}
+
 	
 	if( command.getOp() == MediaCommandString::set_session_sound_settings ){
 		bool turnOn;

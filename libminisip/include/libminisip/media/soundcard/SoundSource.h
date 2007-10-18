@@ -50,7 +50,32 @@ audio samples (read from the network) before they are
 */
 class LIBMINISIP_API SoundSource : public MObject{
 	public:
-		SoundSource(int id);
+		/**
+		 *
+		 * @param id ssrc of the system that generated the audio
+		 *
+		 * @param callId  Minisip can handle multiple simultaneous 
+		 * 	ongoing calls. It can be important to know to
+		 * 	what call a stream belongs such as if the UA
+		 * 	should mix incoming audio from one user (A) when
+		 * 	sending to another (B).
+		 * 	Example:
+		 *        ME is in a conference with A and B, and ME is
+		 *        supposed to act as a conference bridge mixing
+		 *        audio.
+		 *
+		 *            a         a+me
+		 * 	  A------->(ME)------->B
+		 * 	   <-------    <-------
+		 *            b+me         b
+		 *
+		 *      Note that media processing is different when having a 
+		 *      full mesh conference (then minsip handles multiple
+		 *      calls, and the media system is less complicated).
+		 *
+		 */
+		SoundSource(int id, std::string callId);
+
 		virtual ~SoundSource(){};
 		virtual std::string getMemObjectType() const {return "SoundSource";};
 
@@ -58,6 +83,12 @@ class LIBMINISIP_API SoundSource : public MObject{
 		* @return Identifier of source that generated the audio.
 		*/
 		int getId();
+
+		/**
+		 * @return Identifier of call that the audio in the 
+		 *  	buffer belongs to.
+		 */
+		std::string getCallId(){return callid;}
 
 		/**
 		* @return Spatial position of the source.
@@ -166,6 +197,8 @@ class LIBMINISIP_API SoundSource : public MObject{
 		int32_t k; //spaudio
 		
 		friend class SpAudio;
+
+		std::string callid;
 };
 
 /**
@@ -181,6 +214,7 @@ class LIBMINISIP_API BasicSoundSource: public SoundSource{
 		* @param id            Identifier of sound source that
 		*                      is generating audio for
 		*                      stream.
+		* @param callId	       see class SoundSource for details.
 		* @param pcl           Packet loss concealment provider. 
 		*                      The codec that is used
 		*                      to decode the audio data can 
@@ -192,6 +226,7 @@ class LIBMINISIP_API BasicSoundSource: public SoundSource{
 		* @param buffersize    Number of samples in buffer (per channel)
 		*/
 		BasicSoundSource(int32_t id,
+			std::string callId,
 			SoundIOPLCInterface *plc,
 			int32_t position,
 			uint32_t oFreq,

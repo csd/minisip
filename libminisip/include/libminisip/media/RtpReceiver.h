@@ -53,7 +53,7 @@ class LIBMINISIP_API RtpReceiver : public Runnable{
 		 * on which the peer should send data (used by
 		 * NAT traversal mechanisms).
 		 */
-		RtpReceiver( MRef<IpProvider *> ipProvider );
+		RtpReceiver( MRef<IpProvider *> ipProvider, std::string callId );
 
 		/**
 		 * Used for a MediaStreamReceiver to subscribe to data
@@ -117,6 +117,8 @@ class LIBMINISIP_API RtpReceiver : public Runnable{
 		Mutex mediaStreamsLock;
 
 		Thread * thread;
+
+		std::string callId;
 };
 
 #endif

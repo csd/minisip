@@ -54,7 +54,7 @@ class LIBMINISIP_API FileSoundSource : public SoundSource{
          *                       is false.
 	 * @arg id               SoundSource id     
          */
-        FileSoundSource( std::string filename, uint32_t id, 
+        FileSoundSource( std::string callId, std::string filename, uint32_t id, 
 			uint32_t inputFreq,
 			uint32_t inputNChannels, 
 			uint32_t outputFreq,
@@ -76,7 +76,7 @@ class LIBMINISIP_API FileSoundSource : public SoundSource{
          *                      all samples have been played. The default
          *                      is false.
          */
-        FileSoundSource(short *raw_audio, int samples, bool repeat=false);
+        FileSoundSource(std::string callId, short *raw_audio, int samples, bool repeat=false);
 
         /**
          * Note that if a audio buffer was given to the source when it was

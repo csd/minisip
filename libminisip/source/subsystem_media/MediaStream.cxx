@@ -47,7 +47,7 @@
 
 using namespace std;
 
-MediaStream::MediaStream( MRef<Media *> m):media(m),ka(NULL) {
+MediaStream::MediaStream( string cid, MRef<Media *> m) : callId(cid), media(m),ka(NULL) {
 	disabled = false;
 #ifdef ZRTP_SUPPORT
 	zrtpBridge = NULL;
@@ -277,10 +277,10 @@ MRef<ZrtpHostBridgeMinisip *> MediaStream::getZrtpHostBridge() {
 
 #endif
 
-MediaStreamReceiver::MediaStreamReceiver( MRef<Media *> m,
+MediaStreamReceiver::MediaStreamReceiver( string callid, MRef<Media *> m,
 		MRef<RtpReceiver *> rtpRecv, 
 		MRef<RtpReceiver *> rtp6Recv ):
-			MediaStream( m ),
+			MediaStream( callid,  m ),
 			rtpReceiver( rtpRecv ),
 			rtp6Receiver( rtp6Recv ){
 	id = rand();
@@ -295,8 +295,9 @@ uint32_t MediaStreamReceiver::getId(){
 
 void MediaStreamReceiver::start(){
 	if( !running ){
-		if( rtpReceiver )
+		if( rtpReceiver ){
 			rtpReceiver->registerMediaStream( this );
+		}
 		if( rtp6Receiver )
 			rtp6Receiver->registerMediaStream( this );
 		running = true;
@@ -358,7 +359,7 @@ void MediaStreamReceiver::handleRtpPacketExt(MRef<SRtpPacket *> packet) {
 }
 #endif
 
-void MediaStreamReceiver::handleRtpPacket( MRef<SRtpPacket *> packet, MRef<IPAddress *> from ){
+void MediaStreamReceiver::handleRtpPacket( MRef<SRtpPacket *> packet, string callId, MRef<IPAddress *> from ){
 	uint32_t packetSsrc;
 	uint16_t seq_no;
 
@@ -406,12 +407,12 @@ void MediaStreamReceiver::handleRtpPacket( MRef<SRtpPacket *> packet, MRef<IPAdd
 	//bool marker = packet->getHeader().getMarker(); //not used
 	//uint32_t ts = packet->getHeader().getTimestamp(); //not used
 
-	gotSsrc( packetSsrc );
+	gotSsrc( packetSsrc, callId );
 
 	media->playData( *packet );
 }
 
-void MediaStreamReceiver::gotSsrc( uint32_t ssrc ){
+void MediaStreamReceiver::gotSsrc( uint32_t ssrc, string callId ){
 	list<uint32_t>::iterator i;
 
 	ssrcListLock.lock();
@@ -422,7 +423,8 @@ void MediaStreamReceiver::gotSsrc( uint32_t ssrc ){
 		}
 	}
 
-	media->registerMediaSource( ssrc );
+	massert(callId.size()>0);
+	media->registerMediaSource( ssrc, callId );
 	ssrcList.push_back( ssrc );
 	ssrcListLock.unlock();
 }
@@ -441,10 +443,10 @@ uint16_t MediaStreamReceiver::getPort( const string &addrType ){
 }
 
 
-MediaStreamSender::MediaStreamSender( MRef<Media *> m, 
+MediaStreamSender::MediaStreamSender( string callid, MRef<Media *> m, 
 		MRef<UDPSocket *> senderSocket, 
 		MRef<UDPSocket *> sender6Socket ):
-			MediaStream( m ){
+			MediaStream( callid, m ){
 	selectedCodec = NULL;
 	remotePort = 0;
 	seqNo = (uint16_t)rand();

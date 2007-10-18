@@ -34,6 +34,8 @@
 #include<libminisip/media/aec/aec.h>		//hanning
 #endif
 
+#include<string>
+
 class AudioMediaSource;
 class SilenceSensor;
 class Resampler;
@@ -66,6 +68,9 @@ class LIBMINISIP_API AudioMedia : public Media, public SoundRecorderCallback{
 		*/
 		virtual std::string getSdpMediaType();
 
+
+		void setAudioForwarding(bool);
+
 		/**
 		* Play the given RTP packet on this medium. This includes
 		* decoding if relevant.
@@ -97,7 +102,7 @@ class LIBMINISIP_API AudioMedia : public Media, public SoundRecorderCallback{
 		* a different decoder.
 		* @param ssrc the SSRC identifier used by the new media source
 		*/
-		virtual void registerMediaSource( uint32_t ssrc );
+		virtual void registerMediaSource( uint32_t ssrc, std::string callId );
 
 
 		/**
@@ -170,12 +175,13 @@ class LIBMINISIP_API AudioMedia : public Media, public SoundRecorderCallback{
 		#endif
 		std::list< MRef<AudioCodec *> > codecs;
 		std::list< MRef<AudioMediaSource *> > sources;
+		bool audioForwarding;
 		
 };
 
 class LIBMINISIP_API AudioMediaSource : public BasicSoundSource{
 	public:
-		AudioMediaSource( uint32_t ssrc, MRef<Media *> media );
+		AudioMediaSource( uint32_t ssrc, std::string callId, MRef<Media *> media );
 
 		void playData( MRef<RtpPacket *> rtpPacket );
 		uint32_t getSsrc();

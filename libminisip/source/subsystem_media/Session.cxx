@@ -1066,7 +1066,9 @@ string Session::getDebugString() {
 		ret += "\n          ";
 		cr = dynamic_cast<CallRecorder *>( *callRecorder );
 		ret += "; " + cr->getDebugString();
-	}	
+	}else
+		ret += "\n          (no call recorder)";
+
 	for( std::list< MRef<MediaStreamReceiver *> >::iterator it = mediaStreamReceivers.begin();
 				it != mediaStreamReceivers.end(); it++ ) {
 		ret += "\n          " + (*it)->getDebugString();

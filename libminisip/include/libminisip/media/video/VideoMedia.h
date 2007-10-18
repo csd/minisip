@@ -61,7 +61,7 @@ class LIBMINISIP_API VideoMedia : public Media, public VideoEncoderCallback{
 
 		virtual void registerMediaSender( MRef<MediaStreamSender *> sender );
 		virtual void unRegisterMediaSender( MRef<MediaStreamSender *> sender );
-		virtual void registerMediaSource( uint32_t ssrc );
+		virtual void registerMediaSource( uint32_t ssrc, std::string callId );
 		virtual void unRegisterMediaSource( uint32_t ssrc );
 		virtual void handleMHeader( MRef<SdpHeaderM *> m );
 

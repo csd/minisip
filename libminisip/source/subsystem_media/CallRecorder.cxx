@@ -41,7 +41,7 @@ using namespace std;
 CallRecorder::CallRecorder(  MRef<AudioMedia *> aMedia, 
 				MRef<RtpReceiver *> rtpReceiver_,
 				MRef<IpProvider *> ipProvider ):
-		MediaStreamReceiver( (Media *)*aMedia, rtpReceiver_ ),
+		MediaStreamReceiver( "callrecorder", (Media *)*aMedia, rtpReceiver_ ),
 		enabledMic(false),
 		enabledNtwk(false),
 		fileDev( NULL ),

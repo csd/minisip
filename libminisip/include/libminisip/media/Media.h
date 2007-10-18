@@ -31,7 +31,6 @@
 #include<libmutil/MPlugin.h>
 #include<libmutil/MSingleton.h>
 
-#include<libminisip/media/soundcard/SoundRecorderCallback.h>
 #include<libminisip/media/soundcard/SoundIO.h>
 
 #include<libminisip/media/codecs/Codec.h>
@@ -43,6 +42,7 @@ class MediaStreamSender;
 class MediaStreamReceiver;
 class SdpHeaderM;
 class SipSoftPhoneConfiguration;
+class MediaHandler;
 
 /**
  * The Media class is a representation of a medium type, namely
@@ -55,11 +55,14 @@ class SipSoftPhoneConfiguration;
 class LIBMINISIP_API Media : public MObject{
 	public:
 
+		~Media();
+
 		/**
 		 * Returns the media type as used in the SDP (audio or video).
 		 * @returns the media type as a string
 		 */
 		virtual std::string getSdpMediaType()=0;
+
 		
 		/**
 		 * Returns a reference to the CODEC given its RTP
@@ -115,14 +118,14 @@ class LIBMINISIP_API Media : public MObject{
 		 * a different decoder.
 		 * @param ssrc the SSRC identifier used by the new media source
 		 */
-		virtual void registerMediaSource( uint32_t ssrc );
+		virtual void registerMediaSource( uint32_t ssrc, std::string callId )=0;
 		
 		/**
 		 * Used to unregister a media source when the session ends. 
 		 * @param ssrc the SSRC identifier used by the media source to
 		 * unregister
 		 */
-		virtual void unRegisterMediaSource( uint32_t ssrc );
+		virtual void unRegisterMediaSource( uint32_t ssrc)=0;
 		
 		/**
 		 * deprecated...
@@ -176,13 +179,16 @@ class LIBMINISIP_API Media : public MObject{
 		 * NULL if no CODEC with this payload type was available
 		 */
 		MRef<CodecState *> createCodecInstance( uint8_t payloadType );
+
+		void setMediaHandler(MRef<MediaHandler*> reg);
+		MRef<MediaHandler*> getMediaHandler();
 		
 	protected:
 		Media();
 		Media( MRef<Codec *> defaultCodec );
 
 		Media( std::list<MRef<Codec *> > codecList );
-				
+
 		std::list< MRef<Codec *> > codecList;
 		Mutex codecListLock;
 		
@@ -191,6 +197,7 @@ class LIBMINISIP_API Media : public MObject{
 		Mutex sourcesLock;
 		
 		std::list<std::string> sdpAttributes;
+		MRef<MediaHandler*> mediaHandler;
 };
 
 
@@ -220,3 +227,4 @@ class LIBMINISIP_API MediaRegistry : public MPluginRegistry, public MSingleton<M
 #endif
 
 #include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
+#include<libminisip/media/MediaHandler.h>

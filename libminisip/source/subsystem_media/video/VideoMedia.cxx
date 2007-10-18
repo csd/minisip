@@ -102,7 +102,7 @@ void VideoMedia::sendVideoData( byte_t * data, uint32_t length, uint32_t ts, boo
         Media::sendData( data, length, ts, marker );
 }
 
-void VideoMedia::registerMediaSource( uint32_t ssrc ){
+void VideoMedia::registerMediaSource( uint32_t ssrc, string callId ){
 	MRef<VideoMediaSource *> source;
 
 	source = new VideoMediaSource( ssrc, receivingWidth, receivingHeight );

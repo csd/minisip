@@ -737,6 +737,10 @@ MRef<Session *> SipDialogVoip::getMediaSession(){
 	return mediaSession;
 }
 
+void SipDialogVoip::setMediaSession(MRef<Session*> s){
+	mediaSession=s;
+}
+
 bool SipDialogVoip::sortMIME(MRef<SipMessageContent *> Offer, string peerUri, int type){
 	if (Offer){
 		if ( Offer->getContentType().substr(0,9) == "multipart"){
