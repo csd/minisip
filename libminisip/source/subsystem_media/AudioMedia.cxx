@@ -239,7 +239,7 @@ void AudioMedia::sendData( byte_t * data, uint32_t length, uint32_t ts, bool mar
 			// TODO: Copying the last received audio is not the
 			// optimal thing to do. We should have a jitter
 			// buffer that handled re-ordered packets and such.
-			if (audioForwarding){
+			if (/*audioForwarding*/true){
 				std::list< MRef<AudioMediaSource *> >::iterator iSource;
 				for( iSource = sources.begin(); iSource != sources.end(); iSource ++ ){
 					if ( (*iSource)->getCallId()!= (*i)->getCallId() ){
@@ -305,6 +305,11 @@ AudioMediaSource::AudioMediaSource( uint32_t ssrc_, string callId, MRef<Media *>
 	media(m),
 	ssrc(ssrc_)
 {
+	//The codec output might be mixed into outgoing streams
+	//any data has been decoded. We therefore initialize it
+	//to silence.
+	for (int i=0; i<AUDIOMEDIA_CODEC_MAXLEN; i++)
+		codecOutput[i]=0;
 }
 
 void AudioMediaSource::playData( MRef<RtpPacket *> rtpPacket ){

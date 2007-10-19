@@ -40,6 +40,8 @@ class AudioMediaSource;
 class SilenceSensor;
 class Resampler;
 
+#define AUDIOMEDIA_CODEC_MAXLEN 16384
+
 /**
  * The AudioMedia class holds the object required to acquire and
  * play out audio data. It is created upon startup, or when the
@@ -195,7 +197,7 @@ class LIBMINISIP_API AudioMediaSource : public BasicSoundSource{
 	protected:
 		std::list< MRef<CodecState *> > codecs;
 		MRef<Media *> media;
-		short codecOutput[16384];
+		short codecOutput[AUDIOMEDIA_CODEC_MAXLEN];
 		uint32_t ssrc;
 
 };
