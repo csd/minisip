@@ -251,9 +251,7 @@ void AudioMedia::sendData( byte_t * data, uint32_t length, uint32_t ts, bool mar
 					}
 				}
 			}
-
-
-
+			encodedLength = selectedCodec->encode( data, length, encoded );
 		}
 	
 		(*i)->send( encoded, encodedLength, &givenTs, marker );
