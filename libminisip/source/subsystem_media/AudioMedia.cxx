@@ -239,7 +239,7 @@ void AudioMedia::sendData( byte_t * data, uint32_t length, uint32_t ts, bool mar
 			// TODO: Copying the last received audio is not the
 			// optimal thing to do. We should have a jitter
 			// buffer that handled re-ordered packets and such.
-			if (/*audioForwarding*/true){
+			if (audioForwarding){
 				std::list< MRef<AudioMediaSource *> >::iterator iSource;
 				for( iSource = sources.begin(); iSource != sources.end(); iSource ++ ){
 					if ( (*iSource)->getCallId()!= (*i)->getCallId() ){
