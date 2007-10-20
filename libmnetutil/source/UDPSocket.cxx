@@ -90,6 +90,12 @@ bool UDPSocket::initUdpSocket( bool use_ipv6_, int32_t port ) {
 #ifdef HAVE_IPV6
 	if (use_ipv6){
 		struct sockaddr_in6 addr;
+		int32_t on=1;
+
+#ifdef IPV6_V6ONLY
+		setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, &on, sizeof(on));
+#endif
+
 		memset(&addr, 0, sizeof(addr));
 		addr.sin6_family=PF_INET6;
 		addr.sin6_port=htons( (unsigned short)port );
