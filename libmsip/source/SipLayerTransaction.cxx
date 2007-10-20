@@ -177,7 +177,7 @@ bool SipLayerTransaction::handleCommand(const SipSMCommand &c){
 		for (i=transactions.begin(); i!=transactions.end(); i++){
 			if ( (!hasBranch || (*i).second->getBranch()== branch || seqMethod=="ACK") &&
 					(!hasSeqMethod || (*i).second->getCSeqMethod()==seqMethod || 
-					 (seqMethod == "ACK" && (*i).second->getCSeqMethod() == "INVITE")) ){
+					 (c.getCommandPacket()->getType()!=SipResponse::type && seqMethod == "ACK" && (*i).second->getCSeqMethod() == "INVITE")) ){
 				bool ret = (*i).second->handleCommand(c);
 				if (ret){
 					return true;
