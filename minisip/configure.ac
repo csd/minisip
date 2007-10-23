@@ -118,6 +118,22 @@ dnl	  enable_gtk="no"
       fi ])
 AM_CONDITIONAL(QT_GUI, [test "${enable_qtui}" = "yes"])
 
+
+
+
+dnl CONF UI
+AC_ARG_ENABLE(confgui,
+    AS_HELP_STRING([--enable-confgui],
+        [enables the conference user interface (default disabled)]),
+    [ if test "${enable_confgui}" = "yes"
+      then
+          AC_DEFINE(CONF_GUI, [], [Compile the conference bridge application])
+      fi ])
+AM_CONDITIONAL(CONF_GUI, [test "${enable_confgui}" = "yes"])
+
+
+
+
 dnl GTK GUI
 AC_ARG_ENABLE(gtk,
     AS_HELP_STRING([--disable-gtk],
@@ -303,6 +319,7 @@ AC_CONFIG_FILES([minisip/Makefile
 			minisip/gui/qtgui/Makefile
 			minisip/gui/gtkgui/Makefile
 			minisip/gui/textui/Makefile
+			minisip/gui/confgui/Makefile
 			minisip/win32/Makefile
 			minisip/win32/minisip-res.rc
 			share/Makefile
