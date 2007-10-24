@@ -12,7 +12,7 @@
 ## Set to 1 to enable pbuilder
 #my $enable_pbuilder = 1;
 #
-## One of sid, etch, sarge, dapper
+## One of sid, lenny, etch, sarge, gutsy, feisty, edgy, dapper
 #$debian_release_default = 'sid';
 #
 ## Change to the reprepro base directory
