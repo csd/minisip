@@ -64,7 +64,7 @@ endif
 if HAS_GSM
 plugins_LTLIBRARIES += mgsm.la
 mgsm_la_LDFLAGS = $(plugins_LDFLAGS)
-mgsm_la_SOURCES = source/subsystem_media/codecs/GsmCodec.cxx source/codecs/GsmCodec.h
+mgsm_la_SOURCES = source/subsystem_media/codecs/GsmCodec.cxx source/subsystem_media/codecs/GsmCodec.h
 mgsm_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(GSM_LIBS)
 endif
 
