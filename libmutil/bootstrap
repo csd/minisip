@@ -58,3 +58,11 @@ autoconf
 autoheader
 automake${amvers} --add-missing --copy
 
+# libltdl
+(cd libltdl
+aclocal${amvers}
+
+autoconf
+autoheader
+automake${amvers} --add-missing --copy
+)
