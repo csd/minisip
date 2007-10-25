@@ -336,7 +336,8 @@ endif VIDEO_SUPPORT
 
 libcontactdb_src = source/subsystem_contacts/ContactDb.cxx \
 			source/subsystem_contacts/PhoneBook.cxx \
-			source/subsystem_contacts/MXmlPhoneBookIo.cxx
+			source/subsystem_contacts/MXmlPhoneBookIo.cxx \
+			source/subsystem_contacts/MXmlPhoneBookIo.h
 
 libgui_src = source/subsystem_gui/Gui.cxx \
 			source/subsystem_gui/LogEntry.cxx \
@@ -403,7 +404,8 @@ onlineconf_la_SOURCES = source/subsystem_config/OnlineMXmlConfBackend.cxx \
 			source/subsystem_config/OnlineMXmlConfBackend.h
 onlineconf_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(ONLINECONF_LIBS)
 libonlineconf_src = source/subsystem_config/OnlineConfBackend.cxx \
-	  	    source/subsystem_contacts/OnlineMXmlPhoneBookIo.cxx
+	  	    source/subsystem_contacts/OnlineMXmlPhoneBookIo.cxx \
+	  	    source/subsystem_contacts/OnlineMXmlPhoneBookIo.h
 endif
 
 # TODO auto detect LDAP support
