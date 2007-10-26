@@ -305,7 +305,7 @@ sub debian_package {
 #		push(@buildpackage_args, '-sa');
 	}
 
-	my $result = act('debian: svn-buildpackage', '/home/mikael/sh/svn-buildpackage2', @buildpackage_args);
+	my $result = act('debian: svn-buildpackage', 'svn-buildpackage', @buildpackage_args);
 
 	if( $version ne $version_full ){
 		act('debian: restore changelog',
