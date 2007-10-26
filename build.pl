@@ -946,7 +946,9 @@ for $pkg ( @targets ) {
 		"+Object directory: ", pretty_path($objdir), "\n" if $verbose;
 
 	try_callback($pkg, 'pre');
-	callact($_) for @action;
+	foreach my $a (@action) {
+		callact($a);
+	}
 	try_callback($pkg, 'post');
 }
 
