@@ -111,7 +111,7 @@ sub debian_changelog_version {
 #
 # debian_changelog_released
 #
-# Check it top version in debian changelog is released.
+# Check if top version in debian changelog is released.
 #
 sub debian_changelog_released {
 	my ($self) = @_;
@@ -249,9 +249,6 @@ sub debian_package {
 
 	my $builder = $debian_callbacks{'builder'};
 	my $buildareadir = $params->{'buildareadir'} || $default_buildaredir;
-
-	easy_mkdir($debian_tarballsdir);
-
 	my $tar_version = &debian_tar_version;
 
 	easy_mkdir($buildareadir);
@@ -447,7 +444,9 @@ sub debian_cb_purge {
 #
 sub debian_cb_dist_post {
 	my @distfiles = distfiles();
-	
+
+	easy_mkdir($debian_tarballsdir);
+
 	for my $tar (@distfiles) {
 		my $base = basename($tar);
 		
@@ -464,7 +463,7 @@ sub debian_cb_dist_post {
 }
 
 #
-# debian_cb_dist_post
+# debian_cb_tarclean_pre
 #
 # Remove links to tarballs in build/tarballs
 #
