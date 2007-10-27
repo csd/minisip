@@ -51,8 +51,8 @@ config.status: configure
 		--disable-static \
 		--disable-test-suite \
 		--enable-sdl \
-		--enable-alsa \
 		--enable-video \
+		--enable-portaudio \
 		--with-avcodec=/usr/include/ffmpeg
 
 
