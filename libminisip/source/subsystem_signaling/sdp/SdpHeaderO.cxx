@@ -41,52 +41,53 @@
 using namespace std;
 
 SdpHeaderO::SdpHeaderO(string buildFrom):SdpHeader(SDP_HEADER_TYPE_O, 2){
+	int len = buildFrom.length();
 	if (buildFrom.substr(0,2)!="o="){
 #ifdef DEBUG_OUTPUT
 		std::cerr << "ERROR: Origin sdp header is not starting with <o=>:"<<buildFrom<< std::endl;
 #endif
 	}
 	unsigned i=2;
-	while (buildFrom[i]==' ')
+	while ( buildFrom[i]==' ' && i<len )
 		i++;
 	
 	username="";
-	while (buildFrom[i]!=' ')
+	while ( buildFrom[i]!=' ' && i<len )
 		username+=buildFrom[i++];
 
-	while (buildFrom[i]==' ')
+	while ( buildFrom[i]==' ' && i<len )
 		i++;
 
 	session_id="";
-	while (buildFrom[i]!=' ')
+	while ( buildFrom[i]!=' ' && i<len )
 		session_id+=buildFrom[i++];
 
-	while (buildFrom[i]==' ')
+	while ( buildFrom[i]==' ' && i<len )
 		i++;
 	
 	version="";
-	while (buildFrom[i]!=' ')
+	while ( buildFrom[i]!=' ' && i<len )
 		version+=buildFrom[i++];
 
-	while (buildFrom[i]==' ')
+	while ( buildFrom[i]==' ' && i<len )
 		i++;
 
 	net_type="";
-	while (buildFrom[i]!=' ')
+	while ( buildFrom[i]!=' ' && i<len )
 		net_type+=buildFrom[i++];
 
-	while (buildFrom[i]==' ')
+	while ( buildFrom[i]==' ' && i<len )
 		i++;
 
 	addr_type="";
-	while (buildFrom[i]!=' ')
+	while ( buildFrom[i]!=' ' && i<len )
 		addr_type+=buildFrom[i++];
 
-	while (buildFrom[i]==' ')
+	while ( buildFrom[i]==' ' && i<len )
 		i++;
 
 	addr="";
-	while (buildFrom[i]!=' ' && !(i>=buildFrom.length()-1))
+	while ( buildFrom[i]!=' ' && i<len )
 		addr+=buildFrom[i++];
 
 }

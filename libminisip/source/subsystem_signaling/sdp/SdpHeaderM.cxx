@@ -45,24 +45,25 @@ using namespace std;
 
 SdpHeaderM::SdpHeaderM(string buildFrom) : SdpHeader(SDP_HEADER_TYPE_M, 8){
 
+	int len = buildFrom.length();
 	if (buildFrom.substr(0,2)!="m="){
 #ifdef DEBUG_OUTPUT
 		cerr << "ERROR: Origin sdp header is not starting with <m=>"<< endl;
 #endif
 	}
 	unsigned i=2;
-	while (buildFrom[i]==' ')
+	while (buildFrom[i]==' ' && i<len)
 		i++;
 	
 	media="";
-	while (buildFrom[i]!=' ')
+	while (buildFrom[i]!=' ' && i<len)
 		media+=buildFrom[i++];
 
-	while (buildFrom[i]==' ')
+	while (buildFrom[i]==' ' && i<len)
 		i++;
 
 	string portstr="";
-	while (buildFrom[i]!=' ')
+	while (buildFrom[i]!=' ' && i<len)
 		portstr+=buildFrom[i++];
 	
 	int32_t np=0;
@@ -77,27 +78,27 @@ SdpHeaderM::SdpHeaderM(string buildFrom) : SdpHeader(SDP_HEADER_TYPE_M, 8){
 		nPorts=1;
 	}
 	
-	while (buildFrom[i]==' ')
+	while (buildFrom[i]==' ' && i<len)
 		i++;
 	
 	transport="";
-	while (buildFrom[i]!=' ')
+	while (buildFrom[i]!=' ' && i<len)
 		transport+=buildFrom[i++];
 
 	bool done=false;
 	while (!done){
-		while (buildFrom[i]==' '  && !(i>=buildFrom.length())){
+		while (buildFrom[i]==' '  && i<len ){
 			i++;
 		}
 
 		string f="";
-		while (buildFrom[i]!=' ' && !(i>=buildFrom.length()))
+		while (buildFrom[i]!=' ' && i<len )
 			f+=buildFrom[i++];
 		if (f.length()>0){
 			formats.push_back(atoi(f.c_str()));
 		}
 		
-		if (i>=buildFrom.length())
+		if ( i>=len )
 			done=true;
 	}
 }

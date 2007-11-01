@@ -42,6 +42,7 @@
 using namespace std;
 
 SdpHeaderT::SdpHeaderT(string buildFrom):SdpHeader(SDP_HEADER_TYPE_T, 5){
+	int len=buildFrom.length();
 	if (buildFrom.substr(0,2)!="t="){
 #ifdef DEBUG_OUTPUT
 		std::cerr << "ERROR: Origin sdp header is not starting with <o=>"<< std::endl;
@@ -49,18 +50,18 @@ SdpHeaderT::SdpHeaderT(string buildFrom):SdpHeader(SDP_HEADER_TYPE_T, 5){
 	}
 	
 	unsigned i=2;
-	while (buildFrom[i]==' ')
+	while ( buildFrom[i]==' ' && i<len )
 		i++;
 
 	string startstr="";
-	while (buildFrom[i]!=' ')
+	while ( buildFrom[i]!=' ' && i<len )
 		startstr+=buildFrom[i++];
 
-	while (buildFrom[i]==' ')
+	while ( buildFrom[i]==' ' && i<len )
 		i++;
 
 	string stopstr="";
-	while (buildFrom[i]!=' ' && !(i>=buildFrom.length()-1))
+	while ( buildFrom[i]!=' ' && i<len )
 		stopstr+=buildFrom[i++];
 
 	start_time = atoi(startstr.c_str());
