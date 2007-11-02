@@ -335,9 +335,9 @@ void SipIdentity::setPsk( string key ){
 
 SipStackConfig::SipStackConfig():
 	externalContactUdpPort(0),
-	localUdpPort(0),
-	localTcpPort(0),
-	localTlsPort(0),
+	preferedLocalUdpPort(0),
+	preferedLocalTcpPort(0),
+	preferedLocalTlsPort(0),
 	autoAnswer(false),
 	use100Rel(false){
 
@@ -347,14 +347,14 @@ int32_t SipStackConfig::getLocalSipPort(bool usesStun, const string &transport )
 	int32_t localSipPort;
 	
 	if(transport=="TCP" || transport=="tcp")
-		localSipPort = localTcpPort;
+		localSipPort = preferedLocalTcpPort;
 	else if(transport=="TLS" || transport=="tls")
-		localSipPort = localTlsPort;
+		localSipPort = preferedLocalTlsPort;
 	else{ /* UDP, may use STUN */
 		if( usesStun ){
 			localSipPort = externalContactUdpPort;
 		} else {
-			localSipPort = localUdpPort;
+			localSipPort = preferedLocalUdpPort;
 		}
 	}
 	return localSipPort;

@@ -106,9 +106,9 @@ void SipSoftPhoneConfiguration::save(){
 	//Set the version of the file ...
 	backend->save( "version", CONFIG_FILE_VERSION_REQUIRED );
 
-	backend->save( "local_udp_port", sipStackConfig->localUdpPort );
-	backend->save( "local_tcp_port", sipStackConfig->localTcpPort );
-	backend->save( "local_tls_port", sipStackConfig->localTlsPort );
+	backend->save( "local_udp_port", sipStackConfig->preferedLocalUdpPort );
+	backend->save( "local_tcp_port", sipStackConfig->preferedLocalTcpPort );
+	backend->save( "local_tls_port", sipStackConfig->preferedLocalTlsPort );
 	backend->saveBool( "auto_answer", sipStackConfig->autoAnswer );
 	backend->save( "instance_id", sipStackConfig->instanceId);
 
@@ -851,10 +851,10 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 
 	ringtone = backend->loadString("ringtone","");
 
-	sipStackConfig->localUdpPort = backend->loadInt("local_udp_port",5060);
-	sipStackConfig->externalContactUdpPort = sipStackConfig->localUdpPort; //?
-	sipStackConfig->localTcpPort = backend->loadInt("local_tcp_port",5060);
-	sipStackConfig->localTlsPort = backend->loadInt("local_tls_port",5061);
+	sipStackConfig->preferedLocalUdpPort = backend->loadInt("local_udp_port",5060);
+	sipStackConfig->externalContactUdpPort = sipStackConfig->preferedLocalUdpPort; //?
+	sipStackConfig->preferedLocalTcpPort = backend->loadInt("local_tcp_port",5060);
+	sipStackConfig->preferedLocalTlsPort = backend->loadInt("local_tls_port",5061);
 	sipStackConfig->autoAnswer = backend->loadBool("auto_answer");
 	sipStackConfig->instanceId = backend->loadString("instance_id");
 

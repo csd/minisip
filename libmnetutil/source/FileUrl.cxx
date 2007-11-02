@@ -78,7 +78,7 @@ std::string FileUrl::getString() const {
 	return url;
 }
 bool FileUrl::isUnreservedChar(char in) const {
-	char* alphabetUnreserved = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~";
+	const char* alphabetUnreserved = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~";
 	for (int i=0; i<66; i++) {
 		if (alphabetUnreserved[i] == in)
 			return true;
@@ -87,7 +87,7 @@ bool FileUrl::isUnreservedChar(char in) const {
 }
 
 bool FileUrl::isReservedChar(char in) const {
-	char* alphabetReserved = ":/?#[]@!$&'()*+,;=";
+	const char* alphabetReserved = ":/?#[]@!$&'()*+,;=";
 	for (int i=0; i<18; i++) {
 		if (alphabetReserved[i] == in)
 			return true;

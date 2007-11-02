@@ -382,7 +382,7 @@ std::string SipStackInternal::getStackStatusDebugString(){
 
 MRef<SipSocketServer *> SipStackInternal::createUdpServer( bool ipv6, const string &ipString )
 {
-	int32_t port = config->localUdpPort;
+	int32_t port = config->preferedLocalUdpPort;
 
 	MRef<DatagramSocket *> sock = new UDPSocket( port, ipv6 );
 	MRef<SipSocketServer *> server;
@@ -402,7 +402,7 @@ MRef<SipSocketServer *> SipStackInternal::createTcpServer( bool ipv6, const stri
 {
 	MRef<ServerSocket *> sock;
 	MRef<SipSocketServer *> server;
-	int32_t port = config->localTcpPort;
+	int32_t port = config->preferedLocalTcpPort;
 
 	sock = ServerSocket::create( port, ipv6 );
 	server = new StreamSocketServer( dispatcher->getLayerTransport(), sock );
@@ -415,7 +415,7 @@ MRef<SipSocketServer *> SipStackInternal::createTlsServer( bool ipv6, const stri
 {
 	MRef<ServerSocket *> sock;
 	MRef<SipSocketServer *> server;
-	int32_t port = config->localTlsPort;
+	int32_t port = config->preferedLocalTlsPort;
 
 	sock = TLSServerSocket::create( ipv6, port, config->cert->getFirst(),
 					config->cert_db );

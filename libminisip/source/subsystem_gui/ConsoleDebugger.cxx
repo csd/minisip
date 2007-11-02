@@ -288,9 +288,9 @@ void ConsoleDebugger::showConfig(){
 		<< "    localIp6String="<< config->sipStackConfig->localIp6String << endl
 		<< "    externalContactIP=" << config->sipStackConfig->externalContactIP << endl
 		<< "    externalContactUdpPort=" << config->sipStackConfig->externalContactUdpPort << endl
-		<< "    localUdpPort="<< config->sipStackConfig->localUdpPort << endl
-		<< "    localTcpPort="<< config->sipStackConfig->localTcpPort << endl
-		<< "    localTlsPort="<< config->sipStackConfig->localTlsPort << endl
+		<< "    preferedLocalUdpPort="<< config->sipStackConfig->preferedLocalUdpPort << endl //TODO: output actual port in use as well?
+		<< "    preferedLocalTcpPort="<< config->sipStackConfig->preferedLocalTcpPort << endl
+		<< "    preferedLocalTlsPort="<< config->sipStackConfig->preferedLocalTlsPort << endl
 		<< "    autoAnswer="<< config->sipStackConfig->autoAnswer<<endl
 		<< "    use100Rel="<< config->sipStackConfig->use100Rel<< endl
 		<< "    instanceId="<< config->sipStackConfig->instanceId<<endl

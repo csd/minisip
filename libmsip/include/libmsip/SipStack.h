@@ -161,9 +161,9 @@ class LIBMSIP_API SipStackConfig : public MObject{
 		std::string externalContactIP;
 		int32_t externalContactUdpPort;
                 
-		int32_t localUdpPort;	// Advanced -> ...Sip port...
-		int32_t localTcpPort;
-		int32_t localTlsPort;
+		int32_t preferedLocalUdpPort;	// Advanced -> ...Sip port...
+		int32_t preferedLocalTcpPort;
+		int32_t preferedLocalTlsPort;
 		
 		/**
 		@return the port in use, depending on the transport.
