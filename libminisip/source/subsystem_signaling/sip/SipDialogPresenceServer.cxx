@@ -281,7 +281,7 @@ void SipDialogPresenceServer::sendNotify( string toUri, string cid ){
 	MRef<SipRequest*> notify;
 	int32_t localSipPort;
 	
-	localSipPort = getSipStack()->getStackConfig()->getLocalSipPort( useSTUN );
+	localSipPort = getSipStack()->getLocalSipPort( useSTUN );
 	
 	MRef<SipIdentity*> toId( new SipIdentity(toUri));
 	notify = SipRequest::createSipMessageNotify(
