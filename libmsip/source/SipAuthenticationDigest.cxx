@@ -84,7 +84,7 @@ bool SipAuthenticationDigest::update( MRef<SipHeaderValueProxyAuthenticate*> aut
 }
 
 string SipAuthenticationDigest::md5ToString(unsigned char *md5){
-	char *digits = {"0123456789abcdef"};
+	const char *digits = {"0123456789abcdef"};
 	char strsum[33] = {'\0'};
 	for (int i=0 ; i<16; i++){
 		int32_t intval = md5[i];

@@ -165,11 +165,6 @@ class LIBMSIP_API SipStackConfig : public MObject{
 		int32_t preferedLocalTcpPort;
 		int32_t preferedLocalTlsPort;
 		
-		/**
-		@return the port in use, depending on the transport.
-		@param usesStun (default false), found in SipSoftPhoneConfiguration::useSTUN
-		*/
-		int32_t getLocalSipPort(bool usesStun=false, const std::string &transport="UDP");
 
 		bool autoAnswer;
 
@@ -274,6 +269,13 @@ class LIBMSIP_API SipStack : public CommandReceiver, public Runnable{
 		void startUdpServer();
 		void startTcpServer();
 		void startTlsServer();
+
+		/**
+		@return the port in use, depending on the transport.
+		@param usesStun (default false), found in SipSoftPhoneConfiguration::useSTUN
+		*/
+		int32_t getLocalSipPort(bool usesStun=false, const std::string &transport="UDP");
+
 
 		void setDebugPrintPackets(bool enable);
 		bool getDebugPrintPackets();

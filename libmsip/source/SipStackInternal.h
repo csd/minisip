@@ -86,20 +86,15 @@ class SipStackInternal : public SipSMCommandReceiver, public Runnable{
                 
 		std::string getStackStatusDebugString();
 
-		MRef<SipSocketServer *> createUdpServer( bool ipv6, const std::string &ipString );
-		MRef<SipSocketServer *> createTcpServer( bool ipv6, const std::string &ipString );
-		MRef<SipSocketServer *> createTlsServer( bool ipv6, const std::string &ipString );
-
 		void startUdpServer();
 		void startTcpServer();
 		void startTlsServer();
 
+		int32_t getLocalSipPort(bool usesStun, const std::string &transport);
+
 		void free();
 
 	private:
-
-//		std::string getDialogDebugString(MRef<SipDialog*> d, list<MRef<SipTransaction*> > &trans,
-//				list <TPRequest<string,MRef<StateMachine<SipSMCommand,string>*> > > &torequests);
 
 		MRef<SipTimers*> timers;
 		MRef<SipStackConfig *> config;

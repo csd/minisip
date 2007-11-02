@@ -80,7 +80,14 @@ class SipLayerTransport : public SipSMCommandReceiver {
 
 		void datagramSocketRead(MRef<DatagramSocket *> sock);
 
+		void startUdpServer( const std::string & ipString, const std::string & ip6String, int32_t prefUdpPort, int32_t externalContactUdpPort);
+		void startTcpServer( const std::string & ipString, const std::string & ip6String, int32_t prefPort );
+		void startTlsServer( const std::string & ipString, const std::string & ip6String, int32_t prefPort, MRef<CertificateChain *> certChain, MRef<CertificateSet *> cert_db );
+
+		int32_t getLocalSipPort( const std::string &transport );
+
 	protected:
+
 		void sendMessage(MRef<SipMessage*> pack, 
 				 const std::string &toaddr,
 				int32_t port, 
@@ -126,6 +133,23 @@ class SipLayerTransport : public SipSMCommandReceiver {
 				   MRef<SipSocketServer *> server,
 				   MRef<Socket *> socket);
                 
+
+		/**
+		 * Cache what UDP/TCP/TLS server ports are used.
+		 * These values are used when creating SIP via headers.
+		 *
+		 * Note that the values are the one that will be added
+		 * to the Via header, and NAT handling techniques may
+		 * modify these values so that they differ from 
+		 * the low layer socket values. 
+		 */
+		int contactUdpPort;
+		int contactTcpPort;
+		int contactTlsPort;
+		MRef<SipSocketServer *> createUdpServer( bool ipv6, const std::string &ipStrinag, int32_t prefPort, int32_t externalPort );
+		MRef<SipSocketServer *> createTcpServer( bool ipv6, const std::string &ipString, int32_t prefPort );
+		MRef<SipSocketServer *> createTlsServer( bool ipv6, const std::string &ipString, int32_t prefPort, MRef<CertificateChain *> certChain, MRef<CertificateSet *> cert_db  );
+
 		Mutex serversLock;
 		std::list<MRef<SipSocketServer *> > servers;
 		MRef<SocketServer*> manager;

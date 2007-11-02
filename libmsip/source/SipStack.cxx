@@ -201,6 +201,10 @@ void SipStack::startTlsServer(){
 	STACK->startTlsServer();
 }
 
+int32_t SipStack::getLocalSipPort(bool usesStun, const string &transport ) {
+	return STACK->getLocalSipPort(usesStun, transport);
+}
+
 void SipStack::setDebugPrintPackets(bool enable){
 	set_debug_print_packets(enable);	
 }

@@ -43,10 +43,13 @@
 #include<libmsip/SipHeaderContact.h>
 #include<libmsip/SipHeaderTo.h>
 
-#include<libmcrypto/TlsSocket.h>
+#include<libmcrypto/TlsServerSocket.h>
 #include<libmnetutil/ServerSocket.h>
 #include<libmnetutil/NetworkException.h>
 #include<libmnetutil/NetworkFunctions.h>
+#include<libmnetutil/UDPSocket.h>
+#include<libmcrypto/TlsSocket.h>
+#include<libmnetutil/NetworkException.h>
 #include<libmutil/Timestamp.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/mtime.h>
@@ -339,6 +342,9 @@ SipLayerTransport::SipLayerTransport(MRef<CertificateChain *> cchain,
 				     MRef<CertificateSet *> cert_db_):
 		cert_chain(cchain), cert_db(cert_db_), tls_ctx(NULL)
 {
+	contactUdpPort=0;
+	contactTcpPort=0;
+	contactTlsPort=0;
 	manager = new SocketServer();
 	manager->start();
 }
@@ -1196,5 +1202,181 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 			}
 }
 
+
+/**
+ *
+ * @param externalPort  If the application wishes to override what port
+ *   should be reported for the socket it is possible to specify such a port
+ *   number here. This can be used for example to implement support for
+ *   passing NATs with the help of a STUN server.
+ */
+MRef<SipSocketServer *> SipLayerTransport::createUdpServer( bool ipv6, const string &ipString, int32_t prefPort, int32_t externalPort)
+{
+	int32_t port = prefPort;
+	int triesLeft=10;
+	MRef<SipSocketServer *> server;
+	bool fail;
+
+	do {
+		fail=false;
+		try {
+
+			MRef<DatagramSocket *> sock = new UDPSocket( port, ipv6 );
+			server = new DatagramSocketServer( this, sock );
+
+			// IPv6 doesn't need different external udp port
+			// since it never is NATed.
+			if( !ipv6 && externalPort ){
+				server->setExternalPort( externalPort );
+			}
+			server->setExternalIp( ipString );
+
+
+		} catch(const BindFailed &bf){
+			fail=true;
+
+			// If the port is already in use, try random port number in the range 2048 to 63488
+			port = rand()%(0xFFFF-4096) + 2048; 
+			triesLeft--;
+			if (!triesLeft)
+				throw;
+
+		}
+	}while(fail);
+
+	if (externalPort>0)
+		contactUdpPort=externalPort;
+	else
+		contactUdpPort=port;
+
+
+	return server;
+}
+
+MRef<SipSocketServer *> SipLayerTransport::createTcpServer( bool ipv6, const string &ipString, int32_t prefPort)
+{
+	MRef<ServerSocket *> sock;
+	MRef<SipSocketServer *> server;
+	int32_t port = prefPort;
+	bool fail;
+	int triesLeft=10;
+
+	do {
+		fail=false;
+		try {
+
+			sock = ServerSocket::create( port, ipv6 );
+			server = new StreamSocketServer( this, sock );
+			server->setExternalIp( ipString );
+
+		} catch ( const BindFailed &bf ){
+			fail=true;
+			triesLeft--;
+			if (!triesLeft)
+				throw;
+		}
+	} while ( fail );
+
+	contactTcpPort = port;
+
+	return server;
+}
+
+MRef<SipSocketServer *> SipLayerTransport::createTlsServer( bool ipv6, const string &ipString, int32_t prefPort, MRef<CertificateChain *> certChain, MRef<CertificateSet *> cert_db)
+{
+	MRef<ServerSocket *> sock;
+	MRef<SipSocketServer *> server;
+	int32_t port = prefPort;
+	bool fail;
+	int triesLeft=10;
+
+	do {
+		fail=false;
+		try{
+			sock = TLSServerSocket::create( ipv6, port, /*config->cert*/certChain->getFirst(),
+					/*config->*/cert_db );
+			server = new StreamSocketServer( this, sock );
+			server->setExternalIp( ipString );
+		} catch (const BindFailed &bf){
+			fail=true;
+			triesLeft--;
+			if (!triesLeft)
+				throw;
+		}
+
+	} while (fail);
+
+	contactTlsPort = port;
+
+	return server;
+}
+
+void SipLayerTransport::startUdpServer(const string &ipString, const string &ip6String, int32_t localUdpPort, int32_t externalContactUdpPort)
+{
+	MRef<SipSocketServer *> server;
+/*
+	string ipString;
+	if( config->externalContactIP.size()>0 )
+		ipString = config->externalContactIP;
+	else
+		ipString = config->localIpString;
+*/
+
+	server = createUdpServer( false, ipString, localUdpPort, externalContactUdpPort );
+	addServer( server );
+
+	if( /*config->localIp6String*/ ip6String != "" ){
+		MRef<SipSocketServer *> server6;
+		server6 = createUdpServer( true, /*config->localIp6String*/ ip6String,localUdpPort,externalContactUdpPort );
+		addServer( server6 );
+	}
+}
+
+
+void SipLayerTransport::startTcpServer( const string & ipString, const string & ip6String, int32_t prefPort)
+{
+	MRef<SipSocketServer *> server;
+
+	server = createTcpServer( false, /*config->localIpString*/ ipString, prefPort);
+	dispatcher->getLayerTransport()->addServer( server );
+
+	if( /*config->localIp6String*/ ip6String != "" ){
+		MRef<SipSocketServer *> server6;
+
+		server6 = createTcpServer( true, /*config->localIp6String*/ ip6String, prefPort );
+		addServer( server6 );
+	}
+}
+
+void SipLayerTransport::startTlsServer( const string &ipString, const string &ip6String, int32_t prefPort, MRef<CertificateChain *> certChain, MRef<CertificateSet *> cert_db){
+	MRef<SipSocketServer *> server;
+
+	if( certChain.isNull() || certChain->getFirst().isNull() ){
+		merr << "You need a personal certificate to run "
+			"a TLS server. Please specify one in "
+			"the certificate settings. minisip will "
+			"now disable the TLS server." << endl;
+		return;
+	}
+
+	server = createTlsServer( false, /*config->localIpString*/ ipString, prefPort, certChain, cert_db);
+	addServer( server );
+
+	if( /*config->localIp6String*/ ip6String != "" ){
+		MRef<SipSocketServer *> server6;
+
+		server6 = createTlsServer( true, /*config->localIp6String*/ ip6String, prefPort, certChain, cert_db );
+		dispatcher->getLayerTransport()->addServer( server6 );
+	}
+}
+
+
+int32_t SipLayerTransport::getLocalSipPort( const string &transport ) {
+	if (transport=="TCP" || transport=="tcp")
+		return contactTcpPort;
+	if (transport=="TLS" || transport=="tls")
+		return contactTlsPort;
+	return contactUdpPort;
+}
 
 

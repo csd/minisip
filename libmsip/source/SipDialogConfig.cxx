@@ -343,24 +343,6 @@ SipStackConfig::SipStackConfig():
 
 }
 
-int32_t SipStackConfig::getLocalSipPort(bool usesStun, const string &transport ) {
-	int32_t localSipPort;
-	
-	if(transport=="TCP" || transport=="tcp")
-		localSipPort = preferedLocalTcpPort;
-	else if(transport=="TLS" || transport=="tls")
-		localSipPort = preferedLocalTlsPort;
-	else{ /* UDP, may use STUN */
-		if( usesStun ){
-			localSipPort = externalContactUdpPort;
-		} else {
-			localSipPort = preferedLocalUdpPort;
-		}
-	}
-	return localSipPort;
-}
-
-
 SipDialogConfig::SipDialogConfig(MRef<SipStack*> stack) {
 //	inherited = new SipStackConfig; /// We want do do a "deep copy" here. This is so that
 //					 /// we have a local copy that we can modify and that 
@@ -409,7 +391,7 @@ SipUri SipIdentity::getContactUri( MRef<SipStack*> sipStack,
 	else
 		transport = fromUri.getTransport();
 
-	port =sipStack->getStackConfig()->getLocalSipPort(useStun, transport);
+	port =sipStack->getLocalSipPort(useStun, transport);
 
 	contactUri.setParams( fromUri.getUserName(),
 			      sipStack->getStackConfig()->externalContactIP,
