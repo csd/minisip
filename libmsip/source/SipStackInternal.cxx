@@ -64,6 +64,7 @@
 #include<libmsip/SipHeaderWWWAuthenticate.h>
 #include<libmsip/SipCommandString.h>
 #include<libmnetutil/UDPSocket.h>
+#include<libmnetutil/NetworkException.h>
 
 #include<libmutil/massert.h>
 
@@ -383,17 +384,35 @@ std::string SipStackInternal::getStackStatusDebugString(){
 MRef<SipSocketServer *> SipStackInternal::createUdpServer( bool ipv6, const string &ipString )
 {
 	int32_t port = config->preferedLocalUdpPort;
-
-	MRef<DatagramSocket *> sock = new UDPSocket( port, ipv6 );
+	int triesLeft=10;
 	MRef<SipSocketServer *> server;
+	bool fail;
 
-	server = new DatagramSocketServer( dispatcher->getLayerTransport(), sock );
-	// IPv6 doesn't need different external udp port
-	// since it never is NATed.
-	if( !ipv6 && config->externalContactUdpPort ){
-		server->setExternalPort( config->externalContactUdpPort );
-	}
-	server->setExternalIp( ipString );
+	do {
+		fail=false;
+		try {
+
+			MRef<DatagramSocket *> sock = new UDPSocket( port, ipv6 );
+			server = new DatagramSocketServer( dispatcher->getLayerTransport(), sock );
+			// IPv6 doesn't need different external udp port
+			// since it never is NATed.
+			if( !ipv6 && config->externalContactUdpPort ){
+				server->setExternalPort( config->externalContactUdpPort );
+			}
+			server->setExternalIp( ipString );
+
+		} catch(const BindFailed &bf){
+			fail=true;
+
+			// If the port is already in use, try random port number in the range 2048 to 63488
+			port = rand()%(0xFFFF-4096) + 2048; 
+			triesLeft--;
+			if (!triesLeft)
+				throw;
+
+		}
+	}while(fail);
+
 
 	return server;
 }
@@ -403,10 +422,24 @@ MRef<SipSocketServer *> SipStackInternal::createTcpServer( bool ipv6, const stri
 	MRef<ServerSocket *> sock;
 	MRef<SipSocketServer *> server;
 	int32_t port = config->preferedLocalTcpPort;
+	bool fail;
+	int triesLeft=10;
 
-	sock = ServerSocket::create( port, ipv6 );
-	server = new StreamSocketServer( dispatcher->getLayerTransport(), sock );
-	server->setExternalIp( ipString );
+	do {
+		fail=false;
+		try {
+
+			sock = ServerSocket::create( port, ipv6 );
+			server = new StreamSocketServer( dispatcher->getLayerTransport(), sock );
+			server->setExternalIp( ipString );
+
+		} catch ( const BindFailed &bf ){
+			fail=true;
+			triesLeft--;
+			if (!triesLeft)
+				throw;
+		}
+	} while ( fail );
 
 	return server;
 }
@@ -416,11 +449,24 @@ MRef<SipSocketServer *> SipStackInternal::createTlsServer( bool ipv6, const stri
 	MRef<ServerSocket *> sock;
 	MRef<SipSocketServer *> server;
 	int32_t port = config->preferedLocalTlsPort;
+	bool fail;
+	int triesLeft=10;
 
-	sock = TLSServerSocket::create( ipv6, port, config->cert->getFirst(),
+	do {
+		fail=false;
+		try{
+			sock = TLSServerSocket::create( ipv6, port, config->cert->getFirst(),
 					config->cert_db );
-	server = new StreamSocketServer( dispatcher->getLayerTransport(), sock );
-	server->setExternalIp( ipString );
+			server = new StreamSocketServer( dispatcher->getLayerTransport(), sock );
+			server->setExternalIp( ipString );
+		} catch (const BindFailed &bf){
+			fail=true;
+			triesLeft--;
+			if (!triesLeft)
+				throw;
+		}
+
+	} while (fail);
 
 	return server;
 }
