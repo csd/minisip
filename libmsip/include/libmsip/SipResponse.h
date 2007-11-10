@@ -74,6 +74,13 @@ class LIBMSIP_API SipResponse : public SipMessage{
 
 		virtual const std::string& getType(){return type;}
 
+		/**
+		 * Insert "Unupported" header in a 420 (Bad Extension)
+		 * response containing unsupported extensions.
+		 * @param unsupported list of unsupported extensions.
+		 */
+		void addUnsupported(const std::list<std::string> &unsupported);
+
 	private:
 		int32_t status_code;
 		std::string status_desc;

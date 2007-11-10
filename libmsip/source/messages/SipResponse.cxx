@@ -43,6 +43,7 @@
 #include<libmsip/SipHeaderCallID.h>
 #include<libmsip/SipHeaderCSeq.h>
 #include<libmsip/SipHeaderMaxForwards.h>
+#include<libmsip/SipHeaderUnsupported.h>
 
 #include<libmsip/SipException.h>
 #include<libmsip/SipUtils.h>
@@ -149,3 +150,14 @@ string SipResponse::getStatusDesc(){
 	return status_desc;
 }
 
+void SipResponse::addUnsupported(const std::list<string> &unsupported){
+	list<string>::const_iterator i;
+	list<string>::const_iterator last = unsupported.end();
+
+	for( i = unsupported.begin(); i != last; i++ ){
+		const string &ext = *i;
+
+		SipHeaderValue *value = new SipHeaderValueUnsupported( ext );
+		addHeader( new SipHeader( value ));
+	}
+}

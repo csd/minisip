@@ -542,6 +542,18 @@ bool SipMessage::requires(string extension){
 }
 
 
+list<string> SipMessage::getRequired() {
+	list<string> set;
+	int n=0;
+	MRef<SipHeaderValue*> rr;
+	while ( ! (rr=getHeaderValueNo(SIP_HEADER_TYPE_REQUIRE,n++)).isNull() ){
+		set.push_back( ((SipHeaderValueRequire*)*rr)->getString() );
+	}
+
+	return set;
+}
+
+
 bool SipMessage::supported(string extension){
 	MRef<SipHeaderValue*> hval;
 	bool ret=false;

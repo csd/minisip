@@ -148,6 +148,13 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
                  */
 		bool requires(std::string extension);
 
+                /**
+                 * Returns a list of required extensions listed in
+		 * "Require" headers.
+		 * @return list of required extensions.
+                 */
+		std::list<std::string> getRequired();
+
 		/**
 		 * Returns true if the message contains a SIP "Supported" header with
 		 * the extension given as argument to this method.

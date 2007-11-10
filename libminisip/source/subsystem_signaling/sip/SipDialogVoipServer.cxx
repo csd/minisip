@@ -157,6 +157,11 @@ bool SipDialogVoipServer::a3007_start_100rel_INVITE( const SipSMCommand &command
 		
 	MRef<SipRequest*> inv = (SipRequest *)*command.getCommandPacket();
 
+	if( rejectUnsupported( inv ) ){
+		// Unsupported extension(s)
+		return true;
+	}
+
 	if( !inv->supported("100rel") && !inv->requires("100rel") ){
 		return false;
 	}

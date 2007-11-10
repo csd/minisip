@@ -244,6 +244,19 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 
 		std::string getDialogDebugString();
 
+		/**
+		 * @return a list of SIP extensions listed in
+		 * "Require" header(s) but not supported by the SIP stack.
+		 */
+		std::list<std::string> getRequiredUnsupported( MRef<SipMessage*> msg );
+
+		/**
+		 * Send a 420 (Bad Extension) response if the SIP request
+		 * requires unsupported SIP extensions.
+		 * @return true if a 420 response is sent.
+		 */
+		bool rejectUnsupported( MRef<SipRequest*> req );
+
 	protected:
 		
 		bool updateAuthentication( MRef<SipResponse*> resp,

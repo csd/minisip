@@ -596,3 +596,35 @@ std::string SipDialog::getDialogDebugString(){
 	return ret;
 }
 
+list<string> SipDialog::getRequiredUnsupported( MRef<SipMessage*> msg ) {
+	list<string> required = msg->getRequired();
+	list<string> unsupported;
+
+	list<string>::iterator i;
+	list<string>::iterator last = required.end();
+
+	for( i = required.begin(); i != last; i++ ){
+		const string &req = *i;
+
+		if( !callConfig->sipStack->supports( req ) )
+			unsupported.push_back( req );
+	}
+
+	return unsupported;
+}
+
+bool SipDialog::rejectUnsupported( MRef<SipRequest*> req ){
+	list<string> unsuppored = getRequiredUnsupported( *req );
+
+	if( !unsuppored.empty() ){
+		// Send 420 Bad Extension
+		MRef<SipResponse*> resp =
+			createSipResponse( req, 420, "Bad Extension" );
+
+		resp->addUnsupported( unsuppored );
+		sendSipMessage( *resp );
+		return true;
+	}
+
+	return false;
+}
