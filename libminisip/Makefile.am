@@ -70,6 +70,7 @@ endif
 
 
 libmediahandler_src = source/subsystem_media/MediaHandler.cxx \
+			source/subsystem_media/SubsystemMedia.cxx \
 			source/subsystem_media/Session.cxx \
 			source/subsystem_media/MediaStream.cxx \
 			source/subsystem_media/Media.cxx \

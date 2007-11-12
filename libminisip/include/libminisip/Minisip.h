@@ -14,6 +14,7 @@ class ConferenceControl;
 class ConsoleDebugger;
 class MessageRouter;
 class ConfMessageRouter;
+class SubsystemMedia;
 
 
 class LIBMINISIP_API Minisip : public MObject{
@@ -63,6 +64,7 @@ class LIBMINISIP_API Minisip : public MObject{
 
 		std::string confPath;
 		MRef<MediaHandler *> mediaHandler;
+		MRef<SubsystemMedia *> subsystemMedia;
 		MRef<Gui *> gui;
 		MRef<SipSoftPhoneConfiguration *> phoneConf;
 		MRef<Sip *> sip;

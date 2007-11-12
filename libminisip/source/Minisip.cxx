@@ -71,6 +71,7 @@
 #include<libminisip/gui/LogEntry.h>
 #include<libminisip/contacts/ContactDb.h>
 #include<libminisip/media/MediaHandler.h>
+#include<libminisip/media/SubsystemMedia.h>
 #include<libminisip/signaling/conference/ConferenceControl.h>
 #include<libminisip/signaling/conference/ConfCallback.h>
 #include<libminisip/config/ConfBackend.h>
@@ -358,10 +359,14 @@ int Minisip::startSip() {
 #ifdef DEBUG_OUTPUT
 		mout << BOLD << "init 5/9: Creating MediaHandler" << PLAIN << endl;
 #endif
-		mediaHandler = new MediaHandler( phoneConf, ipProvider, ip6Provider );
-		confMessageRouter->setMediaHandler( mediaHandler );
-		messageRouter->addSubsystem("media",*mediaHandler);
-		mediaHandler->setMessageRouterCallback(*messageRouter);
+//		mediaHandler = new MediaHandler( phoneConf, ipProvider, ip6Provider );
+//		confMessageRouter->setMediaHandler( mediaHandler );
+//		messageRouter->addSubsystem("media",*mediaHandler);
+//		mediaHandler->setMessageRouterCallback(*messageRouter);
+
+		subsystemMedia = new SubsystemMedia( phoneConf, ipProvider, ip6Provider );
+		messageRouter->addSubsystem("media",*subsystemMedia);
+		subsystemMedia->setMessageRouterCallback(*messageRouter);
 
 		if( consoleDbg ){
 			consoleDbg->setMediaHandler( mediaHandler );
