@@ -42,6 +42,7 @@ class MediaStreamSender;
 class MediaStreamReceiver;
 class SdpHeaderM;
 class SipSoftPhoneConfiguration;
+class SubsystemMedia;
 class MediaHandler;
 
 /**
@@ -181,6 +182,7 @@ class LIBMINISIP_API Media : public MObject{
 		MRef<CodecState *> createCodecInstance( uint8_t payloadType );
 
 		void setMediaHandler(MRef<MediaHandler*> reg);
+		
 		MRef<MediaHandler*> getMediaHandler();
 		
 	protected:
@@ -227,4 +229,4 @@ class LIBMINISIP_API MediaRegistry : public MPluginRegistry, public MSingleton<M
 #endif
 
 #include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
-#include<libminisip/media/MediaHandler.h>
+#include<libminisip/media/SubsystemMedia.h>

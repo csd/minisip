@@ -50,7 +50,7 @@
 #include <time.h>
 #include<libminisip/gui/LogEntry.h>
 #include<libmsip/SipCommandString.h>
-#include<libminisip/media/MediaHandler.h>
+#include<libminisip/media/SubsystemMedia.h>
 #include<libmutil/MemObject.h>
 #include<libmsip/SipHeaderSubscriptionState.h>
 

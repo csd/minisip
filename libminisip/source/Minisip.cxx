@@ -70,8 +70,9 @@
 #include<libminisip/signaling/sip/Sip.h>
 #include<libminisip/gui/LogEntry.h>
 #include<libminisip/contacts/ContactDb.h>
-#include<libminisip/media/MediaHandler.h>
 #include<libminisip/media/SubsystemMedia.h>
+#include<libminisip/media/Media.h>
+#include<libminisip/ipprovider/IpProvider.h>
 #include<libminisip/signaling/conference/ConferenceControl.h>
 #include<libminisip/signaling/conference/ConfCallback.h>
 #include<libminisip/config/ConfBackend.h>
@@ -293,7 +294,7 @@ int Minisip::join(){
 	messageRouter=NULL;
 
 	phoneConf = NULL;
-	mediaHandler = NULL;
+	//mediaHandler = NULL;
 	confMessageRouter->setGui(NULL);
 	confMessageRouter = NULL;
 	gui = NULL;
@@ -369,10 +370,11 @@ int Minisip::startSip() {
 		subsystemMedia->setMessageRouterCallback(*messageRouter);
 
 		if( consoleDbg ){
-			consoleDbg->setMediaHandler( mediaHandler );
+			consoleDbg->setMediaHandler( /*mediaHandler*/ subsystemMedia );
 		}
 
-		Session::registry = *mediaHandler;
+		//Session::registry = *mediaHandler; Moved to MediaHandler::MediaHandler
+
 		/* Hack: precompute a KeyAgreementDH */
 		//	Session::precomputedKa = new KeyAgreementDH( phoneConf->securityConfig.cert, 
 		//                phoneConf->securityConfig.cert_db, DH_GROUP_OAKLEY5 );
@@ -388,7 +390,7 @@ int Minisip::startSip() {
 		}
 
 		//save Sip object in Minisip::sip ...
-		this->sip=new Sip(phoneConf,mediaHandler);
+		this->sip=new Sip(phoneConf,/*mediaHandler*/ subsystemMedia);
 		//sip->init();
 
 //		phoneConf->sip = sip;

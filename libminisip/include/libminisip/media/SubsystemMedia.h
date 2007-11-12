@@ -30,6 +30,8 @@
 
 class SipSoftPhoneConfiguration;
 class IpProvider;
+class Session;
+class SipIdentity;
 
 class LIBMINISIP_API SubsystemMedia: public CommandReceiver {
 
@@ -75,6 +77,15 @@ class LIBMINISIP_API SubsystemMedia: public CommandReceiver {
                  */
                 MRef<CommandReceiver *> getMessageRouterCallback() { return messageRouterCallback;}
 #endif                       
+
+		/**
+		 * Creates a new media session, for use in a new VoIP call
+		 * @param config the call specific configuration
+		 * @param callId identifier shared with the SIP stack
+		 * @returns a reference to the session created
+		 */
+		MRef<Session *> createSession( MRef<SipIdentity*> ident, std::string callId );
+
 
 		virtual std::string getMemObjectType() const {return "SubsystemMedia";}
 

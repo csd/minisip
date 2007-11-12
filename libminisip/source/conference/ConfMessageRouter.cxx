@@ -165,7 +165,7 @@ string ConfMessageRouter::guicb_confDoInvite(string sip_url){
 */
 
 void ConfMessageRouter::guicb_handleMediaCommand(const CommandString &cmd){
-	mediaHandler->handleCommand("media",cmd);
+	subsystemMedia->handleCommand("media",cmd);
 }
 
 //string ConfMessageRouter::guicb_doInvite(string user){

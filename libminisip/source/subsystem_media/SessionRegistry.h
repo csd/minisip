@@ -47,7 +47,7 @@ class LIBMINISIP_API SessionRegistry{
 		Mutex sessionsLock;
 };
 
-#include<libminisip/media/Session.h>
+#include"Session.h"
 
 
 #endif

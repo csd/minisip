@@ -57,6 +57,8 @@ class LIBMINISIP_API MediaCommandString{
 		 */
 		static const std::string audio_forwarding_enable;
 		static const std::string audio_forwarding_disable;
+
+		static const std::string send_dtmf;
 		
 	
 };

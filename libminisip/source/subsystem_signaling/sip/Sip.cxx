@@ -59,10 +59,10 @@
 
 using namespace std;
 
-Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig, MRef<MediaHandler*>mh){
+Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig, MRef<SubsystemMedia*> sm){
 
 	this->phoneconfig = pconfig;
-	this->mediaHandler = mh;
+	this->subsystemMedia = sm;
 
 	MRef<SipStackConfig *> stackConfig /*= new SipStackConfig()*/;
 //	// Deep copy
@@ -74,7 +74,7 @@ Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig, MRef<MediaHandler*>mh){
 	MRef<DefaultDialogHandler*> defaultDialogHandler = 
 			new DefaultDialogHandler(sipstack,
 						phoneconfig,
-						mediaHandler);
+						subsystemMedia);
 	
 	sipstack->setDefaultDialogCommandHandler(*defaultDialogHandler);
 
@@ -171,7 +171,7 @@ string Sip::confjoin(string &user, minilist<ConfMember> *conflist, string confId
 
 
 	MRef<Session *> mediaSession = 
-		mediaHandler->createSession( /*securityConfig*/ identity, "" );
+		subsystemMedia->createSession( /*securityConfig*/ identity, "" );
 
 	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(dynamic_cast<ConfMessageRouter*>(*sipstack->getConfCallback()), sipstack, identity, phoneconfig, mediaSession, conflist, confId, "")); 
 
@@ -260,7 +260,7 @@ string Sip::confconnect(string &user, string confId){
 
 
 MRef<Session *> mediaSession = 
-		mediaHandler->createSession( /*securityConfig*/ identity, "" );
+		subsystemMedia->createSession( /*securityConfig*/ identity, "" );
 
 	MRef<SipDialog*> voipConfCall( new SipDialogConfVoip(dynamic_cast<ConfMessageRouter*>(*sipstack->getConfCallback()), sipstack, identity, phoneconfig, mediaSession, confId)); 
 
@@ -370,6 +370,7 @@ void Sip::run(){
 	sipstack->run();
 }
 
-void Sip::setMediaHandler( MRef<MediaHandler *> mh ){
-	this->mediaHandler = mh;
+void Sip::setMediaHandler( MRef<SubsystemMedia*> sm ){
+	this->subsystemMedia = sm;
 }
+

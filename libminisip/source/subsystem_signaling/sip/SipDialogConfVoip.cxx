@@ -48,6 +48,7 @@
 #include<libmsip/SipMessageContentMime.h>
 #include<libmsip/SipMessageContent.h>
 #include<libminisip/signaling/sip/DefaultDialogHandler.h>
+#include"../../../source/subsystem_media/Session.h"
 #include<libminisip/signaling/conference/ConfMessageRouter.h>
 #include<libmutil/stringutils.h>
 #include<libmutil/Timestamp.h>
@@ -57,7 +58,7 @@
 #include <time.h>
 #include<libminisip/gui/LogEntry.h>
 #include<libmsip/SipCommandString.h>
-#include<libminisip/media/MediaHandler.h>
+#include<libminisip/media/SubsystemMedia.h>
 #include<libmutil/MemObject.h>
 #include <iostream>
 #include<time.h>

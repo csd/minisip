@@ -25,7 +25,7 @@
 #include <config.h>
 
 #include<libminisip/media/SubsystemMedia.h>
-#include<libminisip/media/MediaHandler.h>
+#include"MediaHandler.h"
 
 #include<string.h>
 #if 0
@@ -90,6 +90,12 @@ CommandString SubsystemMedia::handleCommandResp(string, const CommandString& c){
 void SubsystemMedia::handleCommand(string subsystem, const CommandString& command ){
 	assert(subsystem=="media");
 	return MH->handleCommand(subsystem, command);
+
+}
+
+
+MRef<Session *> SubsystemMedia::createSession( MRef<SipIdentity*> ident, std::string callId ){
+	return MH->createSession(ident, callId);
 
 }
 

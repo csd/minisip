@@ -4,8 +4,8 @@
 #include<libminisip/libminisip_config.h>
 
 #include<libmutil/MemObject.h>
+#include<libminisip/media/SubsystemMedia.h>
 
-class MediaHandler;
 class Gui;
 class SipSoftPhoneConfiguration;
 class Sip;
@@ -14,7 +14,6 @@ class ConferenceControl;
 class ConsoleDebugger;
 class MessageRouter;
 class ConfMessageRouter;
-class SubsystemMedia;
 
 
 class LIBMINISIP_API Minisip : public MObject{
@@ -63,7 +62,6 @@ class LIBMINISIP_API Minisip : public MObject{
 		int initParseConfig();
 
 		std::string confPath;
-		MRef<MediaHandler *> mediaHandler;
 		MRef<SubsystemMedia *> subsystemMedia;
 		MRef<Gui *> gui;
 		MRef<SipSoftPhoneConfiguration *> phoneConf;

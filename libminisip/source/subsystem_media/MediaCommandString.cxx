@@ -39,3 +39,5 @@ const string MediaCommandString::reload="reload";
 
 const string MediaCommandString::audio_forwarding_enable="audio_forwarding_enable";
 const string MediaCommandString::audio_forwarding_disable="audio_forwarding_disable";
+
+const string MediaCommandString::send_dtmf="send_dtmf";

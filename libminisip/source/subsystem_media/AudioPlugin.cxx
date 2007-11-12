@@ -26,6 +26,7 @@
 
 #include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
 #include<libminisip/media/Media.h>
+#include<libminisip/media/AudioMedia.h>
 #include<libminisip/media/soundcard/SoundDevice.h>
 
 

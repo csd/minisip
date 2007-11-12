@@ -31,7 +31,7 @@
 #include<libmutil/Thread.h>
 
 #include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
-#include<libminisip/media/MediaHandler.h>
+#include<libminisip/media/SubsystemMedia.h>
 
 #include<string>
 
@@ -59,7 +59,7 @@ class LIBMINISIP_API ConsoleDebugger : public Runnable{
 		
 		void join();
 		
-		void setMediaHandler( MRef<MediaHandler *> r ) {
+		void setMediaHandler( MRef<SubsystemMedia*> r ) {
 			mediaHandler = r; 
 			if (mediaHandler) 
 				std::cerr << "EEEE: mediaHandler set!"<<std::endl; 
@@ -69,7 +69,7 @@ class LIBMINISIP_API ConsoleDebugger : public Runnable{
 
 	private:
 		MRef<SipStack*> sipStack;
-		MRef<MediaHandler *> mediaHandler;
+		MRef<SubsystemMedia *> mediaHandler;
 		
 		MRef<Thread *> thread;
 		bool keepRunning;

@@ -36,16 +36,15 @@
 #include<libminisip/signaling/sdp/SdpPacket.h>
 #include<libminisip/signaling/conference/ConfMember.h>
 #include<libminisip/gui/LogEntry.h>
-#include<libminisip/media/MediaHandler.h>
+#include<libminisip/media/SubsystemMedia.h>
 
 class SipSoftPhoneConfiguration;
-class MediaHandler;
 
 class LIBMINISIP_API Sip: public Runnable{
 
 	public:
 		Sip(MRef<SipSoftPhoneConfiguration*> phoneconfig,
-		    MRef<MediaHandler*> mediaHandler);
+		    MRef<SubsystemMedia*> subsystemMedia);
 
 		virtual ~Sip();
 
@@ -83,12 +82,12 @@ class LIBMINISIP_API Sip: public Runnable{
 		std::string confconnect(std::string &user, std::string confId);
 		MRef<SipStack*> getSipStack(){return sipstack;}
 
-		void setMediaHandler( MRef<MediaHandler *> mediaHandler );
+		void setMediaHandler( MRef<SubsystemMedia*> subsystemMedia);
 
 	private:
 		MRef<SipStack *> sipstack;
 		MRef<SipSoftPhoneConfiguration*> phoneconfig;
-		MRef<MediaHandler *> mediaHandler;
+		MRef<SubsystemMedia *> subsystemMedia;
 		
 		MRef<Thread *> thread;
 };

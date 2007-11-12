@@ -28,8 +28,8 @@
 #include<libmsip/SipCommandString.h>
 #include<libminisip/gui/Bell.h>
 #include<libminisip/media/MediaCommandString.h>
-#include<libminisip/media/Session.h>
-#include<libminisip/media/MediaStream.h>
+//#include<libminisip/media/Session.h>
+//#include<libminisip/media/MediaStream.h>
 
 #ifdef OLDLIBGLADEMM
 #define SLOT(a,b) SigC::slot(a,b)
@@ -552,11 +552,21 @@ void CallWidget::transfer(){
 }
 
 void CallWidget::dtmfPressed( uint8_t symbol ){
+	char s[2];
+	s[0]=symbol;
+	s[1]=0;
+	CommandString cmd( mainCallId,
+			   MediaCommandString::send_dtmf,
+			   s );
+	mainWindow->getCallback()->handleCommand( "media", cmd );
+
+#if 0
 	MRef<Session *> session = Session::registry->getSession( mainCallId );
 
 	if( session ){
 			session->sendDtmf( symbol );
 	}
+#endif
 }
 
 #endif

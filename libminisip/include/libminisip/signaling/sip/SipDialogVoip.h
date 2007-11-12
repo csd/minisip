@@ -41,7 +41,7 @@
 #include<libmsip/SipResponse.h>
 #include<libmutil/StateMachine.h>
 
-#include<libminisip/media/Session.h>
+#include"../../../../source/subsystem_media/Session.h"
 
 class LogEntry;
 

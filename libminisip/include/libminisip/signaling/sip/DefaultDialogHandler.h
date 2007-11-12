@@ -57,7 +57,7 @@ class LIBMINISIP_API DefaultDialogHandler : public SipDefaultHandler {
 		 */
 		DefaultDialogHandler(MRef<SipStack*> stack, 
 				MRef<SipSoftPhoneConfiguration*> pconf, 
-				MRef<MediaHandler *> mediaHandler);
+				MRef<SubsystemMedia*> subsystemMedia);
 		
 		virtual ~DefaultDialogHandler();
 
@@ -85,7 +85,7 @@ class LIBMINISIP_API DefaultDialogHandler : public SipDefaultHandler {
 		bool handleCommandString(CommandString &command );
 		
 		MRef<SipSoftPhoneConfiguration*> phoneconf;
-		MRef<MediaHandler*> mediaHandler;
+		MRef<SubsystemMedia*> subsystemMedia;
 #ifdef P2T_SUPPORT
 		
 		/**

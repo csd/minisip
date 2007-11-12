@@ -31,8 +31,8 @@
 #include<libmsip/SipCommandString.h>
 #include<libminisip/gui/Bell.h>
 #include<libminisip/media/MediaCommandString.h>
-#include<libminisip/media/Session.h>
-#include<libminisip/media/MediaStream.h>
+//#include<libminisip/media/Session.h>
+//#include<libminisip/media/MediaStream.h>
 #include<libminisip/signaling/conference/ConfMessageRouter.h>
 
 #ifdef OLDLIBGLADEMM

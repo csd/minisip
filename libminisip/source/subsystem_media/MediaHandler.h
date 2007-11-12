@@ -32,8 +32,8 @@
 #include<libminisip/media/AudioMedia.h>
 #include<libminisip/media/Media.h>
 /*#include<libminisip/media/MediaStream.h>*/
-#include<libminisip/media/Session.h>
-#include<libminisip/media/SessionRegistry.h>
+#include"Session.h"
+#include"SessionRegistry.h"
 #include<libminisip/ipprovider/IpProvider.h>
 #include<libmutil/CommandString.h>
 #include<libmutil/MessageRouter.h>

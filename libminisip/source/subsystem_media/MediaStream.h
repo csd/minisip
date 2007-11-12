@@ -31,8 +31,8 @@
 
 #include<libminisip/media/rtp/CryptoContext.h>
 #include<libminisip/media/Media.h>
-#include<libminisip/media/Session.h>
-#include<libminisip/media/RtpReceiver.h>
+#include"Session.h"
+#include"RtpReceiver.h"
 #include<libminisip/media/rtp/SRtpPacket.h>
 
 #ifdef ZRTP_SUPPORT

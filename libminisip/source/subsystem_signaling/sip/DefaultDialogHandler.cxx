@@ -64,7 +64,7 @@
 #endif
 
 
-#include<libminisip/media/MediaHandler.h>
+#include<libminisip/media/SubsystemMedia.h>
 
 
 #include<libmutil/dbg.h>
@@ -73,10 +73,10 @@ using namespace std;
 
 DefaultDialogHandler::DefaultDialogHandler(MRef<SipStack*> stack, 
 	    MRef<SipSoftPhoneConfiguration*> pconf,
-	    MRef<MediaHandler *>mh): 
+	    MRef<SubsystemMedia*> sm): 
 		sipStack(stack),
 		phoneconf(pconf),
-		mediaHandler(mh)
+		subsystemMedia(sm)
 {
 	outsideDialogSeqNo=1;
 
@@ -179,7 +179,7 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 			//string prot = sdp->getSessionLevelAttribute("p2tGroupListProt");
 			// get a session from the mediaHandler
 			MRef<Session *> mediaSession = 
-				mediaHandler->createSession(/*phoneconf->securityConfig*/ id, pkt->getCallId() );
+				subsystemMedia->createSession(/*phoneconf->securityConfig*/ id, pkt->getCallId() );
 
 /*			MRef<SipDialogConfig*> callConf = new SipDialogConfig(phoneconf->inherited);
 			if( id ){
@@ -213,7 +213,7 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 			MRef<SdpPacket*> sdp = (SdpPacket*)*inv->getContent();
 			string confid = sdp->getSessionLevelAttribute("confId");
 			MRef<Session *> mediaSession = 
-				mediaHandler->createSession(/*phoneconf->securityConfig*/ id, pkt->getCallId() );
+				subsystemMedia->createSession(/*phoneconf->securityConfig*/ id, pkt->getCallId() );
 
 /*			MRef<SipDialogConfig*> callConf = new SipDialogConfig(phoneconf->inherited);
 
@@ -249,7 +249,7 @@ bool DefaultDialogHandler::handleCommandPacket( MRef<SipMessage*> pkt){
 
 				// get a session from the mediaHandler
 				MRef<Session *> mediaSession = 
-					mediaHandler->createSession(/*phoneconf->securityConfig*/ id, pkt->getCallId() );
+					subsystemMedia->createSession(/*phoneconf->securityConfig*/ id, pkt->getCallId() );
 
 				MRef<SipDialog*> voipCall;
 				voipCall = new SipDialogVoipServer(sipStack,
@@ -604,7 +604,7 @@ CommandString DefaultDialogHandler::handleCommandResp(string subsystem, const Co
 	
 	MRef<SipDialogVoip*> voipCall = new SipDialogVoipClient(sipStack, id, phoneconf->useSTUN, phoneconf->useAnat, NULL); 
 
-	MRef<Session *> mediaSession = mediaHandler->createSession( id, voipCall->getCallId() );
+	MRef<Session *> mediaSession = subsystemMedia->createSession( id, voipCall->getCallId() );
 	voipCall->setMediaSession( mediaSession );
 
 	sipStack->addDialog(*voipCall);

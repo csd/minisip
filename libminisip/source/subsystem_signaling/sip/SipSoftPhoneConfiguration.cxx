@@ -40,7 +40,8 @@
 #include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
 
 #include<libminisip/media/soundcard/SoundIO.h>
-#include<libminisip/media/MediaHandler.h>
+#include<libminisip/media/SubsystemMedia.h>
+#include<libminisip/media/codecs/Codec.h>
 #include<libminisip/contacts/PhoneBook.h>
 #include<libminisip/config/ConfBackend.h>
 #include<libminisip/config/UserConfig.h>

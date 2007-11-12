@@ -24,7 +24,7 @@
 
 #include <config.h>
 
-#include<libminisip/media/MediaHandler.h>
+#include"MediaHandler.h"
 
 #include<string.h>
 #include<libminisip/signaling/sdp/SdpPacket.h>
@@ -32,11 +32,11 @@
 #include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
 #include<libminisip/ipprovider/IpProvider.h>
 #include<libminisip/media/codecs/Codec.h>
-#include<libminisip/media/Session.h>
-#include<libminisip/media/MediaStream.h>
+#include"Session.h"
+#include"MediaStream.h"
 
 #include<libminisip/media/Media.h>
-#include<libminisip/media/RtpReceiver.h>
+#include"RtpReceiver.h"
 #include<libminisip/media/MediaCommandString.h>
 #include<libmnetutil/UDPSocket.h>
 
@@ -45,7 +45,7 @@
 #include<libminisip/media/codecs/Codec.h>
 
 #include<libminisip/media/CallRecorder.h>
-#include<libminisip/media/SessionRegistry.h>
+#include"SessionRegistry.h"
 
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"
@@ -91,6 +91,8 @@ void MediaHandler::init(){
 			}
 		}
 	}
+
+	Session::registry = this;
 
 //	muteAllButOne = config->muteAllButOne;
 	
@@ -238,6 +240,21 @@ void MediaHandler::handleCommand(string subsystem, const CommandString& command 
 		audioMedia->setAudioForwarding(false);
 		return;
 	}
+
+	if( command.getOp() == MediaCommandString::send_dtmf){
+		MRef<Session *> session = Session::registry->getSession( command.getDestinationId() );
+		if( session ){
+			string tmp = command.getParam();
+			if (tmp.length()==1){
+				uint8_t c = tmp[0];
+				session->sendDtmf( c );
+			}else{
+				merr("media/dtmf") << "Error: DTMF formar error. Ignored."<<endl;
+			}
+		}
+		return;
+	}
+
 
 	
 	if( command.getOp() == MediaCommandString::set_session_sound_settings ){

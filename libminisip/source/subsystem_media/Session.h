@@ -34,7 +34,7 @@
 
 #include<libminisip/media/DtmfSender.h>
 #include<libminisip/signaling/sdp/SdpPacket.h>
-#include<libminisip/media/MediaStream.h>
+#include"MediaStream.h"
 #include<libmsip/SipDialogConfig.h>
 
 class MediaStreamReceiver;
@@ -290,6 +290,6 @@ class LIBMINISIP_API Session : public MObject{
 };
 
 
-#include<libminisip/media/SessionRegistry.h>
+#include"SessionRegistry.h"
 
 #endif

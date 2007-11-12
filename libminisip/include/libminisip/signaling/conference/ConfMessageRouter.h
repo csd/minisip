@@ -62,8 +62,8 @@ class LIBMINISIP_API ConfMessageRouter: 	//public SipCallback,
 		void setGui(MRef<Gui *> g){gui = g;};
 		virtual void setConferenceController(ConferenceControl *conf);
 		virtual void removeConferenceController(ConferenceControl *conf);
-		void setMediaHandler(MRef<MediaHandler *> mh){
-			this->mediaHandler = mh;}
+		void setMediaHandler(MRef<SubsystemMedia*> sm){
+			this->subsystemMedia = sm;}
 
 		virtual void sipcb_handleCommand(const CommandString &command);
 		virtual void sipcb_handleConfCommand(const CommandString &command);
@@ -83,7 +83,7 @@ class LIBMINISIP_API ConfMessageRouter: 	//public SipCallback,
 		MRef<Gui *> gui;
 		minilist<ConferenceControl *> confrout;//bm
 		MRef<Sip*> sip;
-		MRef<MediaHandler *> mediaHandler;
+		MRef<SubsystemMedia*> subsystemMedia;
 };
 
 #endif
