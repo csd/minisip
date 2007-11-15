@@ -34,6 +34,7 @@
 #include<libminisip/media/video/display/VideoDisplay.h>
 #include<libminisip/signaling/sdp/SdpHeaderM.h>
 #include<libminisip/signaling/sdp/SdpHeaderA.h>
+#include"../MediaStream.h"
 #include<libmutil/stringutils.h>
 #include<libmutil/massert.h>
 

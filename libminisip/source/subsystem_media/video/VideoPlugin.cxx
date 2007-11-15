@@ -30,6 +30,8 @@
 #include<libminisip/media/video/codec/VideoCodec.h>
 #include<libminisip/media/video/mixer/ImageMixer.h>
 
+#include"../MediaStream.h"
+
 class VideoPlugin : public MediaPlugin{
 	public:
 		VideoPlugin(MRef<Library*> lib);

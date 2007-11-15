@@ -25,6 +25,7 @@
 #include<config.h>
 #include<libminisip/media/video/mixer/ImageMixer.h>
 #include<libminisip/media/video/VideoMedia.h>
+#include"../../MediaHandler.h"
 #include<libminisip/media/codecs/Codec.h>
 #include<libminisip/media/video/codec/VideoCodec.h>
 #include<libminisip/media/video/codec/AVCoder.h>

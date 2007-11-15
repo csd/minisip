@@ -25,7 +25,7 @@
 #include<libminisip/media/video/codec/VideoCodec.h>
 #include<libminisip/media/video/codec/AVCoder.h>
 #include<libminisip/media/video/codec/AVDecoder.h>
-#include<libminisip/media/MediaHandler.h>
+#include"../../MediaHandler.h"
 #include<libminisip/media/codecs/Codec.h>
 #include<libminisip/media/video/grabber/Grabber.h>
 #include<libminisip/media/video/display/VideoDisplay.h>
