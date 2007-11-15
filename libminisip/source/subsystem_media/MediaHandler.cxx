@@ -35,6 +35,7 @@
 #include"Session.h"
 #include"MediaStream.h"
 
+#include<libminisip/media/zrtp/ZrtpHostBridgeMinisip.h>
 #include<libminisip/media/Media.h>
 #include"RtpReceiver.h"
 #include<libminisip/media/MediaCommandString.h>

@@ -349,7 +349,7 @@ void ZrtpHostBridgeMinisip::rtpSessionError() {
     messageRouterCallback->handleCommand("gui", cmd);
 }
 
-void ZrtpHostBridgeMinisip::zrtpNegotiationFailed(MessageSeverity severity, char* msg)
+void ZrtpHostBridgeMinisip::zrtpNegotiationFailed(MessageSeverity severity, const char* msg)
 {
     fprintf(stderr, "Severity: %d - %s\n", severity, msg);
 }
