@@ -619,7 +619,7 @@ class ZRtp {
      * @param msg
      *     The message string, terminated with a null byte.
      */
-    void sendInfo(MessageSeverity severity, char* msg) {
+    void sendInfo(MessageSeverity severity, const char* msg) {
 	callback->sendInfo(severity, msg);
     }
 
@@ -634,7 +634,7 @@ class ZRtp {
      * @param msg
      *     The message string, terminated with a null byte.
      */
-    void zrtpNegotiationFailed(MessageSeverity severity, char* msg) {
+    void zrtpNegotiationFailed(MessageSeverity severity, const char* msg) {
         callback->zrtpNegotiationFailed(severity, msg);
     }
 

@@ -42,13 +42,13 @@ state_t states[numberOfStates] = {
     {SecureState,  &ZrtpStateClass::evSecureState }
 };
 
-static char* sendErrorText = "Cannot send data via RTP - connection or peer down?";
-static char* sendErrorTextSrtp = "Cannot send data via SRTP - connection or peer down?";
-static char* timerError = "Cannot start a timer - internal resources exhausted?";
-static char* resendError = "Too much retries during ZRTP negotiation - connection or peer down?";
-static char* internalProtocolError = "Internal protocol error occured!";
-static char* zrtpClosed = "No more security for this session";
-static char* goClearReceived = "Received a GoClear message - no security processing!";
+static const char* sendErrorText = "Cannot send data via RTP - connection or peer down?";
+static const char* sendErrorTextSrtp = "Cannot send data via SRTP - connection or peer down?";
+static const char* timerError = "Cannot start a timer - internal resources exhausted?";
+static const char* resendError = "Too much retries during ZRTP negotiation - connection or peer down?";
+static const char* internalProtocolError = "Internal protocol error occured!";
+static const char* zrtpClosed = "No more security for this session";
+static const char* goClearReceived = "Received a GoClear message - no security processing!";
 
 ZrtpStateClass::ZrtpStateClass(ZRtp *p) {
     parent = p;

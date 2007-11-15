@@ -23,70 +23,71 @@
 /**
  *
  */
-char *clientId = "minisip        "; // must be 15 chars
-char *zrtpVersion = "0.02";	// must be 4 chars
+const char *clientId = "minisip        "; // must be 15 chars
+const char *zrtpVersion = "0.02";	// must be 4 chars
 
 /**
  *
  */
-char *HelloMsg =    "Hello   ";
-char *HelloAckMsg = "HelloACK";
-char *CommitMsg =   "Commit  ";
-char *DHPart1Msg =  "DHPart1 ";
-char *DHPart2Msg =  "DHPart2 ";
-char *Confirm1Msg = "Confirm1";
-char *Confirm2Msg = "Confirm2";
-char *Conf2AckMsg = "Conf2ACK";
-char *ErrorMsg =    "Error   ";
-char *GoClearMsg =  "GoClear ";
-char *ClearAckMsg = "ClearACK";
+const char *HelloMsg =    "Hello   ";
+const char *HelloAckMsg = "HelloACK";
+const char *CommitMsg =   "Commit  ";
+const char *DHPart1Msg =  "DHPart1 ";
+const char *DHPart2Msg =  "DHPart2 ";
+const char *Confirm1Msg = "Confirm1";
+const char *Confirm2Msg = "Confirm2";
+const char *Conf2AckMsg = "Conf2ACK";
+const char *ErrorMsg =    "Error   ";
+const char *GoClearMsg =  "GoClear ";
+const char *ClearAckMsg = "ClearACK";
 
 /**
  *
  */
-char *responder = "Responder";
-char *initiator = "Initiator";
-char *iniMasterKey = "Initiator SRTP master key";
-char *iniMasterSalt = "Initiator SRTP master salt";
-char *respMasterKey = "Responder SRTP master key";
-char *respMasterSalt = "Responder SRTP master salt";
+const char *responder = "Responder";
+const char *initiator = "Initiator";
+const char *iniMasterKey = "Initiator SRTP master key";
+const char *iniMasterSalt = "Initiator SRTP master salt";
+const char *respMasterKey = "Responder SRTP master key";
+const char *respMasterSalt = "Responder SRTP master salt";
 
-char *hmacKey = "HMAC key";
-char *retainedSec = "retained secret";
-char *knownPlain = "known plaintext";
+const char *hmacKey = "HMAC key";
+const char *retainedSec = "retained secret";
+const char *knownPlain = "known plaintext";
 
-char *sasString = "Short Authentication String";
+const char *sasString = "Short Authentication String";
 
 /**
  * The arrays are sorted: the most secure / best algorithm is first in the
  * array
  */
-char *supportedHashes[] = { "SHA256  ",
-			    "        ",
-			    "        ",
-			    "        ",
-			    "        " };
+const char *supportedHashes[] = { "SHA256  ",
+				  "        ",
+				  "        ",
+				  "        ",
+				  "        " };
 
-char *supportedCipher[] = { "AES256  ",
-			    "AES128  ",
-			    "        ",
-			    "        ",
-			    "        " };
+const char *supportedCipher[] = { "AES256  ",
+				  "AES128  ",
+				  "        ",
+				  "        ",
+				  "        " };
 
-char *supportedPubKey[] = { "DH4096  ",
-			    "DH3072  ",
-			    "        ",
-			    "        ",
-			    "        " };
+const char *supportedPubKey[] = { "DH4096  ",
+				  "DH3072  ",
+				  "        ",
+				  "        ",
+				  "        " };
 
-char *supportedSASType[] = { "libase32",
-			    "        ",
-			    "        ",
-			    "        ",
-			    "        " };
+const char *supportedSASType[] = { "libase32",
+				   "        ",
+				   "        ",
+				   "        ",
+				   "        " };
 
-char *supportedAuthLen[] = { "80      ",
-                             "32      ",
-                             "        ",
-                             "        ",
-                             "        " };
+const char *supportedAuthLen[] = { "80      ",
+	                           "32      ",
+        	                   "        ",
+                	           "        ",
+                        	   "        " };
+
