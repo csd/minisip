@@ -8,7 +8,7 @@ sub win32_pkgversion {
     my $version = undef;
     
     for my $file ( @distfiles ){
-	$file =~ /$pkg-(.*)\.tar.*$/;
+	$file =~ /.*$pkg-(.*)\.tar.*$/;
 	$version = $1;
 	break;
     }
