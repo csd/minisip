@@ -207,7 +207,7 @@ XMLFileParser::XMLFileParser(string filename_, XMLParserCallback *cb):XMLParser(
 	if (filename != ""){
 		ifstream file(filename.c_str());
 		if (!file){
-			throw XMLFileNotFound( "Could not open file " + filename );
+			throw XMLFileNotFound( "Could not read file " + filename );
 		}
 
 
@@ -348,7 +348,7 @@ void XMLFileParser::saveToFile(string fname){
 	ofstream file(fname.c_str());
 	
 	if (!file){
-		throw XMLFileNotFound( "Could not open file " + fname );
+		throw XMLFileNotFound( "Could not write file " + fname );
 	}
 
 	file << xmlstring();
