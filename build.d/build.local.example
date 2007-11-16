@@ -14,6 +14,9 @@
 # These options override the equivalent command line option defaults
 # XXX: They also cause the command line options to be ignored.
 
+## Override environment
+# $ENV{AMVERS}="1.9";
+
 ## Override default path locations
 ## Note: these are not normally require and use sensible defaults.
 ##
