@@ -146,7 +146,6 @@ class SipLayerTransport : public SipSMCommandReceiver {
 		int contactUdpPort;
 		int contactTcpPort;
 		int contactTlsPort;
-		MRef<SipSocketServer *> createTcpServer( bool ipv6, const std::string &ipString, int32_t prefPort );
 		MRef<SipSocketServer *> createTlsServer( bool ipv6, const std::string &ipString, int32_t prefPort, MRef<CertificateChain *> certChain, MRef<CertificateSet *> cert_db  );
 
 		Mutex serversLock;
