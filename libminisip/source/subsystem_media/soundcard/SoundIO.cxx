@@ -67,23 +67,6 @@
 
 #include<libminisip/media/soundcard/SoundDevice.h>
 
-#ifndef WIN32
-#	ifdef ENABLE_OSS
-#	include<libminisip/media/soundcard/OssSoundDevice.h>
-#	endif
-#	ifdef HAVE_LIBASOUND
-#		include<libminisip/media/soundcard/SoundDevice.h>
-#	endif
-#else
-#	ifdef DSOUND
-#		include<libminisip/media/soundcard/SoundDevice.h>
-#	elif defined(WAVE_SOUND)
-#		include<libminisip/media/soundcard/SoundDevice.h>
-#	else
-#		error "NO Windows AUDIO Defined!"
-#	endif
-#endif
-
 #define BS 160
 
 using namespace std;

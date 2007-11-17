@@ -25,7 +25,7 @@
 
 #include<config.h>
 
-#include<libminisip/media/soundcard/OssSoundDevice.h>
+#include"OssSoundDevice.h"
 
 #ifndef DISABLE_OSS
 #include<config.h>

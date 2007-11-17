@@ -30,7 +30,7 @@
 
 #ifndef WIN32
 #ifdef ENABLE_OSS
-#	include<libminisip/media/soundcard/OssSoundDevice.h>
+#	include"OssSoundDevice.h"
 #endif
 #endif
 
