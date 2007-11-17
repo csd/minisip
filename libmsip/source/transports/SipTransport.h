@@ -32,8 +32,8 @@
 #include<libmnetutil/StreamSocket.h>
 #include<libmcrypto/cert.h>
 
-#include"SipSocketServer.h"
-#include"SipLayerTransport.h"
+#include"../SipSocketServer.h"
+#include"../SipLayerTransport.h"
 
 /**
  * A plugin representing a SIP transport protocol,
