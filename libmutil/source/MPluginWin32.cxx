@@ -294,9 +294,9 @@ MPluginRegistry::~MPluginRegistry(){
 	manager->removeRegistry( this );
 }
 
-MRef<MPlugin*> MPluginRegistry::findPlugin( std::string name ){
-	list< MRef<MPlugin *> >::iterator iter;
-	list< MRef<MPlugin *> >::iterator last = plugins.end();
+MRef<MPlugin*> MPluginRegistry::findPlugin( std::string name ) const{
+	list< MRef<MPlugin *> >::const_iterator iter;
+	list< MRef<MPlugin *> >::const_iterator last = plugins.end();
 
 	for( iter = plugins.begin(); iter != last; iter++ ){
 		MRef<MPlugin *> plugin = *iter;
