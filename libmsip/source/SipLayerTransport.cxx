@@ -1204,35 +1204,6 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 }
 
 
-MRef<SipSocketServer *> SipLayerTransport::createTlsServer( bool ipv6, const string &ipString, int32_t prefPort, MRef<CertificateChain *> certChain, MRef<CertificateSet *> cert_db)
-{
-	MRef<ServerSocket *> sock;
-	MRef<SipSocketServer *> server;
-	int32_t port = prefPort;
-	bool fail;
-	int triesLeft=10;
-
-	do {
-		fail=false;
-		try{
-			sock = TLSServerSocket::create( ipv6, port, /*config->cert*/certChain->getFirst(),
-					/*config->*/cert_db );
-			server = new StreamSocketServer( this, sock );
-			server->setExternalIp( ipString );
-		} catch (const BindFailed &bf){
-			fail=true;
-			triesLeft--;
-			if (!triesLeft)
-				throw;
-		}
-
-	} while (fail);
-
-	contactTlsPort = port;
-
-	return server;
-}
-
 void SipLayerTransport::startUdpServer(const string &ipString, const string &ip6String, int32_t localUdpPort, int32_t externalContactUdpPort)
 {
 	MRef<SipSocketServer *> server;
@@ -1293,13 +1264,17 @@ void SipLayerTransport::startTlsServer( const string &ipString, const string &ip
 		return;
 	}
 
-	server = createTlsServer( false, /*config->localIpString*/ ipString, prefPort, certChain, cert_db);
+	MRef<SipTransport*> tls =
+		SipTransportRegistry::getInstance()->findTransport( "tcp", true );
+
+	server = tls->createServer( this, false, ipString, prefPort, cert_db, certChain );
 	addServer( server );
+	contactTlsPort = server->getExternalPort();
 
 	if( /*config->localIp6String*/ ip6String != "" ){
 		MRef<SipSocketServer *> server6;
 
-		server6 = createTlsServer( true, /*config->localIp6String*/ ip6String, prefPort, certChain, cert_db );
+		server6 = tls->createServer( this, true, ip6String, prefPort, cert_db, certChain );
 		dispatcher->getLayerTransport()->addServer( server6 );
 	}
 }

@@ -33,7 +33,7 @@ class SipTransportUdp: public SipTransport{
 		SipTransportUdp( MRef<Library *> lib );
 		virtual ~SipTransportUdp();
 
-		// SipTransportUdp
+		// SipTransport
 		virtual bool isSecure() const { return false; }
 
 		virtual std::string getProtocol() const { return "udp"; }

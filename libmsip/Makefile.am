@@ -62,6 +62,8 @@ msip_src =           source/SipDialogConfig.cxx \
 		     source/transports/SipTransportUdp.cxx \
 		     source/transports/SipTransportTcp.h \
 		     source/transports/SipTransportTcp.cxx \
+		     source/transports/SipTransportTls.h \
+		     source/transports/SipTransportTls.cxx \
                      source/dialogs/SipTransitionUtils.cxx \
 		     source/dialogs/SipDialog.cxx \
 		     source/dialogs/SipDialogRegister.cxx \

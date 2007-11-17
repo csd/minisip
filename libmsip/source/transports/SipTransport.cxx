@@ -25,6 +25,7 @@
 #include"SipTransport.h"
 #include"SipTransportUdp.h"
 #include"SipTransportTcp.h"
+#include"SipTransportTls.h"
 
 using namespace std;
 
@@ -37,6 +38,7 @@ SipTransport::SipTransport( MRef<Library *> lib ): MPlugin( lib ){
 SipTransportRegistry::SipTransportRegistry(){
 	registerPlugin( new SipTransportUdp( NULL ) );
 	registerPlugin( new SipTransportTcp( NULL ) );
+	registerPlugin( new SipTransportTls( NULL ) );
 }
 
 MRef<SipTransport*> SipTransportRegistry::findTransport( string protocol, bool secure ) const{

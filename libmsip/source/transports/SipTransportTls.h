@@ -20,32 +20,32 @@
  * Authors: Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
-#ifndef SIP_TRANSPORT_TCP_H
-#define SIP_TRANSPORT_TCP_H
+#ifndef SIP_TRANSPORT_TLS_H
+#define SIP_TRANSPORT_TLS_H
 
 #include<libmsip/libmsip_config.h>
 
 #include<string>
 #include"SipTransport.h"
 
-class SipTransportTcp: public SipTransport{
+class SipTransportTls: public SipTransport{
 	public:
-		SipTransportTcp( MRef<Library *> lib );
-		virtual ~SipTransportTcp();
+		SipTransportTls( MRef<Library *> lib );
+		virtual ~SipTransportTls();
 
 		// SipTransport
-		virtual bool isSecure() const { return false; }
+		virtual bool isSecure() const { return true; }
 
 		virtual std::string getProtocol() const { return "tcp"; }
 
 		virtual MRef<SipSocketServer *> createServer( MRef<SipLayerTransport*> receiver, bool ipv6, const std::string &ipString, int32_t prefPort, MRef<CertificateSet *> cert_db = NULL, MRef<CertificateChain *> certChain = NULL );
 
 		// MPlugin
-		virtual std::string getName() const { return "TCP"; }
+		virtual std::string getName() const { return "TLS"; }
 
 		virtual uint32_t getVersion() const;
 
-		virtual std::string getDescription() const { return "SIP Transport TCP"; };
+		virtual std::string getDescription() const { return "SIP Transport TLS"; };
 
 		// MObject
 		virtual std::string getMemObjectType() const { return getName(); }
