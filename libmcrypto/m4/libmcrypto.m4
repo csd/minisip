@@ -62,6 +62,39 @@ else
 	ifelse([$2], , :, [$2])
 fi
 
+dnl Check for DTLS, requires OpenSSL 0.9.8f or later.
+have_dtls=yes
+AC_CHECK_HEADER([openssl/dtls1.h], , [have_dtls=no], [
+#include <openssl/ssl.h>
+])
+
+dnl Check DTLS version magic
+AC_MSG_CHECKING([DTLS version 1.0])
+AC_COMPILE_IFELSE([
+#include<openssl/ssl.h>
+#include<openssl/dtls1.h>
+
+#ifdef DTLS1_VERSION
+# if DTLS1_VERSION != 0xFEFF
+#  error Bad DTLS1 version
+# endif
+#else
+# error  No DTLS1 version
+#endif
+
+int main()
+{
+    return 0;
+}
+], [dtls1=yes],[have_dtls=no;dtls1=no])
+AC_MSG_RESULT([$dtls1])
+
+AC_CHECK_FUNC([DTLSv1_method], , [have_dtls=no])
+if test x$have_dtls = xyes; then
+        AC_DEFINE(USE_DTLS, [], [DTLS transport enabled])
+fi
+AM_CONDITIONAL(USE_DTLS, test x$have_dtls = xyes)
+
 dnl AM_CONDITIONAL(HAVE_OPENSSL, test "x${HAVE_OPENSSL}" = "x1")
 
 LIBS="${mcrypto_save_LIBS}"

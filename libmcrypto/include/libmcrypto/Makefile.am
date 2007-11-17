@@ -28,6 +28,7 @@ endif
 
 pkginclude_HEADERS = \
 		aes.h \
+		DtlsSocket.h \
 		SipSim.h \
 		SipSimSoft.h \
 		cert.h \

@@ -7,6 +7,10 @@ if HAVE_EVP_SHA256
 OTHER_FILES += hmac256.cxx sha256.cxx
 endif
 
+if USE_DTLS
+OTHER_FILES += DtlsSocket.cxx DtlsSocket.h
+endif
+
 libmcopenssl_la_CPPFLAGS = $(MINISIP_CFLAGS)
 libmcopenssl_la_SOURCES = \
 		init.cxx \

@@ -77,7 +77,7 @@ class LIBMNETUTIL_API Socket : public MObject {
 /* Undef this ... it causes a link problem ... */
 //#undef close
 //#endif
-		void close( void );
+		virtual void close( void );
 
 	protected:
 		int32_t type;
