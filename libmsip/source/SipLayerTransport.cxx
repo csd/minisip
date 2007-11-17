@@ -58,6 +58,7 @@
 #include<libmsip/SipCommandString.h>
 #include"SipCommandDispatcher.h"
 #include<libmsip/SipHeaderFrom.h>
+#include"SipTransport.h"
 
 #include<cctype>
 #include<string>
@@ -533,7 +534,7 @@ static bool lookupDestSrv(const string &domain, const string &transport,
 	string srv;
 	uint16_t port = 0;
 
-	if( transport == "TLS" || transport == "tls") { srv = "_sips._tls"; }
+	if( transport == "TLS" || transport == "tls") { srv = "_sips._tcp"; }
 	else if( transport == "TCP" || transport == "tcp") { srv = "_sip._tcp"; }
 	else { //if( trans == "UDP" || trans == "udp") { 	
 		srv = "_sip._udp"; 
@@ -1203,56 +1204,6 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 }
 
 
-/**
- *
- * @param externalPort  If the application wishes to override what port
- *   should be reported for the socket it is possible to specify such a port
- *   number here. This can be used for example to implement support for
- *   passing NATs with the help of a STUN server.
- */
-MRef<SipSocketServer *> SipLayerTransport::createUdpServer( bool ipv6, const string &ipString, int32_t prefPort, int32_t externalPort)
-{
-	int32_t port = prefPort;
-	int triesLeft=10;
-	MRef<SipSocketServer *> server;
-	bool fail;
-
-	do {
-		fail=false;
-		try {
-
-			MRef<DatagramSocket *> sock = new UDPSocket( port, ipv6 );
-			server = new DatagramSocketServer( this, sock );
-
-			// IPv6 doesn't need different external udp port
-			// since it never is NATed.
-			if( !ipv6 && externalPort ){
-				server->setExternalPort( externalPort );
-			}
-			server->setExternalIp( ipString );
-
-
-		} catch(const BindFailed &bf){
-			fail=true;
-
-			// If the port is already in use, try random port number in the range 2048 to 63488
-			port = rand()%(0xFFFF-4096) + 2048; 
-			triesLeft--;
-			if (!triesLeft)
-				throw;
-
-		}
-	}while(fail);
-
-	if (externalPort>0)
-		contactUdpPort=externalPort;
-	else
-		contactUdpPort=port;
-
-
-	return server;
-}
-
 MRef<SipSocketServer *> SipLayerTransport::createTcpServer( bool ipv6, const string &ipString, int32_t prefPort)
 {
 	MRef<ServerSocket *> sock;
@@ -1321,13 +1272,22 @@ void SipLayerTransport::startUdpServer(const string &ipString, const string &ip6
 	else
 		ipString = config->localIpString;
 */
+	MRef<SipTransport*> udp =
+		SipTransportRegistry::getInstance()->findTransport("udp");
 
-	server = createUdpServer( false, ipString, localUdpPort, externalContactUdpPort );
+	server = udp->createServer( this, false, ipString, localUdpPort );
+
+	if( externalContactUdpPort ){
+		server->setExternalPort( externalContactUdpPort );
+	}
 	addServer( server );
+	contactUdpPort = server->getExternalPort();
 
 	if( /*config->localIp6String*/ ip6String != "" ){
 		MRef<SipSocketServer *> server6;
-		server6 = createUdpServer( true, /*config->localIp6String*/ ip6String,localUdpPort,externalContactUdpPort );
+		server6 = udp->createServer( this, true, ip6String,localUdpPort );
+		// IPv6 doesn't need different external udp port
+		// since it never is NATed.
 		addServer( server6 );
 	}
 }

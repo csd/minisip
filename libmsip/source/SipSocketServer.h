@@ -32,6 +32,7 @@
 #include<libmnetutil/Socket.h>
 #include<libmnetutil/ServerSocket.h>
 #include<libmnetutil/SocketServer.h>
+#include<libmnetutil/DatagramSocket.h>
 #include<libmutil/Thread.h>
 
 class SipLayerTransport;
