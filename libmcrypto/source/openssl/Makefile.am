@@ -7,7 +7,7 @@ if HAVE_EVP_SHA256
 OTHER_FILES += hmac256.cxx sha256.cxx
 endif
 
-if USE_DTLS
+if HAVE_OPENSSL_DTLS
 OTHER_FILES += DtlsSocket.cxx DtlsSocket.h
 endif
 

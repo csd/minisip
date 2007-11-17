@@ -62,6 +62,25 @@ else
 	ifelse([$2], , :, [$2])
 fi
 
+dnl AM_CONDITIONAL(HAVE_OPENSSL, test "x${HAVE_OPENSSL}" = "x1")
+
+LIBS="${mcrypto_save_LIBS}"
+CPPFLAGS="${mcrypto_save_CPPFLAGS}"
+
+])
+# End of AM_LIBMCRYPTO_CHECK_OPENSSL
+#
+
+# AM_LIBMCRYPTO_CHECK_OPENSSL_DTLS([ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
+# -----------------------------
+AC_DEFUN([AM_LIBMCRYPTO_CHECK_OPENSSL_DTLS], [
+dnl OpenSSL DTLS
+
+mcrypto_save_LIBS="${LIBS}"
+LIBS="${OPENSSL_LIBS} ${LIBS}"
+mcrypto_save_CPPFLAGS="${CPPFLAGS}"
+CPPFLAGS="${CPPFLAGS} ${OPENSSL_CFLAGS}"
+
 dnl Check for DTLS, requires OpenSSL 0.9.8f or later.
 have_dtls=yes
 AC_CHECK_HEADER([openssl/dtls1.h], , [have_dtls=no], [
@@ -69,7 +88,7 @@ AC_CHECK_HEADER([openssl/dtls1.h], , [have_dtls=no], [
 ])
 
 dnl Check DTLS version magic
-AC_MSG_CHECKING([DTLS version 1.0])
+AC_MSG_CHECKING([for DTLS version 1.0])
 AC_COMPILE_IFELSE([
 #include<openssl/ssl.h>
 #include<openssl/dtls1.h>
@@ -91,17 +110,18 @@ AC_MSG_RESULT([$dtls1])
 
 AC_CHECK_FUNC([DTLSv1_method], , [have_dtls=no])
 if test x$have_dtls = xyes; then
-        AC_DEFINE(USE_DTLS, [], [DTLS transport enabled])
+	AC_DEFINE([USE_DTLS], 1, [Define to 1 if you have OpenSSL 0.9.8f or later])
+	ifelse([$1], , :, [$1])
+else
+	ifelse([$2], , :, [$2])
 fi
-AM_CONDITIONAL(USE_DTLS, test x$have_dtls = xyes)
 
 dnl AM_CONDITIONAL(HAVE_OPENSSL, test "x${HAVE_OPENSSL}" = "x1")
 
 LIBS="${mcrypto_save_LIBS}"
 CPPFLAGS="${mcrypto_save_CPPFLAGS}"
-
 ])
-# End of AM_LIBMCRYPTO_CHECK_OPENSSL
+# End of AM_LIBMCRYPTO_CHECK_OPENSSL_DTLS
 #
 
 AC_DEFUN([AM_LIBMCRYPTO_CHECK_SCSIM], [

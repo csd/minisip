@@ -52,8 +52,11 @@ if test "${with_openssl}" = "yes"; then
     LIBS="${LIBS} ${OPENSSL_LIBS}"
     AC_CHECK_FUNC([EVP_sha256], [have_sha256=yes], [])
     LIBS=$save_LIBS
+
+    AM_LIBMCRYPTO_CHECK_OPENSSL_DTLS([HAVE_OPENSSL_DTLS=yes],[HAVE_OPENSSL_DTLS=no])
 fi
 AM_CONDITIONAL(HAVE_OPENSSL, test "${HAVE_OPENSSL}" = "yes")
+AM_CONDITIONAL(HAVE_OPENSSL_DTLS, test "${HAVE_OPENSSL_DTLS}" = "yes")
 AM_CONDITIONAL(HAVE_EVP_SHA256, test x${have_sha256} = xyes)
 
 AC_ARG_ENABLE(scsim,
