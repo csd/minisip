@@ -26,17 +26,13 @@
 
 #include<libminisip/media/soundcard/SoundDriverRegistry.h>
 #include<libmutil/dbg.h>
-#include<libminisip/media/soundcard/FileSoundDriver.h>
+#include"FileSoundDriver.h"
 
 #ifdef _MSC_VER
 #include"DirectSoundDriver.h"
 #endif
 
 #include<algorithm>
-
-// #ifdef PORTAUDIO_SUPPORT
-// #include<libminisip/media/soundcard/PortAudioDriver.h>
-// #endif
 
 using namespace std;
 

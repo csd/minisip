@@ -194,6 +194,7 @@ BASIC_SOUNDCARD_SRC = source/subsystem_media/soundcard/SilenceSensor.cxx \
 			${AUDIOMIXER_SRC} \
 			source/subsystem_media/soundcard/FileSoundDevice.cxx \
 			source/subsystem_media/soundcard/FileSoundDriver.cxx \
+			source/subsystem_media/soundcard/FileSoundDriver.h \
 			source/subsystem_media/soundcard/FileSoundSource.cxx \
 			source/subsystem_media/soundcard/SoundDevice.cxx \
 			source/subsystem_media/soundcard/SoundDriver.cxx \
