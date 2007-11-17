@@ -24,7 +24,7 @@
 */
 #include<config.h>
 
-#include<libminisip/media/soundcard/WaveSoundDevice.h>
+#include"WaveSoundDevice.h"
 
 #include <libmutil/thread.h>
 

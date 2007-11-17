@@ -73,7 +73,6 @@ nobase_include_HEADERS =    libminisip/media/aec/aecfix.h \
 			libminisip/signaling/sip/SipDialogPresenceServer.h \
 			libminisip/media/soundcard/Resampler.h \
 			libminisip/media/soundcard/SoundRecorderCallback.h \
-			libminisip/media/soundcard/WaveSoundDevice.h \
 			libminisip/media/soundcard/SoundIOPLCInterface.h \
 			libminisip/media/soundcard/AudioMixer.h \
 			libminisip/media/soundcard/SoundSource.h \

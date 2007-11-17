@@ -35,7 +35,7 @@
 #endif
 
 #ifdef WAVE_SOUND
-#	include<libminisip/media/soundcard/WaveSoundDevice.h>
+#	include"WaveSoundDevice.h"
 #endif
 
 #include<stdio.h>
