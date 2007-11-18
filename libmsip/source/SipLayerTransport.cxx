@@ -512,17 +512,6 @@ void SipLayerTransport::addViaHeader( MRef<SipMessage*> pack,
 	pack->addBefore( hdr );
 }
 
-static int32_t getDefaultPort(const string &transport)
-{
-	if( transport == "TLS" ){
-		return 5061;
-	}
-	else{
-		return 5060;
-	}
-}
-
-
 static bool lookupDestSrv(const string &domain, const string &transport,
 			  string &destAddr, int32_t &destPort)
 {
@@ -551,7 +540,7 @@ static bool lookupDestSrv(const string &domain, const string &transport,
 }
 
 // RFC 3263 4.2 Determining Port and IP Address
-static bool lookupDestIpPort(const SipUri &uri, const string &transport,
+static bool lookupDestIpPort(const SipUri &uri, MRef<SipTransport*> transport,
 			     string &destAddr, int32_t &destPort)
 {
 	bool res = false;
@@ -566,7 +555,7 @@ static bool lookupDestIpPort(const SipUri &uri, const string &transport,
 		if( IPAddress::isNumeric( addr ) ){
 			res = true;
 			if( !port ){
-				port = getDefaultPort( transport );
+				port = transport->getDefaultPort();
 			}
 		}
 		// Not numeric	
@@ -575,13 +564,13 @@ static bool lookupDestIpPort(const SipUri &uri, const string &transport,
 			res = true;
 		}
 		// Lookup SRV
-		else if( lookupDestSrv( uri.getIp(), transport,
+		else if( lookupDestSrv( uri.getIp(), transport->getName(),
 					addr, port )){
 			res = true;
 		}
 		else{
 			// Lookup A or AAAA
-			port = getDefaultPort( transport );
+			port = transport->getDefaultPort();
 			res = true;
 		}
 	}
@@ -700,7 +689,7 @@ bool SipLayerTransport::getDestination(MRef<SipMessage*> pack, string &destAddr,
 					return false;
 				}
 
-				return lookupDestIpPort(uri, destTransport->getName(), 
+				return lookupDestIpPort(uri, destTransport, 
 							destAddr, destPort);
 			}
 		}

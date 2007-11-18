@@ -35,6 +35,10 @@ SipTransport::SipTransport(): MPlugin(){
 SipTransport::SipTransport( MRef<Library *> lib ): MPlugin( lib ){
 }
 
+int32_t SipTransport::getDefaultPort(){
+	return isSecure() ? 5061 : 5060;
+}
+
 MRef<StreamSocket *> SipTransport::connect( const IPAddress &addr, uint16_t port, MRef<CertificateSet *> cert_db, MRef<CertificateChain *> certChain ){
 	throw Exception("Connection less transport");
 }
