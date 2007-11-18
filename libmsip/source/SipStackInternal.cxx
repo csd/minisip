@@ -68,8 +68,8 @@
 
 #include<libmutil/dbg.h>
 #include<libmcrypto/cert.h>
-#include<libmcrypto/TlsSocket.h>
-#include<libmcrypto/TlsServerSocket.h>
+
+#include"transports/SipTransport.h"
 
 using namespace std;
 
@@ -379,37 +379,47 @@ std::string SipStackInternal::getStackStatusDebugString(){
 }
 
 
-void SipStackInternal::startUdpServer()
-{
-	string ipString;
+void SipStackInternal::startServer( const string &transportName ){
+	MRef<SipTransport*> transport =
+		SipTransportRegistry::getInstance()->findTransportByName( transportName );
 
-	if( config->externalContactIP.size()>0 )
-		ipString = config->externalContactIP;
-	else
-		ipString = config->localIpString;
+	if( !transport ){
+		merr << "Failed to start " << transportName << " server, unsupported" << endl;
+		return;
+	}
 
-	dispatcher->getLayerTransport()->startUdpServer( ipString, 
-							config->localIp6String, 
-							config->preferedLocalUdpPort, 
-							config->externalContactUdpPort );
-}
+	int32_t port;
+	int32_t externalUdpPort = 0;
+	string ipString = config->localIpString;
 
+	/*
+	  There are three different preferred local ports:
+	  preferedLocalUdpPort - Used by UDP transport only
+	  preferedLocalTcpPort - Used by other SIP transports, TCP etc.
+	  preferedLocalTlsPort - Used by all SIPS transport, TLS and other
+	 */
+	if( transportName == "UDP" ){
+		if( config->externalContactIP.size()>0 ){
+			ipString = config->externalContactIP;
+			externalUdpPort = config->externalContactUdpPort;
+		}
+		port = config->preferedLocalUdpPort;
+	}
+	else{
+		// TODO externalUdpPort for DTLS-UDP 
+		port = transport->isSecure() ? config->preferedLocalTlsPort : config->preferedLocalTcpPort;
+	}
 
-void SipStackInternal::startTcpServer()
-{
-	dispatcher->getLayerTransport()->startTcpServer( config->localIpString, config->localIp6String, config->preferedLocalTcpPort );
-	
-}
-
-void SipStackInternal::startTlsServer(){
-
-	dispatcher->getLayerTransport()->startTlsServer( 
-				config->localIpString, 
+	dispatcher->getLayerTransport()->startServer( transport,
+				ipString, 
 				config->localIp6String, 
-				config->preferedLocalTlsPort, 
+				port, 
+				externalUdpPort,
 				config->cert, 
 				config->cert_db );
 }
+	
+
 
 int32_t SipStackInternal::getLocalSipPort(bool usesStun, const string &transport ) {
 

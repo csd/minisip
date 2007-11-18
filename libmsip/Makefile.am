@@ -19,6 +19,11 @@ libmsip_la_LDFLAGS += -Wl,$(res_obj)
 libmsip_la_DEPENDENCIES = $(res_obj)
 endif OS_WIN
 
+if HAVE_DTLS
+msip_dtls_src =      source/transports/SipTransportDtlsUdp.h \
+		     source/transports/SipTransportDtlsUdp.cxx
+endif HAVE_DTLS
+
 msip_src =           source/SipDialogConfig.cxx \
 		     source/SipAuthenticationDigest.cxx \
 		     source/SipStack.cxx \
@@ -64,6 +69,7 @@ msip_src =           source/SipDialogConfig.cxx \
 		     source/transports/SipTransportTcp.cxx \
 		     source/transports/SipTransportTls.h \
 		     source/transports/SipTransportTls.cxx \
+		     $(msip_dtls_src) \
                      source/dialogs/SipTransitionUtils.cxx \
 		     source/dialogs/SipDialog.cxx \
 		     source/dialogs/SipDialogRegister.cxx \

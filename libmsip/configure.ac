@@ -45,6 +45,10 @@ AM_MINISIP_CHECK_LIBMNETUTIL([0.3.1])
 AM_MINISIP_CHECK_LIBMCRYPTO([0.3.0])
 AM_MINISIP_CHECK_COMPLETE
 
+dnl Checks for DTLS support in libmcrypto
+AM_MINISIP_CHECK_LIBMCRYPTO_DTLS([have_dtls=yes], [have_dtls=no])
+AM_CONDITIONAL(HAVE_DTLS, test "${have_dtls}" = "yes")
+
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([malloc.h stdlib.h string.h unistd.h])

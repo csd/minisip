@@ -97,6 +97,9 @@ class LIBMSIP_API SipTransportRegistry: public MPluginRegistry, public MSingleto
 		/** Search for transport by socket type. */
 		MRef<SipTransport*> findTransport( int32_t socketType ) const;
 
+		/** Search for transport by plugin name */  
+		MRef<SipTransport*> findTransportByName( const std::string &name ) const;
+
 	protected:
 		SipTransportRegistry();
 

@@ -271,6 +271,13 @@ class LIBMSIP_API SipStack : public CommandReceiver, public Runnable{
 		void startTlsServer();
 
 		/**
+		 * Start a SIP(S) server
+		 * @param transportName Name of the transport plugin,
+		 * one of UDP, TCP, TLS etc.
+		 */
+		void startServer( const std::string &transportName );
+
+		/**
 		@return the port in use, depending on the transport.
 		@param usesStun (default false), found in SipSoftPhoneConfiguration::useSTUN
 		*/

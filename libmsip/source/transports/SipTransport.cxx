@@ -26,6 +26,7 @@
 #include"SipTransportUdp.h"
 #include"SipTransportTcp.h"
 #include"SipTransportTls.h"
+#include"SipTransportDtlsUdp.h"
 
 using namespace std;
 
@@ -59,6 +60,9 @@ SipTransportRegistry::SipTransportRegistry(){
 	registerPlugin( new SipTransportUdp( NULL ) );
 	registerPlugin( new SipTransportTcp( NULL ) );
 	registerPlugin( new SipTransportTls( NULL ) );
+#ifdef HAVE_DTLS
+	registerPlugin( new SipTransportDtlsUdp( NULL ) );
+#endif
 }
 
 MRef<SipTransport*> SipTransportRegistry::findTransport( const string &protocol, bool secure ) const{
@@ -83,7 +87,7 @@ MRef<SipTransport*> SipTransportRegistry::findTransport( const string &protocol,
 
 		if( transport->isSecure() == secure &&
 		    transport->getProtocol() == lcProt ){
-			mdbg << "SipTransport: tranport found!!! =  " << lcProt << endl;
+			mdbg << "SipTransport: transport found!!! =  " << lcProt << endl;
 			return transport;
 		}
 	}
@@ -140,6 +144,16 @@ MRef<SipTransport*> SipTransportRegistry::findTransport( int32_t socketType ) co
 			mdbg << "SipTransport: Socket type found!!! =  " << socketType << endl;
 			return transport;
 		}
+	}
+
+	return NULL;
+}
+
+MRef<SipTransport*> SipTransportRegistry::findTransportByName( const std::string &name ) const{
+	MRef<MPlugin*> transport = findPlugin( name );
+
+	if( transport ){
+		return dynamic_cast<SipTransport*>(*transport);
 	}
 
 	return NULL;

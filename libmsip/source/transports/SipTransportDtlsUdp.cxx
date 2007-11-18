@@ -25,9 +25,8 @@
 
 #include<config.h>
 #include<libmnetutil/NetworkException.h>
-#include<libmcrypto/TlsSocket.h>
-#include<libmcrypto/TlsServerSocket.h>
-#include"SipTransportTls.h"
+#include<libmnetutil/UDPSocket.h>
+#include"SipTransportDtlsUdp.h"
 
 static std::list<std::string> pluginList;
 static int initialized;
@@ -35,7 +34,7 @@ static int initialized;
 using namespace std;
 
 extern "C" LIBMSIP_API
-std::list<std::string> *mtls_LTX_listPlugins( MRef<Library*> lib ){
+std::list<std::string> *mdtlsudp_LTX_listPlugins( MRef<Library*> lib ){
 	if( !initialized ){
 		pluginList.push_back("getPlugin");
 		initialized = true;
@@ -45,59 +44,59 @@ std::list<std::string> *mtls_LTX_listPlugins( MRef<Library*> lib ){
 }
 
 extern "C" LIBMSIP_API
-MPlugin * mtls_LTX_getPlugin( MRef<Library*> lib ){
-	return new SipTransportTls( lib );
+MPlugin * mdtlsudp_LTX_getPlugin( MRef<Library*> lib ){
+	return new SipTransportDtlsUdp( lib );
 }
 
 
-SipTransportTls::SipTransportTls( MRef<Library*> lib ) : SipTransport( lib ){
+SipTransportDtlsUdp::SipTransportDtlsUdp( MRef<Library*> lib ) : SipTransport( lib ){
 }
 
-SipTransportTls::~SipTransportTls(){
+SipTransportDtlsUdp::~SipTransportDtlsUdp(){
 }
 
 
 
-MRef<SipSocketServer *> SipTransportTls::createServer( MRef<SipLayerTransport*> receiver, bool ipv6, const string &ipString, int32_t prefPort, MRef<CertificateSet *> cert_db, MRef<CertificateChain *> certChain )
+/**
+ *
+ * @param externalPort  If the application wishes to override what port
+ *   should be reported for the socket it is possible to specify such a port
+ *   number here. This can be used for example to implement support for
+ *   passing NATs with the help of a STUN server.
+ */
+MRef<SipSocketServer *> SipTransportDtlsUdp::createServer( MRef<SipLayerTransport*> receiver, bool ipv6, const string &ipString, int32_t prefPort, MRef<CertificateSet *> cert_db, MRef<CertificateChain *> certChain  )
 {
-	MRef<ServerSocket *> sock;
-	MRef<SipSocketServer *> server;
 	int32_t port = prefPort;
-	bool fail;
 	int triesLeft=10;
-
-	if( certChain.isNull() || certChain->getFirst().isNull() ){
-		merr << "You need a personal certificate to run "
-			"a TLS server. Please specify one in "
-			"the certificate settings. minisip will "
-			"now disable the TLS server." << endl;
-		return NULL;
-	}
+	MRef<SipSocketServer *> server;
+	bool fail;
 
 	do {
 		fail=false;
-		try{
-			sock = TLSServerSocket::create( ipv6, port, /*config->cert*/certChain->getFirst(),
-					/*config->*/cert_db );
-			server = new StreamSocketServer( receiver, sock );
+		try {
+
+			MRef<DatagramSocket *> sock = new UDPSocket( port, ipv6 );
+			MRef<DatagramSocket *> dsock =
+				DTLSSocket::create( sock, certChain->getFirst(), cert_db );
+			server = new DatagramSocketServer( receiver, dsock );
 			server->setExternalIp( ipString );
-		} catch (const BindFailed &bf){
+
+
+		} catch(const BindFailed &bf){
 			fail=true;
+
+			// If the port is already in use, try random port number in the range 2048 to 63488
+			port = rand()%(0xFFFF-4096) + 2048; 
 			triesLeft--;
 			if (!triesLeft)
 				throw;
-		}
 
-	} while (fail);
+		}
+	}while(fail);
 
 	return server;
 }
 
-MRef<StreamSocket *> SipTransportTls::connect( const IPAddress &addr, uint16_t port, MRef<CertificateSet *> cert_db, MRef<CertificateChain *> certChain ){
-	return TLSSocket::connect( addr, port,
-				   certChain->getFirst(), cert_db );
-}
-
-uint32_t SipTransportTls::getVersion() const{
+uint32_t SipTransportDtlsUdp::getVersion() const{
 	return 0x00000001;
 }

@@ -190,15 +190,19 @@ void SipStack::setDialogManagement(MRef<SipDialog*> mgmt){
 }
 
 void SipStack::startUdpServer(){
-	STACK->startUdpServer();
+	STACK->startServer( "UDP" );
 }
 
 void SipStack::startTcpServer(){
-	STACK->startTcpServer();
+	STACK->startServer( "TCP" );
 }
 
 void SipStack::startTlsServer(){
-	STACK->startTlsServer();
+	STACK->startServer( "TLS" );
+}
+
+void SipStack::startServer( const string &transportName ){
+	STACK->startServer( transportName );
 }
 
 int32_t SipStack::getLocalSipPort(bool usesStun, const string &transport ) {

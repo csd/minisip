@@ -81,9 +81,7 @@ class SipLayerTransport : public SipSMCommandReceiver {
 
 		void datagramSocketRead(MRef<DatagramSocket *> sock);
 
-		void startUdpServer( const std::string & ipString, const std::string & ip6String, int32_t prefUdpPort, int32_t externalContactUdpPort);
-		void startTcpServer( const std::string & ipString, const std::string & ip6String, int32_t prefPort );
-		void startTlsServer( const std::string & ipString, const std::string & ip6String, int32_t prefPort, MRef<CertificateChain *> certChain, MRef<CertificateSet *> cert_db );
+		void startServer( MRef<SipTransport*> transport, const std::string & ipString, const std::string & ip6String, int32_t prefPort, int32_t externalUdpPort, MRef<CertificateChain *> certChain = NULL, MRef<CertificateSet *> cert_db = NULL);
 
 		int32_t getLocalSipPort( const std::string &transport );
 
