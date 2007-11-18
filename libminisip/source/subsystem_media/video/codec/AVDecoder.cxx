@@ -25,6 +25,7 @@
 #include<config.h>
 #include<libminisip/media/video/codec/AVDecoder.h>
 #include<libminisip/media/video/ImageHandler.h>
+#include<libminisip/media/video/VideoException.h>
 
 #include<iostream>
 
@@ -67,8 +68,7 @@ AVDecoder::AVDecoder():handler(NULL),codec( NULL ),context( NULL ){
 	codec = avcodec_find_decoder( CODEC_ID_H263 );
 
 	if( codec == NULL ){
-		fprintf( stderr, "libavcodec does not support H263" );
-		exit( 1 );
+		throw VideoException( "libavcodec does not support H263" );
 	}
 
 	context = avcodec_alloc_context();
@@ -78,8 +78,7 @@ AVDecoder::AVDecoder():handler(NULL),codec( NULL ),context( NULL ){
 #endif
 
 	if( avcodec_open( context, codec ) != 0 ){
-		fprintf( stderr, "Could not open libavcodec codec\n" );
-		exit( 1 );
+		throw VideoException( "Could not open libavcodec codec" );
 	}
 	
 	context->opaque = this;

@@ -26,6 +26,7 @@
 #include<sys/time.h>
 #include<libmutil/mtime.h>
 #include<libminisip/media/video/codec/VideoEncoderCallback.h>
+#include<libminisip/media/video/VideoException.h>
 //#include<libminisip/media/rtp/RtpPacket.h>
 
 #include<config.h>
@@ -94,8 +95,7 @@ AVEncoder::AVEncoder():context( NULL ),codec( NULL ){
 	codec = avcodec_find_encoder( CODEC_ID_H263P );
 
 	if( codec == NULL ){
-		merr << "libavcodec does not support H263" << end;
-		exit( 1 );
+		throw VideoException( "libavcodec does not support H263" );
 	}
 
 	int bitRate = 100 * 1000;
@@ -163,8 +163,7 @@ void AVEncoder::init( uint32_t width, uint32_t height ){
 	context->height = height; //height;
 
 	if( avcodec_open( context, codec ) != 0 ){
-		merr << "Could not open libavcodec codec" << end;
-		exit( 1 );
+		throw VideoException( "Could not open libavcodec codec" );
 	}
 
 }
@@ -209,8 +208,7 @@ void AVEncoder::handle( MImage * image ){
 		if( img_convert( (AVPicture*)&frame, context->pix_fmt, 
 					(AVPicture*)image, srcFormat,
 					context->width, context->height ) < 0 ){
-			merr << "Could not convert image to encoding format" << end;
-			exit( 1 );
+			throw VideoException( "Could not convert image to encoding format" );
 		}
 	}
 	else{
