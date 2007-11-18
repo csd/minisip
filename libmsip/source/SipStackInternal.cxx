@@ -143,6 +143,8 @@ SipStackInternal::SipStackInternal( MRef<SipStackConfig *> stackConfig )
 	SipMessage::contentFactories.addFactory("multipart/parallel", SipMIMEContentFactory);
 	SipMessage::contentFactories.addFactory("message/sipfrag", sipSipMessageContentFactory);
 
+	// Instantiate transport registry
+	SipTransportRegistry::getInstance();
 }
 
 MRef<SipCommandDispatcher*> SipStackInternal::getDispatcher(){

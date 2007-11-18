@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2004-2006 the Minisip Team
+ Copyright (C) 2004-2007 the Minisip Team
  
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -21,6 +21,7 @@
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
  *	    Joachim Orrblad <joachim[at]orrblad.com>
+ *	    Mikael Magnusson <mikma@users.sourceforge.net>
 */
 
 #include<config.h>
@@ -341,6 +342,17 @@ void Sip::run(){
 
 			}
 		}
+
+#ifdef START_DTLS
+#ifdef DEBUG_OUTPUT
+		mout << BOLD << "init 8.4/9: Starting DTLS-UDP transport worker thread" << PLAIN << endl;
+#endif
+		try{
+			sipstack->startServer( "DTLS-UDP" );
+		}catch(NetworkException &e){
+			merr << "Error: Failed to create DTLS-UDP socket"<<endl;
+		}
+#endif	// START_DTLS
 	}
 	catch( Exception & exc ){
 		cerr << "ERROR: Exception thrown when creating "
