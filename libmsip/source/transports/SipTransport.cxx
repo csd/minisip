@@ -35,8 +35,15 @@ SipTransport::SipTransport(): MPlugin(){
 SipTransport::SipTransport( MRef<Library *> lib ): MPlugin( lib ){
 }
 
-int32_t SipTransport::getDefaultPort(){
+int32_t SipTransport::getDefaultPort() const{
 	return isSecure() ? 5061 : 5060;
+}
+
+string SipTransport::getSrv() const{
+	string service = isSecure() ? "sips" : "sip";
+	const string &proto = getProtocol();
+
+	return "_" + service + "._" + proto;
 }
 
 MRef<StreamSocket *> SipTransport::connect( const IPAddress &addr, uint16_t port, MRef<CertificateSet *> cert_db, MRef<CertificateChain *> certChain ){

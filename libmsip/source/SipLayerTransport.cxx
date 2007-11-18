@@ -512,18 +512,12 @@ void SipLayerTransport::addViaHeader( MRef<SipMessage*> pack,
 	pack->addBefore( hdr );
 }
 
-static bool lookupDestSrv(const string &domain, const string &transport,
+static bool lookupDestSrv(const string &domain, MRef<SipTransport*> transport,
 			  string &destAddr, int32_t &destPort)
 {
 	//Do a SRV lookup according to the transport ...
-	string srv;
+	string srv = transport->getSrv();
 	uint16_t port = 0;
-
-	if( transport == "TLS" || transport == "tls") { srv = "_sips._tcp"; }
-	else if( transport == "TCP" || transport == "tcp") { srv = "_sip._tcp"; }
-	else { //if( trans == "UDP" || trans == "udp") { 	
-		srv = "_sip._udp"; 
-	}
 
 	string addr = NetworkFunctions::getHostHandlingService(srv, domain, port);
 #ifdef DEBUG_OUTPUT
@@ -564,7 +558,7 @@ static bool lookupDestIpPort(const SipUri &uri, MRef<SipTransport*> transport,
 			res = true;
 		}
 		// Lookup SRV
-		else if( lookupDestSrv( uri.getIp(), transport->getName(),
+		else if( lookupDestSrv( uri.getIp(), transport,
 					addr, port )){
 			res = true;
 		}

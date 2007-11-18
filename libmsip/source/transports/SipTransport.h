@@ -56,7 +56,10 @@ class LIBMSIP_API SipTransport: public MPlugin{
 		/**
 		 * @return 5061 for secure transports and 5060 otherwise.
 		 */
-		virtual int32_t getDefaultPort();
+		virtual int32_t getDefaultPort() const;
+
+		/** @return srv prefix used when looking up SRV RR */
+		virtual std::string getSrv() const;
 
 		/** Setup a new listening socket */
 		virtual MRef<SipSocketServer *> createServer( MRef<SipLayerTransport*> receiver, bool ipv6, const std::string &ipString, int32_t prefPort, MRef<CertificateSet *> cert_db = NULL, MRef<CertificateChain *> certChain = NULL ) = 0;
