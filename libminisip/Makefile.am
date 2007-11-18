@@ -221,7 +221,10 @@ libsoundcard_src = $(BASIC_SOUNDCARD_SRC)
 
 if !OS_WIN
 if ENABLE_OSS
-        libsoundcard_src += source/subsystem_media/soundcard/OssSoundDevice.cxx source/subsystem_media/soundcard/OssSoundDevice.h
+libsoundcard_src += source/subsystem_media/soundcard/OssSoundDevice.cxx \
+		source/subsystem_media/soundcard/OssSoundDevice.h \
+		source/subsystem_media/soundcard/OssSoundDriver.cxx \
+		source/subsystem_media/soundcard/OssSoundDriver.h
 endif ENABLE_OSS
 endif !OS_WIN
 

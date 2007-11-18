@@ -84,23 +84,47 @@ MRef<SoundDevice*> PortAudioDriver::createDevice( string deviceId ){
 	return new PortAudioDevice( device );
 }
 
+
+static bool getPaDeviceName(PaDeviceIndex i, SoundDeviceName &name) {
+	char device[10] = "";
+
+	const PaDeviceInfo *info = Pa_GetDeviceInfo( i );
+
+	if( !info ){
+		return false;
+	}
+
+	snprintf( device, sizeof( device ), "%s:%d", PA_PREFIX, i );
+	name = SoundDeviceName( device, info->name, info->maxInputChannels, info->maxOutputChannels );
+	return true;
+}
+
 std::vector<SoundDeviceName> PortAudioDriver::getDeviceNames() const {
 	std::vector<SoundDeviceName> names;
 
 	for( int i = 0; i < Pa_GetDeviceCount(); i++ ){
-		char device[10] = "";
+		SoundDeviceName name;
 
-		const PaDeviceInfo *info = Pa_GetDeviceInfo( i );
-
-		if( !info ){
+		if( !getPaDeviceName( i, name ) ){
 			continue;
 		}
 
-		snprintf( device, sizeof( device ), "%s:%d", PA_PREFIX, i );
-		names.push_back( SoundDeviceName( device, info->name, info->maxInputChannels, info->maxOutputChannels ) );
+		names.push_back( name );
 	}
 
 	return names;
+}
+
+bool PortAudioDriver::getDefaultInputDeviceName( SoundDeviceName &name ) const {
+	PaDeviceIndex input = Pa_GetDefaultInputDevice();
+
+	return getPaDeviceName( input, name );
+}
+
+bool PortAudioDriver::getDefaultOutputDeviceName( SoundDeviceName &name ) const {
+	PaDeviceIndex output = Pa_GetDefaultOutputDevice();
+
+	return getPaDeviceName( output, name );
 }
 
 uint32_t PortAudioDriver::getVersion() const{

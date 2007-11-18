@@ -41,6 +41,10 @@ class AlsaSoundDriver: public SoundDriver{
 
 		virtual std::vector<SoundDeviceName> getDeviceNames() const;
 
+		virtual bool getDefaultInputDeviceName( SoundDeviceName &name ) const;
+		
+		virtual bool getDefaultOutputDeviceName( SoundDeviceName &name ) const;
+
 		virtual std::string getName() const {
 			return "AlsaSound";
 		}

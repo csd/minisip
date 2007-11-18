@@ -40,6 +40,7 @@
 #include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
 
 #include<libminisip/media/soundcard/SoundIO.h>
+#include<libminisip/media/soundcard/SoundDriverRegistry.h>
 #include<libminisip/media/SubsystemMedia.h>
 #include<libminisip/media/codecs/Codec.h>
 #include<libminisip/contacts/PhoneBook.h>
@@ -897,6 +898,43 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 
 }
 
+static void getDefaultSoundDevices( string &soundDeviceIn,
+				    string &soundDeviceOut ){
+	MRef<SoundDriver*> defaultDriver =
+		SoundDriverRegistry::getInstance()->getDefaultDriver();
+
+	if( defaultDriver ){
+		SoundDeviceName inputName;
+		SoundDeviceName outputName;
+
+		if( defaultDriver->getDefaultInputDeviceName( inputName ) ){
+			soundDeviceIn = inputName.getName();
+		}
+
+		if( defaultDriver->getDefaultOutputDeviceName( outputName ) ){
+			soundDeviceOut = outputName.getName();
+		}
+	}
+
+	if( soundDeviceIn.empty() ){
+		mdbg("signaling/sip") << "SipSoftPhoneConfiguration: Using fallback sound input driver" << endl;
+#ifdef WIN32
+		soundDeviceIn = "dsound:0";
+#else
+		soundDeviceIn = "/dev/dsp";
+#endif
+	}
+
+	if( soundDeviceOut.empty() ){
+		mdbg("signaling/sip") << "SipSoftPhoneConfiguration: Using fallback sound output driver" << endl;
+#ifdef WIN32
+		soundDeviceOut = "dsound:0";
+#else
+		soundDeviceOut = "/dev/dsp";
+#endif
+	}
+}
+
 void SipSoftPhoneConfiguration::saveDefault( MRef<ConfBackend *> be ){
 	//be->save( "version", CONFIG_FILE_VERSION_REQUIRED_STR );
 	be->save( "version", CONFIG_FILE_VERSION_REQUIRED );
@@ -933,11 +971,14 @@ void SipSoftPhoneConfiguration::saveDefault( MRef<ConfBackend *> be ){
 	be->save( "local_tcp_port", 5060 );
 	be->save( "local_tls_port", 5061 );
 
-#ifdef WIN32
-	be->save( "sound_device", "dsound:0" );
-#else
-	be->save( "sound_device", "/dev/dsp" );
-#endif
+	string soundDeviceIn;
+	string soundDeviceOut;
+
+	getDefaultSoundDevices( soundDeviceIn, soundDeviceOut );
+
+	be->save( "sound_device", soundDeviceIn );
+	be->save( "sound_device_in", soundDeviceIn );
+	be->save( "sound_device_out", soundDeviceOut );
 
 	be->save( "mixer_type", "spatial" );
 

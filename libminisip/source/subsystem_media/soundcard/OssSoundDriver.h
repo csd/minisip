@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2004-2006 the Minisip Team
+ Copyright (C) 2007  Mikael Magnusson
  
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -16,13 +16,13 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 */
 
-/* Copyright (C) 2006
+/* Copyright (C) 2007
  *
  * Authors: Mikael Magnusson <mikma@users.sourceforge.net>
  */
 
-#ifndef PORTAUDIODRIVER_H
-#define PORTAUDIODRIVER_H
+#ifndef OSSSOUNDDRIVER_H
+#define OSSSOUNDDRIVER_H
 
 #include<libminisip/libminisip_config.h>
 
@@ -31,31 +31,27 @@
 
 #include<libminisip/media/soundcard/SoundDriver.h>
 
-class PortAudioDriver: public SoundDriver{
+
+class OssSoundDriver: public SoundDriver{
 	public:
-		PortAudioDriver( MRef<Library*> lib );
-		virtual ~PortAudioDriver();
+		OssSoundDriver( MRef<Library*> lib );
+		virtual ~OssSoundDriver();
 		virtual MRef<SoundDevice*> createDevice( std::string deviceId );
-		virtual std::string getDescription() const { return "PortAudio sound driver"; };
+		virtual std::string getDescription() const { return "OssSound sound driver"; };
 
 		virtual std::vector<SoundDeviceName> getDeviceNames() const;
 
 		virtual bool getDefaultInputDeviceName( SoundDeviceName &name ) const;
-
+		
 		virtual bool getDefaultOutputDeviceName( SoundDeviceName &name ) const;
 
 		virtual std::string getName() const {
-			return "PortAudio";
+			return "OssSound";
 		}
 
 		virtual std::string getMemObjectType() const { return getName(); }
 
 		virtual uint32_t getVersion() const;
-
-
-
-	private:
-		bool initialized;
 };
 
-#endif	// PORTAUDIODRIVER_H
+#endif	// OSSSOUNDDRIVER_H

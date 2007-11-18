@@ -82,6 +82,12 @@ class LIBMINISIP_API SoundDriver: public MPlugin{
 		/** Returns a list of device names supported by the driver */
 		virtual std::vector<SoundDeviceName> getDeviceNames() const = 0;
 
+		/** @return the name of the driver's default input device */
+		virtual bool getDefaultInputDeviceName( SoundDeviceName &name ) const = 0;
+
+		/** @returns the name of the driver's default output device */
+		virtual bool getDefaultOutputDeviceName( SoundDeviceName &name ) const = 0;
+
 		int operator==( const SoundDriver &driver ) const;
 		
 	private:

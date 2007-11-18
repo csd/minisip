@@ -32,6 +32,10 @@
 #include"DirectSoundDriver.h"
 #endif
 
+#ifdef ENABLE_OSS
+#include"OssSoundDriver.h"
+#endif
+
 #include<algorithm>
 
 using namespace std;
@@ -54,6 +58,9 @@ SoundDriverRegistry::SoundDriverRegistry(){
 	registerPlugin( new FileSoundDriver( NULL ) );
 #ifdef _MSC_VER
 	registerPlugin( new DirectSoundDriver(NULL) );
+#endif
+#ifdef ENABLE_OSS
+	registerPlugin( new OssSoundDriver( NULL ) );
 #endif
 }
 
@@ -78,6 +85,28 @@ std::vector<SoundDeviceName> SoundDriverRegistry::getAllDeviceNames() const{
 	return allNames;
 }
 
+MRef<SoundDriver*> SoundDriverRegistry::getDefaultDriver() const{
+	const char *driverPriority[] =
+		{ "PortAudio", "DirectSound", "AlsaSound", "OssSound", NULL };
+	int i;
+
+	for( i = 0;; i++ ){
+		const char *name = driverPriority[i];
+
+		if( !name )
+			return NULL;
+
+		MRef<MPlugin*> plugin = findPlugin( name );
+		if( plugin ){
+			MRef<SoundDriver*> driver;
+			driver = dynamic_cast<SoundDriver*>(*plugin);
+			if( driver )
+				return driver;
+		}
+	}
+
+	return NULL;
+}
 
 MRef<SoundDevice*> SoundDriverRegistry::createDevice( std::string deviceName ){
 	string driverId;

@@ -41,6 +41,10 @@ class FileSoundDriver: public SoundDriver{
 
 		virtual std::vector<SoundDeviceName> getDeviceNames() const;
 
+		virtual bool getDefaultInputDeviceName( SoundDeviceName &name ) const { return false; }
+
+		virtual bool getDefaultOutputDeviceName( SoundDeviceName &name ) const { return false; }
+
 		virtual std::string getName() const {
 			return "FileSound";
 		}

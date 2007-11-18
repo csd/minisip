@@ -28,12 +28,6 @@
 #include<libminisip/media/soundcard/SoundDevice.h>
 #include<libminisip/media/soundcard/SoundDriverRegistry.h>
 
-#ifndef WIN32
-#ifdef ENABLE_OSS
-#	include"OssSoundDevice.h"
-#endif
-#endif
-
 #ifdef WAVE_SOUND
 #	include"WaveSoundDevice.h"
 #endif
@@ -61,17 +55,6 @@ MRef<SoundDevice *> SoundDevice::create( string devideId ){
 		return new WaveSoundDevice( devideId.substr( 5, string::npos ) );
 	}
 #endif
-
-#ifndef WIN32
-#ifdef ENABLE_OSS
-#define SOUND_DEVICE_IMPLEMENTED
-	return new OssSoundDevice( devideId );
-#endif
-#else
-	cerr << "WARNING: No sound device is created! (BUG?)"<<endl;
-	return NULL;
-#endif
-
 }
 
 SoundDevice::SoundDevice( string device ):openedRecord(false),openedPlayback(false){

@@ -41,6 +41,9 @@ class LIBMINISIP_API SoundDriverRegistry: public MPluginRegistry, public MSingle
 		const std::vector<MRef<SoundDriver*> > &getDrivers() const;
 		std::vector<SoundDeviceName> getAllDeviceNames() const;
 
+		/** @return the default sound driver */
+		virtual MRef<SoundDriver*> getDefaultDriver() const;
+
 		/**
 		 * @param device specifies a sound device and
 		 * should be written in the format "driver:id", where driver

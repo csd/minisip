@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2006  Mikael Magnusson
+ Copyright (C) 2007  Mikael Magnusson
  
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -16,7 +16,7 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 */
 
-/* Copyright (C) 2006
+/* Copyright (C) 2007
  *
  * Authors: Mikael Magnusson <mikma@users.sourceforge.net>
  */
@@ -27,18 +27,18 @@
 #include<libminisip/media/soundcard/SoundDriverRegistry.h>
 #include<libmutil/MPlugin.h>
 
-#include"AlsaSoundDriver.h"
-#include"AlsaSoundDevice.h"
+#include"OssSoundDriver.h"
+#include"OssSoundDevice.h"
 
 using namespace std;
 
-static const char DRIVER_PREFIX[] = "alsa";
+static const char DRIVER_PREFIX[] = "oss";
 static std::list<std::string> pluginList;
 static int initialized;
 
 
 extern "C" LIBMINISIP_API
-std::list<std::string> *malsa_LTX_listPlugins( MRef<Library*> lib ){
+std::list<std::string> *moss_LTX_listPlugins( MRef<Library*> lib ){
 	if( !initialized ){
 		pluginList.push_back("getPlugin");
 		initialized = true;
@@ -48,40 +48,38 @@ std::list<std::string> *malsa_LTX_listPlugins( MRef<Library*> lib ){
 }
 
 extern "C" LIBMINISIP_API
-MPlugin * malsa_LTX_getPlugin( MRef<Library*> lib ){
-	return new AlsaSoundDriver( lib );
+MPlugin * moss_LTX_getPlugin( MRef<Library*> lib ){
+	return new OssSoundDriver( lib );
 }
 
-AlsaSoundDriver::AlsaSoundDriver( MRef<Library*> lib ) : SoundDriver( DRIVER_PREFIX, lib ){
+OssSoundDriver::OssSoundDriver( MRef<Library*> lib ) : SoundDriver( DRIVER_PREFIX, lib ){
 }
 
-AlsaSoundDriver::~AlsaSoundDriver( ){
+OssSoundDriver::~OssSoundDriver( ){
 }
 
-MRef<SoundDevice*> AlsaSoundDriver::createDevice( string deviceId ){
-	return new AlsaSoundDevice( deviceId );
+MRef<SoundDevice*> OssSoundDriver::createDevice( string deviceId ){
+	return new OssSoundDevice( deviceId );
 }
 
-std::vector<SoundDeviceName> AlsaSoundDriver::getDeviceNames() const {
+std::vector<SoundDeviceName> OssSoundDriver::getDeviceNames() const {
 	std::vector<SoundDeviceName> names;
 
-	mdbg << "AlsaSoundDriver::getDeviceNames not implemented" << endl;
+	mdbg << "OssSoundDriver::getDeviceNames not implemented" << end;
 
 	return names;
 }
 
-bool AlsaSoundDriver::getDefaultInputDeviceName( SoundDeviceName &name ) const{
-	// TODO set max input/output channels
-	name = SoundDeviceName( "alsa:default", "Default input device" );
+bool OssSoundDriver::getDefaultInputDeviceName( SoundDeviceName &name ) const{
+	name = SoundDeviceName( "/dev/dsp", "/dev/dsp" );
 	return true;
 }
 
-bool AlsaSoundDriver::getDefaultOutputDeviceName( SoundDeviceName &name ) const {
-	// TODO set max input/output channels
-	name = SoundDeviceName( "alsa:default", "Default output device" );
+bool OssSoundDriver::getDefaultOutputDeviceName( SoundDeviceName &name ) const {
+	name = SoundDeviceName( "/dev/dsp", "/dev/dsp" );
 	return true;
 }
 
-uint32_t AlsaSoundDriver::getVersion() const{
+uint32_t OssSoundDriver::getVersion() const{
 	return 0x00000001;
 }
