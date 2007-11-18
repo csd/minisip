@@ -34,7 +34,7 @@ class LIBMNETUTIL_API TCPSocket : public StreamSocket {
 		TCPSocket(int32_t fd, sockaddr * addr, int32_t addr_len);
 		
 		TCPSocket(std::string addr,int32_t port=0);
-		TCPSocket(IPAddress &addr,int32_t port=0);
+		TCPSocket(const IPAddress &addr,int32_t port=0);
 
 		TCPSocket(TCPSocket &sock);
 		virtual ~TCPSocket();
@@ -51,7 +51,7 @@ class LIBMNETUTIL_API TCPSocket : public StreamSocket {
 		friend std::ostream& operator<<(std::ostream&, TCPSocket&);
 
 	private:
-		void initTCPSocket(IPAddress &ipaddress, int32_t port);
+		void initTCPSocket(const IPAddress &ipaddress, int32_t port);
 };
 
 TCPSocket& operator<<(TCPSocket& sock, std::string str);

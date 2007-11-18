@@ -271,7 +271,7 @@ int32_t IP6Address::getPort() const
 	return ntoh16(sockaddress->sin6_port);
 }
 
-void IP6Address::connect(Socket &socket, int32_t port){
+void IP6Address::connect(Socket &socket, int32_t port) const{
 	struct sockaddr_in6 sin;
 	memcpy(&sin, sockaddress, sizeof(sin));
 	sin.sin6_port = htons( (unsigned short)port );

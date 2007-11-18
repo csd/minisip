@@ -64,11 +64,11 @@ TCPSocket::TCPSocket(string addr, int32_t port){
 	initTCPSocket( **tmp, port );
 }
 
-TCPSocket::TCPSocket(IPAddress &ipaddress, int32_t port){
+TCPSocket::TCPSocket(const IPAddress &ipaddress, int32_t port){
 	initTCPSocket( ipaddress, port );
 }
 
-void TCPSocket::initTCPSocket(IPAddress &ipaddress, int32_t port){
+void TCPSocket::initTCPSocket(const IPAddress &ipaddress, int32_t port){
 	peerAddress = ipaddress.clone();
 	peerPort = port;
 

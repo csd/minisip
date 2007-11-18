@@ -46,7 +46,7 @@ class LIBMNETUTIL_API IP4Address : public IPAddress {
 
 		virtual int32_t getPort() const;
 		virtual std::string getString() const;
-		virtual void connect(Socket &socket, int32_t port);
+		virtual void connect(Socket &socket, int32_t port) const;
 		friend std::ostream& operator<<(std::ostream&, IP4Address &a);
 		friend Dbg& operator<<(Dbg&, IP4Address &a);
 

@@ -85,7 +85,8 @@ class LIBMCRYPTO_API OsslSocket : public TLSSocket {
 			MRef<OsslCertificate *> cert = NULL,
 			MRef<OsslCertificateSet *> cert_db=NULL );
 		
-		OsslSocket( IPAddress &addr, int32_t port, void * &ssl_ctx,
+		OsslSocket( const IPAddress &addr, int32_t port,
+			void * &ssl_ctx,
 			MRef<OsslCertificate *> cert=NULL,
 			MRef<OsslCertificateSet *> cert_db=NULL );
 		

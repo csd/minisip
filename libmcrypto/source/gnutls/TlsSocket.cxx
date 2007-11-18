@@ -53,7 +53,7 @@ TLSSocket::~TLSSocket()
 {
 }
 
-TLSSocket* TLSSocket::connect( IPAddress &addr, int32_t port,
+TLSSocket* TLSSocket::connect( const IPAddress &addr, int32_t port,
 			       MRef<Certificate *> cert,
 			       MRef<CertificateSet *> cert_db,
 			       string serverName )
@@ -107,7 +107,7 @@ GnutlsSocket::GnutlsSocket(string addr, int32_t port,
 }
 #endif
 
-GnutlsSocket::GnutlsSocket(IPAddress &addr, int32_t port,
+GnutlsSocket::GnutlsSocket(const IPAddress &addr, int32_t port,
 			   MRef<GtlsCertificateSet *> cert_db,
 			   MRef<GtlsCertificate *> cert)
 {

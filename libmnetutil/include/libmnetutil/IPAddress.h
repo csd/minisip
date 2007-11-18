@@ -56,7 +56,7 @@ class LIBMNETUTIL_API IPAddress : public MObject{
 		virtual int32_t getPort() const=0;
 		virtual std::string getString() const=0;
 
-		virtual void connect(Socket &s, int32_t port)=0;
+		virtual void connect(Socket &s, int32_t port) const=0;
 
 		virtual struct sockaddr* getSockaddrptr(int32_t port=0) const=0;
 		virtual int32_t getSockaddrLength() const=0;

@@ -58,7 +58,7 @@ TLSSocket::~TLSSocket()
 {
 }
 
-TLSSocket* TLSSocket::connect( IPAddress &addr, int32_t port,
+TLSSocket* TLSSocket::connect( const IPAddress &addr, int32_t port,
 			       MRef<Certificate *> cert,
 			       MRef<CertificateSet *> cert_db,
 			       string serverName )
@@ -109,7 +109,7 @@ OsslSocket::OsslSocket( MRef<StreamSocket *> tcp_socket, SSL_CTX * ssl_ctx_ ):
 }
 
 
-OsslSocket::OsslSocket( IPAddress &addr, int32_t port, void * &ssl_ctx_,
+OsslSocket::OsslSocket( const IPAddress &addr, int32_t port, void * &ssl_ctx_,
 			      MRef<OsslCertificate *> cert, 
 			      MRef<OsslCertificateSet *> cert_db_ ){
 	MRef<TCPSocket*> tcp_sock = new TCPSocket( addr, port );

@@ -188,7 +188,7 @@ int32_t IP4Address::getPort() const
 	return ntoh16(sockaddress->sin_port);
 }
 
-void IP4Address::connect(Socket &socket, int32_t port){
+void IP4Address::connect(Socket &socket, int32_t port) const{
 
 	unsigned char *ip;
 	unsigned long int ip_data;
