@@ -46,7 +46,7 @@ SipTransportRegistry::SipTransportRegistry(){
 	registerPlugin( new SipTransportTls( NULL ) );
 }
 
-MRef<SipTransport*> SipTransportRegistry::findTransport( string protocol, bool secure ) const{
+MRef<SipTransport*> SipTransportRegistry::findTransport( const string &protocol, bool secure ) const{
 	string lcProt = protocol;
 	list< MRef<MPlugin*> >::const_iterator iter;
 	list< MRef<MPlugin*> >::const_iterator stop = plugins.end();
@@ -69,6 +69,35 @@ MRef<SipTransport*> SipTransportRegistry::findTransport( string protocol, bool s
 		if( transport->isSecure() == secure &&
 		    transport->getProtocol() == lcProt ){
 			mdbg << "SipTransport: tranport found!!! =  " << lcProt << endl;
+			return transport;
+		}
+	}
+
+	return NULL;
+}
+
+MRef<SipTransport*> SipTransportRegistry::findViaTransport( const string &protocol ) const{
+	string ucProt = protocol;
+	list< MRef<MPlugin*> >::const_iterator iter;
+	list< MRef<MPlugin*> >::const_iterator stop = plugins.end();
+
+	transform( ucProt.begin(), ucProt.end(),
+		   ucProt.begin(), (int(*)(int))toupper );
+
+	for( iter = plugins.begin(); iter != stop; iter++ ){
+		MRef<MPlugin*> plugin = *iter;
+
+		if( !plugin )
+			continue;
+
+		MRef<SipTransport*> transport =
+			dynamic_cast<SipTransport*>( *plugin );
+
+		if( !transport )
+			continue;
+
+		if( transport->getViaProtocol() == ucProt ){
+			mdbg << "SipTransport: Via transport found!!! =  " << ucProt << endl;
 			return transport;
 		}
 	}

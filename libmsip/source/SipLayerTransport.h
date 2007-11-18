@@ -46,6 +46,7 @@ class SipMessage;
 
 class SipLayerTransport;
 class SipCommandDispatcher;
+class SipTransport;
 class StreamThreadData;
 class StreamThreadServer;
 
@@ -115,7 +116,7 @@ class SipLayerTransport : public SipSMCommandReceiver {
 		bool validateIncoming(MRef<SipMessage *> msg);
 
 		bool getDestination(MRef<SipMessage*> pack, std::string &destAddr,
-				    int32_t &destPort, std::string &destTransport);
+				    int32_t &destPort, MRef<SipTransport*> &destTransport);
 		void addViaHeader( MRef<SipMessage*> pack, MRef<SipSocketServer*> server, MRef<Socket *> socket, std::string branch );
 		MRef<StreamSocket *> findStreamSocket(IPAddress&, uint16_t);
 		bool findSocket(const std::string &transport,

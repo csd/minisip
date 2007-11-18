@@ -47,6 +47,12 @@ class LIBMSIP_API SipTransport: public MPlugin{
 		/** @return transport protocol id in lower case, such as udp */
 		virtual std::string getProtocol() const=0;
 
+		/**
+		 * @return Via header transport protocol in upper case,
+		 * for example DTLS-UDP
+		 */
+		virtual std::string getViaProtocol() const=0;
+
 		/** Setup a new listening socket */
 		virtual MRef<SipSocketServer *> createServer( MRef<SipLayerTransport*> receiver, bool ipv6, const std::string &ipString, int32_t prefPort, MRef<CertificateSet *> cert_db = NULL, MRef<CertificateChain *> certChain = NULL ) = 0;
 		/**
@@ -68,7 +74,9 @@ class LIBMSIP_API SipTransportRegistry: public MPluginRegistry, public MSingleto
 	public:
 		virtual std::string getPluginType(){ return "SipTransport"; }
 
-		MRef<SipTransport*> findTransport( std::string protocol, bool secure=false ) const;
+		MRef<SipTransport*> findTransport( const std::string &protocol, bool secure=false ) const;
+
+		MRef<SipTransport*> findViaTransport( const std::string &protocol ) const;
 
 	protected:
 		SipTransportRegistry();

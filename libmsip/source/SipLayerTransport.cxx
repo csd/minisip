@@ -597,8 +597,11 @@ static bool lookupDestIpPort(const SipUri &uri, const string &transport,
 
 // Impl RFC 3263 (partly)
 bool SipLayerTransport::getDestination(MRef<SipMessage*> pack, string &destAddr,
-			   int32_t &destPort, string &destTransport)
+			   int32_t &destPort, MRef<SipTransport*> &destTransport)
 {
+	MRef<SipTransportRegistry *> registry =
+		SipTransportRegistry::getInstance();
+
 	if( pack->getType() == SipResponse::type ){
 		// RFC 3263, 5 Server Usage
 		// Send responses to sent by address in top via.
@@ -624,7 +627,8 @@ bool SipLayerTransport::getDestination(MRef<SipMessage*> pack, string &destAddr,
 				if( !destPort ){
 					destPort = 5060;
 				}
-				destTransport = via->getProtocol();
+				destTransport =
+					registry->findViaTransport( via->getProtocol() );
 				return true;
 			}
 		}
@@ -660,26 +664,43 @@ bool SipLayerTransport::getDestination(MRef<SipMessage*> pack, string &destAddr,
 			destAddr = uri.getIp();
 			
 			if( /*destAddr*/ destAddr.size()>0 ){
-				destTransport = uri.getTransport();
-				if( destTransport.length() == 0 ){
-					if( uri.getProtocolId() == "sips" )
-						destTransport = "TLS";
+				bool secure = uri.getProtocolId() == "sips";
+				string protocol = uri.getTransport();
+				if( protocol.length() == 0 ){
+					if( secure )
+						destTransport = registry->findTransport( "tcp", true );
 					else{
 						if (findServerSocket(SOCKET_TYPE_UDP, false)){
-							destTransport="UDP";
+							destTransport = registry->findTransport( "udp" );
 						}else
 						if (findServerSocket(SOCKET_TYPE_TCP, false)){
-							destTransport="TCP";
+							destTransport = registry->findTransport( "tcp" );
 						}else
 						if (findServerSocket(SOCKET_TYPE_TLS, false)){
-							destTransport = "TLS";
+							destTransport = registry->findTransport( "tcp", true );
 						}else{
+							// this should not happen
 							merr << "SipMessateTransport: Warning: could not find any supported transport - trying UDP"<<endl;
-							destTransport = "UDP"; // this should not happen
+							destTransport = registry->findTransport( "udp" );
 						}
 					}
 				}
-				return lookupDestIpPort(uri, destTransport, 
+				else{
+					destTransport = registry->findTransport( protocol, secure );
+					// TODO using TLS in transport parameter is deprecated
+					if( !destTransport ){
+						// Second, try Via protocol
+						// For example TLS
+						destTransport = registry->findViaTransport( protocol );
+					}
+				}
+
+				if( !destTransport ){
+					mdbg("signaling/sip") << "SipLayerTransport: Unsupported transport " << protocol << " secure:" << secure << endl;
+					return false;
+				}
+
+				return lookupDestIpPort(uri, destTransport->getName(), 
 							destAddr, destPort);
 			}
 		}
@@ -698,7 +719,7 @@ void SipLayerTransport::sendMessage(MRef<SipMessage*> pack,
 	//MRef<IPAddress*> destAddr;
 	string destAddr;
 	int32_t destPort = 0;
-	string destTransport;
+	MRef<SipTransport*> destTransport;
 
 	if( !getDestination( pack, destAddr, destPort, destTransport) ){
 #ifdef DEBUG_OUTPUT
@@ -707,11 +728,8 @@ void SipLayerTransport::sendMessage(MRef<SipMessage*> pack,
 		return;
 	}
 
-	transform( destTransport.begin(), destTransport.end(),
-		   destTransport.begin(), (int(*)(int))toupper );
-
 	sendMessage( pack, /* **destAddr */ destAddr, destPort,
-		     branch, destTransport, addVia );
+		     branch, destTransport->getName(), addVia );
 }
 
 
