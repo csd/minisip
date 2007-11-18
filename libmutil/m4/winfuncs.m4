@@ -58,7 +58,7 @@ AC_DEFUN([AM_MINISIP_CHECK_WINFUNC],
 [ac_func_name=`echo $1|sed -e 's/^\(.*\)(.*)$/\1/'`
 AS_VAR_PUSHDEF([ac_var], [ac_cv_func_${ac_func_name}])dnl
 AC_CACHE_CHECK([for ${ac_func_name}], ac_var,
-[AC_COMPILE_IFELSE([
+[AC_LINK_IFELSE([
 AC_INCLUDES_DEFAULT([$4])
 
 int main(){
