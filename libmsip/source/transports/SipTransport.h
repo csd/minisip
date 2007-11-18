@@ -47,7 +47,13 @@ class LIBMSIP_API SipTransport: public MPlugin{
 		/** @return transport protocol id in lower case, such as udp */
 		virtual std::string getProtocol() const=0;
 
+		/** Setup a new listening socket */
 		virtual MRef<SipSocketServer *> createServer( MRef<SipLayerTransport*> receiver, bool ipv6, const std::string &ipString, int32_t prefPort, MRef<CertificateSet *> cert_db = NULL, MRef<CertificateChain *> certChain = NULL ) = 0;
+		/**
+		 * Setup a new connection, implemented by
+		 * connection-oriented transports only
+		 */
+		virtual MRef<StreamSocket *> connect( const IPAddress &addr, uint16_t port, MRef<CertificateSet *> cert_db = NULL, MRef<CertificateChain *> certChain = NULL );
 
 		// MPlugin
 		std::string getPluginType() const { return "SipTransport"; }

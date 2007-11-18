@@ -25,6 +25,7 @@
 
 #include<config.h>
 #include<libmnetutil/NetworkException.h>
+#include<libmcrypto/TlsSocket.h>
 #include<libmcrypto/TlsServerSocket.h>
 #include"SipTransportTls.h"
 
@@ -82,6 +83,11 @@ MRef<SipSocketServer *> SipTransportTls::createServer( MRef<SipLayerTransport*> 
 	} while (fail);
 
 	return server;
+}
+
+MRef<StreamSocket *> SipTransportTls::connect( const IPAddress &addr, uint16_t port, MRef<CertificateSet *> cert_db, MRef<CertificateChain *> certChain ){
+	return TLSSocket::connect( addr, port,
+				   certChain->getFirst(), cert_db );
 }
 
 uint32_t SipTransportTls::getVersion() const{

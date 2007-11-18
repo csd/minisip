@@ -35,6 +35,11 @@ SipTransport::SipTransport(): MPlugin(){
 SipTransport::SipTransport( MRef<Library *> lib ): MPlugin( lib ){
 }
 
+MRef<StreamSocket *> SipTransport::connect( const IPAddress &addr, uint16_t port, MRef<CertificateSet *> cert_db, MRef<CertificateChain *> certChain ){
+	throw Exception("Connection less transport");
+}
+
+
 SipTransportRegistry::SipTransportRegistry(){
 	registerPlugin( new SipTransportUdp( NULL ) );
 	registerPlugin( new SipTransportTcp( NULL ) );
@@ -42,8 +47,12 @@ SipTransportRegistry::SipTransportRegistry(){
 }
 
 MRef<SipTransport*> SipTransportRegistry::findTransport( string protocol, bool secure ) const{
+	string lcProt = protocol;
 	list< MRef<MPlugin*> >::const_iterator iter;
 	list< MRef<MPlugin*> >::const_iterator stop = plugins.end();
+
+	transform( lcProt.begin(), lcProt.end(),
+		   lcProt.begin(), (int(*)(int))tolower );
 
 	for( iter = plugins.begin(); iter != stop; iter++ ){
 		MRef<MPlugin*> plugin = *iter;
@@ -58,8 +67,8 @@ MRef<SipTransport*> SipTransportRegistry::findTransport( string protocol, bool s
 			continue;
 
 		if( transport->isSecure() == secure &&
-		    transport->getProtocol() == protocol ){
-			mdbg << "SipTransport: tranport found!!! =  " << protocol << endl;
+		    transport->getProtocol() == lcProt ){
+			mdbg << "SipTransport: tranport found!!! =  " << lcProt << endl;
 			return transport;
 		}
 	}

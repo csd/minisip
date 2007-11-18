@@ -43,12 +43,8 @@
 #include<libmsip/SipHeaderContact.h>
 #include<libmsip/SipHeaderTo.h>
 
-#include<libmcrypto/TlsServerSocket.h>
-#include<libmnetutil/ServerSocket.h>
 #include<libmnetutil/NetworkException.h>
 #include<libmnetutil/NetworkFunctions.h>
-#include<libmnetutil/UDPSocket.h>
-#include<libmcrypto/TlsSocket.h>
 #include<libmnetutil/NetworkException.h>
 #include<libmutil/Timestamp.h>
 #include<libmutil/MemObject.h>
@@ -750,15 +746,19 @@ bool SipLayerTransport::findSocket(const string &transport,
 			/* No existing StreamSocket to that host,
 			 * create one */
 			cerr << "SipLayerTransport: sendMessage: creating new socket" << endl;
-			if( transport == "TLS" ){
-				ssocket = TLSSocket::connect( destAddr, 
-							port, getMyCertificate(),
-							cert_db );
-			}
-			else{ /* TCP */
-				ssocket = new TCPSocket( destAddr, port );
+
+			// TODO cleanup
+			bool secure = false;
+			string protocol = transport;
+			if( protocol == "TLS" || protocol == "tls" ){
+				protocol = "TCP";
+				secure = true;
 			}
 
+			MRef<SipTransport*> plugin =
+				SipTransportRegistry::getInstance()->findTransport( protocol, secure );
+			ssocket = plugin->connect( destAddr, port,
+						   cert_db, getCertificateChain() );
 			addSocket( ssocket );
 		} else cerr << "SipLayerTransport: sendMessage: reusing old socket" << endl;
 		socket = *ssocket;

@@ -84,6 +84,10 @@ MRef<SipSocketServer *> SipTransportTcp::createServer( MRef<SipLayerTransport*> 
 	return server;
 }
 
+MRef<StreamSocket *> SipTransportTcp::connect( const IPAddress &addr, uint16_t port, MRef<CertificateSet *> cert_db, MRef<CertificateChain *> certChain ){
+	return new TCPSocket( addr, port );
+}
+
 uint32_t SipTransportTcp::getVersion() const{
 	return 0x00000001;
 }
