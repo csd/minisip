@@ -447,23 +447,18 @@ MRef<Socket *> SipLayerTransport::findServerSocket(int32_t type, bool ipv6)
 }
 
 
-string getSocketTransport( MRef<Socket*> socket )
+MRef<SipTransport*> getSocketTransport( MRef<Socket*> socket )
 {
-	switch( socket->getType() ){
-		case SOCKET_TYPE_TLS:
-			return "TLS";
+	MRef<SipTransport*> transport =
+		SipTransportRegistry::getInstance()->findTransport( socket->getType() );
 
-		case SOCKET_TYPE_TCP:
-			return "TCP";
-			
-		case SOCKET_TYPE_UDP:
-			return "UDP";
-
-		default:
-			mdbg("signaling/sip") << "SipLayerTransport: Unknown transport protocol " + socket->getType() <<endl;
-			// TODO more describing exception and message
-			throw NetworkException();
+	if( !transport ){
+		mdbg("signaling/sip") << "SipLayerTransport: Unknown transport protocol " + socket->getType() <<endl;
+		// TODO more describing exception and message
+		throw NetworkException();
 	}
+
+	return transport;
 }
 
 void getIpPort( MRef<SipSocketServer*> server, MRef<Socket*> socket,
@@ -484,7 +479,7 @@ void SipLayerTransport::addViaHeader( MRef<SipMessage*> pack,
 									MRef<SipSocketServer *> server,
 									MRef<Socket *> socket,
 									string branch ){
-	string transport;
+	MRef<SipTransport*> transport;
 	uint16_t port;
 	string ip;
 
@@ -501,7 +496,7 @@ void SipLayerTransport::addViaHeader( MRef<SipMessage*> pack,
 	getIpPort( server, socket, ip, port );
 	
 	MRef<SipHeaderValue*> hdrVal = 
-		new SipHeaderValueVia(transport, ip, port);
+		new SipHeaderValueVia(transport->getViaProtocol(), ip, port);
 
 	// Add rport parameter, defined in RFC 3581
 	hdrVal->addParameter(new SipHeaderParameter("rport", "", false));
@@ -792,7 +787,7 @@ void SipLayerTransport::updateContact(MRef<SipMessage*> pack,
 	MRef<SipHeaderValueContact*> contactp = pack->getHeaderValueContact();
 	uint16_t port;
 	string ip;
-	string transport;
+	MRef<SipTransport*> transport;
 
 	if( !contactp )
 		return;
@@ -810,8 +805,9 @@ void SipLayerTransport::updateContact(MRef<SipMessage*> pack,
 		transport = getSocketTransport( socket );
 		getIpPort( server, socket, ip, port );
 
+		contactUri.setProtocolId( transport->getUriScheme() );
 		contactUri.setIp( ip );
-		contactUri.setTransport( transport );
+		contactUri.setTransport( transport->getProtocol() );
 
 		if(ipv6 || socket->getType() != SOCKET_TYPE_UDP){
 

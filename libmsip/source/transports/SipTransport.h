@@ -41,6 +41,9 @@
  */
 class LIBMSIP_API SipTransport: public MPlugin{
 	public:
+		/** @return scheme of SIP(S) URI:s */
+		virtual std::string getUriScheme() const;
+
 		/** @return true if it is a encrypted SIPS transport */
 		virtual bool isSecure() const=0;
 
@@ -90,6 +93,9 @@ class LIBMSIP_API SipTransportRegistry: public MPluginRegistry, public MSingleto
 		MRef<SipTransport*> findTransport( const std::string &protocol, bool secure=false ) const;
 
 		MRef<SipTransport*> findViaTransport( const std::string &protocol ) const;
+
+		/** Search for transport by socket type. */
+		MRef<SipTransport*> findTransport( int32_t socketType ) const;
 
 	protected:
 		SipTransportRegistry();

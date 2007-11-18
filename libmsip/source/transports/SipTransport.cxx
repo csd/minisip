@@ -35,12 +35,16 @@ SipTransport::SipTransport(): MPlugin(){
 SipTransport::SipTransport( MRef<Library *> lib ): MPlugin( lib ){
 }
 
+string SipTransport::getUriScheme() const{
+	return isSecure() ? "sips" : "sip";
+}
+
 int32_t SipTransport::getDefaultPort() const{
 	return isSecure() ? 5061 : 5060;
 }
 
 string SipTransport::getSrv() const{
-	string service = isSecure() ? "sips" : "sip";
+	const string &service = getUriScheme();
 	const string &proto = getProtocol();
 
 	return "_" + service + "._" + proto;
@@ -109,6 +113,31 @@ MRef<SipTransport*> SipTransportRegistry::findViaTransport( const string &protoc
 
 		if( transport->getViaProtocol() == ucProt ){
 			mdbg << "SipTransport: Via transport found!!! =  " << ucProt << endl;
+			return transport;
+		}
+	}
+
+	return NULL;
+}
+
+MRef<SipTransport*> SipTransportRegistry::findTransport( int32_t socketType ) const{
+	list< MRef<MPlugin*> >::const_iterator iter;
+	list< MRef<MPlugin*> >::const_iterator stop = plugins.end();
+
+	for( iter = plugins.begin(); iter != stop; iter++ ){
+		MRef<MPlugin*> plugin = *iter;
+
+		if( !plugin )
+			continue;
+
+		MRef<SipTransport*> transport =
+			dynamic_cast<SipTransport*>( *plugin );
+
+		if( !transport )
+			continue;
+
+		if( transport->getSocketType() == socketType ){
+			mdbg << "SipTransport: Socket type found!!! =  " << socketType << endl;
 			return transport;
 		}
 	}
