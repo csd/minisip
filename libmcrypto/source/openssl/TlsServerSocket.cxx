@@ -72,7 +72,7 @@ ServerSocket *TLSServerSocket::create( bool use_ipv6, int32_t listen_port, MRef<
 	if( cert_db )
 		ssl_db = (OsslCertificateSet*)*cert_db;
 
-	return new OsslServerSocket( listen_port, ssl_cert, ssl_db );
+	return new OsslServerSocket( use_ipv6, listen_port, ssl_cert, ssl_db );
 }
 
 ServerSocket *TLSServerSocket::create(int32_t listen_port, MRef<Certificate *> cert, MRef<CertificateSet *> cert_db ){

@@ -182,3 +182,33 @@ dnl endif
   ])
 # End of AM_MINISIP_CHECK_LIBMCRYPTO
 #
+
+# AM_MINISIP_CHECK_LIBMCRYPTO_DTLS([ACTION-IF-FOUND [,ACTION-IF-NOT-FOUND]]))
+# ------------------------------------
+AC_DEFUN([AM_MINISIP_CHECK_LIBMCRYPTO_DTLS],[ 
+	AC_REQUIRE([AM_MINISIP_CHECK_LIBMCRYPTO]) dnl
+	mcrypto_dtls_found=yes
+
+dnl Checks for DTLS support in libmcrypto
+	mcrypto_save_LIBS="$LIBS"
+	mcrypto_save_LDFLAGS="$LDFLAGS"
+	mcrypto_save_CPPFLAGS="$CPPFLAGS"
+	LDFLAGS="$LDFLAGS $MINISIP_LIBRARY_LDFLAGS"
+	LIBS="$MINISIP_LIBS $LIBS"
+	CPPFLAGS="$CPPFLAGS $MINISIP_CFLAGS"
+	AM_MINISIP_CHECK_WINFUNCS(["DTLSSocket::create(0,0,0)"],,[mcrypto_dtls_found=no],[dnl
+#include<libmcrypto/DtlsSocket.h>
+])
+	LIBS="$mcrypto_save_LIBS"
+	LDFLAGS="$mcrypto_save_LDFLAGS"
+	CPPFLAGS="$mcrypto_save_CPPFLAGS"
+
+	if test "${mcrypto_dtls_found}" = "yes"; then
+		AC_DEFINE([HAVE_DTLS], 1, [Define to 1 if you have libmcrypto with DTLS support])
+		ifelse([$1], , :, [$1])
+	else
+		ifelse([$2], , :, [$2])
+	fi
+  ])
+# End of AM_MINISIP_CHECK_LIBMCRYPTO_DTLS
+#
