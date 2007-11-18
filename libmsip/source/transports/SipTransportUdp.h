@@ -42,6 +42,8 @@ class SipTransportUdp: public SipTransport{
 
 		virtual int32_t getSocketType() const { return SOCKET_TYPE_UDP; }
 
+		virtual std::string getNaptrService() const { return "SIP+D2U"; }
+
 		virtual MRef<SipSocketServer *> createServer( MRef<SipLayerTransport*> receiver, bool ipv6, const std::string &ipString, int32_t prefPort, MRef<CertificateSet *> cert_db = NULL, MRef<CertificateChain *> certChain = NULL );
 
 		// MPlugin

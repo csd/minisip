@@ -64,6 +64,9 @@ class LIBMSIP_API SipTransport: public MPlugin{
 		/** @return srv prefix used when looking up SRV RR */
 		virtual std::string getSrv() const;
 
+		/** @return NAPTR services field value */
+		virtual std::string getNaptrService() const=0;
+
 		/**
 		 * One of SOCKET_TYPE_*
 		 */
@@ -90,6 +93,8 @@ class LIBMSIP_API SipTransportRegistry: public MPluginRegistry, public MSingleto
 	public:
 		virtual std::string getPluginType(){ return "SipTransport"; }
 
+		std::list<std::string> getNaptrServices( bool secureOnly ) const;
+
 		MRef<SipTransport*> findTransport( const std::string &protocol, bool secure=false ) const;
 
 		MRef<SipTransport*> findViaTransport( const std::string &protocol ) const;
@@ -99,6 +104,9 @@ class LIBMSIP_API SipTransportRegistry: public MPluginRegistry, public MSingleto
 
 		/** Search for transport by plugin name */  
 		MRef<SipTransport*> findTransportByName( const std::string &name ) const;
+
+		/** Search for transport by NAPTR service field */
+		MRef<SipTransport*> findTransportByNaptr( const std::string &service ) const;
 
 	protected:
 		SipTransportRegistry();

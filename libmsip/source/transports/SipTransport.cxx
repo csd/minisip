@@ -65,6 +65,31 @@ SipTransportRegistry::SipTransportRegistry(){
 #endif
 }
 
+list<string> SipTransportRegistry::getNaptrServices( bool secureOnly ) const{
+	list<string> services;
+	list< MRef<MPlugin*> >::const_iterator iter;
+	list< MRef<MPlugin*> >::const_iterator stop = plugins.end();
+
+	for( iter = plugins.begin(); iter != stop; iter++ ){
+		MRef<MPlugin*> plugin = *iter;
+
+		if( !plugin )
+			continue;
+
+		MRef<SipTransport*> transport =
+			dynamic_cast<SipTransport*>( *plugin );
+
+		if( !transport )
+			continue;
+
+		if( !secureOnly || transport->isSecure() ){
+			services.push_back( transport->getNaptrService() );
+		}
+	}
+
+	return services;
+}
+
 MRef<SipTransport*> SipTransportRegistry::findTransport( const string &protocol, bool secure ) const{
 	string lcProt = protocol;
 	list< MRef<MPlugin*> >::const_iterator iter;
@@ -154,6 +179,31 @@ MRef<SipTransport*> SipTransportRegistry::findTransportByName( const std::string
 
 	if( transport ){
 		return dynamic_cast<SipTransport*>(*transport);
+	}
+
+	return NULL;
+}
+
+MRef<SipTransport*> SipTransportRegistry::findTransportByNaptr( const std::string &service ) const{
+	list< MRef<MPlugin*> >::const_iterator iter;
+	list< MRef<MPlugin*> >::const_iterator stop = plugins.end();
+
+	for( iter = plugins.begin(); iter != stop; iter++ ){
+		MRef<MPlugin*> plugin = *iter;
+
+		if( !plugin )
+			continue;
+
+		MRef<SipTransport*> transport =
+			dynamic_cast<SipTransport*>( *plugin );
+
+		if( !transport )
+			continue;
+
+		if( transport->getNaptrService() == service ){
+			mdbg << "SipTransport: NAPTR service found!!! =  " << service << endl;
+			return transport;
+		}
 	}
 
 	return NULL;

@@ -42,6 +42,8 @@ class SipTransportTls: public SipTransport{
 
 		virtual int32_t getSocketType() const { return SOCKET_TYPE_TLS; }
 
+		virtual std::string getNaptrService() const { return "SIPS+D2T"; }
+
 		virtual MRef<SipSocketServer *> createServer( MRef<SipLayerTransport*> receiver, bool ipv6, const std::string &ipString, int32_t prefPort, MRef<CertificateSet *> cert_db = NULL, MRef<CertificateChain *> certChain = NULL );
 
 		virtual MRef<StreamSocket *> connect( const IPAddress &addr, uint16_t port, MRef<CertificateSet *> cert_db = NULL, MRef<CertificateChain *> certChain = NULL );
