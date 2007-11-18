@@ -61,6 +61,11 @@ class LIBMSIP_API SipTransport: public MPlugin{
 		/** @return srv prefix used when looking up SRV RR */
 		virtual std::string getSrv() const;
 
+		/**
+		 * One of SOCKET_TYPE_*
+		 */
+		virtual int32_t getSocketType() const=0;
+
 		/** Setup a new listening socket */
 		virtual MRef<SipSocketServer *> createServer( MRef<SipLayerTransport*> receiver, bool ipv6, const std::string &ipString, int32_t prefPort, MRef<CertificateSet *> cert_db = NULL, MRef<CertificateChain *> certChain = NULL ) = 0;
 		/**

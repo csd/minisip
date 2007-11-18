@@ -93,7 +93,7 @@ class SipLayerTransport : public SipSMCommandReceiver {
 				 const std::string &toaddr,
 				int32_t port, 
 				std::string branch,
-				std::string preferredTransport,
+				MRef<SipTransport*> transport,
 				bool addVia
 				);
 
@@ -119,7 +119,7 @@ class SipLayerTransport : public SipSMCommandReceiver {
 				    int32_t &destPort, MRef<SipTransport*> &destTransport);
 		void addViaHeader( MRef<SipMessage*> pack, MRef<SipSocketServer*> server, MRef<Socket *> socket, std::string branch );
 		MRef<StreamSocket *> findStreamSocket(IPAddress&, uint16_t);
-		bool findSocket(const std::string &transport,
+		bool findSocket( MRef<SipTransport*> transport,
 					 IPAddress &addr,
 					 uint16_t port,
 					 MRef<SipSocketServer*> &server,

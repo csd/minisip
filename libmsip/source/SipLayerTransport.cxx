@@ -712,11 +712,11 @@ void SipLayerTransport::sendMessage(MRef<SipMessage*> pack,
 	}
 
 	sendMessage( pack, /* **destAddr */ destAddr, destPort,
-		     branch, destTransport->getName(), addVia );
+		     branch, destTransport, addVia );
 }
 
 
-bool SipLayerTransport::findSocket(const string &transport,
+bool SipLayerTransport::findSocket(MRef<SipTransport*> transport,
 				   IPAddress &destAddr,
 				   uint16_t port,
 				   MRef<SipSocketServer*> &server,
@@ -726,16 +726,7 @@ bool SipLayerTransport::findSocket(const string &transport,
 	int32_t type = 0;
 
 	ipv6 = (destAddr.getType() == IP_ADDRESS_TYPE_V6);
-
-	if( transport == "UDP" ){
-		type = SOCKET_TYPE_UDP;
-	}
-	else if( transport == "TCP" ){
-		type = SOCKET_TYPE_TCP;
-	}
-	else if( transport == "TLS" ){
-		type = SOCKET_TYPE_TLS;
-	}
+	type = transport->getSocketType();
 
 	serversLock.lock();
 	server = findServer(type, ipv6);
@@ -748,18 +739,8 @@ bool SipLayerTransport::findSocket(const string &transport,
 			 * create one */
 			cerr << "SipLayerTransport: sendMessage: creating new socket" << endl;
 
-			// TODO cleanup
-			bool secure = false;
-			string protocol = transport;
-			if( protocol == "TLS" || protocol == "tls" ){
-				protocol = "TCP";
-				secure = true;
-			}
-
-			MRef<SipTransport*> plugin =
-				SipTransportRegistry::getInstance()->findTransport( protocol, secure );
-			ssocket = plugin->connect( destAddr, port,
-						   cert_db, getCertificateChain() );
+			ssocket = transport->connect( destAddr, port,
+						      cert_db, getCertificateChain() );
 			addSocket( ssocket );
 		} else cerr << "SipLayerTransport: sendMessage: reusing old socket" << endl;
 		socket = *ssocket;
@@ -847,7 +828,7 @@ void SipLayerTransport::sendMessage(MRef<SipMessage*> pack,
 				      const string &ip_addr,
 				      int32_t port, 
 				      string branch,
-				      string preferredTransport,
+				      MRef<SipTransport*> transport,
 				      bool addVia)
 {
 	MRef<Socket *> socket;
@@ -876,7 +857,7 @@ void SipLayerTransport::sendMessage(MRef<SipMessage*> pack,
 		}
 
 		if( !socket ){
-			findSocket(preferredTransport, **destAddr, (uint16_t)port, server, socket);
+			findSocket(transport, **destAddr, (uint16_t)port, server, socket);
 			pack->setSocket( socket );
 
 			if( !socket ){
