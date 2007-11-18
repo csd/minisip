@@ -75,14 +75,21 @@ AC_ARG_ENABLE(oss,
     AS_HELP_STRING([--disable-oss],
     	[disables OSS sound IO support (default enabled)]),
 )
-if test "${enable_oss}" = "no"
+if test "${enable_oss}" = "no" -o "${os_win}" = "yes"
+then
+      have_oss=no
+else
+      have_oss=yes
+fi
+
+if test "${have_oss}" = "no"
 then
       AC_DEFINE(NO_OSS, [], [No OSS support])
 else
       AC_DEFINE(ENABLE_OSS, [], [OSS support])
 fi
 
-AM_CONDITIONAL(ENABLE_OSS, [test "${enable_oss}" != "no"])
+AM_CONDITIONAL(ENABLE_OSS, [test "${have_oss}" != "no"])
 
 
 
