@@ -345,7 +345,10 @@ const string & SipUri::getUserName() const {
 }
 
 void SipUri::setIp(string i){
-	this->ip=i;
+	if( i[0] == '[' && i[i.length()-1] == ']' )
+		this->ip=i.substr( 1, i.length() - 2 );
+	else
+		this->ip=i;
 }
 
 const string & SipUri::getIp() const {
