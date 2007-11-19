@@ -134,7 +134,10 @@ MRef<Session *> MediaHandler::createSession( MRef<SipIdentity*> id, string callI
 			MRef<MediaStreamReceiver *> rStream;
 			rStream = new MediaStreamReceiver( callId, m, rtpReceiver, rtp6Receiver );
 			session->addMediaStreamReceiver( rStream );
-			if( (*i) == this->audioMedia ) {
+
+			// Need to dereference MRef:s, Can't compare MRef:s
+			// of different types
+			if( *m == *audioMedia ) {
 				CallRecorder * cr;
 				cr = new CallRecorder( audioMedia, rtpReceiver, ipProvider );
 				session->callRecorder = cr;
