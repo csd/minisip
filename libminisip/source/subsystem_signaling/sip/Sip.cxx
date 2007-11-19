@@ -109,7 +109,7 @@ string Sip::confjoin(string &user, minilist<ConfMember> *conflist, string confId
 	if (user.substr(0,4)=="sip:")
 		startAddr = 4;
 
-	if (user.substr(0,4)=="sips:")
+	if (user.substr(0,5)=="sips:")
 		startAddr = 5;
 
 	bool onlydigits=true;
@@ -200,7 +200,7 @@ string Sip::confconnect(string &user, string confId){
 	if (user.substr(0,4)=="sip:")
 		startAddr = 4;
 	
-	if (user.substr(0,4)=="sips:")
+	if (user.substr(0,5)=="sips:")
 		startAddr = 5;
 
 	bool onlydigits=true;
