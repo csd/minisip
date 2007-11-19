@@ -31,7 +31,7 @@
 
 using namespace std;
 
-#define DEBUG_OUTPUT
+//#define DEBUG_OUTPUT
 //#undef HAVE_POSIX_REGCOMP
 
 DnsNaptrQuery::DnsNaptrQuery()

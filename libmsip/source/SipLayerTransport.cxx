@@ -43,6 +43,7 @@
 #include<libmsip/SipHeaderContact.h>
 #include<libmsip/SipHeaderTo.h>
 
+#include<libmnetutil/DnsNaptr.h>
 #include<libmnetutil/NetworkException.h>
 #include<libmnetutil/NetworkFunctions.h>
 #include<libmnetutil/NetworkException.h>
@@ -528,6 +529,37 @@ static bool lookupDestSrv(const string &domain, MRef<SipTransport*> transport,
 	return false;
 }
 
+
+// RFC 3263 4.1 Determining transport using NAPTR
+static bool lookupNaptrTransport(const SipUri &uri,
+				 MRef<SipTransport*> &destTransport,
+				 string &destAddr)
+{
+	MRef<SipTransportRegistry*> registry =
+		SipTransportRegistry::getInstance();
+	bool secure = uri.getProtocolId() == "sips";
+	list<string> services = registry->getNaptrServices( secure );
+	MRef<DnsNaptrQuery*> query = DnsNaptrQuery::create();
+
+	query->setAccept( services );
+
+	if( !query->resolve( uri.getIp(), "" )){
+		mdbg("signaling/sip") << "NAPTR lookup failed" << endl;
+		return false;
+	}
+	else if( query->getResultType() != DnsNaptrQuery::SRV ){
+		mdbg("signaling/sip") << "SipLayerTransport: NAPTR failed, invalid result type " << endl;
+		return false;
+	}
+
+	const string &service = query->getService();
+
+	destTransport = registry->findTransportByNaptr( service );
+	destAddr = query->getResult();
+	return true;
+}
+
+
 // RFC 3263 4.2 Determining Port and IP Address
 static bool lookupDestIpPort(const SipUri &uri, MRef<SipTransport*> transport,
 			     string &destAddr, int32_t &destPort)
@@ -569,6 +601,7 @@ static bool lookupDestIpPort(const SipUri &uri, MRef<SipTransport*> transport,
 		destPort = port;
 	}
 
+	mdbg("signaling/sip") << "lookupDestIpPort " << res << " " << destAddr << ":" << destPort << ";transport=" << transport->getName() << endl;
 	return res;
 }
 
@@ -634,9 +667,10 @@ bool SipLayerTransport::getDestination(MRef<SipMessage*> pack, string &destAddr,
 			uri = req->getUri();
 		}
 
+		mdbg("signaling/sip") << "Destination URI: " << uri.getRequestUriString() << endl;
+
 		if( uri.isValid() ){
 			// RFC 3263, 4.1 Selecting a Transport Protocol
-			// TODO: Support NAPTR
 
 			//destAddr = IPAddress::create( uri.getIp() );
 			destAddr = uri.getIp();
@@ -644,7 +678,24 @@ bool SipLayerTransport::getDestination(MRef<SipMessage*> pack, string &destAddr,
 			if( /*destAddr*/ destAddr.size()>0 ){
 				bool secure = uri.getProtocolId() == "sips";
 				string protocol = uri.getTransport();
-				if( protocol.length() == 0 ){
+				if( protocol.length() > 0 ){
+					destTransport = registry->findTransport( protocol, secure );
+					// TODO using TLS in transport parameter is deprecated
+					if( !destTransport ){
+						// Second, try Via protocol
+						// For example TLS
+						destTransport = registry->findViaTransport( protocol );
+					}
+				}
+				else if( !IPAddress::isNumeric( destAddr ) ){
+					lookupNaptrTransport(uri, destTransport, destAddr);
+					// TODO fallback to SRV lookup of
+					// all supported protocols 
+					// _sip._udp etc.
+				}
+
+				// Fallback
+				if( !destTransport ){
 					if( secure )
 						destTransport = registry->findTransport( "tcp", true );
 					else{
@@ -661,15 +712,6 @@ bool SipLayerTransport::getDestination(MRef<SipMessage*> pack, string &destAddr,
 							merr << "SipMessateTransport: Warning: could not find any supported transport - trying UDP"<<endl;
 							destTransport = registry->findTransport( "udp" );
 						}
-					}
-				}
-				else{
-					destTransport = registry->findTransport( protocol, secure );
-					// TODO using TLS in transport parameter is deprecated
-					if( !destTransport ){
-						// Second, try Via protocol
-						// For example TLS
-						destTransport = registry->findViaTransport( protocol );
 					}
 				}
 
