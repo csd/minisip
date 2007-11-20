@@ -253,7 +253,7 @@ void MediaHandler::handleCommand(string subsystem, const CommandString& command 
 				uint8_t c = tmp[0];
 				session->sendDtmf( c );
 			}else{
-				merr("media/dtmf") << "Error: DTMF formar error. Ignored."<<endl;
+				merr("media/dtmf") << "Error: DTMF format error. Ignored."<<endl;
 			}
 		}
 		return;

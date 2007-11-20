@@ -555,9 +555,11 @@ void CallWidget::dtmfPressed( uint8_t symbol ){
 	char s[2];
 	s[0]=symbol;
 	s[1]=0;
+	// Handle 0 <= symbol <= 11
+	string str( s, 1 );
 	CommandString cmd( mainCallId,
 			   MediaCommandString::send_dtmf,
-			   s );
+			   str );
 	mainWindow->getCallback()->handleCommand( "media", cmd );
 
 #if 0
