@@ -28,6 +28,7 @@
 #include <libmutil/libmutil_config.h>
 
 #include<libmutil/mtypes.h>
+#include<libmutil/MemObject.h>
 #include<libmutil/Exception.h>
 
 #include<list>
@@ -88,7 +89,7 @@ class LIBMUTIL_API XMLParserCallback{
 
 class LIBMUTIL_API XMLNode;
 
-class LIBMUTIL_API XMLParser{
+class LIBMUTIL_API XMLParser : public MObject{
 	public:
 		XMLParser(XMLParserCallback *cb=NULL);
 		~XMLParser();
@@ -105,6 +106,8 @@ class LIBMUTIL_API XMLParser{
 		
 		void addValue(std::string elementPath, std::string value);
 		void changeValue(std::string elemPath, std::string value, bool addIfMissing=true);
+
+		std::string getMemObjectType(){return "XMLParser";}
 		
 	protected:
 		void addValue(XMLNode *root, const char *elementPath, std::string &value, int32_t start=0);

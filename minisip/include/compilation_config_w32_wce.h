@@ -4,7 +4,7 @@
 #ifdef _WIN32_WCE
 
 /* Debug output */
-#define DEBUG_OUTPUT 
+//#define DEBUG_OUTPUT 
 
 //To use include/config.h ... only for compilation time
 #define HAVE_CONFIG_H

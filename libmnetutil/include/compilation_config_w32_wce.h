@@ -3,7 +3,7 @@
 
 #ifdef _WIN32_WCE
 /* Debug output */
-#define DEBUG_OUTPUT 
+//#define DEBUG_OUTPUT 
 
 //use this to avoid the warning (coming from STLPort used in WinCE)
 //exception.h(47) : warning C4275: non dll-interface class 'std::exception' used as base for dll-interface class 'Exception'
