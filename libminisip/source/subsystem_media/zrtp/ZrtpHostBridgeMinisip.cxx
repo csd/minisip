@@ -30,6 +30,8 @@
 #include <libminisip/config/UserConfig.h>
 #include <libmutil/CommandString.h>
 
+#include "../MediaStream.h"
+
 #ifdef ZRTP_SUPPORT
 
 static MRef<TimeoutProvider<std::string, MRef<StateMachine<SipSMCommand,std::string>*> > *>staticTimeoutProvider;
