@@ -4,7 +4,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl AC_PREREQ(2.57)
 
 m4_MINISIP_PACKAGE_VERSION(libmcrypto, mcrypto, 0, 3, 1)
-m4_MINISIP_PACKAGE_CONTACT([Zachary T Welch], [zw@superlucidity.net])
+m4_MINISIP_PACKAGE_CONTACT([The Minisip developer team], [minisip-users@minisip.org])
 dnl m4_MINISIP_PACKAGE_RELEASED
 m4_MINISIP_LIBRARY_VERSION(0, 0, 0)
 

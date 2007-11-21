@@ -4,7 +4,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl AC_PREREQ(2.57)
 
 m4_MINISIP_PACKAGE_VERSION(ministun, ministun, 0, 5, 0)
-m4_MINISIP_PACKAGE_CONTACT([Zachary T Welch], [zach-minisip@splitstring.com])
+m4_MINISIP_PACKAGE_CONTACT([The Minisip developer team], [minisip-users@minisip.org])
 dnl m4_MINISIP_PACKAGE_RELEASED
 
 AC_INIT(MINISIP_PACKAGE_NAME, MINISIP_PACKAGE_VERSION, MINISIP_PACKAGE_CONTACT)
