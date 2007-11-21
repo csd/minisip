@@ -246,17 +246,6 @@ AM_MINISIP_CHECK_LIBMINISIP([0.3.1])
 AM_MINISIP_CHECK_COMPLETE
 
 dnl Checks for libraries.
-AC_CHECK_LIB([gdi32], [main])
-AC_CHECK_LIB([wsock32], [main])
-
-dnl FIXME: Replace `main' with a function in `-lX11':
-AC_CHECK_LIB([X11], [main])
-dnl FIXME: Replace `main' with a function in `-lXext':
-AC_CHECK_LIB([Xext], [main])
-dnl FIXME: Replace `main' with a function in `-lm':
-AC_CHECK_LIB([m], [main])
-dnl FIXME: Replace `main' with a function in `-lnsl':
-AC_CHECK_LIB([nsl], [main])
 
 dnl Check for QT libraries
 if test "${QTGUI}" = "yes"
@@ -294,6 +283,14 @@ AC_ARG_ENABLE(opie,
     [ if test "${enable_opie}" = "yes"
       then
 	LDFLAGS="${LDFLAGS} -L${QT_LIB_LOCATION} -L${OPIEDIR}/lib"
+	dnl FIXME: Replace `main' with a function in `-lX11':
+	AC_CHECK_LIB([X11], [main])
+	dnl FIXME: Replace `main' with a function in `-lXext':
+	AC_CHECK_LIB([Xext], [main])
+	dnl FIXME: Replace `main' with a function in `-lm':
+	AC_CHECK_LIB([m], [main])
+	dnl FIXME: Replace `main' with a function in `-lnsl':
+	AC_CHECK_LIB([nsl], [main])
         AC_CHECK_LIB([qpe], [main],,
            [AC_MSG_ERROR([Could not find the QPE library])]
 	)
