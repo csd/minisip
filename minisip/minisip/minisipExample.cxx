@@ -3,7 +3,7 @@
 #include"gui/textui/MinisipTextUI.h"
 
 
-int main( int , char ** ){
+int main( int argc, char *argv[] ){
 	
 //	ContactDb *contactDb = new ContactDb();
 //	ContactEntry::setDb(contactDb);
@@ -14,7 +14,7 @@ int main( int , char ** ){
 //	gui->setContactDb(contactDb);
 		
 	
-        Minisip minisip( *gui );
+        Minisip minisip( *gui, argc, argv );
         minisip.startSip();
 
 	gui->run();
