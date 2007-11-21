@@ -431,19 +431,19 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\transport\SipTransport.cxx"
+				RelativePath="..\source\transports\SipTransport.cxx"
 				>
 			</File>
 			<File
-				RelativePath="..\source\transport\SipTransportTcp.cxx"
+				RelativePath="..\source\transports\SipTransportTcp.cxx"
 				>
 			</File>
 			<File
-				RelativePath="..\source\transport\SipTransportTls.cxx"
+				RelativePath="..\source\transports\SipTransportTls.cxx"
 				>
 			</File>
 			<File
-				RelativePath="..\source\transport\SipTransportUdp.cxx"
+				RelativePath="..\source\transports\SipTransportUdp.cxx"
 				>
 			</File>
 		</Filter>
@@ -729,19 +729,19 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\transport\SipTransport.h"
+				RelativePath="..\source\transports\SipTransport.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\transport\SipTransportTcp.h"
+				RelativePath="..\source\transports\SipTransportTcp.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\transport\SipTransportTls.h"
+				RelativePath="..\source\transports\SipTransportTls.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\transport\SipTransportUdp.h"
+				RelativePath="..\source\transports\SipTransportUdp.h"
 				>
 			</File>
 		</Filter>
