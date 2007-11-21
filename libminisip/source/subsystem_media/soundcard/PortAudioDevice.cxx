@@ -83,6 +83,8 @@ PortAudioDevice::PortAudioDevice( PaDeviceIndex device ): SoundDevice("!PORTAUDI
 	if( res == paNoError ){
 		initialized = true;
 	}
+	else
+		merr << "PortAudio failed to initialize: " << Pa_GetErrorText( res ) << end;
 }
 
 PortAudioDevice::~PortAudioDevice()
@@ -100,19 +102,21 @@ int PortAudioDevice::readFromDevice( byte_t * buffer, uint32_t nSamples )
 #ifdef PA_DEBUG
 	cerr << "readFromDevice" << endl;
 #endif
+	inMutex.lock();
 	while( inRing ){
-		inMutex.lock();
 		long available = inRing->getSize() * BUFFER_WIDTH;
 
 		if( available < nBytes ){
 #ifdef PA_DEBUG
 			char buf[128];
 
-			snprintf(buf, sizeof(buf), "readFromDevice wait %ld < %ld");
-			merr << buf << end;
+			snprintf(buf, sizeof(buf), "readFromDevice wait %ld < %ld", available, nBytes);
+			cerr << buf << endl;
 #endif
-			inMutex.unlock();
-			inCond.wait();
+			inCond.wait( inMutex );
+#ifdef PA_DEBUG
+			cerr << "readFromDevice wake up" << endl;
+#endif
 			continue;
 		}
 
@@ -120,6 +124,7 @@ int PortAudioDevice::readFromDevice( byte_t * buffer, uint32_t nSamples )
 		inMutex.unlock();
 		return res ? nBytes / inBytesPerSample / nChannelsRecord : 0;
 	}
+	inMutex.unlock();
 
 	return -1;
 }
@@ -131,19 +136,21 @@ int PortAudioDevice::writeToDevice( byte_t * buffer, uint32_t nSamples )
 #ifdef PA_DEBUG
 	cerr << "writeToDevice" << endl;
 #endif
+	outMutex.lock();
 	while( outRing ){
-		outMutex.lock();
 		long available = outRing->getFree() * BUFFER_WIDTH;
 
 		if( available < nBytes ){
 #ifdef PA_DEBUG
 			char buf[128];
 
-			snprintf(buf, sizeof(buf), "writeToDevice wait %ld < %ld");
-			merr << buf << end;
+			snprintf(buf, sizeof(buf), "writeToDevice wait %ld < %ld", available, nBytes);
+			cerr << buf << end;
 #endif
-			outMutex.unlock();
-			outCond.wait();
+			outCond.wait( outMutex );
+#ifdef PA_DEBUG
+			cerr << "writeToDevice wake up" << endl;
+#endif
 			continue;
 		}
 
@@ -151,6 +158,7 @@ int PortAudioDevice::writeToDevice( byte_t * buffer, uint32_t nSamples )
 		outMutex.unlock();
 		return res ? nBytes / outBytesPerSample / nChannelsPlay : 0;
 	}
+	outMutex.unlock();
 
 	return -1;
 }
