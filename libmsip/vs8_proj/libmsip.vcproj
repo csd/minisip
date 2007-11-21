@@ -430,6 +430,22 @@
 				RelativePath="..\source\SipUtils.cxx"
 				>
 			</File>
+			<File
+				RelativePath="..\source\transport\SipTransport.cxx"
+				>
+			</File>
+			<File
+				RelativePath="..\source\transport\SipTransportTcp.cxx"
+				>
+			</File>
+			<File
+				RelativePath="..\source\transport\SipTransportTls.cxx"
+				>
+			</File>
+			<File
+				RelativePath="..\source\transport\SipTransportUdp.cxx"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -710,6 +726,22 @@
 			</File>
 			<File
 				RelativePath="..\include\libmsip\SipUtils.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\transport\SipTransport.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\transport\SipTransportTcp.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\transport\SipTransportTls.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\transport\SipTransportUdp.h"
 				>
 			</File>
 		</Filter>
