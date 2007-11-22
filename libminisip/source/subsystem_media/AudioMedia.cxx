@@ -27,7 +27,7 @@
 #include<libminisip/media/AudioMedia.h>
 
 #include<libminisip/media/rtp/RtpHeader.h>
-#include"MediaStream.h"
+#include<libminisip/media/MediaStream.h>
 #include<libminisip/media/soundcard/FileSoundSource.h>
 
 #include<libminisip/media/soundcard/Resampler.h>

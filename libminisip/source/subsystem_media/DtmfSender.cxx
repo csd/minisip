@@ -27,7 +27,7 @@
 #include<libminisip/media/DtmfSender.h>
 
 #include"Session.h"
-#include"MediaStream.h"
+#include<libminisip/media/MediaStream.h>
 
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"

@@ -25,7 +25,7 @@
 
 #include <config.h>
 
-#include"MediaStream.h"
+#include<libminisip/media/MediaStream.h>
 
 #include<libmikey/MikeyPayloadSP.h>
 #include<libmikey/KeyAgreement.h>
@@ -36,7 +36,7 @@
 #include<libmutil/stringutils.h>
 #include<libmutil/Timestamp.h>
 #include<libminisip/media/Media.h>
-#include"RtpReceiver.h"
+#include<libminisip/media/RtpReceiver.h>
 #include<libminisip/media/codecs/Codec.h>
 #include<libminisip/ipprovider/IpProvider.h>
 #include<iostream>

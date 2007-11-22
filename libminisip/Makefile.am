@@ -75,10 +75,8 @@ libmediahandler_src = source/subsystem_media/MediaHandler.cxx \
 			source/subsystem_media/Session.cxx \
 			source/subsystem_media/Session.h \
 			source/subsystem_media/MediaStream.cxx \
-			source/subsystem_media/MediaStream.h \
 			source/subsystem_media/Media.cxx \
 			source/subsystem_media/RtpReceiver.cxx \
-			source/subsystem_media/RtpReceiver.h \
 			source/subsystem_media/MediaCommandString.cxx \
 			source/subsystem_media/AudioMedia.cxx \
 			source/subsystem_media/AudioPlugin.cxx \

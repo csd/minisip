@@ -29,10 +29,9 @@
 #include"Session.h"
 
 #include<libminisip/media/CallRecorder.h>
-#include"MediaStream.h"
+#include<libminisip/media/MediaStream.h>
 #include<libminisip/media/Media.h>
 #include<libminisip/media/AudioMedia.h>
-#include"RtpReceiver.h"
 #include<libminisip/media/DtmfSender.h>
 #include<libminisip/media/codecs/Codec.h>
 #include<libminisip/signaling/sdp/SdpPacket.h>

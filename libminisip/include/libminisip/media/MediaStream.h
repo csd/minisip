@@ -31,17 +31,16 @@
 
 #include<libminisip/media/rtp/CryptoContext.h>
 #include<libminisip/media/Media.h>
-#include"Session.h"
 #include"RtpReceiver.h"
 #include<libminisip/media/rtp/SRtpPacket.h>
 
+#include<libmikey/KeyAgreement.h>
 #ifdef ZRTP_SUPPORT
 #include <libminisip/media/zrtp/ZrtpHostBridgeMinisip.h>
 #include <time.h>
 class ZrtpHostBridgeMinisip;
 #endif
 
-class KeyAgreement;
 class UDPSocket;
 class SdpHeaderM;
 class IpProvider;

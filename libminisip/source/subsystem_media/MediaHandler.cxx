@@ -33,11 +33,11 @@
 #include<libminisip/ipprovider/IpProvider.h>
 #include<libminisip/media/codecs/Codec.h>
 #include"Session.h"
-#include"MediaStream.h"
+#include<libminisip/media/MediaStream.h>
 
 #include<libminisip/media/zrtp/ZrtpHostBridgeMinisip.h>
 #include<libminisip/media/Media.h>
-#include"RtpReceiver.h"
+#include<libminisip/media/RtpReceiver.h>
 #include<libminisip/media/MediaCommandString.h>
 #include<libmnetutil/UDPSocket.h>
 

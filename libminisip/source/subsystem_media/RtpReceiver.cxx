@@ -24,7 +24,7 @@
 
 #include <config.h>
 
-#include"RtpReceiver.h"
+#include<libminisip/media/RtpReceiver.h>
 
 #include<libmnetutil/UDPSocket.h>
 #include<libmnetutil/NetworkException.h>
@@ -33,7 +33,7 @@
 #include<libminisip/media/rtp/SRtpPacket.h>
 #include<libminisip/media/codecs/Codec.h>
 #include<iostream>
-#include"MediaStream.h"
+#include<libminisip/media/MediaStream.h>
 #include<libminisip/ipprovider/IpProvider.h>
 
 #include<stdio.h>

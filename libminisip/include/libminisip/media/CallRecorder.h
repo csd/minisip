@@ -27,7 +27,7 @@
 
 #define CALLREC_BUFF_SIZE 16000
 
-#include"../../../source/subsystem_media/MediaStream.h"
+#include<libminisip/media/MediaStream.h>
 #include<libminisip/media/soundcard/SoundRecorderCallback.h>
 #include<libminisip/media/soundcard/FileSoundDevice.h>
 

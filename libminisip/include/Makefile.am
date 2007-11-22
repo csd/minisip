@@ -10,6 +10,8 @@ nobase_include_HEADERS =    libminisip/media/aec/aecfix.h \
 			libminisip/media/AudioMedia.h \
 			libminisip/media/SubsystemMedia.h \
 			libminisip/media/Media.h \
+			libminisip/media/MediaStream.h \
+			libminisip/media/RtpReceiver.h \
 			libminisip/media/CallRecorder.h \
 			libminisip/signaling/p2t/SipDialogP2Tuser.h \
 			libminisip/signaling/p2t/SipDialogP2T.h \

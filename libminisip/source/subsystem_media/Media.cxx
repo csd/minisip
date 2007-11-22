@@ -29,12 +29,11 @@
 #include<libminisip/media/codecs/Codec.h>
 #include<libminisip/media/soundcard/SoundIO.h>
 #include<libminisip/ipprovider/IpProvider.h>
-#include"MediaStream.h"
-#include"RtpReceiver.h"
+#include<libminisip/media/MediaStream.h>
 #include<libmutil/stringutils.h>
 #include<libminisip/signaling/sdp/SdpHeaderM.h>
 #include<libminisip/signaling/sdp/SdpHeaderA.h>
-//#include"MediaHandler.h"
+#include<libmikey/KeyAgreement.h>
 
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"
