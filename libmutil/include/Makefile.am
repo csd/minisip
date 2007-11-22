@@ -31,6 +31,7 @@ pkginclude_HEADERS = \
 			libmutil/CircularBuffer.h \
 			libmutil/SipUri.h \
 			libmutil/CacheItem.h \
+			libmutil/FileSystem.h \
 			libmutil/FileSystemUtils.h
 
 noinst_HEADERS = 	config.h
