@@ -39,6 +39,7 @@
 #include<libminisip/media/SubsystemMedia.h>
 
 class SipSoftPhoneConfiguration;
+class SubsystemMedia;
 
 class LIBMINISIP_API Sip: public Runnable{
 

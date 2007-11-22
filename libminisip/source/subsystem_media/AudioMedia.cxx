@@ -244,7 +244,7 @@ void AudioMedia::sendData( byte_t * data, uint32_t length, uint32_t ts, bool mar
 				for( iSource = sources.begin(); iSource != sources.end(); iSource ++ ){
 					if ( (*iSource)->getCallId()!= (*i)->getCallId() ){
 						short *stream = (*iSource)->getCodecOutputBuffer();
-						for (int ii=0; ii< length/2; ii++)
+						for (uint32_t ii=0; ii< length/2; ii++)
 							((short*)data)[ii] += stream[ii];
 						
 

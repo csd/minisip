@@ -42,4 +42,7 @@ class LIBMINISIP_API IpProvider: public MObject{
 		static MRef<IpProvider *> create( MRef<SipSoftPhoneConfiguration *> config, bool useIpv6 = false );
 		
 };
+
+#include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
+
 #endif

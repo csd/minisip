@@ -34,7 +34,7 @@
 #include<libmutil/stringutils.h>
 #include<libminisip/signaling/sdp/SdpHeaderM.h>
 #include<libminisip/signaling/sdp/SdpHeaderA.h>
-#include"MediaHandler.h"
+//#include"MediaHandler.h"
 
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"
@@ -63,16 +63,6 @@ Media::Media( std::list<MRef<Codec *> > codecListing ){
 Media::~Media(){
 
 }
-
-void Media::setMediaHandler(MRef<MediaHandler*> reg){
-	mediaHandler=reg;
-}
-
-MRef<MediaHandler*> Media::getMediaHandler(){
-	return mediaHandler;
-}
-
-
 
 // pn507 Added for being able to change the current codec
 // pn507 NOTE Using this during a conference call will most likely cause complete havoc.
@@ -108,14 +98,6 @@ void Media::unRegisterMediaSender( MRef<MediaStreamSender *> sender ){
 	senders.remove( sender );
 	sendersLock.unlock();
 }
-
-#if 0
-void Media::registerMediaSource( uint32_t ssrc ){
-}
-
-void Media::unRegisterMediaSource( uint32_t ssrc ){
-}
-#endif
 
 void Media::sendData( byte_t * data, uint32_t length, uint32_t ts, bool marker ){
 	list< MRef<MediaStreamSender *> >::iterator i;

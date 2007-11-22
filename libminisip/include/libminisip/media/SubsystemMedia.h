@@ -27,9 +27,9 @@
 #include<libminisip/libminisip_config.h>
 
 #include<libmutil/MessageRouter.h>
+#include<libminisip/ipprovider/IpProvider.h>
 
 class SipSoftPhoneConfiguration;
-class IpProvider;
 class Session;
 class SipIdentity;
 

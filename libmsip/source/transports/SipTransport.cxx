@@ -28,6 +28,8 @@
 #include"SipTransportTls.h"
 #include"SipTransportDtlsUdp.h"
 
+#include<algorithm>
+
 using namespace std;
 
 SipTransport::SipTransport(): MPlugin(){

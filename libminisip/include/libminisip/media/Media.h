@@ -39,7 +39,6 @@
 
 class SoundIO;
 class MediaStreamSender;
-class MediaStreamReceiver;
 class SdpHeaderM;
 class SipSoftPhoneConfiguration;
 class SubsystemMedia;
@@ -181,10 +180,6 @@ class LIBMINISIP_API Media : public MObject{
 		 */
 		MRef<CodecState *> createCodecInstance( uint8_t payloadType );
 
-		void setMediaHandler(MRef<MediaHandler*> reg);
-		
-		MRef<MediaHandler*> getMediaHandler();
-		
 	protected:
 		Media();
 		Media( MRef<Codec *> defaultCodec );
@@ -199,7 +194,6 @@ class LIBMINISIP_API Media : public MObject{
 		Mutex sourcesLock;
 		
 		std::list<std::string> sdpAttributes;
-		MRef<MediaHandler*> mediaHandler;
 };
 
 

@@ -81,8 +81,6 @@ void MediaHandler::init(){
 			MRef<Media *> m = mediaPlugin->createMedia( config );
 			MRef<AudioMedia *> audio = dynamic_cast<AudioMedia *>( *m );
 
-			m->setMediaHandler(this);
-
 			if( m ){
 				registerMedia( m );
 			}
