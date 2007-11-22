@@ -58,7 +58,7 @@ int SDES_NAME::size(){
 //	int npad = 4-((2+cname.length())%4);
 //	if (npad==4)
 //		npad=0;
-	return 2+name.length()/*+npad*/;
+	return 2+(int)name.length()/*+npad*/;
 }
 
 #ifdef DEBUG_OUTPUT

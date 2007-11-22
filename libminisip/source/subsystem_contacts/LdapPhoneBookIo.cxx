@@ -99,7 +99,7 @@ MRef<PhoneBook *> LdapPhoneBookIo::load(){
 
 		try {
 			contact = entry->getAttrValueString(label);
-		} catch( LdapException &e ) {
+		} catch( LdapException & ) {
 			continue;
 		}
 

@@ -42,14 +42,14 @@
 using namespace std;
 
 SdpHeaderT::SdpHeaderT(string buildFrom):SdpHeader(SDP_HEADER_TYPE_T, 5){
-	int len=buildFrom.length();
+	size_t len=buildFrom.length();
 	if (buildFrom.substr(0,2)!="t="){
 #ifdef DEBUG_OUTPUT
 		std::cerr << "ERROR: Origin sdp header is not starting with <o=>"<< std::endl;
 #endif
 	}
 	
-	unsigned i=2;
+	size_t i=2;
 	while ( buildFrom[i]==' ' && i<len )
 		i++;
 

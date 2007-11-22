@@ -54,7 +54,9 @@ MRef<SoundDevice *> SoundDevice::create( string devideId ){
 	if( devideId.substr( 0, 5 ) == "wave:" ){
 		return new WaveSoundDevice( devideId.substr( 5, string::npos ) );
 	}
+		
 #endif
+	return NULL;
 }
 
 SoundDevice::SoundDevice( string device ):openedRecord(false),openedPlayback(false){

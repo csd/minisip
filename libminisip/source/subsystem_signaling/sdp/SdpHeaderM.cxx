@@ -45,13 +45,13 @@ using namespace std;
 
 SdpHeaderM::SdpHeaderM(string buildFrom) : SdpHeader(SDP_HEADER_TYPE_M, 8){
 
-	int len = buildFrom.length();
+	size_t len = buildFrom.length();
 	if (buildFrom.substr(0,2)!="m="){
 #ifdef DEBUG_OUTPUT
 		cerr << "ERROR: Origin sdp header is not starting with <m=>"<< endl;
 #endif
 	}
-	unsigned i=2;
+	size_t i=2;
 	while (buildFrom[i]==' ' && i<len)
 		i++;
 	

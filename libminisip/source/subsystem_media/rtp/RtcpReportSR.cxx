@@ -92,7 +92,7 @@ RtcpReportSenderInfo &RtcpReportSR::get_sender_info(){
 }
 
 int RtcpReportSR::get_n_report_blocks(){
-	return reception_blocks.size();
+	return (int)reception_blocks.size();
 }
 		
 RtcpReportReceptionBlock &RtcpReportSR::get_reception_block(int i){

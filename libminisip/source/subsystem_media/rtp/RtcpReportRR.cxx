@@ -83,7 +83,7 @@ int RtcpReportRR::size(){
 
 
 int RtcpReportRR::get_n_report_blocks(){
-	return reception_blocks.size();
+	return (int)reception_blocks.size();
 }
                 
 RtcpReportReceptionBlock &RtcpReportRR::get_reception_block(int i){

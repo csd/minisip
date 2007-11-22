@@ -58,7 +58,7 @@ int SDES_LOC::size(){
 //	int npad = 4-((2+cname.length())%4);
 //	if (npad==4)
 //		npad=0;
-	return 2+loc.length()/*+npad*/;
+	return 2+(int)loc.length()/*+npad*/;
 }
 
 #ifdef DEBUG_OUTPUT

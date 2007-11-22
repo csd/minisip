@@ -319,7 +319,7 @@ void Sip::run(){
 
 			try{
 				sipstack->startTcpServer();
-			}catch(NetworkException &e){
+			}catch(NetworkException &){
 				merr << "Error: Failed to create TCP socket"<<endl;
 			}
 
@@ -336,7 +336,7 @@ void Sip::run(){
 #endif
 				try{
 					sipstack->startTlsServer();
-				}catch(NetworkException &e){
+				}catch(NetworkException &){
 					merr << "Error: Failed to create TLS socket"<<endl;
 				}
 

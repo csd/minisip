@@ -39,11 +39,11 @@
 using namespace std;
 
 SdpHeaderC::SdpHeaderC(string buildFrom):SdpHeader(SDP_HEADER_TYPE_C, 4){
-	int len = buildFrom.length();
+	size_t len = buildFrom.length();
 	if (buildFrom.substr(0,2)!="c="){
 		std::cerr << "ERROR: Contact sdp header is not starting with <c=>"<< std::endl;
 	}
-	unsigned i=2;
+	size_t i=2;
 	while ( buildFrom[i]==' ' && i<len )
 		i++;
 
