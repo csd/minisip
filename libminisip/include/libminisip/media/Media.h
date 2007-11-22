@@ -32,10 +32,9 @@
 #include<libmutil/MSingleton.h>
 
 #include<libminisip/media/soundcard/SoundIO.h>
-
 #include<libminisip/media/codecs/Codec.h>
-
 #include<libminisip/media/rtp/RtpPacket.h>
+#include<libminisip/media/MediaStream.h>
 
 class SoundIO;
 class MediaStreamSender;

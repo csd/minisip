@@ -211,6 +211,10 @@
 			<File
 				RelativePath="..\source\subsystem_media\CallRecorder.cxx"
 				>
+			</File>			
+			<File
+				RelativePath="..\source\subsystem_media\SubsystemMedia.cxx"
+				>
 			</File>
 			<File
 				RelativePath="..\source\subsystem_media\codecs\Codec.cxx"
@@ -459,7 +463,7 @@
 			<File
 				RelativePath="..\source\subsystem_media\Session.cxx"
 				>
-			</File>
+			</File>			
 			<File
 				RelativePath="..\source\subsystem_media\SessionRegistry.cxx"
 				>
@@ -672,6 +676,10 @@
 			</File>
 			<File
 				RelativePath="..\source\subsystem_media\codecs\G711CODEC.h"
+				>
+			</File>			
+			<File
+				RelativePath="..\source\subsystem_media\SubsystemMedia.h"
 				>
 			</File>
 			<File
