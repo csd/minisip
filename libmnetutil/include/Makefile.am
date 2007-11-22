@@ -25,6 +25,7 @@ pkginclude_HEADERS =    \
 			libmnetutil/libmnetutil_config.h \
 			libmnetutil/Downloader.h \
 			libmnetutil/HttpDownloader.h \
+			libmnetutil/HttpFileSystem.h \
 			libmnetutil/FileUrl.h \
 			libmnetutil/FileDownloaderException.h \
 			libmnetutil/FileDownloader.h \

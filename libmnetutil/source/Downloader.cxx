@@ -32,18 +32,19 @@
 
 #include <string>
 
-MRef<Downloader*> Downloader::create(std::string const uri) {
+MRef<Downloader*> Downloader::create(std::string const uri, MRef<StreamSocket*> conn) {
 	size_t pos = uri.find("://");
 	if (std::string::npos != pos) {
 		std::string protocol = uri.substr(0, pos);
 		if (protocol == "http")
-			return MRef<Downloader*>(dynamic_cast<Downloader*>(new HttpDownloader(uri)));
+			return new HttpDownloader(uri, conn);
 		else if (protocol == "file")
-			return MRef<Downloader*>(dynamic_cast<Downloader*>(new FileDownloader(uri)));
+			return new FileDownloader(uri);
 #ifdef ENABLE_LDAP
 		else if (protocol == "ldap")
-			return MRef<Downloader*>(dynamic_cast<Downloader*>(new LdapDownloader(uri)));
+			return new LdapDownloader(uri);
 #endif
 	}
-	return MRef<Downloader*>();
+	return NULL;
 }
+

@@ -63,6 +63,7 @@ mnetutil_src = \
 		    source/FileUrl.cxx \
 		    source/FileDownloaderException.cxx \
 		    source/FileDownloader.cxx \
+		    source/HttpFileSystem.cxx \
 		    source/DirectorySet.cxx \
 		    source/DirectorySetItem.cxx
 

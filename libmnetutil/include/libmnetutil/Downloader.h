@@ -22,6 +22,7 @@
 #include <libmnetutil/libmnetutil_config.h>
 
 #include <libmutil/MemObject.h>
+#include <libmnetutil/StreamSocket.h>
 #include <string>
 
 /**
@@ -42,13 +43,19 @@ class LIBMNETUTIL_API Downloader : public MObject {
 		 * Uses the protocol portion of the specified URI to determine
 		 * what type of object should be created to handle the download.
 		 *
-		 * Currently only supports HTTP download using the HttpDownloader class.
+		 * Currently, the following downloading URIs are supported:
+		 * 	file://		Local file download
+		 * 	http://		Download from web server
+		 * 	ldap://		Download from LDAP server
 		 *
 		 * @param	uri	Full URI for a remote document (e.g. "http://www.kth.se/index.html")
+		 * @param	conn	Given if an existing connection should be used. This is currently
+		 * 			only supported for http:// URIs.
 		 */
-		static MRef<Downloader*> create(std::string const uri);
+		static MRef<Downloader*> create(std::string const uri, MRef<StreamSocket*> conn=NULL);
 
-		virtual std::string getMemObjectType() const {return "Downloader";};
+
+		virtual std::string getMemObjectType() const {return "Downloader";}
 
 		/**
 		 * Returns the document in question. In order to support both

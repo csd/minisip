@@ -96,7 +96,7 @@ class LIBMNETUTIL_API HttpDownloader : public Downloader {
 		 * @param	url	File/document to fetch.
 		 * @param	sock	Pre-existing socket to use for communicating with HTTP server.
 		 */
-		HttpDownloader(std::string url, StreamSocket * sock);
+		HttpDownloader(std::string url, MRef<StreamSocket*> sock);
 
 		/**
 		 * The default constructor deallocates memory, if allocated.
@@ -156,7 +156,7 @@ class LIBMNETUTIL_API HttpDownloader : public Downloader {
 		std::map<std::string, std::string> headers;
 		int 	respCode;
 		bool	followRedirect;
-		StreamSocket * sock;
+		MRef<StreamSocket *> sock;
 		bool 	internalSocketObject;
 
 		// Functions

@@ -206,6 +206,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\include\libmutil\FileSystem.h"
+				>
+			</File>
+			<File
 				RelativePath="..\include\libmutil\FileSystemUtils.h"
 				>
 			</File>
@@ -343,6 +347,10 @@
 			</File>
 			<File
 				RelativePath="..\source\Exception.cxx"
+				>
+			</File>
+			<File
+				RelativePath="..\source\FileSystem.cxx"
 				>
 			</File>
 			<File

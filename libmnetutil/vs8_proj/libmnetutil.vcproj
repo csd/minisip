@@ -215,6 +215,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\source\HttpFileSystem.cxx"
+				>
+			</File>
+			<File
 				RelativePath="..\inet_aton.c"
 				>
 			</File>
@@ -402,6 +406,10 @@
 			</File>
 			<File
 				RelativePath="..\include\libmnetutil\HttpDownloader.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\libmnetutil\HttpFileSystem.h"
 				>
 			</File>
 			<File

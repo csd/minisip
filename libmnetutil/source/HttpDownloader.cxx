@@ -41,21 +41,18 @@
 #define HTTP_METHOD_1_0                         "HTTP/1.0"
 #define HTTP_HEADER_CRLF                        "\r\n"
 
-HttpDownloader::HttpDownloader(std::string url) : url (url), remotePort(80), respCode(-1), followRedirect(true), sock(NULL), internalSocketObject(false) {
+HttpDownloader::HttpDownloader(std::string url) : url (url), remotePort(80), respCode(-1), followRedirect(true) {
 	parseUrl();
 	if (remotePort > 0 && remoteHostname != "") {
 		sock = new TCPSocket(remoteHostname, remotePort);
-		internalSocketObject = true;
 	}
 }
 
-HttpDownloader::HttpDownloader(std::string url, StreamSocket * sock): url (url), remotePort(80), respCode(-1), followRedirect(true), sock(sock), internalSocketObject(false) {
+HttpDownloader::HttpDownloader(std::string url, MRef<StreamSocket*> sock): url (url), remotePort(80), respCode(-1), followRedirect(true), sock(sock) {
 	parseUrl();
 }
 
 HttpDownloader::~HttpDownloader() {
-	if (internalSocketObject)
-		delete sock;
 }
 
 char* HttpDownloader::getChars(int *length) {
@@ -98,7 +95,7 @@ bool HttpDownloader::getFollowRedirects() const {
 
 int HttpDownloader::fetch(std::string request, std::ostream & bodyStream) {
 
-	if (sock == NULL) {
+	if ( sock.isNull() ) {
 		// TODO: Error check for socket object
 	}
 
@@ -169,8 +166,6 @@ int HttpDownloader::fetch(std::string request, std::ostream & bodyStream) {
 			}
 		}
 	}
-	if (internalSocketObject)
-		sock->close();
 
 /*
 	if (bytesRead < 0) {
