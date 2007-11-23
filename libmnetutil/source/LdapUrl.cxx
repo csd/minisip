@@ -127,7 +127,7 @@ std::string LdapUrl::getString() const {
 #endif
 }
 bool LdapUrl::isUnreservedChar(char in) const {
-	char* alphabetUnreserved = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~";
+	const char* alphabetUnreserved = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~";
 	for (int i=0; i<66; i++) {
 		if (alphabetUnreserved[i] == in)
 			return true;
@@ -136,7 +136,7 @@ bool LdapUrl::isUnreservedChar(char in) const {
 }
 
 bool LdapUrl::isReservedChar(char in) const {
-	char* alphabetReserved = ":/?#[]@!$&'()*+,;=";
+	const char* alphabetReserved = ":/?#[]@!$&'()*+,;=";
 	for (int i=0; i<18; i++) {
 		if (alphabetReserved[i] == in)
 			return true;

@@ -30,7 +30,7 @@
 #include <libminisip/config/UserConfig.h>
 #include <libmutil/CommandString.h>
 
-#include "../MediaStream.h"
+#include <libminisip/media/MediaStream.h>
 
 #ifdef ZRTP_SUPPORT
 
