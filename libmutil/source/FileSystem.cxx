@@ -61,9 +61,16 @@ void LocalFile::flush(){
 }
 
 void LocalFileSystem::mkdir( const std::string & name ){
+#ifdef WIN32
+	if ( _mkdir( name.c_str() ) != 0 ){
+		throw FileSystemException("Could not create directory");
+	}
+
+#else
 	if ( ::mkdir( name.c_str(), 0 ) != 0 ){
 		throw FileSystemException("Could not create directory");
 	}
+#endif
 }
 
 MRef<File*> LocalFileSystem::open( const std::string & name, bool createIfNotExist ){

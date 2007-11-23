@@ -63,8 +63,6 @@ int64_t FileString::size(){
 }
 
 void FileString::flush(){
-#warning FileString flush not implemented FIXME
-//	httpDl->uploadFile(myPath, data, len);
 }
 
 HttpFileSystem::HttpFileSystem(MRef<StreamSocket*> conn_, string prefix_) : 
@@ -79,9 +77,7 @@ MRef<File*> HttpFileSystem::open( const std::string& path, bool createIfNotExist
 	int len=0;
 	HttpDownloader dl( "www.minisip.org/~erik/data.bin", conn );
 	data = dl.getChars(&len);
-#warning download data here FIXME;
 	return new FileString( data, len, conn);
-
 }
 
 

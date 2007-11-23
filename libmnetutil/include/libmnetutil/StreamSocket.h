@@ -35,6 +35,7 @@ class IPAddress;
 
 class LIBMNETUTIL_API StreamSocket : public Socket {
 	public:
+		StreamSocket();
 		virtual ~StreamSocket();
 		virtual int32_t write(std::string)=0;
 		virtual int32_t write(const void *buf, int32_t count)=0;

@@ -147,3 +147,4 @@ void FileDownloader::saveToFile(std::string filename) throw (FileDownloaderExcep
 		file.close();
 	}
 }
+

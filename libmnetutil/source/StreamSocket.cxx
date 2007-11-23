@@ -29,6 +29,8 @@
 
 using namespace std;
 
+StreamSocket::StreamSocket(){}
+
 StreamSocket::~StreamSocket(){
 }
 
