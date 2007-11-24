@@ -780,6 +780,7 @@ std::vector<std::string> GtlsCertificate::getAltName( SubjectAltName type ){
 }
 
 vector<string> GtlsCertificate::getSubjectInfoAccess() {
+	// TODO
 
 	vector<string> output;
 	/*

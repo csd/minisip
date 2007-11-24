@@ -8,6 +8,9 @@
 #include<sys/stat.h>
 #include<sys/types.h>
 
+#ifdef WIN32
+#include<io.h>
+#endif
 
 using namespace std;
 

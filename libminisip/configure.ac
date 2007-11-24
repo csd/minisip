@@ -542,6 +542,44 @@ AC_ARG_ENABLE(opie,
 	CPPFLAGS="${CPPFLAGS} -I${OPIEDIR}/include"
       fi ])
 
+
+dnl Contacts
+AC_ARG_ENABLE(ldapcontacts,
+    AS_HELP_STRING([--enable-ldapcontacts],
+    	[enables support for loading minisip contacts from LDAP (default auto).]),,enable_ldapcontacts="auto")
+
+use_ldapcontacts="no"
+if test "${enable_ldapcontacts}" != "no"; then
+   CPPFLAGS_SAVE="${CPPFLAGS}"
+   CPPFLAGS="${CPPFLAGS} ${MINISIP_CFLAGS}"
+   LIBS_SAVE="${LIBS}"
+   LIBS="${MINISIP_LIBS} ${LIBS}"
+
+   AC_MSG_CHECKING([LDAP in libmnetutil])
+   AC_LINK_IFELSE([
+	AC_INCLUDES_DEFAULT([])
+#include<libmnetutil/LdapConnection.h>
+
+int main(){
+    MRef<LdapConnection*> conn = new LdapConnection("", 0);
+    return 0;
+}
+],
+	[use_ldapcontacts="yes"],
+	[if test "${enable_ldapcontacts}" = "yes"; then
+	   AC_MSG_ERROR([LDAP unsupported by libmnetutil])
+	fi])
+fi
+   AC_MSG_RESULT(${use_ldapcontacts})
+   CPPFLAGS="${CPPFLAGS_SAVE}"
+   LIBS="${LIBS_SAVE}"
+
+if test "${use_ldapcontacts}" = "yes"; then
+   AC_DEFINE(LDAPCONTACTS_SUPPORT, [], [Enable support for contacts details stored on LDAP])
+fi
+AM_CONDITIONAL(LDAPCONTACTS_SUPPORT, [test "${use_ldapcontacts}" = "yes"])
+
+
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h malloc.h netdb.h netinet/in.h stdlib.h string.h sys/ioctl.h sys/socket.h sys/time.h syslog.h unistd.h])

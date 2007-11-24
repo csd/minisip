@@ -28,12 +28,12 @@
 #include <libmutil/Exception.h>
 #include <libmutil/MemObject.h>
 
-LIBMUTIL_API class FileException : public Exception{
+class LIBMUTIL_API FileException : public Exception{
 	public:
 		FileException(const std::string why);
 };
 
-LIBMUTIL_API class FileSystemException : public Exception{
+class LIBMUTIL_API FileSystemException : public Exception{
 	public:
 		FileSystemException(const std::string why);
 };
@@ -46,7 +46,7 @@ LIBMUTIL_API class FileSystemException : public Exception{
  * the flush() is more likely to fail on such files than when
  * doing traditional file I/O.
  */
-LIBMUTIL_API class File : public MObject {
+class LIBMUTIL_API File : public MObject {
 	public:
 		virtual void read(void *buf, int32_t count) = 0;
 		virtual void write(void *buf, int32_t count) = 0;
@@ -60,7 +60,7 @@ LIBMUTIL_API class File : public MObject {
  * the user can create directories, open files, and set default
  * paths.
  */
-LIBMUTIL_API class FileSystem : public MObject {
+class LIBMUTIL_API FileSystem : public MObject {
 	public:
 		virtual void mkdir( const std::string & name ) = 0;
 		virtual MRef<File*> open( const std::string& path, bool createIfNotExist=false ) = 0;
@@ -92,7 +92,7 @@ LIBMUTIL_API class FileSystem : public MObject {
 		std::string defPrefix;
 };
 
-LIBMUTIL_API class LocalFileSystem : public FileSystem {
+class LIBMUTIL_API LocalFileSystem : public FileSystem {
 	public:
 		virtual void mkdir( const std::string & name );
 		virtual MRef<File*> open( const std::string& path, bool createIfNotExist=false );

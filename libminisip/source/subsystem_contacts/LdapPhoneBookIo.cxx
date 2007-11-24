@@ -70,7 +70,6 @@ LdapPhoneBookIoDriver::~LdapPhoneBookIoDriver()
 
 LdapPhoneBookIo::LdapPhoneBookIo( string fn ): url( fn ){
 //   ldap://server/bind_dn?attributes?scope(sub|)?(filter)
-	// ldap://mulder/ou=People,dc=hem,dc=za,dc=org?cn,mobile,telephoneNumber,homePhone?sub?(objectclass=*)
 	url.printDebug();
 }
 

@@ -416,14 +416,13 @@ libonlineconf_src = source/subsystem_config/OnlineConfBackend.cxx \
 	  	    source/subsystem_contacts/OnlineMXmlPhoneBookIo.h
 endif
 
-# TODO auto detect LDAP support
-if FALSE
+if LDAPCONTACTS_SUPPORT
 plugins_LTLIBRARIES += ldappb.la
 ldappb_la_CPPFLAGS = $(AM_CPPFLAGS)
 ldappb_la_LDFLAGS = $(plugins_LDFLAGS)
 ldappb_la_SOURCES = source/subsystem_contacts/LdapPhoneBookIo.cxx
 ldappb_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(MNETUTIL_LIBS)
-endif
+endif LDAPCONTACTS_SUPPORT
 
 libminisip_la_SOURCES = source/Minisip.cxx \
 			source/MinisipExceptions.cxx \
