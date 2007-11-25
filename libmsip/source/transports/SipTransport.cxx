@@ -22,7 +22,7 @@
 
 #include<config.h>
 
-#include"SipTransport.h"
+#include<libmsip/SipTransport.h>
 #include"SipTransportUdp.h"
 #include"SipTransportTcp.h"
 #include"SipTransportTls.h"

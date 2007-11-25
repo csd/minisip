@@ -37,6 +37,12 @@
 
 class SipLayerTransport;
 
+class SipSocketReceiver : public virtual MObject {
+	public:
+		virtual void addSocket(MRef<StreamSocket *> sock) = 0;
+		virtual void datagramSocketRead(MRef<DatagramSocket *> sock) = 0;
+};
+
 /**
  * Purpose: Listens on a TCP or TLS server socket and reports
  * when a client connects to it.
@@ -44,14 +50,14 @@ class SipLayerTransport;
  */
 class SipSocketServer : public SocketServer, InputReadyHandler {
 	public:
-		SipSocketServer(MRef<SipLayerTransport*> r, MRef<Socket*> sock );
+		SipSocketServer(MRef<SipSocketReceiver*> r, MRef<Socket*> sock );
 		virtual ~SipSocketServer();
 		void free();
 		std::string getMemObjectType() const {return "SipSocketServer";}
 
 		MRef<Socket *> getSocket() const;
-		MRef<SipLayerTransport *> getReceiver() const;
-		void setReceiver(MRef<SipLayerTransport *> r);
+		MRef<SipSocketReceiver *> getReceiver() const;
+		void setReceiver(MRef<SipSocketReceiver *> r);
 
 		bool isIpv6() const;
 		int32_t getType() const;
@@ -70,7 +76,7 @@ class SipSocketServer : public SocketServer, InputReadyHandler {
 
 	private:
 		MRef<Socket *> ssock;
-		MRef<SipLayerTransport *> receiver;
+		MRef<SipSocketReceiver *> receiver;
 		std::string externalIp;
 		int32_t externalPort;
 };
@@ -82,7 +88,7 @@ class SipSocketServer : public SocketServer, InputReadyHandler {
 
 class StreamSocketServer : public SipSocketServer{
 	public:
-		StreamSocketServer(MRef<SipLayerTransport*> r, MRef<ServerSocket*> sock );
+		StreamSocketServer(MRef<SipSocketReceiver*> r, MRef<ServerSocket*> sock );
 		std::string getMemObjectType(){return "StreamSocketServer";}
 		virtual void inputReady();
 };
@@ -93,7 +99,7 @@ class StreamSocketServer : public SipSocketServer{
 // 
 class DatagramSocketServer : public SipSocketServer{
 	public:
-		DatagramSocketServer(MRef<SipLayerTransport*> r, MRef<DatagramSocket*> sock );
+		DatagramSocketServer(MRef<SipSocketReceiver*> r, MRef<DatagramSocket*> sock );
 		std::string getMemObjectType(){return "DatagramSocketServer";}
 		virtual void inputReady();
 };

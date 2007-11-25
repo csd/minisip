@@ -64,7 +64,7 @@ SipTransportDtlsUdp::~SipTransportDtlsUdp(){
  *   number here. This can be used for example to implement support for
  *   passing NATs with the help of a STUN server.
  */
-MRef<SipSocketServer *> SipTransportDtlsUdp::createServer( MRef<SipLayerTransport*> receiver, bool ipv6, const string &ipString, int32_t prefPort, MRef<CertificateSet *> cert_db, MRef<CertificateChain *> certChain  )
+MRef<SipSocketServer *> SipTransportDtlsUdp::createServer( MRef<SipSocketReceiver*> receiver, bool ipv6, const string &ipString, int32_t prefPort, MRef<CertificateSet *> cert_db, MRef<CertificateChain *> certChain  )
 {
 	int32_t port = prefPort;
 	int triesLeft=10;

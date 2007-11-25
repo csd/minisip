@@ -41,7 +41,6 @@ msip_src =           source/SipDialogConfig.cxx \
 		     source/SipCommandDispatcher.cxx \
 		     source/SipLayerTransport.h \
 		     source/SipLayerTransport.cxx \
-		     source/SipSocketServer.h \
 		     source/SipSocketServer.cxx \
 		     source/SipSMCommand.cxx \
 		     source/SipCommandString.cxx \
@@ -61,7 +60,6 @@ msip_src =           source/SipDialogConfig.cxx \
 		     source/transactions/SipTransactionInviteServer.cxx \
 		     source/transactions/SipTransactionInviteServerUA.h \
 		     source/transactions/SipTransactionInviteServerUA.cxx \
-		     source/transports/SipTransport.h \
 		     source/transports/SipTransport.cxx \
 		     source/transports/SipTransportUdp.h \
 		     source/transports/SipTransportUdp.cxx \

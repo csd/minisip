@@ -37,7 +37,7 @@
 #include<libmcrypto/cert.h>
 #include<libmsip/SipSMCommand.h>
 #include<libmsip/SipMessage.h>
-#include"SipSocketServer.h"
+#include<libmsip/SipSocketServer.h>
 #include"SipCommandDispatcher.h"
 
 #include<list>
@@ -50,7 +50,8 @@ class SipTransport;
 class StreamThreadData;
 class StreamThreadServer;
 
-class SipLayerTransport : public SipSMCommandReceiver {
+class SipLayerTransport : public SipSMCommandReceiver,
+			  public SipSocketReceiver {
 	public:
 		SipLayerTransport( MRef<CertificateChain *> cchain=NULL,
 				   MRef<CertificateSet *> cert_db = NULL

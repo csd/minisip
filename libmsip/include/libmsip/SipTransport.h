@@ -32,8 +32,8 @@
 #include<libmnetutil/StreamSocket.h>
 #include<libmcrypto/cert.h>
 
-#include"../SipSocketServer.h"
-#include"../SipLayerTransport.h"
+#include<libmsip/SipSocketServer.h>
+#include<libmsip/SipStack.h>
 
 /**
  * A plugin representing a SIP transport protocol,
@@ -73,7 +73,7 @@ class LIBMSIP_API SipTransport: public MPlugin{
 		virtual int32_t getSocketType() const=0;
 
 		/** Setup a new listening socket */
-		virtual MRef<SipSocketServer *> createServer( MRef<SipLayerTransport*> receiver, bool ipv6, const std::string &ipString, int32_t prefPort, MRef<CertificateSet *> cert_db = NULL, MRef<CertificateChain *> certChain = NULL ) = 0;
+		virtual MRef<SipSocketServer *> createServer( MRef<SipSocketReceiver*> receiver, bool ipv6, const std::string &ipString, int32_t prefPort, MRef<CertificateSet *> cert_db = NULL, MRef<CertificateChain *> certChain = NULL ) = 0;
 		/**
 		 * Setup a new connection, implemented by
 		 * connection-oriented transports only

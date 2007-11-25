@@ -58,7 +58,7 @@ SipTransportTls::~SipTransportTls(){
 
 
 
-MRef<SipSocketServer *> SipTransportTls::createServer( MRef<SipLayerTransport*> receiver, bool ipv6, const string &ipString, int32_t prefPort, MRef<CertificateSet *> cert_db, MRef<CertificateChain *> certChain )
+MRef<SipSocketServer *> SipTransportTls::createServer( MRef<SipSocketReceiver*> receiver, bool ipv6, const string &ipString, int32_t prefPort, MRef<CertificateSet *> cert_db, MRef<CertificateChain *> certChain )
 {
 	MRef<ServerSocket *> sock;
 	MRef<SipSocketServer *> server;

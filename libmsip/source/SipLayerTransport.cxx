@@ -55,7 +55,7 @@
 #include<libmsip/SipCommandString.h>
 #include"SipCommandDispatcher.h"
 #include<libmsip/SipHeaderFrom.h>
-#include"transports/SipTransport.h"
+#include<libmsip/SipTransport.h>
 
 #include<cctype>
 #include<string>

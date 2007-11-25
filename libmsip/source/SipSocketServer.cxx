@@ -28,8 +28,7 @@
 
 #include<libmnetutil/NetworkException.h>
 #include<libmnetutil/DatagramSocket.h>
-#include"SipSocketServer.h"
-#include"SipLayerTransport.h"
+#include<libmsip/SipSocketServer.h>
 
 using namespace std;
 
@@ -38,7 +37,7 @@ using namespace std;
 // 
 
 
-SipSocketServer::SipSocketServer(MRef<SipLayerTransport*> r, MRef<Socket*> sock): ssock(sock), receiver(r){
+SipSocketServer::SipSocketServer(MRef<SipSocketReceiver*> r, MRef<Socket*> sock): ssock(sock), receiver(r){
 	externalPort = ssock->getPort();
 
 	addSocket( sock, this );
@@ -63,11 +62,11 @@ MRef<Socket *> SipSocketServer::getSocket() const {
 	return ssock;
 }
 
-MRef<SipLayerTransport *> SipSocketServer::getReceiver() const {
+MRef<SipSocketReceiver *> SipSocketServer::getReceiver() const {
 	return receiver;
 }
 
-void SipSocketServer::setReceiver(MRef<SipLayerTransport*> r){
+void SipSocketServer::setReceiver(MRef<SipSocketReceiver*> r){
 	receiver=r;
 }
 
@@ -75,7 +74,7 @@ void SipSocketServer::setReceiver(MRef<SipLayerTransport*> r){
 //
 // StreamSocketServer
 //
-StreamSocketServer::StreamSocketServer(MRef<SipLayerTransport*> r, MRef<ServerSocket*> sock): SipSocketServer(r, *sock){
+StreamSocketServer::StreamSocketServer(MRef<SipSocketReceiver*> r, MRef<ServerSocket*> sock): SipSocketServer(r, *sock){
 }
 
 void SipSocketServer::inputReady( MRef<Socket*> socket ){
@@ -83,7 +82,7 @@ void SipSocketServer::inputReady( MRef<Socket*> socket ){
 }
 
 void StreamSocketServer::inputReady(){
-	MRef<SipLayerTransport *> r = getReceiver();
+	MRef<SipSocketReceiver *> r = getReceiver();
 	MRef<Socket *> sock = getSocket();
 	if (r && sock){
 		MRef<ServerSocket *> ssock = (ServerSocket*)*sock;
@@ -107,11 +106,11 @@ void StreamSocketServer::inputReady(){
 // DatagramSocketServer
 // 
 
-DatagramSocketServer::DatagramSocketServer(MRef<SipLayerTransport*> r, MRef<DatagramSocket*> sock): SipSocketServer(r, *sock){
+DatagramSocketServer::DatagramSocketServer(MRef<SipSocketReceiver*> r, MRef<DatagramSocket*> sock): SipSocketServer(r, *sock){
 }
 
 void DatagramSocketServer::inputReady(){
-	MRef<SipLayerTransport *> transport = getReceiver();
+	MRef<SipSocketReceiver *> transport = getReceiver();
 	MRef<Socket *> sock = getSocket();
 	if (transport && sock){
 		MRef<DatagramSocket *> dsock = (DatagramSocket*)*sock;
