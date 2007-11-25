@@ -25,6 +25,7 @@
 
 #include"AccountsList.h"
 #include"AccountDialog.h"
+#include"TransportList.h"
 
 #include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
 
@@ -49,18 +50,21 @@ AccountsListColumns::AccountsListColumns(){
 
 Glib::RefPtr<AccountsList> AccountsList::create( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
 						 CertificateDialog * certDialog,
-						 AccountsListColumns * columns ){
+						 AccountsListColumns * columns,
+						 Glib::RefPtr<TransportList> transportList ){
 	return Glib::RefPtr<AccountsList>::RefPtr<AccountsList>( 
-			new AccountsList( refXml, certDialog, columns ) );
+		new AccountsList( refXml, certDialog, columns, transportList ) );
 }
 	
 AccountsList::AccountsList( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
 			    CertificateDialog * certDialog,
-			    AccountsListColumns * columns ):
+			    AccountsListColumns * columns,
+			    Glib::RefPtr<TransportList> transportList ):
 	Gtk::ListStore( *columns ),
 	columns( columns ),
 	refXml( refXml ),
-	certDialog( certDialog ){
+	certDialog( certDialog ),
+	transportList( transportList ){
 	
 
 }
@@ -193,12 +197,12 @@ string AccountsList::saveToConfig( MRef<SipSoftPhoneConfiguration *> config ){
 }
 
 void AccountsList::addAccount(){
-	AccountDialog dialog( refXml, certDialog, this );
+	AccountDialog dialog( refXml, certDialog, this, transportList );
 	dialog.addAccount();
 }
 
 void AccountsList::editAccount( Gtk::TreeModel::iterator iter ){
-	AccountDialog dialog( refXml, certDialog, this );
+	AccountDialog dialog( refXml, certDialog, this, transportList );
 	dialog.editAccount( iter );
 }
 

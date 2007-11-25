@@ -40,6 +40,7 @@
 #include"SettingsDialog.h"
 #include"CertificateDialog.h"
 #include"DtmfWidget.h"
+#include"TransportList.h"
 
 #ifndef WIN32
 #	include"TrayIcon.h"
@@ -268,8 +269,10 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 	aboutMenu->set_sensitive( false );
 #endif
 	
+	transportList = TransportList::create();
+
 	certificateDialog = new CertificateDialog( refXml );
-	settingsDialog = new SettingsDialog( refXml );
+	settingsDialog = new SettingsDialog( refXml, transportList );
 	
 	refXml->get_widget( "callUriEntry", uriEntry );
 
@@ -314,7 +317,8 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 	//mainTabWidget->append_page( *logWidget, "Call list" );
 
 	accountsList = AccountsList::create( refXml, certificateDialog,
-					     new AccountsListColumns() );
+					     new AccountsListColumns(),
+					     transportList );
 
 	statusWidget = new AccountsStatusWidget( accountsList);
 	statusWindow = new Gtk::ScrolledWindow();

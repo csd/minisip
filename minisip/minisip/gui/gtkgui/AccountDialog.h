@@ -31,12 +31,14 @@
 class AccountsList;
 class CertificateDialog;
 class SecuritySettings;
+class TransportList;
 
 class AccountDialog{
 	public:
 		AccountDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
 			       CertificateDialog * certDialog,
-			       AccountsList * list );
+			       AccountsList * list,
+			       Glib::RefPtr<TransportList> transportList );
 		~AccountDialog();
 
 		void addAccount();
@@ -63,10 +65,8 @@ class AccountDialog{
 		Gtk::Label * proxyPortLabel;
 		Gtk::SpinButton * proxyPortSpin;
 		Gtk::CheckButton * proxyPortCheck;
-
-		Gtk::RadioButton * udpRadio;
-		Gtk::RadioButton * tcpRadio;
-		Gtk::RadioButton * tlsRadio;
+		Gtk::ComboBox * proxyTransportView;
+		Gtk::CheckButton * proxyTransportCheck;
 
 		Gtk::CheckButton * registerCheck;
 		
@@ -79,12 +79,14 @@ class AccountDialog{
 		Gtk::SpinButton * registerTimeSpin;
 		
 		AccountsList * list;
+		Glib::RefPtr<TransportList> transportList;		
 		SecuritySettings * securitySettings;
 
 		sigc::connection requiresAuthConn;
 		sigc::connection autodetectProxyConn;
 		sigc::connection proxyConn;
 		sigc::connection proxyPortConn;
+		sigc::connection proxyTransportConn;
 };
 
 #endif

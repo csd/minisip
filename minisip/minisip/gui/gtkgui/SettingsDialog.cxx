@@ -43,7 +43,8 @@
 
 using namespace std;
 
-SettingsDialog::SettingsDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
+SettingsDialog::SettingsDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
+				Glib::RefPtr<TransportList> transportList ){
 	refXml->get_widget( "settingsDialog", dialogWindow );
 
 	Gtk::Button * settingsOkButton;
@@ -61,7 +62,7 @@ SettingsDialog::SettingsDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 	generalSettings = new GeneralSettings( refXml );
 	mediaSettings = new MediaSettings( refXml );
 	deviceSettings = new DeviceSettings( refXml );
-	advancedSettings = new AdvancedSettings( refXml );
+	advancedSettings = new AdvancedSettings( refXml, transportList );
 	sipSettings = new SipSettings( refXml );
 
 
@@ -791,7 +792,8 @@ string SecuritySettings::apply(){
 
 }
 
-AdvancedSettings::AdvancedSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
+AdvancedSettings::AdvancedSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
+				    Glib::RefPtr<TransportList> transportList ): transportList( transportList ){
 	refXml->get_widget( "networkInterfacesCombo", networkInterfacesCombo );
 	refXml->get_widget( "networkInterfacesEntry", networkInterfacesEntry );
 		
@@ -804,7 +806,6 @@ AdvancedSettings::AdvancedSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 	refXml->get_widget( "stunAutodetectCheck", stunAutodetectCheck );
 	refXml->get_widget( "stunEntry", stunEntry );
 
-	transportList = TransportList::create();
 	transportView->set_model( transportList );
 	TransportListColumns *columns = transportList->getColumns();
 

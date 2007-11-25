@@ -54,6 +54,7 @@ class ImWidget;
 class ContactDb;
 class AccountsList;
 class AccountsStatusWidget;
+class TransportList;
 
 using namespace std;
 
@@ -192,6 +193,7 @@ class MainWindow : public GtkMainUI,
 		Gtk::CheckMenuItem * viewStatusMenu;
 
 		Glib::RefPtr<AccountsList> accountsList;
+		Glib::RefPtr<TransportList> transportList;
 		Glib::RefPtr<Gtk::IconFactory> factory;
 		Glib::RefPtr<Gdk::Pixbuf> icon;
 

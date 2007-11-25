@@ -33,12 +33,14 @@ class AccountsListColumns;
 class CertificateDialog;
 class SipSoftPhoneConfiguration;
 class SipIdentity;
+class TransportList;
 
 class AccountsList : public MObject, public Gtk::ListStore{
 	public:
 		static Glib::RefPtr<AccountsList> create( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
 							  CertificateDialog * certDialog,
-							  AccountsListColumns * columns );
+							  AccountsListColumns * columns,
+							  Glib::RefPtr<TransportList> transportList );
 		void loadFromConfig( MRef<SipSoftPhoneConfiguration *> config );
 		std::string saveToConfig( MRef<SipSoftPhoneConfiguration *> config );
 
@@ -55,10 +57,12 @@ class AccountsList : public MObject, public Gtk::ListStore{
 	private:
 		AccountsList( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
 			      CertificateDialog * certDialog,
-			      AccountsListColumns * columns );
+			      AccountsListColumns * columns,
+			      Glib::RefPtr<TransportList> transportList );
 
 		Glib::RefPtr<Gnome::Glade::Xml> refXml;
 		CertificateDialog * certDialog;
+		Glib::RefPtr<TransportList> transportList;
 };
 
 

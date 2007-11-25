@@ -52,7 +52,8 @@ class SettingsDialog
 #endif
 {
 	public:
-		SettingsDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml );
+		SettingsDialog( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
+				Glib::RefPtr<TransportList> transportList );
 		~SettingsDialog();
 
 		int run();
@@ -249,7 +250,8 @@ class AdvancedSettings
 {
 
 	public:
-		AdvancedSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml );
+		AdvancedSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
+				  Glib::RefPtr<TransportList> transportList );
 
 		 std::string apply();
 		

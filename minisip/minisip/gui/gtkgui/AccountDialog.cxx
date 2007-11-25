@@ -27,6 +27,7 @@
 #include"AccountsList.h"
 #include"CertificateDialog.h"
 #include"SettingsDialog.h"
+#include"TransportList.h"
 
 #include<libmcrypto/SipSimSoft.h>
 
@@ -48,10 +49,12 @@ using namespace std;
 
 AccountDialog::AccountDialog( Glib::RefPtr<Gnome::Glade::Xml>  theRefXml,
 			      CertificateDialog * certDialog,
-			      AccountsList * list ):
+			      AccountsList * list,
+			      Glib::RefPtr<TransportList> transportList ):
 		refXml( theRefXml ),
 		certificateDialog( certDialog ),
 		list(list),
+		transportList( transportList ),
 		securitySettings(NULL)
 {
 	refXml->get_widget( "accountDialog", dialogWindow );
@@ -70,14 +73,23 @@ AccountDialog::AccountDialog( Glib::RefPtr<Gnome::Glade::Xml>  theRefXml,
 	refXml->get_widget( "usernameLabel", usernameLabel );
 	refXml->get_widget( "passwordEntry", passwordEntry );
 	refXml->get_widget( "passwordLabel", passwordLabel );
-	refXml->get_widget( "udpRadio", udpRadio );
-	refXml->get_widget( "tcpRadio", tcpRadio );
-	refXml->get_widget( "tlsRadio", tlsRadio );
 	refXml->get_widget( "registerCheck", registerCheck );
 	refXml->get_widget( "registerTimeSpin", registerTimeSpin );
 	refXml->get_widget( "proxyPortSpin", proxyPortSpin );
 	refXml->get_widget( "proxyPortLabel", proxyPortLabel );
 	refXml->get_widget( "proxyPortCheck", proxyPortCheck );
+	refXml->get_widget( "proxyTransportList", proxyTransportView );
+	refXml->get_widget( "proxyTransportCheck", proxyTransportCheck );
+
+	if( proxyTransportView->get_model() != transportList ){
+		proxyTransportView->set_model( transportList );
+		TransportListColumns *columns = transportList->getColumns();
+
+		Gtk::CellRendererText* crt;
+		crt = new Gtk::CellRendererText();
+		proxyTransportView->pack_end(*manage(crt), true);
+		proxyTransportView->add_attribute(crt->property_text(), columns->name);
+	}
 
 	requiresAuthConn = requiresAuthCheck->signal_toggled().connect(
 		SLOT( *this, &AccountDialog::requiresAuthCheckChanged ) );
@@ -86,6 +98,8 @@ AccountDialog::AccountDialog( Glib::RefPtr<Gnome::Glade::Xml>  theRefXml,
 	proxyConn = proxyCheck->signal_toggled().connect(
 		SLOT( *this, &AccountDialog::autodetectProxyCheckChanged ) );
 	proxyPortConn = proxyPortCheck->signal_toggled().connect(
+		SLOT( *this, &AccountDialog::autodetectProxyCheckChanged ) );
+	proxyTransportConn = proxyTransportCheck->signal_toggled().connect(
 		SLOT( *this, &AccountDialog::autodetectProxyCheckChanged ) );
 	
 	securitySettings = new SecuritySettings( refXml, certDialog );
@@ -98,8 +112,8 @@ AccountDialog::AccountDialog( Glib::RefPtr<Gnome::Glade::Xml>  theRefXml,
 AccountDialog::~AccountDialog(){
 	requiresAuthConn.disconnect();
 	autodetectProxyConn.disconnect();
-	proxyConn.disconnect();
 	proxyPortConn.disconnect();
+	proxyTransportConn.disconnect();
 
 	delete securitySettings;
 	securitySettings = NULL;
@@ -134,7 +148,7 @@ void AccountDialog::reset(){
 	proxyEntry->set_text( "" );
 	proxyPortSpin->set_value( 5060 );
 	proxyPortCheck->set_active( true );
-	udpRadio->set_active( true );
+	proxyTransportCheck->set_active( true );
 
 	requiresAuthCheck->set_active( true );
 	usernameEntry->set_text( "" );
@@ -172,18 +186,32 @@ void AccountDialog::apply( Gtk::TreeModel::iterator iter ){
 			(*iter)[list->columns->proxy] = proxyEntry->get_text();
 			(*iter)[list->columns->port] = proxyPortSpin->get_value_as_int();
 		}
-		
+
+		if( proxyTransportCheck->get_active() ){
+			(*iter)[list->columns->transport] = "";
+		}
+		else{
+			Gtk::TreeModel::iterator listIter = proxyTransportView->get_active();
+			if( listIter ){
+				Gtk::TreeModel::Row row = *listIter;
+				TransportListColumns *columns =
+					transportList->getColumns();
+
+				MRef<SipTransportConfig*> transportConfig =
+					(*listIter)[columns->config];
+
+				(*iter)[list->columns->transport] =
+					transportConfig->getName();
+			}
+			else{
+				(*iter)[list->columns->transport] = "";
+			}
+		}
+
 		(*iter)[list->columns->username] = usernameEntry->get_text();
 		(*iter)[list->columns->password] = passwordEntry->get_text();
 		(*iter)[list->columns->doRegister] = registerCheck->get_active();
 		(*iter)[list->columns->registerExpires] = registerTimeSpin->get_value_as_int();
-		if( tcpRadio->get_active() ){
-			(*iter)[list->columns->transport] = "TCP";
-		} else if( tlsRadio->get_active() ){
-			(*iter)[list->columns->transport] = "TLS";
-		} else{
-			(*iter)[list->columns->transport] = "UDP";
-		}
 
 		securitySettings->apply();
 }
@@ -209,21 +237,28 @@ void AccountDialog::editAccount( Gtk::TreeModel::iterator iter ){
 		proxyPortSpin->set_value( (double)(5060) );
 		proxyPortCheck->set_active( true );
 	}
-	
+
+	Gtk::TreeModel::iterator transportIter;
+	for( transportIter = transportList->children().begin();
+	     transportIter != transportList->children().end();
+	     transportIter++ ){
+		MRef<SipTransportConfig*> transportConfig =
+			(*transportIter)[transportList->getColumns()->config];
+
+		if( (*iter)[list->columns->transport] == transportConfig->getName() ){
+			proxyTransportView->set_active(*transportIter);
+		}
+	}
+
+	Glib::ustring transport = (*iter)[list->columns->transport];
+	proxyTransportCheck->set_active( transport == "" );
+
 	requiresAuthCheck->set_active( (*iter)[list->columns->username] != "" );
 	usernameEntry->set_text( (*iter)[list->columns->username] );
 	passwordEntry->set_text( (*iter)[list->columns->password] );
 	registerCheck->set_active( (*iter)[list->columns->doRegister] );
 	registerTimeSpin->set_value( (*iter)[list->columns->registerExpires] );
 	
-	if( (*iter)[list->columns->transport] == "TCP" ){
-		tcpRadio->set_active( true );
-	} else if( (*iter)[list->columns->transport] == "TLS" ){
-		tlsRadio->set_active( true );
-	} else{
-		udpRadio->set_active( true );
-	}
-
 	MRef<SipIdentity*> identity = (*iter)[list->columns->identity]; 
 
 	if( identity ){
@@ -253,9 +288,7 @@ void AccountDialog::autodetectProxyCheckChanged(){
 	bool proxyEnabled = proxyCheck->get_active();
 // 	proxyLabel->set_sensitive( proxyEnabled );
 	autodetectProxyCheck->set_sensitive( proxyEnabled );
-	udpRadio->set_sensitive( proxyEnabled );
-	tcpRadio->set_sensitive( proxyEnabled );
-	tlsRadio->set_sensitive( proxyEnabled );
+	proxyTransportCheck->set_sensitive( proxyEnabled );
 
 	bool setTo = !proxyEnabled || autodetectProxyCheck->get_active();
 	proxyEntry->set_sensitive( ! setTo  );
@@ -264,4 +297,8 @@ void AccountDialog::autodetectProxyCheckChanged(){
 
 	bool autoPort = setTo || proxyPortCheck->get_active();
 	proxyPortSpin->set_sensitive( ! autoPort  );
+
+	bool autoTransport = !proxyEnabled || proxyTransportCheck->get_active();
+	proxyTransportView->set_sensitive( ! autoTransport );
+
 }
