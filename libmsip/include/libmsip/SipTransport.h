@@ -108,6 +108,8 @@ class LIBMSIP_API SipTransportRegistry: public MPluginRegistry, public MSingleto
 		/** Search for transport by NAPTR service field */
 		MRef<SipTransport*> findTransportByNaptr( const std::string &service ) const;
 
+		std::list<MRef<SipTransportConfig*> > createDefaultConfig() const;
+
 	protected:
 		SipTransportRegistry();
 

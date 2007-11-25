@@ -86,6 +86,10 @@ class SipStackInternal : public SipSMCommandReceiver, public Runnable{
                 
 		std::string getStackStatusDebugString();
 
+		MRef<SipTransportConfig*> findTransportConfig( const std::string &transportName ) const;
+
+		void startServers();
+
 		void startServer( const std::string &tranportName );
 
 		int32_t getLocalSipPort(bool usesStun, const std::string &transport);

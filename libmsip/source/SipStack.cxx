@@ -26,6 +26,7 @@
 
 #include"SipLayerTransport.h"
 #include"SipCommandDispatcher.h"
+#include<libmsip/SipTransport.h>
 #include<libmsip/SipMessageContentIM.h>
 #include<libmsip/SipMessageContentMime.h>
 #include<libmutil/Timestamp.h>
@@ -189,6 +190,10 @@ void SipStack::setDialogManagement(MRef<SipDialog*> mgmt){
 	STACK->getDispatcher()->setDialogManagement(mgmt);
 }
 
+void SipStack::startServers(){
+	STACK->startServers();
+}
+
 void SipStack::startUdpServer(){
 	STACK->startServer( "UDP" );
 }
@@ -220,6 +225,3 @@ bool SipStack::getDebugPrintPackets(){
 std::string SipStack::getStackStatusDebugString(){
 	return STACK->getStackStatusDebugString();
 }
-
-
-

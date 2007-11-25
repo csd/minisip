@@ -149,6 +149,27 @@ class LIBMSIP_API SipDefaultHandler : public SipSMCommandReceiver, public Comman
 };
 
 
+class LIBMSIP_API SipTransportConfig : public MObject{
+	public:
+		SipTransportConfig() {}
+
+		SipTransportConfig( const std::string &name );
+
+		/** Transport plugin name */
+		std::string getName() const;
+
+		bool isEnabled() const;
+
+		void setEnabled( bool enabled );
+
+		int operator==( const SipTransportConfig &dev ) const;
+
+	private:
+		std::string name;
+		bool enabled;
+};
+
+
 class LIBMSIP_API SipStackConfig : public MObject{
 	public:
 		SipStackConfig();
@@ -161,10 +182,8 @@ class LIBMSIP_API SipStackConfig : public MObject{
 		std::string externalContactIP;
 		int32_t externalContactUdpPort;
                 
-		int32_t preferedLocalUdpPort;	// Advanced -> ...Sip port...
-		int32_t preferedLocalTcpPort;
-		int32_t preferedLocalTlsPort;
-		
+		int32_t preferedLocalSipPort;
+		int32_t preferedLocalSipsPort;
 
 		bool autoAnswer;
 
@@ -192,6 +211,11 @@ class LIBMSIP_API SipStackConfig : public MObject{
 		 * It's used by draft-Outbound and draft-GRUU.
 		 */
 		std::string instanceId;
+
+		/**
+		 * Configuration for all transports, UDP, TCP etc.
+		 */
+		std::list<MRef<SipTransportConfig*> > transports;
 };
 
 //TODO: Enable conference calling
@@ -265,6 +289,11 @@ class LIBMSIP_API SipStack : public CommandReceiver, public Runnable{
 		void setDialogManagement(MRef<SipDialog*> mgmt);
 
 		std::list<MRef<SipDialog *> > getDialogs();
+
+		/**
+		 * Start SIP(S) servers enabled in stack config.
+		 */
+		void startServers();
 
 		void startUdpServer();
 		void startTcpServer();

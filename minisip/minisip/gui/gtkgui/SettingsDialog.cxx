@@ -24,6 +24,7 @@
 #include"SettingsDialog.h"
 #include"AccountsList.h"
 #include"CertificateDialog.h"
+#include"TransportList.h"
 #include<libminisip/gui/Gui.h>
 #include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
 #include<libminisip/media/MediaCommandString.h>
@@ -794,21 +795,24 @@ AdvancedSettings::AdvancedSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 	refXml->get_widget( "networkInterfacesCombo", networkInterfacesCombo );
 	refXml->get_widget( "networkInterfacesEntry", networkInterfacesEntry );
 		
-	refXml->get_widget( "udpSpin", udpSpin );
-	refXml->get_widget( "tcpSpin", tcpSpin );
-	refXml->get_widget( "tlsSpin", tlsSpin );
-	
-	refXml->get_widget( "tcpCheck", tcpCheck );
-	refXml->get_widget( "tlsCheck", tlsCheck );
+	refXml->get_widget( "transportView", transportView );
+
+	refXml->get_widget( "sipSpin", sipSpin );
+	refXml->get_widget( "sipsSpin", sipsSpin );
 	
 	refXml->get_widget( "stunCheck", stunCheck );
 	refXml->get_widget( "stunAutodetectCheck", stunAutodetectCheck );
 	refXml->get_widget( "stunEntry", stunEntry );
-	
-	tcpCheck->signal_toggled().connect( SLOT( 
-		*this, &AdvancedSettings::transportChange ) );
-	tlsCheck->signal_toggled().connect( SLOT( 
-		*this, &AdvancedSettings::transportChange ) );
+
+	transportList = TransportList::create();
+	transportView->set_model( transportList );
+	TransportListColumns *columns = transportList->getColumns();
+
+	transportView->append_column_editable( "Enabled", columns->enabled );
+	transportView->append_column( "Name", columns->name );
+	transportView->append_column( "Scheme", columns->scheme );
+	transportView->append_column( "Protocol", columns->protocol );
+	transportView->append_column( "Description", columns->description );
 	
 	stunAutodetectCheck->signal_toggled().connect( SLOT( 
 		*this, &AdvancedSettings::stunAutodetectChange ) );
@@ -817,6 +821,8 @@ AdvancedSettings::AdvancedSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 
 void AdvancedSettings::setConfig( MRef<SipSoftPhoneConfiguration *> config ){ 
 	this->config = config;
+
+	transportList->loadFromConfig( config );
 
 	//Set the choosen network interface ...
 	vector<string> ifaces = NetworkFunctions::getAllInterfaces();
@@ -837,12 +843,8 @@ void AdvancedSettings::setConfig( MRef<SipSoftPhoneConfiguration *> config ){
 		networkInterfacesEntry->set_text( preferredIfaceIP );
 	}
 	
-	udpSpin->set_value( config->sipStack->getStackConfig()->preferedLocalUdpPort );
-	tcpSpin->set_value( config->sipStack->getStackConfig()->preferedLocalTcpPort );
-	tlsSpin->set_value( config->sipStack->getStackConfig()->preferedLocalTlsPort );
-
-	tcpCheck->set_active( config->tcp_server );
-	tlsCheck->set_active( config->tls_server );
+	sipSpin->set_value( config->sipStack->getStackConfig()->preferedLocalSipPort );
+	sipsSpin->set_value( config->sipStack->getStackConfig()->preferedLocalSipsPort );
 
 	transportChange();
 
@@ -854,9 +856,6 @@ void AdvancedSettings::setConfig( MRef<SipSoftPhoneConfiguration *> config ){
 
 void AdvancedSettings::transportChange(){
 
-	tlsSpin->set_sensitive( tlsCheck->get_active() );
-	tcpSpin->set_sensitive( tcpCheck->get_active() );
-	
 	stunAutodetectChange();
 }
 
@@ -868,6 +867,8 @@ void AdvancedSettings::stunAutodetectChange(){
 }
 
 string AdvancedSettings::apply(){
+	string err;
+
 	//config->networkInterfaceName = networkInterfacesCombo->
 	string ipSelected = networkInterfacesEntry->get_text();
 	string ifaceSel = NetworkFunctions::getInterfaceOf( ipSelected );
@@ -878,20 +879,16 @@ string AdvancedSettings::apply(){
 		config->networkInterfaceName = ifaceSel;
 	}
 
-	config->sipStack->getStackConfig()->preferedLocalUdpPort = udpSpin->get_value_as_int();
-	config->sipStack->getStackConfig()->preferedLocalTcpPort = tcpSpin->get_value_as_int();
-	config->sipStack->getStackConfig()->preferedLocalTlsPort = tlsSpin->get_value_as_int();
-
-	config->tcp_server = tcpCheck->get_active();
-	config->tls_server = tlsCheck->get_active();
+	config->sipStack->getStackConfig()->preferedLocalSipPort = sipSpin->get_value_as_int();
+	config->sipStack->getStackConfig()->preferedLocalSipsPort = sipsSpin->get_value_as_int();
 
 	config->useSTUN = stunCheck->get_active();
 	config->useUserDefinedStunServer = !stunAutodetectCheck->get_active()
 		&& stunEntry->get_text() != "";
 	config->userDefinedStunServer = stunEntry->get_text();
 
-	return "";
-
+	err += transportList->saveToConfig( config );
+	return err;
 }
 
 // SipSettings

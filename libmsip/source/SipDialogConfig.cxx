@@ -333,11 +333,35 @@ void SipIdentity::setPsk( string key ){
 	psk=key;
 }
 
+// SipTransportConfig::SipTransportConfig(){
+// }
+
+SipTransportConfig::SipTransportConfig( const std::string &name ):
+		name( name ), enabled( false )
+{
+}
+
+string SipTransportConfig::getName() const{
+	return name;
+}
+
+bool SipTransportConfig::isEnabled() const{
+	return enabled;
+}
+
+void SipTransportConfig::setEnabled( bool enabled ){
+	this->enabled = enabled;
+}
+
+int SipTransportConfig::operator==( const SipTransportConfig &dev ) const{
+	return name == dev.name;
+}
+
+
 SipStackConfig::SipStackConfig():
 	externalContactUdpPort(0),
-	preferedLocalUdpPort(0),
-	preferedLocalTcpPort(0),
-	preferedLocalTlsPort(0),
+	preferedLocalSipPort(0),
+	preferedLocalSipsPort(0),
 	autoAnswer(false),
 	use100Rel(false){
 

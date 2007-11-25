@@ -17,6 +17,8 @@ minisip_gtkgui_LDADD =	$(MINISIP_LIBS) \
 minisip_gtkgui_SOURCES = MainWindow.cxx \
 				CallWidget.cxx \
 				ConferenceWidget.cxx \
+				TransportList.h \
+				TransportList.cxx \
 				PhoneBook.cxx \
 				SettingsDialog.cxx \
 				CertificateDialog.cxx \

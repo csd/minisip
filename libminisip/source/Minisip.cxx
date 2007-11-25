@@ -347,10 +347,10 @@ int Minisip::startSip() {
 		// FIXME: This should be done more often
 		localIpString = externalContactIP = ipProvider->getExternalIp();                
 
-		MRef<UDPSocket*> udpSocket = new UDPSocket( phoneConf->sipStackConfig->preferedLocalUdpPort );
+		MRef<UDPSocket*> udpSocket = new UDPSocket( phoneConf->sipStackConfig->preferedLocalSipPort );
 
 		//FIXME: We should not update the prefered port
-		phoneConf->sipStackConfig->preferedLocalUdpPort = ipProvider->getExternalPort( udpSocket );
+		phoneConf->sipStackConfig->preferedLocalSipPort = ipProvider->getExternalPort( udpSocket );
 		phoneConf->sipStackConfig->localIpString = externalContactIP;
 		phoneConf->sipStackConfig->externalContactIP = externalContactIP;
 		if( ip6Provider )

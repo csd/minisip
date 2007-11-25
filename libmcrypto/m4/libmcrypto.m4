@@ -193,7 +193,7 @@ dnl Checks for DTLS support in libmcrypto
 	mcrypto_save_LIBS="$LIBS"
 	mcrypto_save_LDFLAGS="$LDFLAGS"
 	mcrypto_save_CPPFLAGS="$CPPFLAGS"
-	LDFLAGS="$LDFLAGS $MINISIP_LIBRARY_LDFLAGS"
+	LDFLAGS="$LDFLAGS $LIBMCRYPTO_LDFLAGS"
 	LIBS="$MINISIP_LIBS $LIBS"
 	CPPFLAGS="$CPPFLAGS $MINISIP_CFLAGS"
 	AM_MINISIP_CHECK_WINFUNCS(["DTLSSocket::create(0,0,0)"],,[mcrypto_dtls_found=no],[dnl

@@ -44,7 +44,6 @@
 
 class SipMessage;
 
-class SipLayerTransport;
 class SipCommandDispatcher;
 class SipTransport;
 class StreamThreadData;

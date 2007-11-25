@@ -126,10 +126,6 @@ class LIBMINISIP_API SipSoftPhoneConfiguration : public MObject{
 		
 		bool usePSTNProxy;
 
-		bool tcp_server;
-
-		bool tls_server;
-
 		std::list<MRef<PhoneBook *> > phonebooks;
 
 		std::string ringtone;

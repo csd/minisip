@@ -302,61 +302,11 @@ void Sip::join() {
 void Sip::run(){
 
 	try{
-#ifdef DEBUG_OUTPUT
-		mout << BOLD << "init 8.1/9: Starting UDP transport worker thread" << PLAIN << endl;
-#endif
-		try{
-			sipstack->startUdpServer();
-		}catch(NetworkException &e){
-			//FIXME: This happens when binding to the IPv6 address
-			merr << "Error: Failed to create to UDP socket: "<< e.what()<<endl;
-		}
-
-		if (phoneconfig->tcp_server){
-#ifdef DEBUG_OUTPUT
-			mout << BOLD << "init 8.2/9: Starting TCP transport worker thread" << PLAIN << endl;
-#endif
-
-			try{
-				sipstack->startTcpServer();
-			}catch(NetworkException &){
-				merr << "Error: Failed to create TCP socket"<<endl;
-			}
-
-		}
-
-		if (phoneconfig->tls_server){
-			//if( phoneconfig->securityConfig.cert.isNull() ){
-			if( !phoneconfig->defaultIdentity->getSim() || phoneconfig->defaultIdentity->getSim()->getCertificateChain().isNull() ){
-				merr << "Certificate needed for TLS server. You will not be able to receive incoming TLS connections." << endl;
-			}
-			else{
-#ifdef DEBUG_OUTPUT
-				mout << BOLD << "init 8.3/9: Starting TLS transport worker thread" << PLAIN << endl;
-#endif
-				try{
-					sipstack->startTlsServer();
-				}catch(NetworkException &){
-					merr << "Error: Failed to create TLS socket"<<endl;
-				}
-
-			}
-		}
-
-#ifdef START_DTLS
-#ifdef DEBUG_OUTPUT
-		mout << BOLD << "init 8.4/9: Starting DTLS-UDP transport worker thread" << PLAIN << endl;
-#endif
-		try{
-			sipstack->startServer( "DTLS-UDP" );
-		}catch(NetworkException &e){
-			merr << "Error: Failed to create DTLS-UDP socket"<<endl;
-		}
-#endif	// START_DTLS
+		sipstack->startServers();
 	}
 	catch( Exception & exc ){
 		cerr << "ERROR: Exception thrown when creating "
-			"UDP/TCP/TLS servers." << endl;
+			"SIP transport servers." << endl;
 		cerr << exc.what() << endl;
 	}
 

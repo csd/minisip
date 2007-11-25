@@ -39,6 +39,8 @@ class GeneralSettings;
 class MediaSettings;
 class DeviceSettings;
 class SecuritySettings;
+class TransportList;
+class TransportListColumns;
 class AdvancedSettings;
 class SipSettings;
 class SipSoftPhoneConfiguration;
@@ -263,20 +265,18 @@ class AdvancedSettings
 		*/
 		Gtk::Combo * networkInterfacesCombo;
 		Gtk::Entry * networkInterfacesEntry;
-		
-		Gtk::SpinButton * udpSpin;
-		Gtk::SpinButton * tcpSpin;
-		Gtk::SpinButton * tlsSpin;
 
-		Gtk::CheckButton * tcpCheck;
-		Gtk::CheckButton * tlsCheck;
+		Gtk::TreeView * transportView;
+		
+		Gtk::SpinButton * sipSpin;
+		Gtk::SpinButton * sipsSpin;
 
 		Gtk::CheckButton * stunCheck;
 		Gtk::CheckButton * stunAutodetectCheck;
 		Gtk::Entry * stunEntry;
 
 		MRef<SipSoftPhoneConfiguration *> config;
-
+		Glib::RefPtr<TransportList> transportList;		
 };
 
 class SipSettings

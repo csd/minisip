@@ -62,6 +62,7 @@
 #include<libmutil/dbg.h>
 #include<libmutil/massert.h>
 
+#include<libmsip/SipTransport.h>
 #include<libminisip/config/OnlineConfBackend.h>
 
 #include<algorithm>
@@ -86,12 +87,14 @@ SipSoftPhoneConfiguration::SipSoftPhoneConfiguration():
 	soundDeviceOut(""),
 	videoDevice(""),
 	usePSTNProxy(false),
-	tcp_server(false),
-	tls_server(false),
 	ringtone(""),
 	p2tGroupListServerPort(0)
 {
 	sipStackConfig = new SipStackConfig;
+	sipStackConfig->transports =
+		SipTransportRegistry::getInstance()->createDefaultConfig();
+	cerr << "SipSoftPhoneConfiguration ctor " << this << endl;
+	cerr << "Transport list " << ((sipStackConfig->transports.begin() == sipStackConfig->transports.end())?string("empty"):string("not empty")) << endl;
 }
 
 SipSoftPhoneConfiguration::~SipSoftPhoneConfiguration(){
@@ -108,9 +111,8 @@ void SipSoftPhoneConfiguration::save(){
 	//Set the version of the file ...
 	backend->save( "version", CONFIG_FILE_VERSION_REQUIRED );
 
-	backend->save( "local_udp_port", sipStackConfig->preferedLocalUdpPort );
-	backend->save( "local_tcp_port", sipStackConfig->preferedLocalTcpPort );
-	backend->save( "local_tls_port", sipStackConfig->preferedLocalTlsPort );
+	backend->save( "local_udp_port", sipStackConfig->preferedLocalSipPort );
+	backend->save( "local_tls_port", sipStackConfig->preferedLocalSipsPort );
 	backend->saveBool( "auto_answer", sipStackConfig->autoAnswer );
 	backend->save( "instance_id", sipStackConfig->instanceId);
 
@@ -416,8 +418,21 @@ void SipSoftPhoneConfiguration::save(){
 	/************************************************************
 	 * Advanced settings
 	 ************************************************************/
-	backend->saveBool("tcp_server", tcp_server);
-	backend->saveBool("tls_server", tls_server);
+	list< MRef<SipTransportConfig*> >::iterator j;
+	for( j = sipStackConfig->transports.begin();
+	     j != sipStackConfig->transports.end(); j++ ){
+		MRef<SipTransportConfig*> transport = (*j);
+		string name = transport->getName();
+
+		transform( name.begin(), name.end(),
+			   name.begin(), (int(*)(int))tolower );
+
+		string label = name + "_server";
+		bool enabled = transport->isEnabled();
+
+		backend->saveBool( label, enabled );
+		cerr << "Save " << label << "=" << enabled << endl;
+	}
 
 	backend->save("ringtone", ringtone);
 
@@ -780,8 +795,24 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 
 	}while( true );
 
-	tcp_server = backend->loadBool("tcp_server", true);
-	tls_server = backend->loadBool("tls_server");
+	list< MRef<SipTransportConfig*> >::iterator j;
+	for( j = sipStackConfig->transports.begin();
+	     j != sipStackConfig->transports.end(); j++ ){
+		MRef<SipTransportConfig*> config = (*j);
+		string name = config->getName();
+
+		MRef<SipTransport*> transport =
+			SipTransportRegistry::getInstance()->findTransportByName( name );
+		bool secure = transport->isSecure();
+
+		transform( name.begin(), name.end(),
+			   name.begin(), (int(*)(int))tolower );
+
+		string label = name + "_server";
+
+		config->setEnabled( backend->loadBool( label, !secure) );
+		cerr << "Load " << label << "=" << config->isEnabled() << endl;
+	}
 
 	string soundDevice = backend->loadString("sound_device","");
 	soundDeviceIn = backend->loadString("sound_device_in",soundDevice);
@@ -853,10 +884,9 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 
 	ringtone = backend->loadString("ringtone","");
 
-	sipStackConfig->preferedLocalUdpPort = backend->loadInt("local_udp_port",5060);
-	sipStackConfig->externalContactUdpPort = sipStackConfig->preferedLocalUdpPort; //?
-	sipStackConfig->preferedLocalTcpPort = backend->loadInt("local_tcp_port",5060);
-	sipStackConfig->preferedLocalTlsPort = backend->loadInt("local_tls_port",5061);
+	sipStackConfig->preferedLocalSipPort = backend->loadInt("local_udp_port",5060);
+	sipStackConfig->externalContactUdpPort = 0; //sipStackConfig->preferedLocalUdpPort; //?
+	sipStackConfig->preferedLocalSipsPort = backend->loadInt("local_tls_port",5061);
 	sipStackConfig->autoAnswer = backend->loadBool("auto_answer");
 	sipStackConfig->instanceId = backend->loadString("instance_id");
 
@@ -965,6 +995,7 @@ void SipSoftPhoneConfiguration::saveDefault( MRef<ConfBackend *> be ){
 	be->saveBool( "account[0]/psk_enabled", false );
 	be->saveBool( "account[0]/check_cert", true );
 
+	be->saveBool( "udp_server", true );
 	be->saveBool( "tcp_server", true );
 	be->saveBool( "tls_server", false );
 	be->save( "local_udp_port", 5060 );

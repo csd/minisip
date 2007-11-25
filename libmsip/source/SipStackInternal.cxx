@@ -26,6 +26,7 @@
 
 #include"SipLayerTransport.h"
 #include"SipCommandDispatcher.h"
+#include<libmnetutil/NetworkException.h>
 #include<libmsip/SipMessageContentIM.h>
 #include<libmsip/SipMessageContentMime.h>
 #include<libmutil/Timestamp.h>
@@ -380,6 +381,55 @@ std::string SipStackInternal::getStackStatusDebugString(){
 	return ret;
 }
 
+struct transportConfigCmp {
+		typedef MRef<SipTransportConfig*> first_argument_type;
+		typedef const string second_argument_type;
+		typedef bool  result_type;
+
+		result_type operator()( first_argument_type config,
+					second_argument_type name ) const {
+			return config->getName() == name;
+		}
+};
+
+MRef<SipTransportConfig*> SipStackInternal::findTransportConfig( const std::string &transportName ) const{
+	list<MRef<SipTransportConfig*> >::const_iterator transp =
+		find_if( config->transports.begin(), config->transports.end(),
+			 bind2nd( transportConfigCmp(), transportName ) );
+
+	if( transp == config->transports.end() ){
+		return NULL;
+	}
+
+	return *transp;
+}
+
+void SipStackInternal::startServers(){
+	list<MRef<SipTransportConfig*> >::const_iterator i;
+	list<MRef<SipTransportConfig*> >::const_iterator last =
+		config->transports.end();
+	for( i = config->transports.begin(); i != last; i++ ){
+		MRef<SipTransportConfig*> transportConfig = (*i);
+		string name = transportConfig->getName();
+
+		if( !transportConfig->isEnabled() )
+			continue;
+#ifdef DEBUG_OUTPUT
+		mout << BOLD << "SipStack: Starting " << name << " transport worker thread" << PLAIN << endl;
+#endif
+
+// 			if( !phoneconfig->defaultIdentity->getSim() || phoneconfig->defaultIdentity->getSim()->getCertificateChain().isNull() ){
+// 				merr << "Certificate needed for TLS server. You will not be able to receive incoming TLS connections." << endl;
+// 			}
+
+		try{
+			startServer( name );
+		}catch( NetworkException &e ){
+			//FIXME: This happens when binding to the IPv6 address
+			merr << "Error: Failed to create to " << name << " socket: "<< e.what()<<endl;
+		}
+	}
+}
 
 void SipStackInternal::startServer( const string &transportName ){
 	MRef<SipTransport*> transport =
@@ -390,9 +440,14 @@ void SipStackInternal::startServer( const string &transportName ){
 		return;
 	}
 
-	int32_t port;
+	int32_t port = 0;
 	int32_t externalUdpPort = 0;
 	string ipString = config->localIpString;
+
+	if( transport->isSecure() )
+		port = config->preferedLocalSipsPort;
+	else
+		port = config->preferedLocalSipPort;
 
 	/*
 	  There are three different preferred local ports:
@@ -405,11 +460,6 @@ void SipStackInternal::startServer( const string &transportName ){
 			ipString = config->externalContactIP;
 			externalUdpPort = config->externalContactUdpPort;
 		}
-		port = config->preferedLocalUdpPort;
-	}
-	else{
-		// TODO externalUdpPort for DTLS-UDP 
-		port = transport->isSecure() ? config->preferedLocalTlsPort : config->preferedLocalTcpPort;
 	}
 
 	dispatcher->getLayerTransport()->startServer( transport,
@@ -428,4 +478,3 @@ int32_t SipStackInternal::getLocalSipPort(bool usesStun, const string &transport
 	return dispatcher->getLayerTransport()->getLocalSipPort( transport );
 
 }
-

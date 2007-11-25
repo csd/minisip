@@ -210,3 +210,31 @@ MRef<SipTransport*> SipTransportRegistry::findTransportByNaptr( const std::strin
 
 	return NULL;
 }
+
+list<MRef<SipTransportConfig*> > SipTransportRegistry::createDefaultConfig() const{
+	list< MRef<SipTransportConfig* > > result;
+	list< MRef<MPlugin*> >::const_iterator iter;
+	list< MRef<MPlugin*> >::const_iterator stop = plugins.end();
+
+	cerr << "createDefaultConfig" << endl;
+	for( iter = plugins.begin(); iter != stop; iter++ ){
+		MRef<MPlugin*> plugin = *iter;
+
+		if( !plugin )
+			continue;
+
+		MRef<SipTransport*> transport =
+			dynamic_cast<SipTransport*>( *plugin );
+
+		if( !transport )
+			continue;
+
+		MRef<SipTransportConfig*> config =
+			new SipTransportConfig( transport->getName() );
+
+		cerr << "Transport:" << transport->getName() << endl;
+		result.push_back( config );
+	}
+
+	return result;
+}

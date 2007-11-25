@@ -278,8 +278,8 @@ void ConsoleDebugger::showConfig(){
 		<< "    frameWidth=" << config->frameWidth << endl
 		<< "    frameHeight="<< config->frameHeight << endl
 		<< "    usePSTNProxy="<< config->usePSTNProxy <<endl
-		<< "    tcp_server="<< config->tcp_server<<  endl
-		<< "    tls_server="<< config->tls_server << endl
+// 		<< "    tcp_server="<< config->tcp_server<<  endl
+// 		<< "    tls_server="<< config->tls_server << endl
 		<< "    ringtone="<< config->ringtone << endl
 		<< "    soundIOmixerType="<<config->soundIOmixerType <<endl
 		<< "    networkInterfaceName="<< config->networkInterfaceName <<endl
@@ -288,9 +288,9 @@ void ConsoleDebugger::showConfig(){
 		<< "    localIp6String="<< config->sipStackConfig->localIp6String << endl
 		<< "    externalContactIP=" << config->sipStackConfig->externalContactIP << endl
 		<< "    externalContactUdpPort=" << config->sipStackConfig->externalContactUdpPort << endl
-		<< "    preferedLocalUdpPort="<< config->sipStackConfig->preferedLocalUdpPort << endl //TODO: output actual port in use as well?
-		<< "    preferedLocalTcpPort="<< config->sipStackConfig->preferedLocalTcpPort << endl
-		<< "    preferedLocalTlsPort="<< config->sipStackConfig->preferedLocalTlsPort << endl
+// 		<< "    preferedLocalUdpPort="<< config->sipStackConfig->preferedLocalUdpPort << endl //TODO: output actual port in use as well?
+// 		<< "    preferedLocalTcpPort="<< config->sipStackConfig->preferedLocalTcpPort << endl
+// 		<< "    preferedLocalTlsPort="<< config->sipStackConfig->preferedLocalTlsPort << endl
 		<< "    autoAnswer="<< config->sipStackConfig->autoAnswer<<endl
 		<< "    use100Rel="<< config->sipStackConfig->use100Rel<< endl
 		<< "    instanceId="<< config->sipStackConfig->instanceId<<endl
