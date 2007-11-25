@@ -57,15 +57,12 @@ void TransportList::loadFromConfig( MRef<SipSoftPhoneConfiguration *> config ){
 	list< MRef<SipTransportConfig*> >::iterator i;
 	list< MRef<SipTransportConfig*> >::iterator last = transports.end();
 
-	cerr << "TransportList::loadFromConfig " <<  *config << endl;
-	cerr << "Transport list " << ((config->sipStackConfig->transports.begin() == config->sipStackConfig->transports.end())?string("empty"):string("not empty")) << endl;
 	for( i = transports.begin(); i != last; i++ ){
 		MRef<SipTransportConfig*> transportConfig = (*i);
 		MRef<SipTransport*> transport =
 			SipTransportRegistry::getInstance()->findTransportByName( transportConfig->getName() );
 		Gtk::TreeModel::iterator iter = append();
 
-		cerr << "Transport: " << transport->getName() << endl;
 		(*iter)[columns->config] = transportConfig;
 		(*iter)[columns->name] = transport->getName();
 		(*iter)[columns->scheme] =

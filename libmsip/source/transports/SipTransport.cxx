@@ -216,7 +216,6 @@ list<MRef<SipTransportConfig*> > SipTransportRegistry::createDefaultConfig() con
 	list< MRef<MPlugin*> >::const_iterator iter;
 	list< MRef<MPlugin*> >::const_iterator stop = plugins.end();
 
-	cerr << "createDefaultConfig" << endl;
 	for( iter = plugins.begin(); iter != stop; iter++ ){
 		MRef<MPlugin*> plugin = *iter;
 
@@ -232,7 +231,6 @@ list<MRef<SipTransportConfig*> > SipTransportRegistry::createDefaultConfig() con
 		MRef<SipTransportConfig*> config =
 			new SipTransportConfig( transport->getName() );
 
-		cerr << "Transport:" << transport->getName() << endl;
 		result.push_back( config );
 	}
 

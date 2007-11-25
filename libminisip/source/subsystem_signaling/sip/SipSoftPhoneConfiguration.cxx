@@ -93,8 +93,6 @@ SipSoftPhoneConfiguration::SipSoftPhoneConfiguration():
 	sipStackConfig = new SipStackConfig;
 	sipStackConfig->transports =
 		SipTransportRegistry::getInstance()->createDefaultConfig();
-	cerr << "SipSoftPhoneConfiguration ctor " << this << endl;
-	cerr << "Transport list " << ((sipStackConfig->transports.begin() == sipStackConfig->transports.end())?string("empty"):string("not empty")) << endl;
 }
 
 SipSoftPhoneConfiguration::~SipSoftPhoneConfiguration(){
@@ -431,7 +429,6 @@ void SipSoftPhoneConfiguration::save(){
 		bool enabled = transport->isEnabled();
 
 		backend->saveBool( label, enabled );
-		cerr << "Save " << label << "=" << enabled << endl;
 	}
 
 	backend->save("ringtone", ringtone);
@@ -811,7 +808,6 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 		string label = name + "_server";
 
 		config->setEnabled( backend->loadBool( label, !secure) );
-		cerr << "Load " << label << "=" << config->isEnabled() << endl;
 	}
 
 	string soundDevice = backend->loadString("sound_device","");

@@ -415,7 +415,7 @@ void SipStackInternal::startServers(){
 		if( !transportConfig->isEnabled() )
 			continue;
 #ifdef DEBUG_OUTPUT
-		mout << BOLD << "SipStack: Starting " << name << " transport worker thread" << PLAIN << endl;
+		mout << "SipStack: Starting " << name << " transport worker thread" << endl;
 #endif
 
 // 			if( !phoneconfig->defaultIdentity->getSim() || phoneconfig->defaultIdentity->getSim()->getCertificateChain().isNull() ){
