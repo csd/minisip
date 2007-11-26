@@ -209,6 +209,7 @@ Minisip::Minisip( MRef<Gui *> g, int /*argc*/, char **argv ) : gui(g){
 
 	}while(a);
 
+	libmnetutilInit();
 	libmcryptoInit();
 
 	srand((unsigned int)time(0));
