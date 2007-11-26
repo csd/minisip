@@ -94,8 +94,8 @@ MRef<SipSocketServer *> SipTransportTls::createServer( MRef<SipSocketReceiver*> 
 }
 
 MRef<StreamSocket *> SipTransportTls::connect( const IPAddress &addr, uint16_t port, MRef<CertificateSet *> cert_db, MRef<CertificateChain *> certChain ){
-	return TLSSocket::connect( addr, port,
-				   certChain->getFirst(), cert_db );
+	MRef<StreamSocket*> sock = new TCPSocket( addr, port );
+	return TLSSocket::connect( sock, certChain->getFirst(), cert_db );
 }
 
 uint32_t SipTransportTls::getVersion() const{

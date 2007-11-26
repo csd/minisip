@@ -38,8 +38,7 @@ class LIBMCRYPTO_API TLSSocket : public StreamSocket {
 	public:
 		virtual ~TLSSocket();
 
-		static TLSSocket* connect( const IPAddress &addr,
-					   int32_t port,
+		static TLSSocket* connect( MRef<StreamSocket*> ssock,
 					   MRef<Certificate *> cert=NULL,
 					   MRef<CertificateSet *> cert_db=NULL,
 					   std::string serverName="" );

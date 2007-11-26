@@ -53,7 +53,7 @@ TLSSocket::~TLSSocket()
 {
 }
 
-TLSSocket* TLSSocket::connect( const IPAddress &addr, int32_t port,
+TLSSocket* TLSSocket::connect( MRef<StreamSocket *> sock,
 			       MRef<Certificate *> cert,
 			       MRef<CertificateSet *> cert_db,
 			       string serverName )
@@ -67,7 +67,7 @@ TLSSocket* TLSSocket::connect( const IPAddress &addr, int32_t port,
 	if( cert )
 		Gtlscert = (GtlsCertificate*)*cert;
 
-	return new GnutlsSocket( addr, port, Gtlsdb, Gtlscert );
+	return new GnutlsSocket( sock, Gtlsdb, Gtlscert );
 }
 
 
@@ -97,21 +97,11 @@ GnutlsSocket::GnutlsSocket( MRef<StreamSocket *> tcp_socket,
 	printf("- Handshake was completed\n");
 }
 
-#if 0
-GnutlsSocket::GnutlsSocket(string addr, int32_t port,
+GnutlsSocket::GnutlsSocket(MRef<StreamSocket *> sock,
 			   MRef<GtlsCertificateSet *> cert_db,
 			   MRef<GtlsCertificate *> cert)
 {
-	GnutlsSocket::GnutlsSocket_init(new TCPSocket(addr, port),
-					cert_db, cert);
-}
-#endif
-
-GnutlsSocket::GnutlsSocket(const IPAddress &addr, int32_t port,
-			   MRef<GtlsCertificateSet *> cert_db,
-			   MRef<GtlsCertificate *> cert)
-{
-	GnutlsSocket::GnutlsSocket_init(new TCPSocket(addr, port),
+	GnutlsSocket::GnutlsSocket_init(sock,
 					cert_db, cert);
 }
 

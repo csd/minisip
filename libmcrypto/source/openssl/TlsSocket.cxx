@@ -40,7 +40,6 @@
 #endif
 
 #include<libmnetutil/IPAddress.h>
-#include<libmnetutil/TCPSocket.h>
 
 #include<iostream>
 
@@ -58,7 +57,7 @@ TLSSocket::~TLSSocket()
 {
 }
 
-TLSSocket* TLSSocket::connect( const IPAddress &addr, int32_t port,
+TLSSocket* TLSSocket::connect( MRef<StreamSocket*> ssock,
 			       MRef<Certificate *> cert,
 			       MRef<CertificateSet *> cert_db,
 			       string serverName )
@@ -73,7 +72,7 @@ TLSSocket* TLSSocket::connect( const IPAddress &addr, int32_t port,
 	if( cert_db )
 		ssl_db = (OsslCertificateSet*)*cert_db;
 
-	return new OsslSocket( addr, port, ssl_ctx, ssl_cert, ssl_db );
+	return new OsslSocket( ssock, ssl_ctx, ssl_cert, ssl_db );
 }
 
 
@@ -109,18 +108,10 @@ OsslSocket::OsslSocket( MRef<StreamSocket *> tcp_socket, SSL_CTX * ssl_ctx_ ):
 }
 
 
-OsslSocket::OsslSocket( const IPAddress &addr, int32_t port, void * &ssl_ctx_,
+OsslSocket::OsslSocket( MRef<StreamSocket*> ssock, void * &ssl_ctx_,
 			      MRef<OsslCertificate *> cert, 
 			      MRef<OsslCertificateSet *> cert_db_ ){
-	MRef<TCPSocket*> tcp_sock = new TCPSocket( addr, port );
-	OsslSocket::OsslSocket_init( *tcp_sock, ssl_ctx_, cert, cert_db_);
-}
-
-OsslSocket::OsslSocket( string addr, int32_t port, void * &ssl_ctx_, 
-			      MRef<OsslCertificate *> cert, 
-			      MRef<OsslCertificateSet *> cert_db_ ){
-	MRef<TCPSocket*> tcp_sock = new TCPSocket( addr, port );
-	OsslSocket::OsslSocket_init( *tcp_sock, ssl_ctx_, cert, cert_db_);
+	OsslSocket::OsslSocket_init( ssock, ssl_ctx_, cert, cert_db_);
 }
 
 /* Helper function ... simplify the maintenance of constructors ... */

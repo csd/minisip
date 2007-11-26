@@ -81,14 +81,10 @@ template class __declspec(dllexport) MRef<CertificateSet*>;
 
 class LIBMCRYPTO_API OsslSocket : public TLSSocket {
 	public:
-		OsslSocket(std::string addr, int32_t port, void * &ssl_ctx,
-			MRef<OsslCertificate *> cert = NULL,
-			MRef<OsslCertificateSet *> cert_db=NULL );
-		
-		OsslSocket( const IPAddress &addr, int32_t port,
+		OsslSocket( MRef<StreamSocket*> ssock,
 			void * &ssl_ctx,
-			MRef<OsslCertificate *> cert=NULL,
-			MRef<OsslCertificateSet *> cert_db=NULL );
+			MRef<OsslCertificate *> cert,
+			MRef<OsslCertificateSet *> cert_db );
 		
 		OsslSocket( MRef<StreamSocket *> sock, SSL_CTX * ssl_ctx );
 		

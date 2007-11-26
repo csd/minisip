@@ -42,7 +42,7 @@
 
 class LIBMCRYPTO_API GnutlsSocket : public TLSSocket {
 	public:
-		GnutlsSocket( const IPAddress &addr, int32_t port,
+		GnutlsSocket( MRef<StreamSocket *> sock,
 			      MRef<GtlsCertificateSet *> cert_db=NULL,
 			      MRef<GtlsCertificate *> cert=NULL);
 
