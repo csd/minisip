@@ -30,8 +30,7 @@
 
 #include<string>
 
-
-class IPAddress;
+#include<libmnetutil/IPAddress.h>
 
 class LIBMNETUTIL_API StreamSocket : public Socket {
 	public:
