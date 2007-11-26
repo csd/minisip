@@ -59,6 +59,7 @@
 #include<libmnetutil/NetworkException.h>
 
 #include<libmcrypto/init.h>
+#include<libmnetutil/init.h>
 
 #include<libmikey/KeyAgreementDH.h>
 
