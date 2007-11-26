@@ -95,8 +95,22 @@ class LIBMSIP_API SipTransportRegistry: public MPluginRegistry, public MSingleto
 
 		std::list<std::string> getNaptrServices( bool secureOnly ) const;
 
+		/*
+		 * Search for transport by protocol (udp or tcp),
+		 * and if it's secure or not (sips/sip)
+		 */
 		MRef<SipTransport*> findTransport( const std::string &protocol, bool secure=false ) const;
 
+		/*
+		 * Search for transport suitable for sending
+		 * requests to the specified SIP URI.
+		 */
+		MRef<SipTransport*> findTransport( const SipUri &uri ) const;
+
+		/*
+		 * Search for transport by Via transport,
+		 * like UDP, TCP, TLS or DTLS-UDP.
+		 */
 		MRef<SipTransport*> findViaTransport( const std::string &protocol ) const;
 
 		/** Search for transport by socket type. */

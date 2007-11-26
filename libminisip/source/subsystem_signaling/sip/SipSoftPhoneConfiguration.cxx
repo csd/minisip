@@ -291,9 +291,14 @@ void SipSoftPhoneConfiguration::save(){
 			backend->save( accountPath + "proxy_port",
 				       proxyUri.getPort() );
 
-			string transport = proxyUri.getTransport();
+			string transportName = "";
+			MRef<SipTransport*> transport =
+				SipTransportRegistry::getInstance()->findTransport( proxyUri );
 
-			backend->save( accountPath + "transport", transport );
+			if( transport )
+				transportName = transport->getName();
+
+			backend->save( accountPath + "transport", transportName );
 		}
 		else {
 			backend->save( accountPath + "proxy_addr", "" );

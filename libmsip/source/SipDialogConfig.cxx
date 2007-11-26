@@ -31,6 +31,7 @@
 #include<libmnetutil/NetworkException.h>
 #include<libmnetutil/NetworkFunctions.h>
 #include<libmutil/massert.h>
+#include<libmsip/SipTransport.h>
 
 using namespace std;
 
@@ -238,42 +239,44 @@ bool SipIdentity::setSipRegistrar( MRef<SipRegistrar *> proxy ){
 	return true;
 }
 
-string SipIdentity::setSipProxy( bool autodetect, string userUri, string transport, string proxyAddr, int proxyPort ) {
+string SipIdentity::setSipProxy( bool autodetect, string userUri, string transportName, string proxyAddr, int proxyPort ) {
 	string ret = "";
+	MRef<SipTransport*> transport;
+	SipUri proxyUri;
+
+	if( !transportName.empty() ){
+		transport = SipTransportRegistry::getInstance()->findTransportByName( transportName );
+	}
+
 	routeSet.clear();
 	
 	#ifdef DEBUG_OUTPUT
 	if( autodetect ) cerr << "SipIdentity::setSipProxy: autodetect is true";
 	else 		cerr << "SipIdentity::setSipProxy: autodetect is false";
-	cerr << "; userUri=" << userUri << "; transport = "<< transport << "; proxyAddr=" << proxyAddr << "; proxyPort=" << proxyPort << endl;
+	cerr << "; userUri=" << userUri << "; transport = "<< transportName << "; proxyAddr=" << proxyAddr << "; proxyPort=" << proxyPort << endl;
 	#endif	
 
 	if( autodetect ){
-		SipUri proxyUri;
 		SipUri aor( userUri );
 
 		proxyUri.setProtocolId( aor.getProtocolId() );
 		proxyUri.setIp( aor.getIp() );
-		if( transport != "" )
-			proxyUri.setTransport( transport );
-		proxyUri.setParameter( "lr", "true" );
-		proxyUri.makeValid( true );
-
-		routeSet.push_back( proxyUri );
 	}
 	else if( proxyAddr != "" ){
-		SipUri proxyUri;
-		
 		proxyUri.setProtocolId( "sip" );
 		proxyUri.setIp( proxyAddr );
 		proxyUri.setPort( proxyPort );
-		if( transport != "" )
-			proxyUri.setTransport( transport );
-		proxyUri.setParameter( "lr", "true" );
-		proxyUri.makeValid( true );
-
-		routeSet.push_back( proxyUri );
 	}
+
+	if( transport ){
+		proxyUri.setProtocolId( transport->getUriScheme() );
+		proxyUri.setTransport( transport->getProtocol() );
+	}
+
+	proxyUri.setParameter( "lr", "true" );
+	proxyUri.makeValid( true );
+
+	routeSet.push_back( proxyUri );
 
 	return ret;
 }

@@ -27,6 +27,7 @@
 #include"AccountDialog.h"
 #include"TransportList.h"
 
+#include<libmsip/SipTransport.h>
 #include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
 
 using namespace std;
@@ -88,7 +89,14 @@ void AccountsList::loadFromConfig( MRef<SipSoftPhoneConfiguration *> config ){
 
 			(*iter)[columns->proxy] = proxyUri.getIp();
 			(*iter)[columns->port] = proxyUri.getPort();
-			(*iter)[columns->transport] = proxyUri.getTransport();
+
+			MRef<SipTransport*> transport =
+				SipTransportRegistry::getInstance()->findTransport( proxyUri );
+
+			if( transport )
+				(*iter)[columns->transport] = transport->getName();
+			else
+				(*iter)[columns->transport] = "";
 		}
 		else {
 			(*iter)[columns->proxy] = "";

@@ -75,6 +75,8 @@ class AccountsListColumns : public Gtk::TreeModel::ColumnRecord{
 		Gtk::TreeModelColumn<bool> autodetectSettings;
 		Gtk::TreeModelColumn<Glib::ustring> proxy;
 		Gtk::TreeModelColumn<uint16_t> port;
+
+		/** Name of SIP transport plugin, like SIP, UDP or TLS */
 		Gtk::TreeModelColumn<Glib::ustring> transport;
 		Gtk::TreeModelColumn<Glib::ustring> username;
 		Gtk::TreeModelColumn<Glib::ustring> password;

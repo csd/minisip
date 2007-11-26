@@ -122,6 +122,10 @@ MRef<SipTransport*> SipTransportRegistry::findTransport( const string &protocol,
 	return NULL;
 }
 
+MRef<SipTransport*> SipTransportRegistry::findTransport( const SipUri &uri ) const{
+	return findTransport( uri.getTransport(), uri.getProtocolId() == "sips" );
+}
+
 MRef<SipTransport*> SipTransportRegistry::findViaTransport( const string &protocol ) const{
 	string ucProt = protocol;
 	list< MRef<MPlugin*> >::const_iterator iter;
