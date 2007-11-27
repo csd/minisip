@@ -26,6 +26,7 @@
 #include<config.h>
 #include<libmnetutil/NetworkException.h>
 #include<libmnetutil/TCPSocket.h>
+#include<libmnetutil/TcpServerSocket.h>
 #include"SipTransportTcp.h"
 
 static std::list<std::string> pluginList;
@@ -68,8 +69,7 @@ MRef<SipSocketServer *> SipTransportTcp::createServer( MRef<SipSocketReceiver*> 
 	do {
 		fail=false;
 		try {
-
-			sock = ServerSocket::create( port, ipv6 );
+			sock = TcpServerSocket::create( port, ipv6 );
 			server = new StreamSocketServer( receiver, sock );
 			server->setExternalIp( ipString );
 

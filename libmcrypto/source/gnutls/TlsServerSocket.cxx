@@ -31,8 +31,8 @@
 
 using namespace std;
 
-TLSServerSocket::TLSServerSocket( int32_t domain, int32_t listen_port )
-		:ServerSocket( domain, listen_port )
+TLSServerSocket::TLSServerSocket()
+		:ServerSocket()
 {
 }
 
@@ -40,7 +40,7 @@ TLSServerSocket::~TLSServerSocket()
 {
 }
 
-ServerSocket *TLSServerSocket::create( bool use_ipv6, int32_t listen_port, MRef<Certificate *> cert, MRef<CertificateSet *> cert_db ){
+TLSServerSocket *TLSServerSocket::create( MRef<ServerSocket*> sock, MRef<Certificate *> cert, MRef<CertificateSet *> cert_db ){
 	MRef<GtlsCertificate*> Gtlscert;
 	MRef<GtlsCertificateSet*> Gtlsdb;
 
@@ -50,20 +50,15 @@ ServerSocket *TLSServerSocket::create( bool use_ipv6, int32_t listen_port, MRef<
 	if( cert_db )
 		Gtlsdb = (GtlsCertificateSet*)*cert_db;
 
-	return new GnutlsServerSocket( use_ipv6, listen_port,
-				       Gtlscert, Gtlsdb );
-}
-
-ServerSocket *TLSServerSocket::create(int32_t listen_port, MRef<Certificate *> cert, MRef<CertificateSet *> cert_db ){
-	return create( false, listen_port, cert, cert_db );
+	return new GnutlsServerSocket( sock, Gtlscert, Gtlsdb );
 }
 
 
-GnutlsServerSocket::GnutlsServerSocket( bool use_ipv6, int32_t listen_port, 
+GnutlsServerSocket::GnutlsServerSocket( MRef<ServerSocket*> sock,
 					MRef<GtlsCertificate *> cert,
-					MRef<GtlsCertificateSet *> cert_db):TLSServerSocket(use_ipv6?AF_INET6:AF_INET, listen_port)
+					MRef<GtlsCertificateSet *> cert_db)
 {
-	init(use_ipv6, listen_port, cert, cert_db);
+	init( sock, cert, cert_db );
 }
 
 GnutlsServerSocket::~GnutlsServerSocket(){ 
@@ -99,17 +94,16 @@ gnutls_session_t GnutlsServerSocket::initialize_tls_session(){
 	return session;
 }
 
-void GnutlsServerSocket::init( bool use_ipv6, int32_t listen_port, 
+void GnutlsServerSocket::init( MRef<ServerSocket*> sock, 
 			       MRef<GtlsCertificate *> cert,
 			       MRef<GtlsCertificateSet *> cert_db)
 {
 	type = SOCKET_TYPE_TLS;
+	this->sock = sock;
 	cerr << "GnutlsServerSocket::init" << endl;
 	m_cert = cert;
 	m_cert_db = cert_db;
 
-	int32_t backlog = 25;
-	
 	gnutls_certificate_allocate_credentials (&m_xcred);
 
 	if( !cert_db->getDb(&m_ca_list, &m_ca_list_len) ){
@@ -132,11 +126,6 @@ void GnutlsServerSocket::init( bool use_ipv6, int32_t listen_port,
 
 	gnutls_certificate_set_x509_key(m_xcred, &gcert, 1, gkey);
 
-	if( use_ipv6 )
-		listen("::", listen_port, backlog);
-	else
-		listen("0.0.0.0", listen_port, backlog);
-
 	cerr << "GnutlsServerSocket::init ends" << endl;
 }
 
@@ -146,4 +135,27 @@ MRef<StreamSocket *> GnutlsServerSocket::accept(){
 	gnutls_session_t session = initialize_tls_session();
 
 	return new GnutlsSocket( ssocket, session );
+}
+
+MRef<StreamSocket *> GnutlsServerSocket::createSocket( int32_t sd,
+						     struct sockaddr *sa,
+						     int32_t salen ){
+	// Unused
+	return NULL;
+}
+
+int32_t GnutlsServerSocket::getFd(){
+	return sock->getFd();
+}
+
+int32_t GnutlsServerSocket::getPort(){
+	return sock->getPort();
+}
+
+int GnutlsServerSocket::getAddressFamily(){
+	return sock->getAddressFamily();
+}
+
+MRef<IPAddress *> GnutlsServerSocket::getLocalAddress() const{
+	return sock->getLocalAddress();
 }

@@ -34,21 +34,30 @@
 class LIBMCRYPTO_API GnutlsServerSocket : public TLSServerSocket {
 
 	public:
-		GnutlsServerSocket( bool use_ipv6, int32_t listen_port,
+		GnutlsServerSocket( MRef<ServerSocket*> sock,
 				    MRef<GtlsCertificate *> cert,
 				    MRef<GtlsCertificateSet *> cert_db=NULL);
 		~GnutlsServerSocket();
 		virtual std::string getMemObjectType() const {return "GnutlsServerSocket";}
 
 		virtual MRef<StreamSocket *> accept();
+		virtual MRef<StreamSocket *> createSocket( int32_t sd,
+							   struct sockaddr *sa,
+							   int32_t salen );
+		// Socket
+		virtual int32_t getFd();
+		virtual int32_t getPort();
+		virtual int getAddressFamily();
+		virtual MRef<IPAddress *> getLocalAddress() const;
 
 	protected:
-		virtual void init( bool use_ipv6, int32_t listen_port, 
+		virtual void init( MRef<ServerSocket*> sock,
 				   MRef<GtlsCertificate *> cert,
 				   MRef<GtlsCertificateSet *> cert_db);
 		gnutls_session_t initialize_tls_session();
 
 	private:
+		MRef<ServerSocket*> sock;
 		MRef<GtlsCertificateSet *> m_cert_db;
 		MRef<GtlsCertificate*> m_cert;
 

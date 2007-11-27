@@ -25,6 +25,7 @@
 
 #include<config.h>
 #include<libmnetutil/NetworkException.h>
+#include<libmnetutil/TcpServerSocket.h>
 #include<libmcrypto/TlsSocket.h>
 #include<libmcrypto/TlsServerSocket.h>
 #include"SipTransportTls.h"
@@ -77,7 +78,9 @@ MRef<SipSocketServer *> SipTransportTls::createServer( MRef<SipSocketReceiver*> 
 	do {
 		fail=false;
 		try{
-			sock = TLSServerSocket::create( ipv6, port, /*config->cert*/certChain->getFirst(),
+			MRef<ServerSocket*> ssock =
+				TcpServerSocket::create( port, ipv6 );
+			sock = TLSServerSocket::create( ssock, /*config->cert*/certChain->getFirst(),
 					/*config->*/cert_db );
 			server = new StreamSocketServer( receiver, sock );
 			server->setExternalIp( ipString );

@@ -28,8 +28,7 @@ endif OS_WIN
 ipv6_src =
 if HAVE_IPV6
 ipv6_src += \
-		    source/IP6Address.cxx \
-		    source/IP6ServerSocket.cxx
+		    source/IP6Address.cxx
 endif
 
 ldap_src = \
@@ -37,14 +36,13 @@ ldap_src = \
                     source/LdapEntry.cxx \
                     source/LdapException.cxx \
 		    source/LdapUrl.cxx \
- 		    source/LdapDownloader.cxx
+		    source/LdapDownloader.cxx
 
 mnetutil_src = \
 		    source/init.cxx \
 		    source/DnsNaptr.cxx \
 		    source/IPAddress.cxx \
 		    source/IP4Address.cxx \
-		    source/IP4ServerSocket.cxx \
 		    $(ipv6_src) \
 		    $(ldap_src) \
 		    source/NetworkException.cxx \
@@ -53,6 +51,7 @@ mnetutil_src = \
 		    source/Socket.cxx \
 		    source/SocketServer.cxx \
 		    source/TCPSocket.cxx \
+		    source/TcpServerSocket.cxx \
 		    source/NetUtil.cxx \
 		    source/UDPSocket.cxx \
 		    source/DatagramSocket.cxx \

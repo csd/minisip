@@ -31,19 +31,21 @@
 
 
 class LIBMNETUTIL_API ServerSocket : public Socket {
-
 	public:
-		ServerSocket(int32_t domain, int32_t listen_port);
 		virtual MRef<StreamSocket *> accept();
-
-		static ServerSocket * create( int32_t listen_port, bool use_ipv6 = false );
+		void listen( const IPAddress &addr, int32_t listenPort,
+			     int32_t backlog );
 
 	protected:
-		void listen(struct sockaddr *saddr, int32_t sockaddr_length, int32_t backlog);
-		void listen(std::string local_ip, int32_t local_port, int32_t backlog);
+		ServerSocket();
+		ServerSocket( int32_t domain, int32_t type, int32_t protocol );
 
-	private:
-		int32_t domain;
-		int32_t listen_port;
+		/**
+		 * Used in accept to create a socket for
+		 * the incoming connection.
+		 */
+		virtual MRef<StreamSocket *> createSocket( int32_t sd,
+							   struct sockaddr *sa,
+							   int32_t salen )=0;
 };
 #endif

@@ -54,7 +54,7 @@ const string SipResponse::type="RESPONSE";
 
 SipResponse::SipResponse( int32_t status, 
 		string status_desc_, 
-		MRef<SipRequest*> req)
+			  MRef<SipRequest*> req): request( req )
 {
 	this->status_code=status;
 	this->status_desc=status_desc_;
@@ -160,4 +160,8 @@ void SipResponse::addUnsupported(const std::list<string> &unsupported){
 		SipHeaderValue *value = new SipHeaderValueUnsupported( ext );
 		addHeader( new SipHeader( value ));
 	}
+}
+
+MRef<SipRequest*> SipResponse::getRequest() const{
+	return request;
 }

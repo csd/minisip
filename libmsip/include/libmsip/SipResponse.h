@@ -81,14 +81,17 @@ class LIBMSIP_API SipResponse : public SipMessage{
 		 */
 		void addUnsupported(const std::list<std::string> &unsupported);
 
+		/**
+		 * @return the request supplied when creating this response
+		 */
+		MRef<SipRequest*> getRequest() const;
+
 	private:
 		int32_t status_code;
 		std::string status_desc;
 
-		std::string realm;
-		std::string nonce;
-
 		std::string tag;
+		MRef<SipRequest*> request;
 };
 
 

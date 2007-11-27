@@ -30,7 +30,7 @@
 
 class IPAddress;
 
-class LIBMNETUTIL_API IPSockAddr : public MObject {
+class LIBMCRYPTO_API IPSockAddr : public MObject {
 	public:
 		IPSockAddr( MRef<IPAddress *> addr, int32_t port );
 		virtual ~IPSockAddr();
@@ -61,7 +61,7 @@ struct mrefIpSockAddrCmp {
 		}
 };
 
-class LIBMNETUTIL_API SSLSession : public MObject{
+class LIBMCRYPTO_API SSLSession : public MObject{
 	public:
 		SSLSession( MRef<DatagramSocket *> sock,
 			    MRef<IPSockAddr *> sa );
@@ -88,7 +88,7 @@ class LIBMNETUTIL_API SSLSession : public MObject{
 		int num;
 };
 
-class LIBMNETUTIL_API OdtlsSocket : public DTLSSocket {
+class LIBMCRYPTO_API OdtlsSocket : public DTLSSocket {
 	public:
 	
 		OdtlsSocket( MRef<DatagramSocket *> sock, void * &ssl_ctx,

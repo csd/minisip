@@ -34,19 +34,28 @@
 class LIBMCRYPTO_API OsslServerSocket : public TLSServerSocket {
 
 	public:
-		OsslServerSocket( bool use_ipv6, int32_t listen_port, MRef<OsslCertificate *> cert, MRef<OsslCertificateSet *> cert_db=NULL);
-		OsslServerSocket( int32_t listen_port, MRef<OsslCertificate *> cert, MRef<OsslCertificateSet *> cert_db=NULL);
+		OsslServerSocket( MRef<ServerSocket*> sock, MRef<OsslCertificate *> cert, MRef<OsslCertificateSet *> cert_db=NULL);
 		virtual std::string getMemObjectType() const {return "OsslServerSocket";}
 
 		virtual MRef<StreamSocket *> accept();
+		virtual MRef<StreamSocket *> createSocket( int32_t sd,
+							   struct sockaddr *sa,
+							   int32_t salen );
+
+		// Socket
+
+		virtual int32_t getFd();
+		virtual int32_t getPort();
+		virtual int getAddressFamily();
+		virtual MRef<IPAddress *> getLocalAddress() const;
 
 	protected:
-		virtual void init( bool use_ipv6, int32_t listen_port, 
+		virtual void init( MRef<ServerSocket*> sock, 
 				   MRef<OsslCertificate *> cert,
 				   MRef<OsslCertificateSet *> cert_db);
 
 	private:
-		int32_t listen_port;
+		MRef<ServerSocket*> sock;
 
 		SSL_CTX * ssl_ctx;
 		SSL * ssl;

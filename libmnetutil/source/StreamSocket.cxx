@@ -62,3 +62,18 @@ int32_t StreamSocket::getPeerPort() const{
 	return peerPort;
 }
 
+int32_t StreamSocket::write(string data){
+#ifdef _MSC_VER
+	return ::_write(fd, data.c_str(), (unsigned int)data.length());
+#else
+	return ::send(fd, data.c_str(), data.length(), 0);
+#endif
+}
+
+int32_t StreamSocket::write(const void *buf, int32_t count){
+	return ::write(fd, buf, count);
+}
+
+int32_t StreamSocket::read(void *buf, int32_t count){
+	return ::recv(fd, (char*)buf, count, 0);
+}

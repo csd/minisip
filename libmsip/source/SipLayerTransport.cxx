@@ -829,7 +829,6 @@ void SipLayerTransport::updateContact(MRef<SipMessage*> pack,
 	MRef<SipHeaderValueContact*> contactp = pack->getHeaderValueContact();
 	uint16_t port;
 	string ip;
-	MRef<SipTransport*> transport;
 
 	if( !contactp )
 		return;
@@ -839,15 +838,33 @@ void SipLayerTransport::updateContact(MRef<SipMessage*> pack,
 	if( contactUri.hasParameter("minisip") ){
 
 		bool ipv6 = socket->getLocalAddress()->getType() == IP_ADDRESS_TYPE_V6;
+		// Copy scheme/protocol-id from the request URI
+		MRef<SipRequest*> req;
+		if( pack->getType() == SipResponse::type ){
+			MRef<SipResponse*> resp =
+				dynamic_cast<SipResponse*>(*pack);
+			req = resp->getRequest();
+		}
+		else{
+			req = dynamic_cast<SipRequest*>(*pack);
+		}
 
-		if( !server ){
+		const SipUri &uri = req->getUri();
+		bool secure = uri.getProtocolId() == "sips";
+		MRef<SipTransport*> transport = getSocketTransport( socket );
+
+		// Can't use local server address in the contact unless
+		// both the contact and the server use sip or sips. They can't
+		// use different schemes.
+		if( secure != transport->isSecure() ){
+			server = NULL;
+		} else if( !server ){
 			server = findServer(socket->getType(), ipv6);
 		}
 
-		transport = getSocketTransport( socket );
 		getIpPort( server, socket, ip, port );
 
-		contactUri.setProtocolId( transport->getUriScheme() );
+		contactUri.setProtocolId( uri.getProtocolId() );
 		contactUri.setIp( ip );
 		contactUri.setTransport( transport->getProtocol() );
 

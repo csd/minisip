@@ -36,9 +36,6 @@
 #endif
 
 #include<libmutil/merror.h>
-#include<libmnetutil/IP4ServerSocket.h>
-#include<libmnetutil/IP6ServerSocket.h>
-#include<libmnetutil/TCPSocket.h>
 #include<libmnetutil/NetworkException.h>
 
 #include<stdio.h>
@@ -51,9 +48,11 @@ using namespace std;
 typedef int socklen_t;
 #endif
 
-ServerSocket::ServerSocket(int32_t domain_, int32_t listenport):domain(domain_),listen_port(listenport){
-	type = SOCKET_TYPE_TCP;
-	fd = (int32_t)::socket(domain, SOCK_STREAM, IPPROTO_TCP);
+ServerSocket::ServerSocket(){
+}
+
+ServerSocket::ServerSocket(int32_t domain, int32_t type, int32_t protocol){
+	fd = (int32_t)::socket( domain, type, protocol );
 	if (fd<0){
 		throw SocketFailed( errno );
 	}
@@ -71,25 +70,11 @@ ServerSocket::ServerSocket(int32_t domain_, int32_t listenport):domain(domain_),
 }
 
 
-void ServerSocket::listen(struct sockaddr *saddr, int32_t sockaddr_length, int32_t backlog){
+void ServerSocket::listen( const IPAddress &addr, int32_t port, int32_t backlog){
+	socklen_t salen = addr.getSockaddrLength();
+	struct sockaddr *sa = addr.getSockaddrptr( port );
 	
-	if (bind(fd,saddr, sockaddr_length )!=0){
-		throw BindFailed( errno );
-	}
-
-	if (::listen(fd, backlog)!=0){
-		throw ListenFailed( errno );
-	}
-}
-
-void ServerSocket::listen(string local_ip, int32_t local_port, int32_t backlog){
-	MRef<IPAddress *> addr = IPAddress::create(local_ip);
-	struct sockaddr *sa = NULL;
-	socklen_t salen = addr->getSockaddrLength();
-
-	sa = addr->getSockaddrptr(local_port);
-
-	if (bind(fd, sa, salen)!=0){
+	if (bind(fd, sa, salen )!=0){
 		throw BindFailed( errno );
 	}
 
@@ -103,24 +88,10 @@ MRef<StreamSocket *>ServerSocket::accept(){
 	struct sockaddr_storage sin;
 	socklen_t sinlen=sizeof(sin);
 	//sin = get_sockaddr_struct(sinlen);
-	
+
 	if ((cli=(int32_t)::accept(fd, (struct sockaddr*)&sin, &sinlen))<0){
 		merror("in ServerSocket::accept(): accept:");
 	}
 	
-	return new TCPSocket(cli,(struct sockaddr*)&sin,sinlen);
-}
-
-ServerSocket * ServerSocket::create( int32_t listen_port, bool use_ipv6 )
-{
-#ifdef HAVE_IPV6
-	if( use_ipv6 ){
-		return new IP6ServerSocket( listen_port );
-	}
-	else{
-#endif
-		return new IP4ServerSocket( listen_port );
-#ifdef HAVE_IPV6
-	}
-#endif
+	return createSocket( cli, (struct sockaddr*)&sin, sinlen );
 }

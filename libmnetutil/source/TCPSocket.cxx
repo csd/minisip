@@ -118,18 +118,6 @@ TCPSocket::~TCPSocket(){
 	//delete peerAddress;
 }
 
-int32_t TCPSocket::write(string data){
-#ifdef _MSC_VER
-	return ::_write(fd, data.c_str(), (unsigned int)data.length());
-#else
-	return ::send(fd, data.c_str(), data.length(), 0);
-#endif
-}
-
-int32_t TCPSocket::write(const void *buf, int32_t count){
-	return ::write(fd, buf, count);
-}
-
 //ostream& operator<<(ostream& out, TCPSocket& s){
 //	int32_t buf[1024*10];
 //	int32_t n = s.do_read(buf,1024*10);
@@ -141,11 +129,6 @@ TCPSocket& operator<<(TCPSocket& sock, string str){
 	sock.write(str);
 	return sock;
 }
-
-int32_t TCPSocket::read(void *buf, int32_t count){
-	return ::recv(fd, (char*)buf, count, 0);
-}
-
 
 void TCPSocket::useNoDelay(bool noDelay){
 	int on = noDelay?1:0;

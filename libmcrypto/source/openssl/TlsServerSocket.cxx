@@ -53,8 +53,8 @@ typedef int socklen_t;
 #endif
 
 
-TLSServerSocket::TLSServerSocket( int32_t domain_, int32_t listen_port_ )
-		:ServerSocket( domain_, listen_port_ )
+TLSServerSocket::TLSServerSocket()
+		:ServerSocket()
 {
 }
 
@@ -62,7 +62,7 @@ TLSServerSocket::~TLSServerSocket()
 {
 }
 
-ServerSocket *TLSServerSocket::create( bool use_ipv6, int32_t listen_port, MRef<Certificate *> cert, MRef<CertificateSet *> cert_db ){
+TLSServerSocket *TLSServerSocket::create( MRef<ServerSocket*> sock, MRef<Certificate *> cert, MRef<CertificateSet *> cert_db ){
 	MRef<OsslCertificate*> ssl_cert;
 	MRef<OsslCertificateSet*> ssl_db;
 
@@ -72,43 +72,26 @@ ServerSocket *TLSServerSocket::create( bool use_ipv6, int32_t listen_port, MRef<
 	if( cert_db )
 		ssl_db = (OsslCertificateSet*)*cert_db;
 
-	return new OsslServerSocket( use_ipv6, listen_port, ssl_cert, ssl_db );
-}
-
-ServerSocket *TLSServerSocket::create(int32_t listen_port, MRef<Certificate *> cert, MRef<CertificateSet *> cert_db ){
-
-	return create( false, listen_port, cert, cert_db );
+	return new OsslServerSocket( sock, ssl_cert, ssl_db );
 }
 
 
 
-OsslServerSocket::OsslServerSocket( int32_t listen_port_, MRef<OsslCertificate *> cert_, MRef<OsslCertificateSet *> cert_db_):TLSServerSocket(AF_INET, listen_port)
+OsslServerSocket::OsslServerSocket( MRef<ServerSocket*> sock, MRef<OsslCertificate *> cert_, MRef<OsslCertificateSet *> cert_db_)
 {
-	init(false, listen_port_, cert_, cert_db_);
+	init(sock, cert_, cert_db_);
 }
 
-OsslServerSocket::OsslServerSocket( bool use_ipv6_, int32_t listen_port_, 
-				 MRef<OsslCertificate *> cert_,
-				  MRef<OsslCertificateSet *> cert_db_):TLSServerSocket(use_ipv6_?AF_INET6:AF_INET, listen_port_)
-{
-	init(use_ipv6_, listen_port_, cert_, cert_db_);
-}
-
-void OsslServerSocket::init( bool use_ipv6_, int32_t listen_port_, 
+void OsslServerSocket::init( MRef<ServerSocket*> sock, 
 			    MRef<OsslCertificate *> cert,
 			    MRef<OsslCertificateSet *> cert_db_)
 {
 	type = SOCKET_TYPE_TLS;
 	this->cert_db = cert_db_;
-	int32_t backlog = 25;
+	this->sock = sock;
 	SSL_METHOD * meth;
 	const unsigned char * sid_ctx = (const unsigned char *)"Minisip TLS";
 	
-	if( use_ipv6_ )
-		listen("::", listen_port_, backlog);
-	else
-		listen("0.0.0.0", listen_port_, backlog);
-
 	SSL_load_error_strings();
 	SSLeay_add_ssl_algorithms();
 	meth = SSLv23_server_method();
@@ -172,8 +155,30 @@ void OsslServerSocket::init( bool use_ipv6_, int32_t listen_port_,
 }
 
 MRef<StreamSocket *> OsslServerSocket::accept(){
-	MRef<StreamSocket *> ssocket = ServerSocket::accept();
+	MRef<StreamSocket *> ssocket = sock->accept();
 
 	return new OsslSocket( ssocket, ssl_ctx );
 }
 
+MRef<StreamSocket *> OsslServerSocket::createSocket( int32_t sd,
+						     struct sockaddr *sa,
+						     int32_t salen ){
+	// Unused
+	return NULL;
+}
+
+int32_t OsslServerSocket::getFd(){
+	return sock->getFd();
+}
+
+int32_t OsslServerSocket::getPort(){
+	return sock->getPort();
+}
+
+int OsslServerSocket::getAddressFamily(){
+	return sock->getAddressFamily();
+}
+
+MRef<IPAddress *> OsslServerSocket::getLocalAddress() const{
+	return sock->getLocalAddress();
+}
