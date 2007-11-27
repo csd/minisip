@@ -103,6 +103,7 @@ void GnutlsServerSocket::init( bool use_ipv6, int32_t listen_port,
 			       MRef<GtlsCertificate *> cert,
 			       MRef<GtlsCertificateSet *> cert_db)
 {
+	type = SOCKET_TYPE_TLS;
 	cerr << "GnutlsServerSocket::init" << endl;
 	m_cert = cert;
 	m_cert_db = cert_db;

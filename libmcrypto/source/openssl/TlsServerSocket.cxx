@@ -98,6 +98,7 @@ void OsslServerSocket::init( bool use_ipv6_, int32_t listen_port_,
 			    MRef<OsslCertificate *> cert,
 			    MRef<OsslCertificateSet *> cert_db_)
 {
+	type = SOCKET_TYPE_TLS;
 	this->cert_db = cert_db_;
 	int32_t backlog = 25;
 	SSL_METHOD * meth;
