@@ -7,6 +7,9 @@
 #include<libminisip/media/MediaCommandString.h>
 #include<libminisip/signaling/conference/ConferenceControl.h>
 #include<libminisip/signaling/conference/ConfMessageRouter.h>
+#include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
+#include<libminisip/contacts/ContactDb.h>
+#include<libminisip/contacts/PhoneBook.h>
 
 
 
