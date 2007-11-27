@@ -10,6 +10,7 @@
 
 #ifdef WIN32
 #include<io.h>
+#include<direct.h>
 #endif
 
 using namespace std;

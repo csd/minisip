@@ -71,6 +71,7 @@
 #include<libmcrypto/cert.h>
 
 #include<libmsip/SipTransport.h>
+#include<algorithm>
 
 using namespace std;
 
