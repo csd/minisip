@@ -27,6 +27,12 @@
 #include<libmnetutil/StreamSocket.h>
 #include<libmnetutil/IPAddress.h>
 
+#ifdef _MSC_VER
+#	include<io.h>
+#else
+#	include<unistd.h>
+#endif
+
 using namespace std;
 
 StreamSocket::StreamSocket(){}
