@@ -69,7 +69,6 @@ bool SipLayerTransaction::defaultCommandHandler(const SipSMCommand &cmd){
 
 	if (newTransaction){
 		addTransaction(newTransaction);
-//		cerr << "EEEE: TransactionLayer::defaultCommandHandler: forwarding cmd to transaction"<<endl;
 		bool handled = newTransaction->handleCommand(cmd);
 		if (!handled){
 			cerr <<"ERROR: TransactionLayer::defaultCommandHandler: Transaction refused command: "<<cmd<<endl;

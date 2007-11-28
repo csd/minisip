@@ -79,7 +79,6 @@ class MyGui : public Gui{
 
 				description = "ACCEPT_CALL " + callId;
 
-				cerr << "EEEE: number of entries: " << contactEntries.size()<<endl; 
 				for( entryIter = contactEntries.begin(); entryIter != contactEntries.end(); entryIter++ ){
 					if( SipUri((*entryIter)->getUri()) == SipUri(command.getParam()) ){
 						cerr << "***** ACCEPTED *** CALL ***** " << description << endl;

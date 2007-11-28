@@ -124,7 +124,6 @@ bool SipDialogRegister::a0_start_trying_register( const SipSMCommand &command){
 
 		return true;
 	}else{
-		cerr << "EEEE: Error: command is "<<command<<endl;
 		massert(1==0); // this should never happen - the first transaction MUST be register command
 		return false;
 	}

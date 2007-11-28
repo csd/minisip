@@ -61,10 +61,6 @@ class LIBMINISIP_API ConsoleDebugger : public Runnable{
 		
 		void setMediaHandler( MRef<SubsystemMedia*> r ) {
 			mediaHandler = r; 
-			if (mediaHandler) 
-				std::cerr << "EEEE: mediaHandler set!"<<std::endl; 
-			else 
-				std::cerr << "EEEE: mediaHandler set to NULL"<<std::endl;
 		}
 
 	private:

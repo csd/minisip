@@ -655,7 +655,6 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 			try{
 				Certificate * cert = Certificate::load( certFile );
 				massert(cert);
-				cerr << "EEEE: adding certificate to certchain"<<endl;
 				certchain->addCertificate( cert );
 			}
 			catch( CertificateException &){
@@ -924,7 +923,6 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 	//<network_interface> into networkInterfaceName
 	networkInterfaceName = backend->loadString("network_interface", "");
 
-	//cerr << "EEEE: SIM: sim is "<< (sipStackConfig?"not NULL":"NULL")<< endl;
 	return ret;
 
 }
