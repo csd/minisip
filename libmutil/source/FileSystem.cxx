@@ -33,7 +33,6 @@ class LocalFile : public File {
 
 
 LocalFile::LocalFile(string path) {
-	cerr << "EEEE: trying to open <"<<path<<">"<<endl;
 	file.open( path.c_str(), ios::out | ios::in | ios::binary );
 	if (!file.is_open()){
 		throw FileException("Could not open file");
