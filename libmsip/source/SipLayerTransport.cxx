@@ -233,6 +233,7 @@ MRef<SipMessage*> SipMessageParser::feed( uint8_t udata ){
 				return msg;
 				//return SipMessage::createMessage( messageString );
 			}
+			break;
 		default:
 			/*never reached*/
 			massert(0);
@@ -620,13 +621,12 @@ bool SipLayerTransport::getDestination(MRef<SipMessage*> pack, string &destAddr,
 		MRef<SipHeaderValueVia*> via = pack->getFirstVia();
 
 		if ( via ){
-			string peer = via->getParameter( "received" );
-			if( peer == "" ){
-				peer = via->getIp();
+			destAddr = via->getParameter( "received" );
+
+			if( destAddr.empty() ){
+				destAddr = via->getIp();
 			}
 
-			//destAddr = IPAddress::create( via->getIp() );
-			destAddr = via->getIp();
 			if( destAddr.size()>0 ){
 				string rport = via->getParameter( "rport" );
 				if( rport != "" ){
@@ -635,11 +635,11 @@ bool SipLayerTransport::getDestination(MRef<SipMessage*> pack, string &destAddr,
 				else{
 					destPort = via->getPort();
 				}
-				if( !destPort ){
-					destPort = 5060;
-				}
 				destTransport =
 					registry->findViaTransport( via->getProtocol() );
+				if( !destPort && destTransport ){
+					destPort = destTransport->getDefaultPort();
+				}
 				return true;
 			}
 		}
