@@ -239,15 +239,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\IP4ServerSocket.cxx"
+				RelativePath="..\source\TcpServerSocket.cxx"
 				>
 			</File>
 			<File
 				RelativePath="..\source\IP6Address.cxx"
-				>
-			</File>
-			<File
-				RelativePath="..\source\IP6ServerSocket.cxx"
 				>
 			</File>
 			<File
@@ -433,15 +429,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\include\libmnetutil\IP4ServerSocket.h"
+				RelativePath="..\include\libmnetutil\TcpServerSocket.h"
 				>
 			</File>
 			<File
 				RelativePath="..\include\libmnetutil\IP6Address.h"
-				>
-			</File>
-			<File
-				RelativePath="..\include\libmnetutil\IP6ServerSocket.h"
 				>
 			</File>
 			<File
