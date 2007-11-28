@@ -79,7 +79,7 @@ void AccountsList::loadFromConfig( MRef<SipSoftPhoneConfiguration *> config ){
 		Gtk::TreeModel::iterator iter = append();
 		(*iter)[columns->identity] = (*i);
 		(*iter)[columns->name] = (*i)->identityIdentifier;
-		(*iter)[columns->uri] = (*i)->getSipUri().getUserIpString();
+		(*iter)[columns->uri] = (*i)->getSipUri().getRequestUriString();
 		(*iter)[columns->autodetectSettings] = false;
 
 		const list<SipUri> & routeSet = (*i)->getRouteSet();
@@ -180,8 +180,11 @@ string AccountsList::saveToConfig( MRef<SipSoftPhoneConfiguration *> config ){
 			config->defaultIdentity = identity;
 		}
 
+		SipUri registrarUri( identity->getSipUri().getUserIpString() );
+		registrarUri.setUser( "" );
+
 		MRef<SipRegistrar*> registrar =
-			new SipRegistrar( identity->getSipUri().getIp() );
+			new SipRegistrar( registrarUri );
 		identity->setSipRegistrar( registrar );
 		identity->getSipRegistrar()->setDefaultExpires( (*iter)[columns->registerExpires] );
 

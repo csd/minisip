@@ -129,7 +129,7 @@ void SipSoftPhoneConfiguration::save(){
 
 		backend->save( accountPath + "account_name", (*iIdent)->identityIdentifier );
 
-		backend->save( accountPath + "sip_uri", (*iIdent)->getSipUri().getUserIpString() );
+		backend->save( accountPath + "sip_uri", (*iIdent)->getSipUri().getRequestUriString() );
 
 
 /*From SipDialogSecurity below*/
