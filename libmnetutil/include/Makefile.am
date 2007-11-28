@@ -5,7 +5,7 @@ ldap_src = \
 			libmnetutil/LdapEntry.h \
 			libmnetutil/LdapException.h \
 			libmnetutil/LdapUrl.h \
- 			libmnetutil/LdapDownloader.h
+			libmnetutil/LdapDownloader.h
 
 pkginclude_HEADERS =    \
 			$(ldap_src) \
@@ -19,6 +19,7 @@ pkginclude_HEADERS =    \
 			libmnetutil/SocketServer.h \
 			libmnetutil/StreamSocket.h \
 			libmnetutil/TCPSocket.h \
+			libmnetutil/TcpServerSocket.h \
 			libmnetutil/NetUtil.h \
 			libmnetutil/UDPSocket.h \
 			libmnetutil/DatagramSocket.h \
