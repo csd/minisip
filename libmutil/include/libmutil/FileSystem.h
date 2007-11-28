@@ -48,9 +48,26 @@ class LIBMUTIL_API FileSystemException : public Exception{
  */
 class LIBMUTIL_API File : public MObject {
 	public:
-		virtual void read(void *buf, int32_t count) = 0;
+		/**
+		 * @return Number of bytes read. This can be less than the
+		 * requested number of bytes in case EOF is reached.
+		 */
+		virtual int32_t read(void *buf, int32_t count) = 0;
 		virtual void write(void *buf, int32_t count) = 0;
-		virtual void seek(int32_t pos ) = 0;
+
+		virtual bool eof() = 0;
+
+		/**
+		 * Sets the read position offset from the beginning of the
+		 * file. 
+		 */
+		virtual void seek(int64_t pos ) = 0;
+
+		/**
+		 * @return Current read position from the start of the file
+		 * 	in bytes.
+		 */
+		virtual int64_t offset() = 0;
 		virtual int64_t size() = 0;
 		virtual void flush() = 0;
 };

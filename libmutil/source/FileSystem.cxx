@@ -18,9 +18,11 @@ using namespace std;
 class LocalFile : public File {
 	public:
 		LocalFile(string path);
-		virtual void read(void *buf, int32_t count);
+		virtual int32_t read(void *buf, int32_t count);
 		virtual void write(void *buf, int32_t count);
-		virtual void seek(int32_t pos );
+		virtual bool eof();
+		virtual void seek(int64_t pos );
+		virtual int64_t offset();
 		virtual int64_t size();
 		virtual void flush();
 
@@ -38,16 +40,26 @@ LocalFile::LocalFile(string path) {
 	}
 }
 
-void LocalFile::read(void *buf, int32_t count){
+int32_t LocalFile::read(void *buf, int32_t count){
+	int64_t spos = offset();
 	file.read( (char*)buf, count );
+	return (int32_t) ( offset() - spos );
 }
 
 void LocalFile::write(void *buf, int32_t count){
 	file.write( (char*)buf, count);
 }
 
-void LocalFile::seek(int32_t pos ){
+bool LocalFile::eof(){
+	return !file;
+}
+
+void LocalFile::seek(int64_t pos ){
 	file.seekg( pos, ios::beg );
+}
+
+int64_t LocalFile::offset(){
+	return file.tellg();
 }
 
 int64_t LocalFile::size(){

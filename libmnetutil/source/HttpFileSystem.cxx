@@ -9,9 +9,11 @@ using namespace std;
 class FileString : public File {
 public:
 	FileString(char *data, int len, MRef<StreamSocket*> ssock);
-	virtual void read(void *buf, int32_t count);
+	virtual int32_t read(void *buf, int32_t count);
 	virtual void write(void *buf, int32_t count);
-	virtual void seek(int32_t pos );
+	virtual bool eof();
+	virtual void seek(int64_t pos);
+	virtual int64_t offset();
 	virtual int64_t size();
 	virtual void flush();
 
@@ -30,12 +32,13 @@ FileString::FileString( char *d, int l, MRef<StreamSocket*> ssock_ ) : data(d), 
 					   allocSize(len), ssock(ssock_) { }
 
 
-void FileString::read(void *buf, int32_t count){
-	if ( count+curpos > len ){
-		//count = len-curpos;
-		throw FileException("Read beyond end of file");
+int32_t FileString::read(void *buf, int32_t count){
+	if ( count+curpos > len ) {
+		count = len-curpos;
 	}
 	memcpy(buf, &data[curpos], count);
+	curpos+=count;
+	return count;
 }
 
 void FileString::write(void *buf, int32_t count){
@@ -51,11 +54,19 @@ void FileString::write(void *buf, int32_t count){
 		len = curpos;
 }
 
+bool FileString::eof(){
+	return curpos>=len;
+}
 
-void FileString::seek(int32_t pos ){
+
+void FileString::seek(int64_t pos ){
 	curpos=pos;
 	if (curpos>len)
 		curpos=len;
+}
+
+int64_t FileString::offset(){
+	return curpos;
 }
 
 int64_t FileString::size(){
@@ -63,6 +74,7 @@ int64_t FileString::size(){
 }
 
 void FileString::flush(){
+	//TODO: FIXME:  upload to Webdav/HTTP server not implemented
 }
 
 HttpFileSystem::HttpFileSystem(MRef<StreamSocket*> conn_, string prefix_) : 
@@ -75,7 +87,7 @@ void HttpFileSystem::mkdir( const std::string & name ){
 MRef<File*> HttpFileSystem::open( const std::string& path, bool createIfNotExist ){
 	char *data=NULL;
 	int len=0;
-	HttpDownloader dl( "www.minisip.org/~erik/data.bin", conn );
+	HttpDownloader dl( path , conn ); //FIXME: Check if "path" makes sense to send here 
 	data = dl.getChars(&len);
 	return new FileString( data, len, conn);
 }

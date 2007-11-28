@@ -30,6 +30,7 @@
 #include<libmutil/mtypes.h>
 #include<libmutil/MemObject.h>
 #include<libmutil/Exception.h>
+#include<libmutil/FileSystem.h>
 
 #include<list>
 
@@ -120,9 +121,13 @@ class LIBMUTIL_API XMLParser : public MObject{
 class LIBMUTIL_API XMLFileParser : public XMLParser{
 	public:
 		XMLFileParser(std::string filename="", XMLParserCallback *cb=NULL);
+		XMLFileParser(std::string filename, MRef<FileSystem*> fs, XMLParserCallback *cb=NULL);
 		void saveToFile(std::string file="");
 	private:
+		void init();
+
 		std::string filename;
+		MRef<FileSystem*> fs;
 };
 
 class LIBMUTIL_API XMLstringParser : public XMLParser{

@@ -202,6 +202,10 @@ string XMLParser::xmlstring(){
 }
 
 XMLFileParser::XMLFileParser(string filename_, XMLParserCallback *cb):XMLParser(cb), filename(filename_){
+
+	fs = new LocalFileSystem;
+
+	init();
 	
 	string s = "";
 	if (filename != ""){
@@ -224,6 +228,44 @@ XMLFileParser::XMLFileParser(string filename_, XMLParserCallback *cb):XMLParser(
 	}
 	parsestring(s);
 }
+
+XMLFileParser::XMLFileParser(string filename_, MRef<FileSystem*> fs_, XMLParserCallback *cb) : 
+	XMLParser(cb), 
+	filename(filename_), fs(fs_)
+{
+	init();
+}
+
+void XMLFileParser::init(){
+	
+	string s = "";
+	if (filename != ""){
+		MRef<File*> file;
+		try{
+			file = fs->open(filename);
+			ifstream file(filename.c_str());
+		}catch(const FileException &e){
+			throw XMLFileNotFound( "Could not read file " + filename );
+		}
+
+
+		int32_t bufsize=20; 
+		char *buf = (char *)calloc(bufsize,1);
+		do{
+			for (int32_t i=0; i<bufsize; i++)
+				buf[i]=0;
+			//file.read(buf,bufsize-1);
+			file->read(buf, bufsize-1);
+			s = s+string(buf);
+		}while(/*!(!file)*/ !file->eof());
+		free(buf);
+
+	}
+	parsestring(s);
+
+	
+}
+
 
 static XMLNode *parseAttribute(const char *s, int32_t &i){
 //	cerr << "parseAttribute with s="<<s+i<<" and i=" << i <<endl;
