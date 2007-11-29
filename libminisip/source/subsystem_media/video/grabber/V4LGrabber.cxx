@@ -57,7 +57,7 @@ V4LGrabber::V4LGrabber( string device ):device(device){
 	stopped = false;
 	fd = -1;
 
-	mdbg << "V4LGrabber: device " << device << end;
+	mdbg << "V4LGrabber: device " << device << endl;
 }
 
 void V4LGrabber::open(){
@@ -128,7 +128,7 @@ void V4LGrabber::mapMemory(){
                 throw VideoException( strerror( errno ) );
 	}
 	
-	mdbg << "Got " << mBuf.frames << " device buffers" << end;
+	mdbg << "Got " << mBuf.frames << " device buffers" << endl;
 
 	nFrames = mBuf.frames;
 
@@ -180,8 +180,8 @@ bool V4LGrabber::setImageSize( uint32_t width, uint32_t height ){
 		getImageFormat();
         }
 
-        mdbg << "Trying to set input size to " << width << "x" << height << end;
-        mdbg << "Clipcount " << imageWindow->clipcount << end;
+        mdbg << "Trying to set input size to " << width << "x" << height << endl;
+        mdbg << "Clipcount " << imageWindow->clipcount << endl;
 
         imageWindow->height = height;
         imageWindow->width = width;
@@ -222,7 +222,7 @@ bool V4LGrabber::setImageChroma( uint32_t chroma ){
                         return false;
 	}
 
-        mdbg << "Depth: " << imageFormat->depth << end;
+        mdbg << "Depth: " << imageFormat->depth << endl;
 
 	if( ioctl( fd, VIDIOCSPICT,  imageFormat ) != 0 ){
 		merror( "VIDIOCSPICT" );
@@ -323,7 +323,7 @@ void V4LGrabber::stop(){
 }
 
 void V4LGrabber::run(){
-	mdbg << "Start read()" << end;
+	mdbg << "Start read()" << endl;
 	stopped = false;
 	read( handler );
 }
@@ -335,7 +335,7 @@ void V4LGrabber::setHandler( ImageHandler * handler ){
 }
 
 void V4LGrabber::read( ImageHandler * handler ){
-	mdbg << "Start read( handler )" << end;
+	mdbg << "Start read( handler )" << endl;
 	grabberLock.lock();
 	int i;
 	struct video_mmap mMap;
@@ -355,13 +355,13 @@ void V4LGrabber::read( ImageHandler * handler ){
         }
         
         if( ! setImageSize( handlerInputWidth, handlerInputHeight ) ){
-                merr << "Could not set grabber image size." << end;
-                merr << "Grabber size: " << width << "x" << height << end;
+                merr << "Could not set grabber image size." << endl;
+                merr << "Grabber size: " << width << "x" << height << endl;
         }
         
 
 
-        mdbg << "ImageFormat->palette " << imageFormat->palette << end;
+        mdbg << "ImageFormat->palette " << imageFormat->palette << endl;
         
         if( imageFormat->palette == VIDEO_PALETTE_RGB24 ){
                 pixelSize = 3;
@@ -386,7 +386,7 @@ void V4LGrabber::read( ImageHandler * handler ){
 		merror( "VIDIOCMCAPTURE" );
                 throw VideoException( strerror( errno ) );
 	}
-	mdbg << "before loop" << end;
+	mdbg << "before loop" << endl;
 
 
 	if( !handlerProvidesImage ){
@@ -460,7 +460,7 @@ void V4LGrabber::read( ImageHandler * handler ){
 }
 
 void V4LGrabber::close(){
-	mdbg << "V4LGrabber: Close" << end;
+	mdbg << "V4LGrabber: Close" << endl;
 	stop();
 
 	grabberLock.lock();

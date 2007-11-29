@@ -256,7 +256,7 @@ Minisip::Minisip( MRef<Gui *> g, int /*argc*/, char **argv ) : gui(g){
 		osso_context_t * ossoCtxt = NULL;
 		ossoCtxt = osso_initialize( PACKAGE_NAME, PACKAGE_VERSION, TRUE, NULL );
 		if( !ossoCtxt ){
-			mdbg("init") << "Could not initialize osso context" << end;
+			mdbg("init") << "Could not initialize osso context" << endl;
 		}
 	#endif
 
@@ -341,7 +341,7 @@ int Minisip::startSip() {
 		MRef<IpProvider *> ip6Provider;
 		ip6Provider = IpProvider::create( phoneConf, true );
 		//#ifdef DEBUG_OUTPUT
-		//                mout << BOLD << "init 5/9: Creating SIP transport layer" << PLAIN << end;
+		//                mout << BOLD << "init 5/9: Creating SIP transport layer" << PLAIN << endl;
 		//#endif
 		string localIpString;
 		string externalContactIP;
@@ -432,7 +432,7 @@ int Minisip::startSip() {
 #endif
 
 		/*
-		   mdbg("init") << "Starting presence server"<< end;
+		   mdbg("init") << "Starting presence server"<< endl;
 		   CommandString subscribeserver("", SipCommandString::start_presence_server);
 		   SipSMCommand sipcmdss(subscribeserver, SipSMCommand::remote, SipSMCommand::TU);
 		   sip->getSipStack()->handleCommand(sipcmdss);

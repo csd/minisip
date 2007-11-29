@@ -204,7 +204,7 @@ ThreadHandle Thread::createThread(void *f(void*), void *arg){
 	DWORD id;
 	
 	#ifdef DEBUG_OUTPUT
-		mdbg << "createThread: Creating thread" << end;
+		mdbg << "createThread: Creating thread" << endl;
 	#endif	// DEBUG_OUTPUT
 		h = CreateThread( 
 			NULL,                        // default security attributes 
@@ -214,7 +214,7 @@ ThreadHandle Thread::createThread(void *f(void*), void *arg){
 			0,                           // use default creation flags 
 			&id);
 	#ifdef DEBUG_OUTPUT
-		mdbg << "createThread: done Creating thread" << end;
+		mdbg << "createThread: done Creating thread" << endl;
 	#endif	// DEBUG_OUTPUT
 
 	if (h==NULL){

@@ -157,8 +157,8 @@ AVEncoder::AVEncoder():context( NULL ),codec( NULL ){
 }
 
 void AVEncoder::init( uint32_t width, uint32_t height ){
-	mdbg << "Opening coder with width: " << width << end;
-	mdbg << "Opening coder with height: " << height << end;
+	mdbg << "Opening coder with width: " << width << endl;
+	mdbg << "Opening coder with height: " << height << endl;
 	context->width =  width;//width;
 	context->height = height; //height;
 

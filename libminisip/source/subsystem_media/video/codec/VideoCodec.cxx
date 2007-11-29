@@ -33,6 +33,7 @@
 
 #include<libmutil/dbg.h>
 
+using namespace std;
 
 VideoCodec::VideoCodec(){
 	decoder = new AVDecoder();
@@ -94,7 +95,7 @@ void VideoCodec::startSend( uint32_t width, uint32_t height){
                 if( !grabber->setImageChroma( M_CHROMA_RV32 ) &&
 		    !grabber->setImageChroma( M_CHROMA_I420 ) ){
                         merr << "Could not select video capture chroma: "
-                             << end;
+                             << endl;
                         grabber = NULL;
 			return;
 		}
@@ -103,7 +104,7 @@ void VideoCodec::startSend( uint32_t width, uint32_t height){
                 }
                 catch( VideoException & exc ){
                         merr << "Could not open the video capture device: "
-                             << exc.error() << end;
+                             << exc.error() << endl;
                         grabber = NULL;
                 }
 	}
@@ -117,7 +118,7 @@ void VideoCodec::stopSend(){
                 }
                 catch( VideoException & exc ){
                         merr << "Could not close the video capture device: "
-                             << exc.error() << end;
+                             << exc.error() << endl;
                 }
 	}
 	coder->close();
