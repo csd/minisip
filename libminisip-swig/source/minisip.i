@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2006  Mikael Magnusson
+ Copyright (C) 2006 - 2007 Mikael Magnusson
  
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -16,7 +16,7 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  */
 
-/* Copyright (C) 2006
+/* Copyright (C) 2006 - 2007
  *
  * Authors: Mikael Magnusson <mikma@users.sourceforge.net>
  */
@@ -140,7 +140,7 @@ void setupDefaultSignalHandling();
 
 #include<libmsip/SipDialogConfig.h>
 #include<libmsip/SipCommandString.h>
-#include<libmsip/SipUri.h>
+#include<libmutil/SipUri.h>
 
 //#include<libminisip/aec/aec.h>
 //#include<libminisip/aec/aecfix.h>
@@ -148,7 +148,7 @@ void setupDefaultSignalHandling();
 //#include<libminisip/ipsec/MsipIpsecAPI.h>
 
 
-#include<libminisip/conference/ConfMessageRouter.h>
+#include<libminisip/signaling/conference/ConfMessageRouter.h>
 #include<libminisip/gui/LogEntry.h>
 #include<libminisip/Minisip.h>
 
@@ -156,15 +156,15 @@ void setupDefaultSignalHandling();
 #include<libminisip/gui/Bell.h>
 #include<libminisip/gui/ConsoleDebugger.h>
 
-#include<libminisip/contactdb/ContactDb.h>
-#include<libminisip/contactdb/PhoneBook.h>
+#include<libminisip/contacts/ContactDb.h>
+#include<libminisip/contacts/PhoneBook.h>
 
-#include<libminisip/sip/SipSoftPhoneConfiguration.h>
+#include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
 
 //#include<libminisip/sdp/SdpHeaderA.h>
 //#include<libminisip/sdp/SdpHeaderM.h>
 
-#include<libminisip/mediahandler/MediaCommandString.h>
+#include<libminisip/media/MediaCommandString.h>
 %}
 
 %include<libmutil/MemObject.h>
@@ -177,7 +177,7 @@ void setupDefaultSignalHandling();
 
 %include<libmsip/SipDialogConfig.h>
 %include<libmsip/SipCommandString.h>
-%include<libmsip/SipUri.h>
+%include<libmutil/SipUri.h>
 
 %include<libminisip/gui/Gui.h>
 %include<libminisip/gui/Bell.h>
@@ -186,12 +186,12 @@ void setupDefaultSignalHandling();
 %include<libminisip/gui/LogEntry.h>
 %include<libminisip/Minisip.h>
 
-%include<libminisip/contactdb/ContactDb.h>
-%include<libminisip/contactdb/PhoneBook.h>
+%include<libminisip/contacts/ContactDb.h>
+%include<libminisip/contacts/PhoneBook.h>
 
-%include<libminisip/sip/SipSoftPhoneConfiguration.h>
+%include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
 
-%include<libminisip/mediahandler/MediaCommandString.h>
+%include<libminisip/media/MediaCommandString.h>
 
 // Smart pointers
 %define REF(type)
@@ -228,10 +228,10 @@ REF(Minisip);
 //REF(PhoneBookIo);
 REF(PhoneBookPerson);
 REF(PhoneBook);
-REF(Session);
+//REF(Session);
 REF(Sip);
 REF(SipIdentity);
-REF(SipProxy);
+REF(SipRegistrar);
 REF(SipSoftPhoneConfiguration);
 REF(CommandReceiver);
 REF(SipStackConfig);
@@ -242,7 +242,12 @@ REF(SipStackConfig);
 %template(MStrings) minilist<std::string>;
 //%template(ConfMembers) minilist<ConfMember>;
 
+%define LIST(type)
+%template(type ## List) std::list< type >;
+%enddef
+
 //LIST(String);
+LIST(SipUri);
 
 //SWIG_STD_LIST_SPECIALIZE(SipIdentityRef, MRef<SipIdentity*>)
 //%template(SipIdentityList) std::list< MRef<SipIdentity*> >;

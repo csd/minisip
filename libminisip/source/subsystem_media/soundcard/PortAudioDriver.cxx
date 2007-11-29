@@ -70,14 +70,14 @@ PortAudioDriver::~PortAudioDriver( ){
 
 MRef<SoundDevice*> PortAudioDriver::createDevice( string deviceId ){
 	if( !initialized ){
-		merr << "PortAudioDriver not initialized" << end;
+		merr << "PortAudioDriver not initialized" << endl;
 		return NULL;
 	}
 
 	PaDeviceIndex device = atoi( deviceId.c_str() );
 
 	if( device < 0 || device >= Pa_GetDeviceCount() ){
-		merr << "PortAudio: invalid device: " << deviceId << end;
+		merr << "PortAudio: invalid device: " << deviceId << endl;
 		return NULL;
 	}
 

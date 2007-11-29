@@ -65,7 +65,7 @@ MRef<SoundDevice*> OssSoundDriver::createDevice( string deviceId ){
 std::vector<SoundDeviceName> OssSoundDriver::getDeviceNames() const {
 	std::vector<SoundDeviceName> names;
 
-	mdbg << "OssSoundDriver::getDeviceNames not implemented" << end;
+	mdbg << "OssSoundDriver::getDeviceNames not implemented" << endl;
 
 	return names;
 }

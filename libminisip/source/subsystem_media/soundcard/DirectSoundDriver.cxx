@@ -115,13 +115,13 @@ std::vector<SoundDeviceName> DirectSoundDriver::getDeviceNames() const {
 }
 
 bool DirectSoundDriver::getDefaultInputDeviceName( SoundDeviceName &name ) const{
-	mdbg << "DirectSoundDriver::getDefaultInputDeviceName not implemented" << end;
+	mdbg << "DirectSoundDriver::getDefaultInputDeviceName not implemented" << endl;
 
 	return false;
 }
 
 bool DirectSoundDriver::getDefaultOutputDeviceName( SoundDeviceName &name ) const {
-	mdbg << "DirectSoundDriver::getDefaultOutputDeviceName not implemented" << end;
+	mdbg << "DirectSoundDriver::getDefaultOutputDeviceName not implemented" << endl;
 
 	return false;
 }

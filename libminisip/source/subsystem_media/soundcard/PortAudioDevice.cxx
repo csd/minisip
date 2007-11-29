@@ -84,7 +84,7 @@ PortAudioDevice::PortAudioDevice( PaDeviceIndex device ): SoundDevice("!PORTAUDI
 		initialized = true;
 	}
 	else
-		merr << "PortAudio failed to initialize: " << Pa_GetErrorText( res ) << end;
+		merr << "PortAudio failed to initialize: " << Pa_GetErrorText( res ) << endl;
 }
 
 PortAudioDevice::~PortAudioDevice()
@@ -145,7 +145,7 @@ int PortAudioDevice::writeToDevice( byte_t * buffer, uint32_t nSamples )
 			char buf[128];
 
 			snprintf(buf, sizeof(buf), "writeToDevice wait %ld < %ld", available, nBytes);
-			cerr << buf << end;
+			cerr << buf << endl;
 #endif
 			outCond.wait( outMutex );
 #ifdef PA_DEBUG

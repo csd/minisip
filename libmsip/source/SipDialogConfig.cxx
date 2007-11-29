@@ -35,7 +35,7 @@
 
 using namespace std;
 
-#define DEBUG_OUTPUT
+// #define DEBUG_OUTPUT
 
 int SipIdentity::globalIndex = 1; //give an initial value
 

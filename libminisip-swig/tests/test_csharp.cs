@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2006  Mikael Magnusson
+ Copyright (C) 2006-2007  Mikael Magnusson
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-/* Copyright (C) 2006
+/* Copyright (C) 2006-2007
  *
  * Authors: Mikael Magnusson <mikma@users.sourceforge.net>
  */
@@ -46,9 +46,9 @@ public class MyDbgHandler : DbgHandler {
 
 public class MyGui : GuiProxy {
 //   private DbgBuf outBuf;
-//   private DbgBuf errBuf;
-
 //   private streambuf oldOutBuf;
+
+//   private DbgBuf errBuf;
 //   private streambuf oldErrBuf;
   private string callId;
 
@@ -57,8 +57,8 @@ public class MyGui : GuiProxy {
   public MyGui() {
     Console.WriteLine("MyGui");
 
-    Dbg.getOut().setEnabled(true);
-    Dbg.getErr().setEnabled(true);
+//     Dbg.getOut().setEnabled(true);
+//     Dbg.getErr().setEnabled(true);
     //Dbg.getDbg().setEnabled(true);
 
 //     Dbg.getOut().setExternalHandler(new MyDbgHandler(displayMessage, "mout"));
@@ -66,9 +66,9 @@ public class MyGui : GuiProxy {
 //     Dbg.getDbg().setExternalHandler(new MyDbgHandler(displayMessage, "mdbg"));
 
 //     outBuf = new DbgBuf(new MyDbgHandler(displayMessage, "out"));
-//     errBuf = new DbgBuf(new MyDbgHandler(displayMessage, "err"));
-
 //     oldOutBuf = MinisipModule.setOutputBuf(outBuf);
+    
+//     errBuf = new DbgBuf(new MyDbgHandler(displayMessage, "err"));
 //     oldErrBuf = MinisipModule.setErrorBuf(errBuf);
   }
 
@@ -108,17 +108,34 @@ public class MyGui : GuiProxy {
   }
 
   public override void handleCommand(CommandString command) {
-    Console.WriteLine("My handleCommand: " + command.getString());
-
-    if( command.getOp()=="invite_ok" ){
-      CommandString sendersOn = new CommandString(callId, MediaCommandString.set_session_sound_settings, "senders", "ON");
-      sendCommand("media", sendersOn);
+    switch( command.getOp() ){
+    case "incoming_available": {
+      callId = command.get("destination_id");
+      Console.WriteLine("Incoming call!: " + callId);
+      CommandString cmd = new CommandString(callId, SipCommandString.accept_invite, "");
+      sendCommand("sip", cmd);
+      break;
+    }
+    case "remote_cancelled_invite":
+      Console.WriteLine("Missed call!");
+      break;
+    case "invite_ok": {
+      CommandString cmd = new CommandString(callId, MediaCommandString.set_session_sound_settings, "senders", "ON");
+      sendCommand("media", cmd);
 
       Console.WriteLine("Activated media");
+      break;
+    }
+    case "remote_hang_up":
+      Console.WriteLine("Hangup");
+      break;
+    default:
+      Console.WriteLine("My handleCommand: " + command.getString());
+      break;
     }
   }
 
-    public override bool configDialog(SipSoftPhoneConfigurationRef conf) {
+  public override bool configDialog(SipSoftPhoneConfigurationRef conf) {
     Console.WriteLine("configDialog");
     return true;
   }
@@ -131,21 +148,26 @@ public class MyGui : GuiProxy {
     Console.WriteLine("reg    " + id.registerToProxy);
     Console.WriteLine("reg?   " + id.isRegistered());
 
-    dumpProxy(id.getSipProxy());
+    dumpRoute(id.getRouteSet());
   }
 
   private void dumpIdentities(SipIdentityList list) {
-    System.Collections.IEnumerator ien = list.GetEnumerator();
-    ien.Reset();
-    while(ien.MoveNext()) {
-      SipIdentityRef id = (SipIdentityRef)ien.Current;
+    foreach (SipIdentityRef id in list) {
       dumpIdentity(id);
     }
+
+//     System.Collections.IEnumerator ien = list.GetEnumerator();
+//     ien.Reset();
+//     while(ien.MoveNext()) {
+//       SipIdentityRef id = (SipIdentityRef)ien.Current;
+//       dumpIdentity(id);
+//     }
   }
 
-  private void dumpProxy(SipProxyRef proxy){
-    Console.WriteLine("SipProxy");
-    Console.WriteLine("uri:      " + proxy.getUri().getString());
+  private void dumpRoute(SipUriList routeSet){
+    foreach (SipUri route in routeSet) {
+      Console.WriteLine("route:      " + route.getString());
+    }
   }
 
   public override void setContactDb(ContactDbRef contactDb) {
@@ -163,14 +185,15 @@ public class MyGui : GuiProxy {
 
 public class runme {
   static SWIGTYPE_p_p_char getArgv(string[] args, out int length) {
-    SWIGTYPE_p_p_char argv = MinisipModule.new_CStrings(args.Length+1);
+    SWIGTYPE_p_p_char argv = MinisipModule.new_CStrings(args.Length+2);
     MinisipModule.CStrings_setitem(argv, 0, Assembly.GetExecutingAssembly().Location);
     for (int i = 0; i < args.Length; i++){
       Console.WriteLine("String: " + i + " = " + args[i]);
       MinisipModule.CStrings_setitem(argv, i + 1, args[i]);
     }
 
-    length = args.Length + 1;
+    MinisipModule.CStrings_setitem(argv, args.Length + 1, null);
+    length = args.Length + 2;
     return argv;
   }
 

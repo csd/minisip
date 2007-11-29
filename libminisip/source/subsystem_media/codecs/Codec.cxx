@@ -75,7 +75,7 @@ MRef<AudioCodec *> AudioCodecRegistry::create( const std::string & description )
 		}
 	}
 
-	merr << "AudioCodec not found name: " << description << endl;
+	mdbg << "AudioCodec not found name: " << description << endl;
 	return NULL;
 }
 

@@ -91,9 +91,6 @@ public:
 	Dbg &operator<<( const char *);
 	Dbg &operator<<( void *);
 
-	LIBMUTIL_DEPRECATED
-	Dbg& operator<<(const DbgEndl &);
-
 	//accepts std::endl as parameter
 	Dbg &operator<<( std::ostream&(*arg)(std::ostream&) );
 

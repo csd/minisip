@@ -843,7 +843,6 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 
 #ifdef VIDEO_SUPPORT
 	videoDevice = backend->loadString( "video_device", "" );
-	cerr << "Loaded video_device" << videoDevice << endl;
 #endif
 	//Even if we can't send video, we might be able to display it.
 	//Therefore this is not within the VIDEO_SUPPORT ifdef

@@ -165,7 +165,7 @@ static bool sa_get_addr(struct sockaddr *sa, bool &ipv6, string &ip)
 	}
 #endif
 	else{
-		cerr << "sa_get_addr: unsupported address family: " << sa->sa_family << endl;
+		mdbg << "sa_get_addr: unsupported address family: " << sa->sa_family << endl;
 		return false;
 	}
 	

@@ -774,12 +774,12 @@ bool SipLayerTransport::findSocket(MRef<SipTransport*> transport,
 		if( ssocket.isNull() ) {
 			/* No existing StreamSocket to that host,
 			 * create one */
-			cerr << "SipLayerTransport: sendMessage: creating new socket" << endl;
+			mdbg << "SipLayerTransport: sendMessage: creating new socket" << endl;
 
 			ssocket = transport->connect( destAddr, port,
 						      cert_db, getCertificateChain() );
 			addSocket( ssocket );
-		} else cerr << "SipLayerTransport: sendMessage: reusing old socket" << endl;
+		} else mdbg << "SipLayerTransport: sendMessage: reusing old socket" << endl;
 		socket = *ssocket;
 	}
 	else{

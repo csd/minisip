@@ -125,6 +125,7 @@ Dbg &Dbg::operator<<( std::ostream&(*)(std::ostream&) ){
 	return (*this);
 }
 
+#if 0
 Dbg &Dbg::operator<<(const DbgEndl &){
 	(*this)<<"\n";
 	lock->lock();
@@ -133,6 +134,7 @@ Dbg &Dbg::operator<<(const DbgEndl &){
 	lock->unlock();
 	return (*this);
 }
+#endif
 
 Dbg& Dbg::operator<<(int i){
 	return (*this)<<itoa(i);
