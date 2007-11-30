@@ -112,6 +112,7 @@ AccountDialog::AccountDialog( Glib::RefPtr<Gnome::Glade::Xml>  theRefXml,
 AccountDialog::~AccountDialog(){
 	requiresAuthConn.disconnect();
 	autodetectProxyConn.disconnect();
+	proxyConn.disconnect();
 	proxyPortConn.disconnect();
 	proxyTransportConn.disconnect();
 
