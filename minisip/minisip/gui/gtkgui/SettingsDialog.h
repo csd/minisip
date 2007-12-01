@@ -267,6 +267,8 @@ class AdvancedSettings
 		*/
 		Gtk::Combo * networkInterfacesCombo;
 		Gtk::Entry * networkInterfacesEntry;
+		Gtk::RadioButton * ipv4Radio;
+		Gtk::RadioButton * ipv46Radio;
 
 		Gtk::TreeView * transportView;
 		

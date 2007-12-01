@@ -116,6 +116,7 @@ class LIBMINISIP_API SipSoftPhoneConfiguration : public MObject{
 		std::string userDefinedStunServer;
 
 		bool useAnat;
+		bool useIpv6;
 		
 		std::string soundDeviceIn;
 		std::string soundDeviceOut;

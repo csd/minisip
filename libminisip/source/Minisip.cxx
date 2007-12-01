@@ -339,7 +339,9 @@ int Minisip::startSip() {
 #endif
 		MRef<IpProvider *> ipProvider = IpProvider::create( phoneConf );
 		MRef<IpProvider *> ip6Provider;
-		ip6Provider = IpProvider::create( phoneConf, true );
+		if( phoneConf->useIpv6 ){
+			ip6Provider = IpProvider::create( phoneConf, true );
+		}
 		//#ifdef DEBUG_OUTPUT
 		//                mout << BOLD << "init 5/9: Creating SIP transport layer" << PLAIN << endl;
 		//#endif

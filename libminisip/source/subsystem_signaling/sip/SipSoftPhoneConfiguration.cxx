@@ -83,6 +83,7 @@ SipSoftPhoneConfiguration::SipSoftPhoneConfiguration():
 	stunDomain(""),
 	useUserDefinedStunServer(false),
 	useAnat(false),
+	useIpv6(false),
 	soundDeviceIn(""),
 	soundDeviceOut(""),
 	videoDevice(""),
@@ -421,6 +422,7 @@ void SipSoftPhoneConfiguration::save(){
 	/************************************************************
 	 * Advanced settings
 	 ************************************************************/
+	backend->saveBool( "use_ipv6", useIpv6 );
 	list< MRef<SipTransportConfig*> >::iterator j;
 	for( j = sipStackConfig->transports.begin();
 	     j != sipStackConfig->transports.end(); j++ ){
@@ -795,6 +797,8 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 
 
 	}while( true );
+
+	useIpv6 = backend->loadBool( "use_ipv6", true );
 
 	list< MRef<SipTransportConfig*> >::iterator j;
 	for( j = sipStackConfig->transports.begin();

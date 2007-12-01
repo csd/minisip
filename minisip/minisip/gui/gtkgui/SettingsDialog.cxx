@@ -797,6 +797,9 @@ AdvancedSettings::AdvancedSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml,
 	refXml->get_widget( "networkInterfacesCombo", networkInterfacesCombo );
 	refXml->get_widget( "networkInterfacesEntry", networkInterfacesEntry );
 		
+	refXml->get_widget( "ipv4Radio", ipv4Radio );
+	refXml->get_widget( "ipv46Radio", ipv46Radio );
+
 	refXml->get_widget( "transportView", transportView );
 
 	refXml->get_widget( "sipSpin", sipSpin );
@@ -843,6 +846,13 @@ void AdvancedSettings::setConfig( MRef<SipSoftPhoneConfiguration *> config ){
 		string preferredIfaceIP = NetworkFunctions::getInterfaceIPStr( config->networkInterfaceName );
 		networkInterfacesEntry->set_text( preferredIfaceIP );
 	}
+
+	if( config->useIpv6 ){
+		ipv46Radio->set_active( true );
+	}
+	else{
+		ipv4Radio->set_active( true );
+	}
 	
 	sipSpin->set_value( config->sipStack->getStackConfig()->preferedLocalSipPort );
 	sipsSpin->set_value( config->sipStack->getStackConfig()->preferedLocalSipsPort );
@@ -879,6 +889,8 @@ string AdvancedSettings::apply(){
 	if( ifaceSel != "" ) {
 		config->networkInterfaceName = ifaceSel;
 	}
+
+	config->useIpv6 = ipv46Radio->get_active();
 
 	config->sipStack->getStackConfig()->preferedLocalSipPort = sipSpin->get_value_as_int();
 	config->sipStack->getStackConfig()->preferedLocalSipsPort = sipsSpin->get_value_as_int();
