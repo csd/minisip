@@ -274,6 +274,8 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 	certificateDialog = new CertificateDialog( refXml );
 	settingsDialog = new SettingsDialog( refXml, transportList );
 	
+	refXml->get_widget( "accountList", accountListView );
+	refXml->get_widget( "accountLabel", accountLabel );
 	refXml->get_widget( "callUriEntry", uriEntry );
 
 	refXml->get_widget( "prefMenu", prefMenu );
@@ -304,6 +306,7 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 
 	dispatcher.connect( SLOT( *this, &MainWindow::gotCommand ) );
 
+	accountListView->signal_changed().connect( SLOT( *this, &MainWindow::accountListSelect ) );
 	uriEntry->signal_activate().connect( SLOT( *this, &MainWindow::inviteClick ) );
 
 #if not defined WIN32 && not defined HILDON_SUPPORT
@@ -326,6 +329,8 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 	statusWindow->add( *statusWidget );
 	statusWindow->set_shadow_type( Gtk::SHADOW_NONE );
 	statusWindow->set_policy( Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC );
+
+	accountListInit();
 
 	//mainTabWidget->append_page( *statusWidget, "Accounts" );
 
@@ -589,6 +594,7 @@ void MainWindow::updateConfig(){
 	accountsList->loadFromConfig( config );
 	settingsDialog->setAccounts( accountsList );
 	settingsDialog->setConfig( config );
+	accountListUpdate();
 
 	const Glib::RefPtr<PhoneBookModel> modelPtr( phoneBookModel );
 
@@ -777,6 +783,38 @@ void MainWindow::inviteFromTreeview( const Gtk::TreeModel::Path&,
 		                     Gtk::TreeViewColumn * ){
 	phoneSelected();
 	invite();
+}
+
+void MainWindow::accountListInit() {
+	accountListView->set_model( accountsList );
+	Gtk::CellRendererText* crt;
+	crt = new Gtk::CellRendererText();
+	accountListView->pack_end( *manage(crt), true );
+	accountListView->add_attribute( crt->property_text(), accountsList->getColumns()->name );
+	accountListUpdate();
+}
+
+void MainWindow::accountListUpdate() {
+	Gtk::TreeModel::iterator iter;
+	for( iter = accountsList->children().begin();
+	     iter != accountsList->children().end(); iter ++ ){
+		if( config->defaultIdentity ==
+		    (*iter)[accountsList->getColumns()->identity] ){
+			accountListView->set_active( iter );
+			break;
+		}
+	}
+}
+
+void MainWindow::accountListSelect() {
+	Gtk::TreeModel::iterator iter = accountListView->get_active();
+
+	accountsList->setDefaultAccount( iter );
+
+	config->defaultIdentity =
+		(*iter)[accountsList->getColumns()->identity];
+
+	accountLabel->set_label( (*iter)[accountsList->getColumns()->name] );
 }
 
 void MainWindow::inviteClick() {

@@ -130,6 +130,10 @@ class MainWindow : public GtkMainUI,
 		void registerIcons();
 		void hideSlot();
 		void phoneTreeClicked( GdkEventButton * event );
+
+		void accountListInit();
+		void accountListUpdate();
+		void accountListSelect();
 		
 		void inviteClick();
 		void invite(  std::string uri="" );
@@ -183,6 +187,8 @@ class MainWindow : public GtkMainUI,
 		Gtk::MenuItem * phoneAddAddressMenu;
 		Gtk::MenuItem * phoneRemoveMenu;
 		Gtk::MenuItem * phoneEditMenu;
+		Gtk::ComboBox * accountListView;
+		Gtk::Label * accountLabel;
 		Gtk::Entry * uriEntry;
 		PhoneBookModel * phoneBookModel;
 		PhoneBookTree * phoneBookTree;
