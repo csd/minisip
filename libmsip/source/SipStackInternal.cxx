@@ -406,6 +406,43 @@ MRef<SipTransportConfig*> SipStackInternal::findTransportConfig( const std::stri
 }
 
 void SipStackInternal::startServers(){
+	startSipServers();
+	startSipsServers();
+}
+
+void SipStackInternal::startSipServers(){
+	int32_t port = config->preferedLocalSipPort;
+
+	try {
+		startServers( false, port );
+	} catch ( const BindFailed &bf ){
+		stopServers( false );
+		// Retry with a dynamic port
+		// choosen by the first started transport
+		port = 0;
+		startServers( false, port );
+	}
+
+	mdbg << "SIP servers started on port " << port << endl;
+}
+
+void SipStackInternal::startSipsServers(){
+	int32_t port = config->preferedLocalSipsPort;
+
+	try {
+		startServers( true, port );
+	} catch ( const BindFailed &bf ){
+		stopServers( true );
+		// Retry with a dynamic port
+		// choosen by the first started transport
+		port = 0;
+		startServers( true, port );
+	}
+
+	mdbg << "SIPS servers started on port " << port << endl;
+}
+
+void SipStackInternal::startServers( bool secure, int32_t &prefPort ){
 	list<MRef<SipTransportConfig*> >::const_iterator i;
 	list<MRef<SipTransportConfig*> >::const_iterator last =
 		config->transports.end();
@@ -415,20 +452,26 @@ void SipStackInternal::startServers(){
 
 		if( !transportConfig->isEnabled() )
 			continue;
-#ifdef DEBUG_OUTPUT
-		mout << "SipStack: Starting " << name << " transport worker thread" << endl;
-#endif
+
+		MRef<SipTransport*> transport =
+			SipTransportRegistry::getInstance()->findTransportByName( name );
+		if( !transport ){
+			merr << "Failed to start " << transport->getName() << " server, unsupported" << endl;
+			continue;
+		}
+
+		if( secure != transport->isSecure() ){
+			// Only start on type SIP or SIPS
+			continue;
+		}
+
+		mdbg << "SipStack: Starting " << name << " transport worker thread" << endl;
 
 // 			if( !phoneconfig->defaultIdentity->getSim() || phoneconfig->defaultIdentity->getSim()->getCertificateChain().isNull() ){
 // 				merr << "Certificate needed for TLS server. You will not be able to receive incoming TLS connections." << endl;
 // 			}
 
-		try{
-			startServer( name );
-		}catch( NetworkException &e ){
-			//FIXME: This happens when binding to the IPv6 address
-			merr << "Error: Failed to create to " << name << " socket: "<< e.what()<<endl;
-		}
+		startServer( transport, prefPort );
 	}
 }
 
@@ -442,21 +485,22 @@ void SipStackInternal::startServer( const string &transportName ){
 	}
 
 	int32_t port = 0;
-	int32_t externalUdpPort = 0;
-	string ipString = config->localIpString;
 
 	if( transport->isSecure() )
 		port = config->preferedLocalSipsPort;
 	else
 		port = config->preferedLocalSipPort;
 
-	/*
-	  There are three different preferred local ports:
-	  preferedLocalUdpPort - Used by UDP transport only
-	  preferedLocalTcpPort - Used by other SIP transports, TCP etc.
-	  preferedLocalTlsPort - Used by all SIPS transport, TLS and other
-	 */
-	if( transportName == "UDP" ){
+	startServer( transport, port );
+}
+
+
+void SipStackInternal::startServer( MRef<SipTransport*> transport,
+				    int32_t &port ){
+	int32_t externalUdpPort = 0;
+	string ipString = config->localIpString;
+
+	if( transport->getName() == "UDP" ){
 		if( config->externalContactIP.size()>0 ){
 			ipString = config->externalContactIP;
 			externalUdpPort = config->externalContactUdpPort;
@@ -473,6 +517,55 @@ void SipStackInternal::startServer( const string &transportName ){
 }
 	
 
+void SipStackInternal::stopServers( bool secure ){
+	list<MRef<SipTransportConfig*> >::const_iterator i;
+	list<MRef<SipTransportConfig*> >::const_iterator last =
+		config->transports.end();
+	for( i = config->transports.begin(); i != last; i++ ){
+		MRef<SipTransportConfig*> transportConfig = (*i);
+		string name = transportConfig->getName();
+
+		if( !transportConfig->isEnabled() )
+			continue;
+
+		MRef<SipTransport*> transport =
+			SipTransportRegistry::getInstance()->findTransportByName( name );
+
+		if( !transport ){
+			mdbg << "Error: Failed to stop " << name << endl;
+			continue;
+		}
+
+		if( secure != transport->isSecure() ){
+			continue;
+		}
+
+		mdbg << "SipStack: Stopping " << name << " transport worker thread" << endl;
+
+		stopServer( transport );
+	}
+}
+
+
+void SipStackInternal::stopServer( const string &transportName ){
+	MRef<SipTransport*> transport =
+		SipTransportRegistry::getInstance()->findTransportByName( transportName );
+
+	if( !transport ){
+		mdbg << "Error: Failed to stop " << transportName << endl;
+		return;
+	}
+
+	stopServer( transport );
+}
+
+void SipStackInternal::stopServer( MRef<SipTransport*> transport ){
+	try{
+		dispatcher->getLayerTransport()->stopServer( transport );
+	}catch( NetworkException &e ){
+		mdbg << "Error: Failed to stop " << transport->getName() << ": "<< e.what()<<endl;
+	}
+}
 
 int32_t SipStackInternal::getLocalSipPort(bool usesStun, const string &transport ) {
 

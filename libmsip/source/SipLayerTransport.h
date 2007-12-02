@@ -81,7 +81,9 @@ class SipLayerTransport : public SipSMCommandReceiver,
 
 		void datagramSocketRead(MRef<DatagramSocket *> sock);
 
-		void startServer( MRef<SipTransport*> transport, const std::string & ipString, const std::string & ip6String, int32_t prefPort, int32_t externalUdpPort, MRef<CertificateChain *> certChain = NULL, MRef<CertificateSet *> cert_db = NULL);
+		void startServer( MRef<SipTransport*> transport, const std::string & ipString, const std::string & ip6String, int32_t &prefPort, int32_t externalUdpPort, MRef<CertificateChain *> certChain = NULL, MRef<CertificateSet *> cert_db = NULL);
+
+		void stopServer( MRef<SipTransport*> transport );
 
 		int32_t getLocalSipPort( const std::string &transport );
 
@@ -143,8 +145,8 @@ class SipLayerTransport : public SipSMCommandReceiver,
 		 * the low layer socket values. 
 		 */
 		int contactUdpPort;
-		int contactTcpPort;
-		int contactTlsPort;
+		int contactSipPort;
+		int contactSipsPort;
 
 		Mutex serversLock;
 		std::list<MRef<SipSocketServer *> > servers;

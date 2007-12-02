@@ -59,13 +59,11 @@ SipTransportTls::~SipTransportTls(){
 
 
 
-MRef<SipSocketServer *> SipTransportTls::createServer( MRef<SipSocketReceiver*> receiver, bool ipv6, const string &ipString, int32_t prefPort, MRef<CertificateSet *> cert_db, MRef<CertificateChain *> certChain )
+MRef<SipSocketServer *> SipTransportTls::createServer( MRef<SipSocketReceiver*> receiver, bool ipv6, const string &ipString, int32_t &prefPort, MRef<CertificateSet *> cert_db, MRef<CertificateChain *> certChain )
 {
 	MRef<ServerSocket *> sock;
 	MRef<SipSocketServer *> server;
 	int32_t port = prefPort;
-	bool fail;
-	int triesLeft=10;
 
 	if( certChain.isNull() || certChain->getFirst().isNull() ){
 		merr << "You need a personal certificate to run "
@@ -75,23 +73,13 @@ MRef<SipSocketServer *> SipTransportTls::createServer( MRef<SipSocketReceiver*> 
 		return NULL;
 	}
 
-	do {
-		fail=false;
-		try{
-			MRef<ServerSocket*> ssock =
-				TcpServerSocket::create( port, ipv6 );
-			sock = TLSServerSocket::create( ssock, /*config->cert*/certChain->getFirst(),
-					/*config->*/cert_db );
-			server = new StreamSocketServer( receiver, sock );
-			server->setExternalIp( ipString );
-		} catch (const BindFailed &bf){
-			fail=true;
-			triesLeft--;
-			if (!triesLeft)
-				throw;
-		}
-
-	} while (fail);
+	MRef<ServerSocket*> ssock =
+		TcpServerSocket::create( port, ipv6 );
+	sock = TLSServerSocket::create( ssock, certChain->getFirst(),
+					cert_db );
+	server = new StreamSocketServer( receiver, sock );
+	server->setExternalIp( ipString );
+	prefPort = sock->getPort();
 
 	return server;
 }

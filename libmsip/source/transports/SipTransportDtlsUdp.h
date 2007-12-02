@@ -45,7 +45,7 @@ class SipTransportDtlsUdp: public SipTransport{
 
 		virtual std::string getNaptrService() const { return "SIPS+D2U"; }
 
-		virtual MRef<SipSocketServer *> createServer( MRef<SipSocketReceiver*> receiver, bool ipv6, const std::string &ipString, int32_t prefPort, MRef<CertificateSet *> cert_db = NULL, MRef<CertificateChain *> certChain = NULL );
+		virtual MRef<SipSocketServer *> createServer( MRef<SipSocketReceiver*> receiver, bool ipv6, const std::string &ipString, int32_t &prefPort, MRef<CertificateSet *> cert_db = NULL, MRef<CertificateChain *> certChain = NULL );
 
 		// MPlugin
 		virtual std::string getName() const { return "DTLS-UDP"; }

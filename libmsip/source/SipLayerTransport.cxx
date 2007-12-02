@@ -342,8 +342,8 @@ SipLayerTransport::SipLayerTransport(MRef<CertificateChain *> cchain,
 		cert_chain(cchain), cert_db(cert_db_), tls_ctx(NULL)
 {
 	contactUdpPort=0;
-	contactTcpPort=0;
-	contactTlsPort=0;
+	contactSipPort=0;
+	contactSipsPort=0;
 	manager = new SocketServer();
 	manager->start();
 }
@@ -1241,10 +1241,12 @@ void StreamThreadData::streamSocketRead( MRef<StreamSocket *> socket ){
 }
 
 
-void SipLayerTransport::startServer( MRef<SipTransport*> transport, const string &ipString, const string &ip6String, int32_t prefPort, int32_t externalUdpPort, MRef<CertificateChain *> certChain, MRef<CertificateSet *> cert_db){
+void SipLayerTransport::startServer( MRef<SipTransport*> transport, const string &ipString, const string &ip6String, int32_t &prefPort, int32_t externalUdpPort, MRef<CertificateChain *> certChain, MRef<CertificateSet *> cert_db){
 	MRef<SipSocketServer *> server;
+	MRef<SipSocketServer *> server6;
+	int32_t port = prefPort;
 
-	server = transport->createServer( this, false, ipString, prefPort, cert_db, certChain );
+	server = transport->createServer( this, false, ipString, port, cert_db, certChain );
 
 	if( !server ){
 		mdbg << "SipLayerTransport: startServer failed to create server" << endl;
@@ -1255,37 +1257,65 @@ void SipLayerTransport::startServer( MRef<SipTransport*> transport, const string
 		server->setExternalPort( externalUdpPort );
 	}
 
-	addServer( server );
-
 	if( transport->getName() == "UDP" ){
 		contactUdpPort = server->getExternalPort();
 	}
 	else if( transport->isSecure() ){
-		contactTlsPort = server->getExternalPort();
+		contactSipsPort = server->getExternalPort();
 	}
 	else{
-		contactTcpPort = server->getExternalPort();
+		contactSipPort = server->getExternalPort();
 	}
 
 	if( ip6String != "" ){
-		MRef<SipSocketServer *> server6;
-
-		server6 = transport->createServer( this, true, ip6String, prefPort, cert_db, certChain );
+		server6 = transport->createServer( this, true, ip6String, port, cert_db, certChain );
 		// IPv6 doesn't need different external udp port
 		// since it never is NATed.
+	}
+
+	addServer( server );
+	if( server6 )
 		addServer( server6 );
+
+	prefPort = port;
+}
+
+void SipLayerTransport::stopServer( MRef<SipTransport*> transport ){
+	MRef<SipSocketServer *> server =
+		findServer( transport->getSocketType(), false );
+
+	MRef<SipSocketServer *> server6 =
+		findServer( transport->getSocketType(), true );
+
+	// First stop both the IPv4 and IPv6 servers
+	if( server )
+		server->stop();
+	if( server6 )
+		server6->stop();
+
+	// then wait for both threads to exit.
+	if( server )
+		server->join();
+	if( server6 )
+		server6->join();
+}
+
+int32_t SipLayerTransport::getLocalSipPort( const string &transportName ) {
+	if( transportName == "UDP" || transportName == "udp" ){
+		return contactUdpPort;
+	}
+
+	MRef<SipTransport*> transport =
+		SipTransportRegistry::getInstance()->findTransportByName( transportName );
+
+	if( !transport ){
+		return 0;
+	}
+
+	if( transport->isSecure() ){
+		return contactSipsPort;
+	}
+	else {
+		return contactSipPort;
 	}
 }
-
-
-int32_t SipLayerTransport::getLocalSipPort( const string &transport ) {
-	if (transport=="TCP" || transport=="tcp")
-		return contactTcpPort;
-	if (transport=="TLS" || transport=="tls")
-		return contactTlsPort;
-	if (transport=="DTLS-UDP" || transport=="dtls-udp")
-		return contactTlsPort;
-	return contactUdpPort;
-}
-
-

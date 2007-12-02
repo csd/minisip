@@ -58,28 +58,17 @@ SipTransportTcp::~SipTransportTcp(){
 
 
 
-MRef<SipSocketServer *> SipTransportTcp::createServer( MRef<SipSocketReceiver*> receiver, bool ipv6, const string &ipString, int32_t prefPort, MRef<CertificateSet *> cert_db, MRef<CertificateChain *> certChain )
+MRef<SipSocketServer *> SipTransportTcp::createServer( MRef<SipSocketReceiver*> receiver, bool ipv6, const string &ipString, int32_t &prefPort, MRef<CertificateSet *> cert_db, MRef<CertificateChain *> certChain )
 {
 	MRef<ServerSocket *> sock;
 	MRef<SipSocketServer *> server;
 	int32_t port = prefPort;
-	bool fail;
-	int triesLeft=10;
 
-	do {
-		fail=false;
-		try {
-			sock = TcpServerSocket::create( port, ipv6 );
-			server = new StreamSocketServer( receiver, sock );
-			server->setExternalIp( ipString );
+	sock = TcpServerSocket::create( port, ipv6 );
+	server = new StreamSocketServer( receiver, sock );
+	server->setExternalIp( ipString );
 
-		} catch ( const BindFailed &bf ){
-			fail=true;
-			triesLeft--;
-			if (!triesLeft)
-				throw;
-		}
-	} while ( fail );
+	prefPort = sock->getPort();
 
 	return server;
 }

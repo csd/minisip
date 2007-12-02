@@ -29,6 +29,7 @@
 #include<libmutil/CommandString.h>
 #include<libmsip/SipDialogConfig.h>
 #include<libmsip/SipTimers.h>
+#include<libmsip/SipTransport.h>
 
 #include"SipLayerTransport.h"
 #include"transactions/SipTransaction.h"
@@ -88,13 +89,29 @@ class SipStackInternal : public SipSMCommandReceiver, public Runnable{
 
 		MRef<SipTransportConfig*> findTransportConfig( const std::string &transportName ) const;
 
+		/** Start all enabled SIP(S) servers */
 		void startServers();
 
-		void startServer( const std::string &tranportName );
+		/** Start all enabled SIP(S) servers */
+		void stopServers();
+
+		void startServer( const std::string &transportName );
+
+		void stopServer( const std::string &transportName );
 
 		int32_t getLocalSipPort(bool usesStun, const std::string &transport);
 
 		void free();
+
+	protected:
+		void startSipServers();
+		void startSipsServers();
+		void startServers( bool secure, int32_t &prefPort );
+		void startServer( MRef<SipTransport*> transport,
+				  int32_t &port );
+
+		void stopServers( bool secure );
+		void stopServer( MRef<SipTransport*> transport );
 
 	private:
 

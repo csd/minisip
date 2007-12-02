@@ -72,8 +72,12 @@ class LIBMSIP_API SipTransport: public MPlugin{
 		 */
 		virtual int32_t getSocketType() const=0;
 
-		/** Setup a new listening socket */
-		virtual MRef<SipSocketServer *> createServer( MRef<SipSocketReceiver*> receiver, bool ipv6, const std::string &ipString, int32_t prefPort, MRef<CertificateSet *> cert_db = NULL, MRef<CertificateChain *> certChain = NULL ) = 0;
+		/**
+		 * Setup a new listening socket.
+		 * @arg prefPort Port to listen on. If 0, then it contains
+		 * the chosen dynamic port after returning.
+		 */
+		virtual MRef<SipSocketServer *> createServer( MRef<SipSocketReceiver*> receiver, bool ipv6, const std::string &ipString, int32_t &prefPort, MRef<CertificateSet *> cert_db = NULL, MRef<CertificateChain *> certChain = NULL ) = 0;
 		/**
 		 * Setup a new connection, implemented by
 		 * connection-oriented transports only

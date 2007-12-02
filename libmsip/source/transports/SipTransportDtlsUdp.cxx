@@ -64,35 +64,17 @@ SipTransportDtlsUdp::~SipTransportDtlsUdp(){
  *   number here. This can be used for example to implement support for
  *   passing NATs with the help of a STUN server.
  */
-MRef<SipSocketServer *> SipTransportDtlsUdp::createServer( MRef<SipSocketReceiver*> receiver, bool ipv6, const string &ipString, int32_t prefPort, MRef<CertificateSet *> cert_db, MRef<CertificateChain *> certChain  )
+MRef<SipSocketServer *> SipTransportDtlsUdp::createServer( MRef<SipSocketReceiver*> receiver, bool ipv6, const string &ipString, int32_t &prefPort, MRef<CertificateSet *> cert_db, MRef<CertificateChain *> certChain  )
 {
 	int32_t port = prefPort;
-	int triesLeft=10;
 	MRef<SipSocketServer *> server;
-	bool fail;
 
-	do {
-		fail=false;
-		try {
-
-			MRef<DatagramSocket *> sock = new UDPSocket( port, ipv6 );
-			MRef<DatagramSocket *> dsock =
-				DTLSSocket::create( sock, certChain->getFirst(), cert_db );
-			server = new DatagramSocketServer( receiver, dsock );
-			server->setExternalIp( ipString );
-
-
-		} catch(const BindFailed &bf){
-			fail=true;
-
-			// If the port is already in use, try random port number in the range 2048 to 63488
-			port = rand()%(0xFFFF-4096) + 2048; 
-			triesLeft--;
-			if (!triesLeft)
-				throw;
-
-		}
-	}while(fail);
+	MRef<DatagramSocket *> sock = new UDPSocket( port, ipv6 );
+	MRef<DatagramSocket *> dsock =
+		DTLSSocket::create( sock, certChain->getFirst(), cert_db );
+	server = new DatagramSocketServer( receiver, dsock );
+	server->setExternalIp( ipString );
+	prefPort = sock->getPort();
 
 	return server;
 }
