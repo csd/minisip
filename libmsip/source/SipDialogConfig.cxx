@@ -268,15 +268,17 @@ string SipIdentity::setSipProxy( bool autodetect, string userUri, string transpo
 		proxyUri.setPort( proxyPort );
 	}
 
-	if( transport ){
-		proxyUri.setProtocolId( transport->getUriScheme() );
-		proxyUri.setTransport( transport->getProtocol() );
+	if( proxyUri.isValid() ){
+		if( transport ){
+			proxyUri.setProtocolId( transport->getUriScheme() );
+			proxyUri.setTransport( transport->getProtocol() );
+		}
+
+		proxyUri.setParameter( "lr", "true" );
+		proxyUri.makeValid( true );
+
+		routeSet.push_back( proxyUri );
 	}
-
-	proxyUri.setParameter( "lr", "true" );
-	proxyUri.makeValid( true );
-
-	routeSet.push_back( proxyUri );
 
 	return ret;
 }
