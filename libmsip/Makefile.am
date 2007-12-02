@@ -24,6 +24,13 @@ msip_dtls_src =      source/transports/SipTransportDtlsUdp.h \
 		     source/transports/SipTransportDtlsUdp.cxx
 endif HAVE_DTLS
 
+if HAVE_SCTP
+msip_sctp_src =	     source/transports/SipTransportSctp.h \
+		     source/transports/SipTransportSctp.cxx \
+		     source/transports/SipTransportTlsSctp.h \
+		     source/transports/SipTransportTlsSctp.cxx
+endif HAVE_SCTP
+
 msip_src =           source/SipDialogConfig.cxx \
 		     source/SipAuthenticationDigest.cxx \
 		     source/SipStack.cxx \
@@ -68,6 +75,7 @@ msip_src =           source/SipDialogConfig.cxx \
 		     source/transports/SipTransportTls.h \
 		     source/transports/SipTransportTls.cxx \
 		     $(msip_dtls_src) \
+		     $(msip_sctp_src) \
                      source/dialogs/SipTransitionUtils.cxx \
 		     source/dialogs/SipDialog.cxx \
 		     source/dialogs/SipDialogRegister.cxx \

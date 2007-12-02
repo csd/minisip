@@ -27,6 +27,8 @@
 #include"SipTransportTcp.h"
 #include"SipTransportTls.h"
 #include"SipTransportDtlsUdp.h"
+#include"SipTransportSctp.h"
+#include"SipTransportTlsSctp.h"
 
 #include<algorithm>
 
@@ -64,6 +66,10 @@ SipTransportRegistry::SipTransportRegistry(){
 	registerPlugin( new SipTransportTls( NULL ) );
 #ifdef HAVE_DTLS
 	registerPlugin( new SipTransportDtlsUdp( NULL ) );
+#endif
+#ifdef HAVE_SCTP
+	registerPlugin( new SipTransportSctp( NULL ) );
+	registerPlugin( new SipTransportTlsSctp( NULL ) );
 #endif
 }
 
@@ -119,6 +125,7 @@ MRef<SipTransport*> SipTransportRegistry::findTransport( const string &protocol,
 		}
 	}
 
+	mdbg << "SipTransport: transport not found!!! = '" << lcProt << "'" << endl;
 	return NULL;
 }
 

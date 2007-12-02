@@ -216,9 +216,10 @@ void IP4Address::connect(Socket &socket, int32_t port) const{
 	
 	int error = ::connect(socket.getFd(), (struct sockaddr *)&sin, sizeof(sin));
 	if (error < 0){
+		int failedErrno = errno;
 		merror("connect");
 		socket.close();
-		throw ConnectFailed( error );
+		throw ConnectFailed( failedErrno );
 	}
 
 }

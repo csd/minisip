@@ -30,6 +30,8 @@
 #define SOCKET_TYPE_TCP         0x11
 #define SOCKET_TYPE_TLS         0x12
 #define SOCKET_TYPE_TLSSRP      0x13
+#define SOCKET_TYPE_SCTP        0x14
+#define SOCKET_TYPE_TLS_SCTP    0x15
 
 #define SOCKET_TYPE_UDP         0x20
 

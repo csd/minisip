@@ -40,6 +40,16 @@ AC_ARG_ENABLE(ldap,
 AM_CONDITIONAL(ENABLE_LDAP, test "${ENABLE_LDAP}" = "yes" )
 AC_SUBST(LDAP_LIBS)
 
+AC_ARG_ENABLE(sctp,
+    AS_HELP_STRING([--enable-sctp],
+        [Enable SCTP]),,[enable_sctp=no])
+
+if test "${enable_ldap}" = "yes"; then
+   AC_DEFINE(ENABLE_SCTP, [], [Define to 1 if you have SCTP support])
+   have_sctp=yes
+fi  
+AM_CONDITIONAL(ENABLE_SCTP, test "${have_sctp}" = "yes" )
+
 AG_CHECK_POSIX_REGCOMP
 AM_CONDITIONAL(HAVE_POSIX_REGCOMP, test "${ag_cv_posix_regcomp}" = "yes")
 

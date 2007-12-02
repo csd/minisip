@@ -45,6 +45,10 @@ AM_MINISIP_CHECK_LIBMNETUTIL([0.3.1])
 AM_MINISIP_CHECK_LIBMCRYPTO([0.3.0])
 AM_MINISIP_CHECK_COMPLETE
 
+dnl Checks for SCTP support in libmnetutil
+AM_MINISIP_CHECK_LIBMNETUTIL_SCTP([have_sctp=yes], [have_sctp=no])
+AM_CONDITIONAL(HAVE_SCTP, test "${have_sctp}" = "yes")
+
 dnl Checks for DTLS support in libmcrypto
 AM_MINISIP_CHECK_LIBMCRYPTO_DTLS([have_dtls=yes], [have_dtls=no])
 AM_CONDITIONAL(HAVE_DTLS, test "${have_dtls}" = "yes")

@@ -20,6 +20,8 @@ pkginclude_HEADERS =    \
 			libmnetutil/StreamSocket.h \
 			libmnetutil/TCPSocket.h \
 			libmnetutil/TcpServerSocket.h \
+			libmnetutil/SctpSocket.h \
+			libmnetutil/SctpServerSocket.h \
 			libmnetutil/NetUtil.h \
 			libmnetutil/UDPSocket.h \
 			libmnetutil/DatagramSocket.h \

@@ -85,6 +85,7 @@ SocketServer::SocketServer(): fdSignal( -1 ), doStop( false )
 SocketServer::~SocketServer()
 {
 	stop();
+	join();
 }
 
 void SocketServer::start()

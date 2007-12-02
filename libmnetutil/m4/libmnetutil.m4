@@ -62,3 +62,33 @@ AC_DEFUN([AM_MINISIP_CHECK_LIBMNETUTIL],[
   ])
 # End of AM_MINISIP_CHECK_LIBMNETUTIL
 #
+
+# AM_MINISIP_CHECK_LIBMNETUTIL_SCTP([ACTION-IF-FOUND [,ACTION-IF-NOT-FOUND]])
+# ------------------------------------
+AC_DEFUN([AM_MINISIP_CHECK_LIBMNETUTIL_SCTP],[ 
+	AC_REQUIRE([AM_MINISIP_CHECK_LIBMNETUTIL]) dnl
+	mnetutil_sctp_found=yes
+
+dnl Checks for SCTP support in libmnetutil
+	mnetutil_save_LIBS="$LIBS"
+	mnetutil_save_LDFLAGS="$LDFLAGS"
+	mnetutil_save_CPPFLAGS="$CPPFLAGS"
+	LDFLAGS="$LDFLAGS $LIBMNETUTIL_LDFLAGS"
+	LIBS="$MINISIP_LIBS $LIBS"
+	CPPFLAGS="$CPPFLAGS $MINISIP_CFLAGS"
+	AM_MINISIP_CHECK_WINFUNCS(["new SctpSocket(0,0,0)"],,[mnetutil_sctp_found=no],[dnl
+#include<libmnetutil/SctpSocket.h>
+])
+	LIBS="$mnetutil_save_LIBS"
+	LDFLAGS="$mnetutil_save_LDFLAGS"
+	CPPFLAGS="$mnetutil_save_CPPFLAGS"
+
+	if test "${mnetutil_sctp_found}" = "yes"; then
+		AC_DEFINE([HAVE_SCTP], 1, [Define to 1 if you have libmnetutil with SCTP support])
+		ifelse([$1], , :, [$1])
+	else
+		ifelse([$2], , :, [$2])
+	fi
+  ])
+# End of AM_MINISIP_CHECK_LIBMNETUTIL_SCTP
+#
