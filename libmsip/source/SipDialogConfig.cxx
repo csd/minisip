@@ -243,6 +243,7 @@ string SipIdentity::setSipProxy( bool autodetect, string userUri, string transpo
 	string ret = "";
 	MRef<SipTransport*> transport;
 	SipUri proxyUri;
+	bool useProxy = false;
 
 	if( !transportName.empty() ){
 		transport = SipTransportRegistry::getInstance()->findTransportByName( transportName );
@@ -261,14 +262,16 @@ string SipIdentity::setSipProxy( bool autodetect, string userUri, string transpo
 
 		proxyUri.setProtocolId( aor.getProtocolId() );
 		proxyUri.setIp( aor.getIp() );
+		useProxy = true;
 	}
 	else if( proxyAddr != "" ){
 		proxyUri.setProtocolId( "sip" );
 		proxyUri.setIp( proxyAddr );
 		proxyUri.setPort( proxyPort );
+		useProxy = true;
 	}
 
-	if( proxyUri.isValid() ){
+	if( useProxy ){
 		if( transport ){
 			proxyUri.setProtocolId( transport->getUriScheme() );
 			proxyUri.setTransport( transport->getProtocol() );
