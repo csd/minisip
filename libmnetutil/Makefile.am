@@ -31,6 +31,11 @@ ipv6_src += \
 		    source/IP6Address.cxx
 endif
 
+if ENABLE_SCTP
+sctp_src =	    source/SctpSocket.cxx \
+		    source/SctpServerSocket.cxx
+endif ENABLE_SCTP
+
 ldap_src = \
 		    source/LdapConnection.cxx \
                     source/LdapEntry.cxx \
@@ -52,8 +57,7 @@ mnetutil_src = \
 		    source/SocketServer.cxx \
 		    source/TCPSocket.cxx \
 		    source/TcpServerSocket.cxx \
-		    source/SctpSocket.cxx \
-		    source/SctpServerSocket.cxx \
+		    $(sctp_src) \
 		    source/NetUtil.cxx \
 		    source/UDPSocket.cxx \
 		    source/DatagramSocket.cxx \
