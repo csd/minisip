@@ -67,7 +67,7 @@ bool SipLayerDialog::removeDialog(string callId){
 	size_t n = dialogs.erase(callId);
 #ifdef DEBUG_OUTPUT
 	if (n!=1){
-		merr << "WARNING: dialogs.erase should return 1, but returned "<< n<<endl;
+		merr << "WARNING: dialogs.erase should return 1, but returned "<< (short)n<<endl;
 	}
 #endif
 	return n==1;
