@@ -72,7 +72,7 @@
 #include<libminisip/gui/LogEntry.h>
 #include<libminisip/contacts/ContactDb.h>
 #include<libminisip/media/SubsystemMedia.h>
-#include<libminisip/media/Media.h>
+#include<libminisip/media/RealtimeMedia.h>
 #include<libminisip/ipprovider/IpProvider.h>
 #include<libminisip/signaling/conference/ConferenceControl.h>
 #include<libminisip/signaling/conference/ConfCallback.h>
@@ -80,6 +80,7 @@
 #include<libminisip/contacts/PhoneBook.h>
 #include<libminisip/signaling/conference/ConfMessageRouter.h>
 #include<libminisip/media/soundcard/SoundDriverRegistry.h>
+#include<libminisip/media/soundcard/Resampler.h>
 #include<libminisip/media/codecs/Codec.h>
 
 #ifdef ZRTP_SUPPORT

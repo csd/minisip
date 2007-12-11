@@ -30,7 +30,7 @@
 #include<libmutil/MemObject.h>
 
 #include<libminisip/media/rtp/CryptoContext.h>
-#include<libminisip/media/Media.h>
+#include<libminisip/media/RealtimeMedia.h>
 #include"RtpReceiver.h"
 #include<libminisip/media/rtp/SRtpPacket.h>
 
@@ -44,7 +44,7 @@ class ZrtpHostBridgeMinisip;
 class UDPSocket;
 class SdpHeaderM;
 class IpProvider;
-class Media;
+class RealtimeMedia;
 
 /**
  * Abstract class that implements common functions to a
@@ -121,7 +121,7 @@ class LIBMINISIP_API MediaStream : public MObject{
 		Returns an MRef to the Media object used by this media stream.
 		Use with care.
 		*/
-		MRef<Media *> getMedia() { return media; }
+		MRef<RealtimeMedia *> getMedia() { return media; }
 #ifdef ZRTP_SUPPORT
 		/**
 		 * Set the ZRTP implementation host brigde for this media stream.
@@ -160,9 +160,9 @@ class LIBMINISIP_API MediaStream : public MObject{
 
 	protected:
 		MRef<CryptoContext *> getCryptoContext( uint32_t ssrc, uint16_t seq_no );
-		MediaStream( std::string callId, MRef<Media *> );
+		MediaStream( std::string callId, MRef<RealtimeMedia *> );
 		std::string callId;
-		MRef<Media *> media;
+		MRef<RealtimeMedia *> media;
 		uint32_t csbId;
 
 		uint8_t localPayloadType;
@@ -197,7 +197,7 @@ class LIBMINISIP_API MediaStreamReceiver : public MediaStream{
 		 * traversal mechanism
 		 */
 		MediaStreamReceiver( std::string callId,
-				MRef<Media *> media,
+				MRef<RealtimeMedia *> media,
 				MRef<RtpReceiver *> rtpReceiver,
 				MRef<RtpReceiver *> rtp6Receiver = NULL );
 
@@ -318,7 +318,7 @@ class LIBMINISIP_API MediaStreamSender : public MediaStream{
 		 * is created
 		 */
 		MediaStreamSender( std::string callId,
-				   MRef<Media *> media,
+				   MRef<RealtimeMedia *> media,
 				   MRef<UDPSocket *> senderSock=NULL,
 				   MRef<UDPSocket *> sender6Sock=NULL );
 

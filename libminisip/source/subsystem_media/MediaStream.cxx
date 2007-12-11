@@ -47,7 +47,7 @@
 
 using namespace std;
 
-MediaStream::MediaStream( string cid, MRef<Media *> m) : callId(cid), media(m),ka(NULL) {
+MediaStream::MediaStream( string cid, MRef<RealtimeMedia *> m) : callId(cid), media(m),ka(NULL) {
 	disabled = false;
 #ifdef ZRTP_SUPPORT
 	zrtpBridge = NULL;
@@ -277,7 +277,7 @@ MRef<ZrtpHostBridgeMinisip *> MediaStream::getZrtpHostBridge() {
 
 #endif
 
-MediaStreamReceiver::MediaStreamReceiver( string callid, MRef<Media *> m,
+MediaStreamReceiver::MediaStreamReceiver( string callid, MRef<RealtimeMedia *> m,
 		MRef<RtpReceiver *> rtpRecv, 
 		MRef<RtpReceiver *> rtp6Recv ):
 			MediaStream( callid,  m ),
@@ -443,7 +443,7 @@ uint16_t MediaStreamReceiver::getPort( const string &addrType ){
 }
 
 
-MediaStreamSender::MediaStreamSender( string callid, MRef<Media *> m, 
+MediaStreamSender::MediaStreamSender( string callid, MRef<RealtimeMedia *> m, 
 		MRef<UDPSocket *> senderSocket, 
 		MRef<UDPSocket *> sender6Socket ):
 			MediaStream( callid, m ){

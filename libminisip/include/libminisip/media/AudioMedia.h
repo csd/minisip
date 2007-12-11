@@ -27,8 +27,8 @@
 
 #include<libminisip/libminisip_config.h>
 
-#include<libminisip/media/Media.h>
-#include<libminisip/media/soundcard/SoundSource.h>
+#include<libminisip/media/RealtimeMedia.h>
+#include<libminisip/media/soundcard/SoundIO.h>
 
 #ifdef AEC_SUPPORT
 #include<libminisip/media/aec/aec.h>		//hanning
@@ -47,7 +47,7 @@ class Resampler;
  * play out audio data. It is created upon startup, or when the
  * media configuration changes.
  */
-class LIBMINISIP_API AudioMedia : public Media, public SoundRecorderCallback{
+class LIBMINISIP_API AudioMedia : public RealtimeMedia, public SoundRecorderCallback{
 
 	public:
 		/**

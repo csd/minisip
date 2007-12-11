@@ -74,7 +74,7 @@ using namespace std;
 //                soundIo(soundIo){
 AudioMedia::AudioMedia( MRef<SoundIO *> soundIo_, 
 			std::list<MRef<Codec *> > codecList_):
-							Media(codecList_),
+							RealtimeMedia(codecList_),
 							soundIo(soundIo_){
 						
 	// for audio media, we assume that we can both send and receive
