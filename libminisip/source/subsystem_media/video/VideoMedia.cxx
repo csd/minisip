@@ -44,7 +44,7 @@
 using namespace std;
 
 VideoMedia::VideoMedia( MRef<Codec *> codec, MRef<VideoDisplay *> display, MRef<ImageMixer *> mixer, MRef<Grabber *> grabber, uint32_t receivingWidth, uint32_t receivingHeight ):
-                Media( codec ),grabber(grabber),display(display),mixer(mixer),receivingWidth(receivingWidth),receivingHeight(receivingHeight){
+                RealtimeMedia( codec ),grabber(grabber),display(display),mixer(mixer),receivingWidth(receivingWidth),receivingHeight(receivingHeight){
 
         this->codec = dynamic_cast<VideoCodec *>(*codec);
         massert( this->codec );
@@ -100,7 +100,7 @@ void VideoMedia::playData( MRef<RtpPacket *> packet ){
 
 
 void VideoMedia::sendVideoData( byte_t * data, uint32_t length, uint32_t ts, bool marker ){
-        Media::sendData( data, length, ts, marker );
+        sendData( data, length, ts, marker );
 }
 
 void VideoMedia::registerMediaSource( uint32_t ssrc, string callId ){

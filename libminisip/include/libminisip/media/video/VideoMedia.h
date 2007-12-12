@@ -27,7 +27,7 @@
 
 #include<libminisip/libminisip_config.h>
 
-#include<libminisip/media/Media.h>
+#include<libminisip/media/RealtimeMedia.h>
 #include<libminisip/media/video/ImageHandler.h>
 #include<libminisip/media/video/display/VideoDisplay.h>
 #include<libminisip/media/video/codec/AVDecoder.h>
@@ -47,7 +47,8 @@ class AVDecoder;
 class ImageMixer;
 class RtpPacket;
 
-class LIBMINISIP_API VideoMedia : public Media, public VideoEncoderCallback{
+class LIBMINISIP_API VideoMedia : public RealtimeMedia,
+				  public VideoEncoderCallback{
 
 	public:
 		VideoMedia( MRef<Codec *> codec, MRef<VideoDisplay *> display, MRef<ImageMixer *> mixer, MRef<Grabber *> = NULL, uint32_t receivingWidth = 176, uint32_t receivingHeight=144 );
