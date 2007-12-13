@@ -321,7 +321,7 @@ bool Session::addRealtimeMediaToOffer(MRef<SdpPacket*> result, const string &pee
 			payloadType = (*iC)->getSdpMediaType();
 			rtpmap = (*iC)->getSdpMediaAttributes();
 			
-			m->addFormat( payloadType );
+			m->addFormat( itoa(payloadType) );
 			if( rtpmap != "" ){
 				MRef<SdpHeaderA*> a = new SdpHeaderA("a=X");
 				a->setAttributes( "rtpmap:" + itoa( payloadType) + " " + rtpmap );
@@ -334,7 +334,7 @@ bool Session::addRealtimeMediaToOffer(MRef<SdpPacket*> result, const string &pee
 			}
 		}
 		//added static DTMF SDP headers in INVITE
-		m->addFormat(101);
+		m->addFormat( "101" );
 		MRef<SdpHeaderA*> dtmf = new SdpHeaderA("a=X");
 		dtmf->setAttributes("rtpmap:101 telephone-event/8000");
 		m->addAttribute(*dtmf);
@@ -776,15 +776,15 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
 					
 					/* found a receiver, accept the offer */
 					//add the payload type to the offer, as accepted ...
-					int payloadTypeAccepted = offerM->getFormat( j );
-					string payloadStr = itoa( payloadTypeAccepted );
+					string payloadTypeAccepted = offerM->getFormat( j );
+					//string payloadStr = itoa( payloadTypeAccepted );
 					answerM->addFormat( payloadTypeAccepted );
 					MRef<SdpHeaderA*> rtpmap = new SdpHeaderA("a=X");
 					MRef<SdpHeaderA*> fmtp = new SdpHeaderA("a=X");
 					       
-					rtpmap->setAttributes( "fmtp:" + payloadStr
+					rtpmap->setAttributes( "fmtp:" + /*payloadStr*/ payloadTypeAccepted
 								 + " " + offerM->getRtpMap( payloadTypeAccepted ) );
-					fmtp->setAttributes(   "rtpmap:" + payloadStr
+					fmtp->setAttributes(   "rtpmap:" + /*payloadStr*/ payloadTypeAccepted
 								+ " " + offerM->getRtpMap( payloadTypeAccepted ) );
 					
 					answerM->addAttribute( *rtpmap );

@@ -249,7 +249,7 @@ string SdpPacket::getKeyMgmt(){
 }
 	
 
-int32_t SdpPacket::getCodecMatch(SdpPacket &pack){
+string SdpPacket::getFormatMatch(SdpPacket &pack){
 	MRef<SdpHeaderM*> mym;
 	MRef<SdpHeaderM*> otherm;
 
@@ -306,7 +306,7 @@ int32_t SdpPacket::getCodecMatch(vector<CODECInterface *>codecs){
 }
 #endif
 
-int32_t SdpPacket::getFirstMediaFormat(){
+string SdpPacket::getFirstMediaFormat(){
 	MRef<SdpHeaderM*> mym;
 
 	for (unsigned i = 0 ; i< headers.size(); i++)
@@ -322,7 +322,7 @@ int32_t SdpPacket::getFirstMediaFormat(){
 
 }
 
-bool SdpPacket::mediaFormatAvailable(int32_t f){
+bool SdpPacket::mediaFormatAvailable(string f){
 	MRef<SdpHeaderM*> mym;
 
 	unsigned int i;

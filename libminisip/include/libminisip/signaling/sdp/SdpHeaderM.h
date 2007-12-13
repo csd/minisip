@@ -53,9 +53,9 @@ class LIBMINISIP_API SdpHeaderM : public SdpHeader{
 
 		virtual std::string getMemObjectType() const {return "SdpHeaderM";}
 
-		void addFormat(int32_t format);
+		void addFormat(std::string format);
 		int32_t getNrFormats();
-		int32_t getFormat(int32_t i);
+		std::string getFormat(int32_t i);
 
 		std::string getMedia();
 		void setMedia(std::string m);
@@ -75,9 +75,9 @@ class LIBMINISIP_API SdpHeaderM : public SdpHeader{
 		std::string getAttribute(std::string key, uint32_t index);
 		std::list<MRef<SdpHeaderA*> > getAttributes();
 
-		std::string getRtpMap(uint32_t format);
+		std::string getRtpMap(std::string format);
 		
-		std::string getFmtpParam(uint32_t format);
+		std::string getFmtpParam(std::string format);
 
 		void setConnection( MRef<SdpHeaderC*> c );
 		MRef<SdpHeaderC*> getConnection();
@@ -87,7 +87,7 @@ class LIBMINISIP_API SdpHeaderM : public SdpHeader{
 		int32_t port;
 		int32_t nPorts;
 		std::string transport;
-		std::vector<int32_t> formats;
+		std::vector<std::string> formats;
 		std::list<MRef<SdpHeaderA*> >attributes;
 		MRef<SdpHeaderC*> connection;
 };

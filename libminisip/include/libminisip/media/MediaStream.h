@@ -165,7 +165,7 @@ class LIBMINISIP_API RealtimeMediaStream : public MObject{
 		MRef<RealtimeMedia *> media;
 		uint32_t csbId;
 
-		uint8_t localPayloadType;
+		std::string localPayloadType; //For RTP media, this is a number
 
 		MRef<CryptoContext *> initCrypto( uint32_t ssrc, uint16_t seq_no );
 		MRef<KeyAgreement *> ka;
@@ -480,7 +480,7 @@ class LIBMINISIP_API RealtimeMediaStreamSender : public RealtimeMediaStream{
 		MRef<IPAddress *> remoteAddress;
 		Mutex senderLock;
 
-		uint8_t payloadType;
+		std::string payloadType;
 		MRef<CodecState *> selectedCodec;
 
 		//Cesc -- does it conflict with bool disabled???

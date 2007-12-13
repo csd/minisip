@@ -65,9 +65,9 @@ class LIBMINISIP_API SdpPacket : public SipMessageContent{
 	
 
 		std::vector<MRef<SdpHeader*> > getHeaders();
-		int32_t getCodecMatch(SdpPacket &pack);
-		int32_t getFirstMediaFormat();
-		bool mediaFormatAvailable(int32_t f);
+		std::string getFormatMatch(SdpPacket &pack);
+		std::string getFirstMediaFormat();
+		bool mediaFormatAvailable(std::string f);
 		
 		/**
  		 * sets an attribute in the Session Level Part (before the first 'm'

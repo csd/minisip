@@ -89,7 +89,7 @@ bool RealtimeMediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
 	string sdpFmtpParam;
 
         //	int i;
-        uint8_t sdpPayloadType = (uint8_t) m->getFormat( formatIndex );
+        string sdpPayloadType = m->getFormat( formatIndex );
 
         media->handleMHeader( m );
 
@@ -139,7 +139,7 @@ bool RealtimeMediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
 
                 }
                 else{
-                        if( sdpPayloadType == codecPayloadType ){
+                        if( sdpPayloadType == itoa(codecPayloadType) ){
 				localPayloadType = codecPayloadType;
                                 return true;
                         }else{
@@ -569,8 +569,8 @@ void RealtimeMediaStreamSender::send( byte_t * data, uint32_t length, uint32_t *
 		packet->getHeader().setPayloadType( 101 );
 	}
 	else{
-		if( payloadType != 255 )
-			packet->getHeader().setPayloadType( payloadType );
+		if( payloadType != "255" )
+			packet->getHeader().setPayloadType( atoi(payloadType.c_str() ) );
 		else
 			packet->getHeader().setPayloadType( selectedCodec->getSdpMediaType() );
 	}
@@ -673,8 +673,8 @@ bool RealtimeMediaStreamSender::matches( MRef<SdpHeaderM *> m, uint32_t formatIn
 
 	if( result && !selectedCodec ){
 		selectedCodec = media->createCodecInstance(
-				localPayloadType  );
-		payloadType = (uint8_t)m->getFormat( formatIndex );
+				atoi( localPayloadType.c_str() )  );
+		payloadType = (uint8_t)atoi(m->getFormat( formatIndex ).c_str());
 	}
 
 	return result;

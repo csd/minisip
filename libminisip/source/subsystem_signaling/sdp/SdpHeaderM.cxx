@@ -95,7 +95,7 @@ SdpHeaderM::SdpHeaderM(string buildFrom) : SdpHeader(SDP_HEADER_TYPE_M, 8){
 		while (buildFrom[i]!=' ' && i<len )
 			f+=buildFrom[i++];
 		if (f.length()>0){
-			formats.push_back(atoi(f.c_str()));
+			formats.push_back( f );
 		}
 		
 		if ( i>=len )
@@ -174,7 +174,7 @@ void SdpHeaderM::setTransport(string t){
 	this->transport=t;
 }
 
-void SdpHeaderM::addFormat(int32_t f){
+void SdpHeaderM::addFormat(string f){
 	formats.push_back(f);;
 }
 
@@ -182,7 +182,7 @@ int32_t SdpHeaderM::getNrFormats(){
 	return (int32_t)formats.size();
 }
 
-int32_t SdpHeaderM::getFormat(int32_t i){
+string SdpHeaderM::getFormat(int32_t i){
 	return formats[i];
 }
 
@@ -197,7 +197,7 @@ string SdpHeaderM::getString(){
 	ret+=" "+transport;
 
 	for (unsigned i=0; i< formats.size(); i++)
-		ret+=" "+itoa(formats[i]);
+		ret+=" "+formats[i];
 
 	if( connection )
 		ret += "\r\n" + connection->getString();
@@ -224,7 +224,7 @@ string SdpHeaderM::getAttribute(string key, uint32_t n){
 	return "";
 }
 
-string SdpHeaderM::getRtpMap(uint32_t format){
+string SdpHeaderM::getRtpMap(std::string format){
 	int i=0;
 	string attrib;
 	string value = "rtpmap";
@@ -232,7 +232,7 @@ string SdpHeaderM::getRtpMap(uint32_t format){
 	while((attrib = getAttribute(value, i)) != ""){
 		size_t firstSpace = attrib.find(" ");
 // 		cerr << "SdpHeaderM::getRtpMap - value retrieved = " << attrib << "; substr = " << attrib.substr(0, firstSpace) << endl;
-		if( attrib.substr(0, firstSpace) == itoa(format) ){
+		if( attrib.substr(0, firstSpace) == format ){
 			return attrib.substr(firstSpace+1, attrib.size());
 		}
 		i++;
@@ -240,7 +240,7 @@ string SdpHeaderM::getRtpMap(uint32_t format){
 	return "";
 }
 
-string SdpHeaderM::getFmtpParam(uint32_t format){
+string SdpHeaderM::getFmtpParam(string format){
 	int i=0;
 	string attrib;
 	string value = "fmtp";
@@ -248,7 +248,7 @@ string SdpHeaderM::getFmtpParam(uint32_t format){
 	while((attrib = getAttribute(value, i)) != ""){
 		size_t firstSpace = attrib.find(" ");
 // 		cerr << "SdpHeaderM::getFmtpParam - value retrieved = " << attrib << "; substr = " << attrib.substr(0, firstSpace) << endl;
-		if( attrib.substr(0, firstSpace) == itoa(format) ){
+		if( attrib.substr(0, firstSpace) == format ){
 			return attrib.substr(firstSpace+1, attrib.size());
 		}
 		i++;
