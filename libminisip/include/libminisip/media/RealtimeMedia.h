@@ -34,7 +34,7 @@
 #include<libminisip/media/rtp/RtpPacket.h>
 #include<libminisip/media/MediaStream.h>
 
-class MediaStreamSender;
+class RealtimeMediaStreamSender;
 
 
 /**
@@ -67,9 +67,9 @@ class LIBMINISIP_API RealtimeMedia : public Media {
 		virtual void playData( MRef<RtpPacket *> rtpPacket )=0;
 		
 		/**
-		 * Send the data to all the registered MediaStreamSender.
+		 * Send the data to all the registered RealtimeMediaStreamSender.
 		 * If relevant, the data is first encoded using the
-		 * MediaStream's selected CODEC.
+		 * RealtimeMediaStream's selected CODEC.
 		 * @param data pointer to the data to send
 		 * @param length length of the data buffer
 		 * @param ts timestamp to use in the RTP header
@@ -79,14 +79,14 @@ class LIBMINISIP_API RealtimeMedia : public Media {
 		virtual void sendData( byte_t * data, uint32_t length, uint32_t ts, bool marker=false );
 
 		/**
-		 * Used by the media sessions to register a MediaStreamSender.
-		 * When a MediaStreamSender is registered to a Media object,
+		 * Used by the media sessions to register a RealtimeMediaStreamSender.
+		 * When a RealtimeMediaStreamSender is registered to a Media object,
 		 * it will be used to send sampled media from the corresponding
 		 * medium
-		 * @param sender a reference to the MediaStreamSender object to
+		 * @param sender a reference to the RealtimeMediaStreamSender object to
 		 * register
 		 */
-		virtual void registerMediaSender( MRef<MediaStreamSender *> sender );
+		virtual void registerRealtimeMediaSender( MRef<RealtimeMediaStreamSender *> sender );
 		
 		/**
 		 * Used by the media sessions to unregister a MediaStreamSender,
@@ -94,7 +94,7 @@ class LIBMINISIP_API RealtimeMedia : public Media {
 		 * @param sender a reference to the MediaStreamSender object to
 		 * unregister
 		 */
-		virtual void unRegisterMediaSender( MRef<MediaStreamSender *> sender );
+		virtual void unregisterRealtimeMediaSender( MRef<RealtimeMediaStreamSender *> sender );
 
 		/**
 		 * Used to register a new media source. Called upon discovery
@@ -109,7 +109,7 @@ class LIBMINISIP_API RealtimeMedia : public Media {
 		 * @param ssrc the SSRC identifier used by the media source to
 		 * unregister
 		 */
-		virtual void unRegisterMediaSource( uint32_t ssrc)=0;
+		virtual void unregisterMediaSource( uint32_t ssrc)=0;
 		
 		/**
 		 * deprecated...
@@ -147,7 +147,7 @@ class LIBMINISIP_API RealtimeMedia : public Media {
 		std::list< MRef<Codec *> > codecList;
 		Mutex codecListLock;
 		
-		std::list< MRef<MediaStreamSender *> > senders;
+		std::list< MRef<RealtimeMediaStreamSender *> > senders;
 		Mutex sendersLock;
 		Mutex sourcesLock;
 };

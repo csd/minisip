@@ -41,7 +41,7 @@ using namespace std;
 CallRecorder::CallRecorder(  MRef<AudioMedia *> aMedia, 
 				MRef<RtpReceiver *> rtpReceiver_,
 				MRef<IpProvider *> ipProvider ):
-		MediaStreamReceiver( "callrecorder", (RealtimeMedia *)*aMedia, rtpReceiver_ ),
+		RealtimeMediaStreamReceiver( "callrecorder", (RealtimeMedia *)*aMedia, rtpReceiver_ ),
 		enabledMic(false),
 		enabledNtwk(false),
 		fileDev( NULL ),
@@ -92,7 +92,7 @@ CallRecorder::~CallRecorder( ) {
 		}
 	}
 	if (audioMedia)
-		audioMedia->getSoundIO()->unRegisterRecorderReceiver( this );
+		audioMedia->getSoundIO()->unregisterRecorderReceiver( this );
 	if( micData!=NULL ) delete micData;
 	if( ntwkData!=NULL ) delete ntwkData;
 // 
@@ -100,7 +100,7 @@ CallRecorder::~CallRecorder( ) {
 
 void CallRecorder::free(){
 	if (audioMedia)
-		audioMedia->getSoundIO()->unRegisterRecorderReceiver( this );
+		audioMedia->getSoundIO()->unregisterRecorderReceiver( this );
 	audioMedia=NULL;
 
 	//free inherited references

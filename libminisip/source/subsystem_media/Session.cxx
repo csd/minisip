@@ -291,74 +291,27 @@ MRef<SdpPacket *> Session::emptySdp(){
 	return result;
 }
 
-MRef<SdpPacket *> Session::getSdpOffer( const string &peerUri, bool anatSupported ){ // used by the initiator when creating the first message
-	MRef<SdpPacket *> result;
-	list< MRef<MediaStreamReceiver *> >::iterator i;
+bool Session::addRealtimeMediaToOffer(MRef<SdpPacket*> result, const string &peerUri, bool anatSupported, string transport){
+	list< MRef<RealtimeMediaStreamReceiver *> >::iterator i;
 	std::list<std::string>::iterator iAttribute;
 	std::list<std::string> attributes;
 	string type;
 	uint16_t localPort = 0;
 	MRef<SdpHeaderM *> m;
-	string keyMgmtMessage;
 	std::list<MRef<Codec *> > codecs;
 	std::list<MRef<Codec *> >::iterator iC;
 	uint8_t payloadType;
 	string rtpmap;
-	const char *transport = NULL;
 	bool anat = false;
 
 // 	cerr << "Session::getSdpOffer" << endl;
-	result = emptySdp();
-	if( identity->securityEnabled ){
-		int type = 0;
-
-		// FIXME
-		switch( ka_type ){
-			case KEY_MGMT_METHOD_MIKEY_DH:
-				type = KEY_AGREEMENT_TYPE_DH;
-				break;
-			case KEY_MGMT_METHOD_MIKEY_PSK:
-				type = KEY_AGREEMENT_TYPE_PSK;
-				break;
-			case KEY_MGMT_METHOD_MIKEY_PK:
-				type = KEY_AGREEMENT_TYPE_PK;
-				break;
-			case KEY_MGMT_METHOD_MIKEY_DHHMAC:
-				type = KEY_AGREEMENT_TYPE_DHHMAC;
-				break;
-			case KEY_MGMT_METHOD_MIKEY_RSA_R:
-				type = KEY_AGREEMENT_TYPE_RSA_R;
-				break;
-			default:
-				mikey = NULL;
-				return NULL;
-		}
-
-		MRef<SdpHeaderA *> a;
-		MikeyConfig *config = new MikeyConfig( identity );
-		// FIXME free config
-		mikey = new Mikey( config );
-
-		addStreams();
-
-		keyMgmtMessage = mikey->initiatorCreate( type, peerUri );
-		if( mikey->error() ){
-			// something went wrong
-			return NULL;
-		}
-		result->setSessionLevelAttribute( "key-mgmt", keyMgmtMessage );
-		transport = "RTP/SAVP";
-	}
-	else{
-		transport = "RTP/AVP";
-	}
 
 	if( anatSupported && !localIpString.empty() && !localIp6String.empty() ){
 		anat = true;
 		result->setSessionLevelAttribute( "group", "ANAT 1 2" );
 	}
 
-	for( i = mediaStreamReceivers.begin(); i != mediaStreamReceivers.end(); i++ ){
+	for( i = realtimeMediaStreamReceivers.begin(); i != realtimeMediaStreamReceivers.end(); i++ ){
 		codecs = (*i)->getAvailableCodecs();
 
 		type = (*i)->getSdpMediaType();
@@ -448,13 +401,75 @@ MRef<SdpPacket *> Session::getSdpOffer( const string &peerUri, bool anatSupporte
 #ifdef DEBUG_OUTPUT	
 	cerr << "Session::getSdpOffer: " << endl << result->getString() << endl << endl;
 #endif
+
+	return true;
+
+}
+
+
+MRef<SdpPacket *> Session::getSdpOffer( const string &peerUri, bool anatSupported ){ // used by the initiator when creating the first message
+	string keyMgmtMessage;
+	const char *transport = NULL;
+	MRef<SdpPacket *> result;
+
+	result = emptySdp();
+
+	if( identity->securityEnabled ){
+		int type = 0;
+
+		// FIXME
+		switch( ka_type ){
+			case KEY_MGMT_METHOD_MIKEY_DH:
+				type = KEY_AGREEMENT_TYPE_DH;
+				break;
+			case KEY_MGMT_METHOD_MIKEY_PSK:
+				type = KEY_AGREEMENT_TYPE_PSK;
+				break;
+			case KEY_MGMT_METHOD_MIKEY_PK:
+				type = KEY_AGREEMENT_TYPE_PK;
+				break;
+			case KEY_MGMT_METHOD_MIKEY_DHHMAC:
+				type = KEY_AGREEMENT_TYPE_DHHMAC;
+				break;
+			case KEY_MGMT_METHOD_MIKEY_RSA_R:
+				type = KEY_AGREEMENT_TYPE_RSA_R;
+				break;
+			default:
+				mikey = NULL;
+				return false;
+		}
+
+		MRef<SdpHeaderA *> a;
+		MikeyConfig *config = new MikeyConfig( identity );
+		// FIXME free config
+		mikey = new Mikey( config );
+
+		addStreams();
+
+		keyMgmtMessage = mikey->initiatorCreate( type, peerUri );
+		if( mikey->error() ){
+			// something went wrong
+			return false;
+		}
+		result->setSessionLevelAttribute( "key-mgmt", keyMgmtMessage );
+		transport = "RTP/SAVP";
+	}
+	else{
+		transport = "RTP/AVP";
+	}
+
+
+
+	if (!addRealtimeMediaToOffer(result, peerUri, anatSupported, transport)){
+		return NULL;
+	}
 	return result;
 }
 
 bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 	unsigned int i;
 	int j;
-	MRef<MediaStreamReceiver *> receiver;
+	MRef<RealtimeMediaStreamReceiver *> receiver;
 	bool found = false;
 
 	this->peerUri = peerUri;
@@ -566,17 +581,17 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 	return found;
 }
 
-MRef<MediaStreamReceiver *> Session::matchFormat( MRef<SdpHeaderM *> m, uint32_t iFormat, MRef<IPAddress *> &remoteAddress ){
-	list< MRef<MediaStreamSender *> >::iterator iSStream;
-	list< MRef<MediaStreamReceiver *> >::iterator iRStream;
+MRef<RealtimeMediaStreamReceiver *> Session::matchFormat( MRef<SdpHeaderM *> m, uint32_t iFormat, MRef<IPAddress *> &remoteAddress ){
+	list< MRef<RealtimeMediaStreamSender *> >::iterator iSStream;
+	list< MRef<RealtimeMediaStreamReceiver *> >::iterator iRStream;
 
 	/* If we have a sender for this format, activate it */
 #ifdef DEBUG_OUTPUT
 	mdbg("media") << "Session::matchFormat: Starting senders loop" << endl;
 #endif
 	uint8_t j = 1;
-	mediaStreamSendersLock.lock();
-	for( iSStream =  mediaStreamSenders.begin(); iSStream != mediaStreamSenders.end(); iSStream++,j++ ){
+	realtimeMediaStreamSendersLock.lock();
+	for( iSStream =  realtimeMediaStreamSenders.begin(); iSStream != realtimeMediaStreamSenders.end(); iSStream++,j++ ){
 #ifdef DEBUG_OUTPUT
 		mdbg("media") << "Trying a sender"<< endl;
 #endif
@@ -603,12 +618,12 @@ MRef<MediaStreamReceiver *> Session::matchFormat( MRef<SdpHeaderM *> m, uint32_t
 			(*iSStream)->setRemoteAddress( remoteAddress );
 		}
 	}
-	mediaStreamSendersLock.unlock();
+	realtimeMediaStreamSendersLock.unlock();
 	/* Look for a receiver */
 #ifdef DEBUG_OUTPUT
 	mdbg("media") << "Starting receivers loop"<< endl;
 #endif
-	for( iRStream =  mediaStreamReceivers.begin(); iRStream != mediaStreamReceivers.end(); iRStream ++ ){
+	for( iRStream =  realtimeMediaStreamReceivers.begin(); iRStream != realtimeMediaStreamReceivers.end(); iRStream ++ ){
 		if( (*iRStream)->matches( m, iFormat ) ){
 #ifdef DEBUG_OUTPUT
 			mdbg("media") << "Found receiver for " << (*iRStream)->getSdpMediaType()<< endl;
@@ -623,7 +638,7 @@ MRef<MediaStreamReceiver *> Session::matchFormat( MRef<SdpHeaderM *> m, uint32_t
 bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by the responder when receiving the first message
 	unsigned int i;
 	int j;
-	MRef<MediaStreamReceiver *> receiver;
+	MRef<RealtimeMediaStreamReceiver *> receiver;
 	MRef<SdpPacket *> packet;
 	string keyMgmtMessage;
 	std::list<std::string>::iterator iAttribute;
@@ -644,7 +659,7 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
 		// FIXME free config
 		mikey = new Mikey( config );
 
-		addStreams();
+		addStreams(); //TODO: This only adds SRTP streams, no reliable media is handled.
 
 		if( !mikey->responderAuthenticate( keyMgmtMessage, peerUri ) ){
 			errorString =  "Incoming key management message could not be authenticated";
@@ -823,8 +838,8 @@ void Session::start(){
 		return;
 	started=true;
 	
-	list< MRef<MediaStreamSender * > >::iterator iS;
-	list< MRef<MediaStreamReceiver * > >::iterator iR;
+	list< MRef<RealtimeMediaStreamSender * > >::iterator iS;
+	list< MRef<RealtimeMediaStreamReceiver * > >::iterator iR;
 
 	MRef<KeyAgreement*> ka;
 
@@ -846,7 +861,7 @@ void Session::start(){
 #endif
 	}
 
-	for( iR = mediaStreamReceivers.begin(); iR != mediaStreamReceivers.end(); iR++ ){
+	for( iR = realtimeMediaStreamReceivers.begin(); iR != realtimeMediaStreamReceivers.end(); iR++ ){
 		if( ! (*iR)->disabled ){
 			if( ka ){
 				(*iR)->setKeyAgreement( ka );
@@ -855,8 +870,8 @@ void Session::start(){
 		}
 	}
 	
-	mediaStreamSendersLock.lock();
-	for( iS = mediaStreamSenders.begin(); iS != mediaStreamSenders.end(); iS++ ){
+	realtimeMediaStreamSendersLock.lock();
+	for( iS = realtimeMediaStreamSenders.begin(); iS != realtimeMediaStreamSenders.end(); iS++ ){
 		if( (*iS)->getPort() ){
 			if( ka ){
 				(*iS)->setKeyAgreement( ka );
@@ -868,22 +883,22 @@ void Session::start(){
 		MRef<CallRecorder *> cr = dynamic_cast<CallRecorder *>(*callRecorder);
 		cr->setEnabled( f
 	}*/
-	mediaStreamSendersLock.unlock();
+	realtimeMediaStreamSendersLock.unlock();
 }
 
 void Session::stop(){
 	started=false;
-	list< MRef<MediaStreamSender * > >::iterator iS;
-	list< MRef<MediaStreamReceiver * > >::iterator iR;
+	list< MRef<RealtimeMediaStreamSender * > >::iterator iS;
+	list< MRef<RealtimeMediaStreamReceiver * > >::iterator iR;
 
-	for( iR = mediaStreamReceivers.begin(); iR != mediaStreamReceivers.end(); iR++ ){
+	for( iR = realtimeMediaStreamReceivers.begin(); iR != realtimeMediaStreamReceivers.end(); iR++ ){
 		if( ! (*iR)->disabled ){
 			(*iR)->stop();
 		}
 	}
 	
-	mediaStreamSendersLock.lock();
-	for( iS = mediaStreamSenders.begin(); iS != mediaStreamSenders.end(); iS++ ){
+	realtimeMediaStreamSendersLock.lock();
+	for( iS = realtimeMediaStreamSenders.begin(); iS != realtimeMediaStreamSenders.end(); iS++ ){
 		if( (*iS)->getPort() ){
 			(*iS)->stop();
 		}
@@ -899,21 +914,21 @@ void Session::stop(){
 	}
 	callRecorder = NULL; //stop the call recorder object
 
-	mediaStreamSendersLock.unlock();
+	realtimeMediaStreamSendersLock.unlock();
 
 }
 
 
-void Session::addMediaStreamReceiver( MRef<MediaStreamReceiver *> mediaStream ){
-	mediaStreamReceivers.push_back( *mediaStream );
+void Session::addRealtimeMediaStreamReceiver( MRef<RealtimeMediaStreamReceiver *> realtimeMediaStream ){
+	realtimeMediaStreamReceivers.push_back( *realtimeMediaStream );
 	silenceSources( silencedSources );
 }
 
-void Session::addMediaStreamSender( MRef<MediaStreamSender *> mediaStream ){
-	mediaStreamSendersLock.lock();
-	mediaStream->setMuted( mutedSenders );
-	mediaStreamSenders.push_back( *mediaStream );
-	mediaStreamSendersLock.unlock();
+void Session::addRealtimeMediaStreamSender( MRef<RealtimeMediaStreamSender *> realtimeMediaStream ){
+	realtimeMediaStreamSendersLock.lock();
+	realtimeMediaStream->setMuted( mutedSenders );
+	realtimeMediaStreamSenders.push_back( *realtimeMediaStream );
+	realtimeMediaStreamSendersLock.unlock();
 }
 
 string Session::getErrorString(){
@@ -936,15 +951,15 @@ string Session::getCallId(){
 void Session::setCallId( const string callId ){
 	this->callId = callId;
 #ifdef ZRTP_SUPPORT
-	mediaStreamSendersLock.lock();
-	for ( std::list< MRef<MediaStreamSender *> >::iterator it =  mediaStreamSenders.begin();
-                     it !=  mediaStreamSenders.end(); it++ ) { // TODO - need better support to set call id in ZHB
+	realtimeMediaStreamSendersLock.lock();
+	for ( std::list< MRef<RealtimeMediaStreamSender *> >::iterator it =  realtimeMediaStreamSenders.begin();
+                     it !=  realtimeMediaStreamSenders.end(); it++ ) { // TODO - need better support to set call id in ZHB
                         MRef<ZrtpHostBridgeMinisip*> zhb = (*it)->getZrtpHostBridge();
                         if (zhb) {
                             zhb->setCallId(callId);
                         }
         }   
-        mediaStreamSendersLock.unlock();
+        realtimeMediaStreamSendersLock.unlock();
 
 #endif
 }
@@ -965,9 +980,9 @@ void Session::sendDtmf( uint8_t symbol ){
 
 void Session::muteSenders (bool mute) {
 	mutedSenders = mute;
-	mediaStreamSendersLock.lock();
-	for( std::list< MRef<MediaStreamSender *> >::iterator it =  mediaStreamSenders.begin();
-				it !=  mediaStreamSenders.end(); it++ ) {
+	realtimeMediaStreamSendersLock.lock();
+	for( std::list< MRef<RealtimeMediaStreamSender *> >::iterator it =  realtimeMediaStreamSenders.begin();
+				it !=  realtimeMediaStreamSenders.end(); it++ ) {
 		(*it)->setMuted( mute );
 	}
 
@@ -984,7 +999,7 @@ void Session::muteSenders (bool mute) {
 		cr->setEnabledMic( !mute );
 	}
 
-	mediaStreamSendersLock.unlock();
+	realtimeMediaStreamSendersLock.unlock();
 }
 
 void Session::silenceSources ( bool silence ) {
@@ -996,8 +1011,8 @@ void Session::silenceSources ( bool silence ) {
 */
 #endif
 	silencedSources = silence;
-	for( std::list< MRef<MediaStreamReceiver *> >::iterator it =  mediaStreamReceivers.begin();
-				it !=  mediaStreamReceivers.end(); it++ ) {
+	for( std::list< MRef<RealtimeMediaStreamReceiver *> >::iterator it =  realtimeMediaStreamReceivers.begin();
+				it !=  realtimeMediaStreamReceivers.end(); it++ ) {
 		list<uint32_t> ssrcList;
 		list<uint32_t>::iterator ssrcIt;
 		MRef<AudioMedia *> audioMedia;
@@ -1068,20 +1083,20 @@ string Session::getDebugString() {
 	}else
 		ret += "\n          (no call recorder)";
 
-	for( std::list< MRef<MediaStreamReceiver *> >::iterator it = mediaStreamReceivers.begin();
-				it != mediaStreamReceivers.end(); it++ ) {
+	for( std::list< MRef<RealtimeMediaStreamReceiver *> >::iterator it = realtimeMediaStreamReceivers.begin();
+				it != realtimeMediaStreamReceivers.end(); it++ ) {
 		ret += "\n          " + (*it)->getDebugString();
 	}
-	for( std::list< MRef<MediaStreamSender *> >::iterator it2 =  mediaStreamSenders.begin();
-				it2 !=  mediaStreamSenders.end(); it2++ ) {
+	for( std::list< MRef<RealtimeMediaStreamSender *> >::iterator it2 =  realtimeMediaStreamSenders.begin();
+				it2 !=  realtimeMediaStreamSenders.end(); it2++ ) {
 		ret += "\n          " + (*it2)->getDebugString();
 	}
 	return ret;
 }
 #endif
 
-void Session::clearMediaStreamReceivers() {
-	mediaStreamReceivers.clear();
+void Session::clearRealtimeMediaStreamReceivers() {
+	realtimeMediaStreamReceivers.clear();
 }
 
 const std::string &Session::getPeerUri() const{
@@ -1089,10 +1104,10 @@ const std::string &Session::getPeerUri() const{
 }
 
 void Session::addStreams() {
-	MediaStreamSenders::iterator i;
-	MediaStreamSenders::iterator last = mediaStreamSenders.end();
+	RealtimeMediaStreamSenders::iterator i;
+	RealtimeMediaStreamSenders::iterator last = realtimeMediaStreamSenders.end();
 
-	for( i = mediaStreamSenders.begin(); i != last; i++ ){
+	for( i = realtimeMediaStreamSenders.begin(); i != last; i++ ){
 		uint32_t ssrc = (*i)->getSsrc();
 		mikey->addSender( ssrc );
 	}

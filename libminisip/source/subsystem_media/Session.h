@@ -37,15 +37,15 @@
 #include<libminisip/media/MediaStream.h>
 #include<libmsip/SipDialogConfig.h>
 
-class MediaStreamReceiver;
-class MediaStreamSender;
+class RealtimeMediaStreamReceiver;
+class RealtimeMediaStreamSender;
 class SdpHeaderM;
 class IPAddress;
 class SessionRegistry;
 
 /**
  * The session class is a representation of the media session associated
- * with a VoIP call. It holds MediaStreams that handles incoming and
+ * with a VoIP call. It holds RealtimeMediaStreams that handles incoming and
  * outgoing streams for a given medium. The session is also the interface
  * used by the SIP stack to send and receive session descriptions (SDP)
  * and to start or stop the media transmission
@@ -123,20 +123,20 @@ class LIBMINISIP_API Session : public MObject{
 		bool setSdpOffer ( MRef<SdpPacket *> offer, std::string peerUri );
 
 		/**
-		 * Adds a MediaStreamReceiver to this media session. Used
+		 * Adds a RealtimeMediaStreamReceiver to this media session. Used
 		 * by the media handler to add a media stream per
 		 * available medium.
-		 * @param r a reference to the MediaStreamReceiver object to add
+		 * @param r a reference to the RealtimeMediaStreamReceiver object to add
 		 */
-		void addMediaStreamReceiver( MRef<MediaStreamReceiver *> r );
+		void addRealtimeMediaStreamReceiver( MRef<RealtimeMediaStreamReceiver *> r );
 		
 		/**
-		 * Adds a MediaStreamSender to this media session. Used
+		 * Adds a RealtimeMediaStreamSender to this media session. Used
 		 * by the media handler to add a media stream per
 		 * available medium.
-		 * @param s a reference to the MediaStreamSender object to add
+		 * @param s a reference to the RealtimeMediaStreamSender object to add
 		 */
-		void addMediaStreamSender( MRef<MediaStreamSender *> s );
+		void addRealtimeMediaStreamSender( MRef<RealtimeMediaStreamSender *> s );
 
 		/**
 		 * Returns an error description suitable for use
@@ -204,7 +204,7 @@ class LIBMINISIP_API Session : public MObject{
 		/**
 		Used to silence all the sources associated to this 
 		Session. SoundSources receive the audio from the
-		MediaStreamReceiver and act as a buffer. They are identified
+		RealtimeMediaStreamReceiver and act as a buffer. They are identified
 		by the ssrc (SoundSource::getId)
 		@param silence whether or not we want the sources silenced
 		*/
@@ -228,20 +228,20 @@ class LIBMINISIP_API Session : public MObject{
 		/**
 		Empty the media stream receivers list.
 		*/
-		void clearMediaStreamReceivers();
+		void clearRealtimeMediaStreamReceivers();
 		
 		/**
 		Return a copy of the list to the media stream receivers
 		*/
-		std::list< MRef<MediaStreamReceiver *> > getMediaStreamReceivers() {
-			return mediaStreamReceivers;
+		std::list< MRef<RealtimeMediaStreamReceiver *> > getRealtimeMediaStreamReceivers() {
+			return realtimeMediaStreamReceivers;
 		}
 
 		/**
 		Return a copy of the list to the media stream senders
 		*/
-		std::list< MRef<MediaStreamSender *> > getMediaStreamSenders() {
-			return mediaStreamSenders;
+		std::list< MRef<RealtimeMediaStreamSender *> > getRealtimeMediaStreamSenders() {
+			return realtimeMediaStreamSenders;
 		}
 
 		/**
@@ -256,6 +256,12 @@ class LIBMINISIP_API Session : public MObject{
 		MRef<MObject *> callRecorder;
 
 	private:
+		/**
+		 * @return false if there was an error, and the result sdp
+		 * packet can not be used.
+		 */
+		bool addRealtimeMediaToOffer(MRef<SdpPacket*> result, const std::string &peerUri, bool anatSupported, std::string transport);
+
 		bool started;
 		void addStreams();
 
@@ -263,13 +269,13 @@ class LIBMINISIP_API Session : public MObject{
 
 
 		MRef<SdpPacket *> emptySdp();
-		MRef<MediaStreamReceiver *> matchFormat( MRef<SdpHeaderM *> m, 
+		MRef<RealtimeMediaStreamReceiver *> matchFormat( MRef<SdpHeaderM *> m, 
 			uint32_t iFormat, MRef<IPAddress *> &remoteAddress );
 
-		typedef std::list< MRef<MediaStreamSender *> > MediaStreamSenders;
-		std::list< MRef<MediaStreamReceiver *> > mediaStreamReceivers;
-		std::list< MRef<MediaStreamSender *> > mediaStreamSenders;
-		Mutex mediaStreamSendersLock;
+		typedef std::list< MRef<RealtimeMediaStreamSender *> > RealtimeMediaStreamSenders;
+		std::list< MRef<RealtimeMediaStreamReceiver *> > realtimeMediaStreamReceivers;
+		std::list< MRef<RealtimeMediaStreamSender *> > realtimeMediaStreamSenders;
+		Mutex realtimeMediaStreamSendersLock;
 
 		MRef<Mikey *> mikey;
 		std::string localIpString;

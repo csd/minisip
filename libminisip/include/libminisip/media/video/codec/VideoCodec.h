@@ -30,7 +30,7 @@
 #include<libminisip/media/video/ImageHandler.h>
 #include<libminisip/media/codecs/Codec.h>
 
-class MediaStreamSender;
+class RealtimeMediaStreamSender;
 class AVEncoder;
 class AVDecoder;
 class Grabber;
@@ -70,7 +70,7 @@ class LIBMINISIP_API VideoCodec : public Codec{
 
 	private:
 
-		MRef<MediaStreamSender *> senders;
+		MRef<RealtimeMediaStreamSender *> senders;
 		MRef<AVEncoder *> coder;
 		MRef<AVDecoder *> decoder;
 

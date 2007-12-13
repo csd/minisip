@@ -123,48 +123,48 @@ RtpReceiver::~RtpReceiver(){
 }
 
 /**
-	register a mediaStreamReceiver ... if the receiver is already registered,
+	register a RealtimeMediaStreamReceiver ... if the receiver is already registered,
 	update the exhisting one to point to the new receiver.
 */
-void RtpReceiver::registerMediaStream( MRef<MediaStreamReceiver *> mediaStream ){
-	list< MRef<MediaStreamReceiver *> >::iterator iter;
-	mediaStreamsLock.lock();
+void RtpReceiver::registerRealtimeMediaStream( MRef<RealtimeMediaStreamReceiver *> realtimeMediaStream ){
+	list< MRef<RealtimeMediaStreamReceiver *> >::iterator iter;
+	realtimeMediaStreamsLock.lock();
 	/* Don't register new streams if the receiver is being closed */
 	if( !kill ){
 		bool found = false;
-		//cerr << "RtpReceiver::registerMediaStream: register done!" << endl;
-		for( iter = mediaStreams.begin();
-				iter != mediaStreams.end();
+		//cerr << "RtpReceiver::registerRealtimeMediaStream: register done!" << endl;
+		for( iter = realtimeMediaStreams.begin();
+				iter != realtimeMediaStreams.end();
 				iter++ ) {
-			if( (*iter)->getId() == mediaStream->getId() ) {
+			if( (*iter)->getId() == realtimeMediaStream->getId() ) {
 				found = true;
 			#ifdef DEBUG_OUTPUT
-				cerr << "RtpRcvr::registerMediaStream: media stream already registered. Updating MRef." << endl;
+				cerr << "RtpRcvr::registerRealtimeMediaStream: media stream already registered. Updating MRef." << endl;
 			#endif
-				(*iter) = mediaStream;
+				(*iter) = realtimeMediaStream;
 				break;
 			}
 		}
 		if( !found ) {
-			mediaStreams.push_back( mediaStream );
+			realtimeMediaStreams.push_back( realtimeMediaStream );
 		}
 	}
-	mediaStreamsLock.unlock();
+	realtimeMediaStreamsLock.unlock();
 }
 
-void RtpReceiver::unregisterMediaStream( MRef<MediaStreamReceiver *> mediaStream ){
+void RtpReceiver::unregisterRealtimeMediaStream( MRef<RealtimeMediaStreamReceiver *> realtimeMediaStream ){
 #ifdef DEBUG_OUTPUT
-	// cerr << "RtpReceiver::unregisterMediaStream: Before taking lock" << endl;
+	// cerr << "RtpReceiver::unregisterRealtimeMediaStream: Before taking lock" << endl;
 #endif
-	mediaStreamsLock.lock();
-	mediaStreams.remove( mediaStream );
-	if( mediaStreams.size() == 0 ){
+	realtimeMediaStreamsLock.lock();
+	realtimeMediaStreams.remove( realtimeMediaStream );
+	if( realtimeMediaStreams.size() == 0 ){
 		/* End the thread */
 		kill = true;
 	}
-	mediaStreamsLock.unlock();
+	realtimeMediaStreamsLock.unlock();
 #ifdef DEBUG_OUTPUT
-	// cerr << "RtpReceiver::unregisterMediaStream: After taking lock" << endl;
+	// cerr << "RtpReceiver::unregisterRealtimeMediaStream: After taking lock" << endl;
 #endif
 }
 
@@ -193,7 +193,7 @@ void RtpReceiver::run(){
 	MRef<SRtpPacket *> packet;
 
 	while( !kill ){
-		list< MRef<MediaStreamReceiver *> >::iterator i;
+		list< MRef<RealtimeMediaStreamReceiver *> >::iterator i;
 		fd_set rfds;
 		struct timeval tv;
 		int ret = -1;
@@ -233,9 +233,9 @@ void RtpReceiver::run(){
 		}
 
 		if( ret == 0 /* timeout */ ){
-			//notify the mediaStreams of the timeout
-			for( i = mediaStreams.begin();
-					i != mediaStreams.end(); i++ ){
+			//notify the RealtimeMediaStreams of the timeout
+			for( i = realtimeMediaStreams.begin();
+					i != realtimeMediaStreams.end(); i++ ){
 				(*i)->handleRtpPacket( NULL, callId, NULL );
 			}
 			continue;
@@ -253,8 +253,8 @@ void RtpReceiver::run(){
 			continue;
 		}
 
-		mediaStreamsLock.lock();
-		for ( i = mediaStreams.begin(); i != mediaStreams.end(); i++ ) {
+		realtimeMediaStreamsLock.lock();
+		for ( i = realtimeMediaStreams.begin(); i != realtimeMediaStreams.end(); i++ ) {
                     std::list<MRef<Codec *> > codecs = (*i)->getAvailableCodecs();
                     std::list<MRef<Codec *> >::iterator iC;
                     int found = 0;
@@ -283,7 +283,7 @@ void RtpReceiver::run(){
                     }
 #endif // ZRTP_SUPPORT
                 }
-                mediaStreamsLock.unlock();
+                realtimeMediaStreamsLock.unlock();
 
                 packet = NULL;
 	}

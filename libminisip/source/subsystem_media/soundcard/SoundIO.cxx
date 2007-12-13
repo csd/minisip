@@ -189,7 +189,7 @@ void SoundIO::register_recorder_receiver(SoundRecorderCallback *callback,
                                             // for G711+ilbc.
 }
 
-void SoundIO::unRegisterRecorderReceiver( SoundRecorderCallback *callback ) {
+void SoundIO::unregisterRecorderReceiver( SoundRecorderCallback *callback ) {
 	list<RecorderReceiver *>::iterator iter;
 	for( iter = recorder_callbacks.begin();
 		iter != recorder_callbacks.end();
@@ -361,10 +361,10 @@ void SoundIO::registerSource( MRef<SoundSource *> source ){
 }
 
 
-void SoundIO::unRegisterSource(int sourceId){
+void SoundIO::unregisterSource(int sourceId){
 	
 #ifdef DEBUG_OUTPUT
-	cerr << "SoundIO::unRegisterSource - Calling unRegister source on source " << sourceId << endl;
+	cerr << "SoundIO::unregisterSource - Calling unregister source on source " << sourceId << endl;
 #endif
 	queueLock.lock();
 	list<MRef<SoundSource *> >::iterator i;

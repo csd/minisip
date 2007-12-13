@@ -1,4 +1,6 @@
 
+#include<config.h>
+
 #include<libminisip/media/RealtimeMedia.h>
 
 using namespace std;
@@ -41,20 +43,20 @@ list< MRef<Codec *> >  RealtimeMedia::getAvailableCodecs(){
 	return copy;
 }
 
-void RealtimeMedia::registerMediaSender( MRef<MediaStreamSender *> sender ){
+void RealtimeMedia::registerRealtimeMediaSender( MRef<RealtimeMediaStreamSender *> sender ){
 	sendersLock.lock();
 	senders.push_back( sender );
 	sendersLock.unlock();
 }
 
-void RealtimeMedia::unRegisterMediaSender( MRef<MediaStreamSender *> sender ){
+void RealtimeMedia::unregisterRealtimeMediaSender( MRef<RealtimeMediaStreamSender *> sender ){
 	sendersLock.lock();
 	senders.remove( sender );
 	sendersLock.unlock();
 }
 
 void RealtimeMedia::sendData( byte_t * data, uint32_t length, uint32_t ts, bool marker ){
-	list< MRef<MediaStreamSender *> >::iterator i;
+	list< MRef<RealtimeMediaStreamSender *> >::iterator i;
 	sendersLock.lock();
 	for( i = senders.begin(); i != senders.end(); i++ ){
 		//only send if active sender, or if muted only if keep-alive

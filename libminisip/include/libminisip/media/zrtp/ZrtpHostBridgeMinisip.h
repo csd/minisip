@@ -42,8 +42,8 @@
 #include <libzrtpcpp/ZrtpCallback.h>
 #include <libzrtpcpp/ZRtp.h>
 
-class MediaStreamReceiver;
-class MediaStreamSender;
+class RealtimeMediaStreamReceiver;
+class RealtimeMediaStreamSender;
 
 /**
  * The connection between the ZRTP implementation and Minisip.
@@ -114,11 +114,11 @@ MRef<StateMachine<SipSMCommand,std::string>*> > *> tp,
     void start();
     void stop();
 
-    void setReceiver(MRef<MediaStreamReceiver *> r);
+    void setReceiver(MRef<RealtimeMediaStreamReceiver *> r);
     void setSsrcReceiver(uint32_t ssrc)             { receiverSsrc = ssrc; };
     uint32_t getSsrcReceiver()                      { return receiverSsrc; };
 
-    void setSender(MRef<MediaStreamSender *> s);
+    void setSender(MRef<RealtimeMediaStreamSender *> s);
     void setSsrcSender(uint32_t ssrc)               { senderSsrc = ssrc; };
     uint32_t getSsrcSender()                        { return senderSsrc; };
 
@@ -131,7 +131,7 @@ MRef<StateMachine<SipSMCommand,std::string>*> > *> tp,
      * The host (Minisip) shall call this mehtod to set the IP address
      * of the remote peer. We use the address to find the right ZRTP
      * host bridge when we receive packets on the receiver port
-     * allocated by the MediaStreamReceiver.
+     * allocated by the RealtimeMediaStreamReceiver.
      *
      * This is (fairly) save because one remote peer shall not have
      * several different RTP sessions for one of my receiver ports.
@@ -325,12 +325,12 @@ MRef<StateMachine<SipSMCommand,std::string>*> > *> tp,
 
     MRef<IPAddress *> remoteAddress;
 
-    MRef<MediaStreamReceiver *> rStream;
+    MRef<RealtimeMediaStreamReceiver *> rStream;
     uint32_t receiverSsrc;
     uint32_t receiverSecure;
     uint16_t receiverSeqNo;
 
-    MRef<MediaStreamSender *> sStream;
+    MRef<RealtimeMediaStreamSender *> sStream;
     uint32_t senderSsrc;
     uint32_t senderSecure;
 

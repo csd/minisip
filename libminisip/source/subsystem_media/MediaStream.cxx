@@ -47,21 +47,21 @@
 
 using namespace std;
 
-MediaStream::MediaStream( string cid, MRef<RealtimeMedia *> m) : callId(cid), media(m),ka(NULL) {
+RealtimeMediaStream::RealtimeMediaStream( string cid, MRef<RealtimeMedia *> m) : callId(cid), media(m),ka(NULL) {
 	disabled = false;
 #ifdef ZRTP_SUPPORT
 	zrtpBridge = NULL;
 #endif
 }
 
-std::string MediaStream::getSdpMediaType(){
+std::string RealtimeMediaStream::getSdpMediaType(){
 	if( media ){
 		return media->getSdpMediaType();
 	}
 	return "";
 }
 
-list<string> MediaStream::getSdpAttributes(){
+list<string> RealtimeMediaStream::getSdpAttributes(){
 	return media->getSdpAttributes();
 }
 
@@ -84,7 +84,7 @@ bool parseRtpMap(string rtpMap, string &name, string &rate, string &param){
 	return true;
 }
 
-bool MediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
+bool RealtimeMediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
         string sdpRtpMap;
 	string sdpFmtpParam;
 
@@ -149,7 +149,7 @@ bool MediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
         return false;
 }
 
-MRef<CryptoContext *> MediaStream::initCrypto( uint32_t ssrc, uint16_t seq_no ){
+MRef<CryptoContext *> RealtimeMediaStream::initCrypto( uint32_t ssrc, uint16_t seq_no ){
 	MRef<CryptoContext *> cryptoContext;
 
 	kaLock.lock();
@@ -216,7 +216,7 @@ MRef<CryptoContext *> MediaStream::initCrypto( uint32_t ssrc, uint16_t seq_no ){
 	return cryptoContext;
 }
 
-MRef<CryptoContext *> MediaStream::getCryptoContext( uint32_t ssrc, uint16_t seq_no ){
+MRef<CryptoContext *> RealtimeMediaStream::getCryptoContext( uint32_t ssrc, uint16_t seq_no ){
 	kaLock.lock();
 	list< MRef<CryptoContext *> >::iterator i;
 
@@ -231,7 +231,7 @@ MRef<CryptoContext *> MediaStream::getCryptoContext( uint32_t ssrc, uint16_t seq
 	return initCrypto( ssrc, seq_no );
 }
 
-void MediaStream::setKeyAgreement( MRef<KeyAgreement *> ka_ ){
+void RealtimeMediaStream::setKeyAgreement( MRef<KeyAgreement *> ka_ ){
 	kaLock.lock();
 	this->ka = ka_;
 
@@ -250,7 +250,7 @@ void MediaStream::setKeyAgreement( MRef<KeyAgreement *> ka_ ){
  * incomming RTP sessions, they are identified by the SSRC. A sender
  * handles one stream (media stream) to the remote peer only.
  */
-void MediaStream::setKeyAgreementZrtp(MRef<CryptoContext *>cx) {
+void RealtimeMediaStream::setKeyAgreementZrtp(MRef<CryptoContext *>cx) {
 
     kaLock.lock();
 
@@ -267,20 +267,20 @@ void MediaStream::setKeyAgreementZrtp(MRef<CryptoContext *>cx) {
     kaLock.unlock();
 }
 
-void MediaStream::setZrtpHostBridge(MRef<ZrtpHostBridgeMinisip *> zsb) {
+void RealtimeMediaStream::setZrtpHostBridge(MRef<ZrtpHostBridgeMinisip *> zsb) {
 	zrtpBridge = zsb;
 }
 
-MRef<ZrtpHostBridgeMinisip *> MediaStream::getZrtpHostBridge() {
+MRef<ZrtpHostBridgeMinisip *> RealtimeMediaStream::getZrtpHostBridge() {
 	return zrtpBridge;
 }
 
 #endif
 
-MediaStreamReceiver::MediaStreamReceiver( string callid, MRef<RealtimeMedia *> m,
+RealtimeMediaStreamReceiver::RealtimeMediaStreamReceiver( string callid, MRef<RealtimeMedia *> m,
 		MRef<RtpReceiver *> rtpRecv, 
 		MRef<RtpReceiver *> rtp6Recv ):
-			MediaStream( callid,  m ),
+			RealtimeMediaStream( callid,  m ),
 			rtpReceiver( rtpRecv ),
 			rtp6Receiver( rtp6Recv ){
 	id = rand();
@@ -289,29 +289,29 @@ MediaStreamReceiver::MediaStreamReceiver( string callid, MRef<RealtimeMedia *> m
 	codecList = m->getAvailableCodecs();
 }
 
-uint32_t MediaStreamReceiver::getId(){
+uint32_t RealtimeMediaStreamReceiver::getId(){
 	return id;
 }
 
-void MediaStreamReceiver::start(){
+void RealtimeMediaStreamReceiver::start(){
 	if( !running ){
 		if( rtpReceiver ){
-			rtpReceiver->registerMediaStream( this );
+			rtpReceiver->registerRealtimeMediaStream( this );
 		}
 		if( rtp6Receiver )
-			rtp6Receiver->registerMediaStream( this );
+			rtp6Receiver->registerRealtimeMediaStream( this );
 		running = true;
 	}
 }
 
-void MediaStreamReceiver::stop(){
+void RealtimeMediaStreamReceiver::stop(){
 	list<uint32_t>::iterator i;
 	if( rtpReceiver ){
-		rtpReceiver->unregisterMediaStream( this );
+		rtpReceiver->unregisterRealtimeMediaStream( this );
 		rtpReceiver->stop();
 	}
 	if( rtp6Receiver ){
-		rtp6Receiver->unregisterMediaStream( this );
+		rtp6Receiver->unregisterRealtimeMediaStream( this );
 		rtp6Receiver->stop();
 	}
 	if( rtpReceiver )
@@ -322,7 +322,7 @@ void MediaStreamReceiver::stop(){
 
 	ssrcListLock.lock();
 	for( i = ssrcList.begin(); i != ssrcList.end(); i++ ){
-		media->unRegisterMediaSource( *i );
+		media->unregisterMediaSource( *i );
 	}
 	ssrcList.clear();
 	ssrcListLock.unlock();
@@ -330,12 +330,12 @@ void MediaStreamReceiver::stop(){
 	running = false;
 }
 
-uint16_t MediaStreamReceiver::getPort(){
+uint16_t RealtimeMediaStreamReceiver::getPort(){
 	return rtpReceiver ? rtpReceiver->getPort() : ( rtp6Receiver ? rtp6Receiver->getPort() : 0 );
 }
 
 #ifdef ZRTP_SUPPORT
-void MediaStreamReceiver::handleRtpPacketExt(MRef<SRtpPacket *> packet) {
+void RealtimeMediaStreamReceiver::handleRtpPacketExt(MRef<SRtpPacket *> packet) {
 	uint32_t recvSsrc;
 	uint16_t seq_no;
 
@@ -359,7 +359,7 @@ void MediaStreamReceiver::handleRtpPacketExt(MRef<SRtpPacket *> packet) {
 }
 #endif
 
-void MediaStreamReceiver::handleRtpPacket( MRef<SRtpPacket *> packet, string callId, MRef<IPAddress *> from ){
+void RealtimeMediaStreamReceiver::handleRtpPacket( MRef<SRtpPacket *> packet, string callId, MRef<IPAddress *> from ){
 	uint32_t packetSsrc;
 	uint16_t seq_no;
 
@@ -412,7 +412,7 @@ void MediaStreamReceiver::handleRtpPacket( MRef<SRtpPacket *> packet, string cal
 	media->playData( *packet );
 }
 
-void MediaStreamReceiver::gotSsrc( uint32_t ssrc, string callId ){
+void RealtimeMediaStreamReceiver::gotSsrc( uint32_t ssrc, string callId ){
 	list<uint32_t>::iterator i;
 
 	ssrcListLock.lock();
@@ -429,12 +429,12 @@ void MediaStreamReceiver::gotSsrc( uint32_t ssrc, string callId ){
 	ssrcListLock.unlock();
 }
 
-std::list<MRef<Codec *> > MediaStreamReceiver::getAvailableCodecs(){
+std::list<MRef<Codec *> > RealtimeMediaStreamReceiver::getAvailableCodecs(){
 	return codecList;
 }
 
 
-uint16_t MediaStreamReceiver::getPort( const string &addrType ){
+uint16_t RealtimeMediaStreamReceiver::getPort( const string &addrType ){
 	if( addrType == "IP4" && rtpReceiver )
 		return rtpReceiver->getPort();
 	else if( addrType == "IP6" && rtp6Receiver )
@@ -443,10 +443,10 @@ uint16_t MediaStreamReceiver::getPort( const string &addrType ){
 }
 
 
-MediaStreamSender::MediaStreamSender( string callid, MRef<RealtimeMedia *> m, 
+RealtimeMediaStreamSender::RealtimeMediaStreamSender( string callid, MRef<RealtimeMedia *> m, 
 		MRef<UDPSocket *> senderSocket, 
 		MRef<UDPSocket *> sender6Socket ):
-			MediaStream( callid, m ){
+			RealtimeMediaStream( callid, m ){
 	selectedCodec = NULL;
 	remotePort = 0;
 	seqNo = (uint16_t)rand();
@@ -466,12 +466,12 @@ MediaStreamSender::MediaStreamSender( string callid, MRef<RealtimeMedia *> m,
 	this->sender6Sock = sender6Socket;
 }
 
-void MediaStreamSender::start(){
-	media->registerMediaSender( this );
+void RealtimeMediaStreamSender::start(){
+	media->registerRealtimeMediaSender( this );
 }
 
-void MediaStreamSender::stop(){
-	media->unRegisterMediaSender( this );
+void RealtimeMediaStreamSender::stop(){
+	media->unregisterRealtimeMediaSender( this );
 	senderSock = NULL;
 	sender6Sock = NULL;
 
@@ -482,11 +482,11 @@ void MediaStreamSender::stop(){
 #endif
 }
 
-void MediaStreamSender::setPort( uint16_t port ){
+void RealtimeMediaStreamSender::setPort( uint16_t port ){
 	remotePort = port;
 }
 
-uint16_t MediaStreamSender::getPort(){
+uint16_t RealtimeMediaStreamSender::getPort(){
 	return remotePort;
 }
 
@@ -502,11 +502,11 @@ static bool first=true;
  *   contexts.
  */
 #ifdef ZRTP_SUPPORT
-void MediaStreamSender::sendZrtp(unsigned char* data, int length,
+void RealtimeMediaStreamSender::sendZrtp(unsigned char* data, int length,
                                 unsigned char* payload, int payLen) {
 
 	if (this->remoteAddress.isNull()) {
-		mdbg("media/zrtp") << " MediaStreamSender::sendZrtp called before " <<
+		mdbg("media/zrtp") << " RealtimeMediaStreamSender::sendZrtp called before " <<
 			"setRemoteAddress!" << endl;
 		return;
 	}
@@ -537,9 +537,9 @@ void MediaStreamSender::sendZrtp(unsigned char* data, int length,
 }
 #endif // ZRTP_SUPPORT
 
-void MediaStreamSender::send( byte_t * data, uint32_t length, uint32_t * givenTs, bool marker, bool dtmf ){
+void RealtimeMediaStreamSender::send( byte_t * data, uint32_t length, uint32_t * givenTs, bool marker, bool dtmf ){
 	if (this->remoteAddress.isNull()) {
-		mdbg("media") << " MediaStreamSender::send called before " <<
+		mdbg("media") << " RealtimeMediaStreamSender::send called before " <<
 			"setRemoteAddress!" << endl;
 		return;
 	}
@@ -602,8 +602,8 @@ void MediaStreamSender::send( byte_t * data, uint32_t length, uint32_t * givenTs
 
 }
 
-void MediaStreamSender::setRemoteAddress( MRef<IPAddress *> ra){
-	mdbg("media") << "MediaStreamSender::setRemoteAddress: " <<
+void RealtimeMediaStreamSender::setRemoteAddress( MRef<IPAddress *> ra){
+	mdbg("media") << "RealtimeMediaStreamSender::setRemoteAddress: " <<
 		ra->getString() << endl;
 	this->remoteAddress = ra;
 #ifdef ZRTP_SUPPORT
@@ -614,14 +614,14 @@ void MediaStreamSender::setRemoteAddress( MRef<IPAddress *> ra){
 }
 
 #ifdef DEBUG_OUTPUT
-string MediaStream::getDebugString() {
+string RealtimeMediaStream::getDebugString() {
 	string ret;
 	ret = getMemObjectType() + " this=" + itoa(reinterpret_cast<int64_t>(this)) +
 		": port=" + itoa(getPort());
 
 	return ret;
 }
-string MediaStreamReceiver::getDebugString() {
+string RealtimeMediaStreamReceiver::getDebugString() {
 	string ret;
 	ret = getMemObjectType() + " this=" + itoa(reinterpret_cast<int64_t>(this)) +
 		": listening port=" + itoa(getPort());
@@ -632,7 +632,7 @@ string MediaStreamReceiver::getDebugString() {
 	}
 	return ret;
 }
-string MediaStreamSender::getDebugString() {
+string RealtimeMediaStreamSender::getDebugString() {
 	string ret;
 
 	ret = getMemObjectType() + " this=" + itoa(reinterpret_cast<int64_t>(this)) +
@@ -651,7 +651,7 @@ string MediaStreamSender::getDebugString() {
 //packet every now and then.
 //Max indicates every how many silenced packets we send one keep-alive
 //It returns true if the packet needs to be let through, false otherwise
-bool MediaStreamSender::muteKeepAlive( uint32_t max ) {
+bool RealtimeMediaStreamSender::muteKeepAlive( uint32_t max ) {
 	bool ret = false;
 
 	//if muted, only return true if packet is keep alive
@@ -668,8 +668,8 @@ bool MediaStreamSender::muteKeepAlive( uint32_t max ) {
 	return ret;
 }
 
-bool MediaStreamSender::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
-	bool result = MediaStream::matches( m, formatIndex );
+bool RealtimeMediaStreamSender::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
+	bool result = RealtimeMediaStream::matches( m, formatIndex );
 
 	if( result && !selectedCodec ){
 		selectedCodec = media->createCodecInstance(
@@ -680,6 +680,6 @@ bool MediaStreamSender::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
 	return result;
 }
 
-uint32_t MediaStreamSender::getSsrc(){
+uint32_t RealtimeMediaStreamSender::getSsrc(){
 	return ssrc;
 }

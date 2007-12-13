@@ -32,7 +32,7 @@
 #include<libminisip/media/soundcard/FileSoundDevice.h>
 
 template <class T> class MRef;
-class MediaStreamReceiver;
+class RealtimeMediaStreamReceiver;
 class AudioMedia;
 class RtpReceiver;
 class IpProvider;
@@ -45,7 +45,7 @@ class CircularBuffer;
  The call recorder is to be used to record all audio in & out related
   to a particular call.
   It inherits from SoundRecorderCallback (to be registered as a recorder receiver
-    in SoundIO) and from MediaStreamReceiver (to be registered as a stream receiver
+    in SoundIO) and from RealtimeMediaStreamReceiver (to be registered as a stream receiver
     to the associated RtpReceiver).
   It implements a producer/consumer model, where we have two producers (one for the 
   	SoundIO::playerLoop() and another for the RtpReceiver::run(). The nice thing
@@ -56,7 +56,7 @@ class CircularBuffer;
 	on bunch of samples from each producer).
 */
 class CallRecorder: 
-		public MediaStreamReceiver,
+		public RealtimeMediaStreamReceiver,
 		public SoundRecorderCallback  { 
 	public:
 		/**
@@ -96,7 +96,7 @@ class CallRecorder:
 		#endif
 		
 		/**
-		Inherited from MediaStreamReceiver
+		Inherited from RealtimeMediaStreamReceiver
 		*/
 		virtual void handleRtpPacket( MRef<SRtpPacket *> packet, MRef<IPAddress *> from );
 // 		virtual void handleRtpPacket( MRef<SRtpPacket *> packet );

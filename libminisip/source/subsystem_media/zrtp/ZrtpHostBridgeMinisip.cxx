@@ -82,11 +82,11 @@ ZrtpHostBridgeMinisip::~ZrtpHostBridgeMinisip() {
     delete zrtpEngine;
 }
 
-void ZrtpHostBridgeMinisip::setReceiver(MRef<MediaStreamReceiver *> r) {
+void ZrtpHostBridgeMinisip::setReceiver(MRef<RealtimeMediaStreamReceiver *> r) {
 	rStream = r;
 }
 
-void ZrtpHostBridgeMinisip::setSender(MRef<MediaStreamSender *> s) {
+void ZrtpHostBridgeMinisip::setSender(MRef<RealtimeMediaStreamSender *> s) {
 	sStream = s;
 }
 

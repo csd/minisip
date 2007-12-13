@@ -88,7 +88,7 @@ class LIBMINISIP_API AudioMedia : public RealtimeMedia, public SoundRecorderCall
 		* @param sender a reference to the MediaStreamSender object to
 		* register
 		*/
-		virtual void registerMediaSender( MRef<MediaStreamSender *> sender );
+		virtual void registerRealtimeMediaSender( MRef<RealtimeMediaStreamSender *> sender );
 
 
 		/**
@@ -97,7 +97,7 @@ class LIBMINISIP_API AudioMedia : public RealtimeMedia, public SoundRecorderCall
 		* @param sender a reference to the MediaStreamSender object to
 		* unregister
 		*/
-		virtual void unRegisterMediaSender( MRef<MediaStreamSender *> sender );
+		virtual void unregisterRealtimeMediaSender( MRef<RealtimeMediaStreamSender *> sender );
 		/**
 		* Used to register a new media source. Called upon discovery
 		* of a new SSRC identifier. Each media source may use
@@ -112,7 +112,7 @@ class LIBMINISIP_API AudioMedia : public RealtimeMedia, public SoundRecorderCall
 		* @param ssrc the SSRC identifier used by the media source to
 		* unregister
 		*/
-		virtual void unRegisterMediaSource( uint32_t ssrc );
+		virtual void unregisterMediaSource( uint32_t ssrc );
 
 		/**
 		* Callback used by the SoundIO when sound samples are

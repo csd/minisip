@@ -34,13 +34,13 @@
 #include<libminisip/ipprovider/IpProvider.h>
 
 class UDPSocket;
-class MediaStreamReceiver;
+class RealtimeMediaStreamReceiver;
 class CryptoContext;
 
 /**
  * The RtpReceiver is used to listen on a UDPSocket and demultiplex
  * several incoming streams, depending on their payload type.
- * MediaStreamReceiver objects register to it when they are ready
+ * RealtimeMediaStreamReceiver objects register to it when they are ready
  * to receive a specific media type.
  */
 class LIBMINISIP_API RtpReceiver : public Runnable{
@@ -56,23 +56,23 @@ class LIBMINISIP_API RtpReceiver : public Runnable{
 		RtpReceiver( MRef<IpProvider *> ipProvider, std::string callId );
 
 		/**
-		 * Used for a MediaStreamReceiver to subscribe to data
+		 * Used for a RealtimeMediaStreamReceiver to subscribe to data
 		 * incoming on this RtpReceiver. If the payload type
-		 * is handled by the MediaStreamReceiver, the data
+		 * is handled by the RealtimeMediaStreamReceiver, the data
 		 * is sent to it.
-		 * @param mediaStream a reference to the MediaStreamReceiver
+		 * @param RealtimeMediaStream a reference to the RealtimeMediaStreamReceiver
 		 * object to subscribe
 		 */
-		void registerMediaStream( MRef<MediaStreamReceiver *> mediaStream );
+		void registerRealtimeMediaStream( MRef<RealtimeMediaStreamReceiver *> realtimeMediaStream );
 
 		/**
-		 * Used to signify that a MediaStreamReceiver should no
+		 * Used to signify that a RealtimeMediaStreamReceiver should no
 		 * longer receive data from this RtpReceiver. Used
 		 * when the media Session is stopped.
-		 * @param mediaStream a reference to the MediaStreamReceiver
+		 * @param RealtimeMediaStream a reference to the RealtimeMediaStreamReceiver
 		 * object that should be unsubscribed
 		 */
-		void unregisterMediaStream( MRef<MediaStreamReceiver *> mediaStream);
+		void unregisterRealtimeMediaStream( MRef<RealtimeMediaStreamReceiver *> realtimeMediaStream);
 
 		/**
 		 * Listening thread main loop.
@@ -112,9 +112,9 @@ class LIBMINISIP_API RtpReceiver : public Runnable{
 		uint16_t externalPort;
 		bool kill;
 
-		std::list< MRef<MediaStreamReceiver *> > mediaStreams;
+		std::list< MRef<RealtimeMediaStreamReceiver *> > realtimeMediaStreams;
 
-		Mutex mediaStreamsLock;
+		Mutex realtimeMediaStreamsLock;
 
 		Thread * thread;
 

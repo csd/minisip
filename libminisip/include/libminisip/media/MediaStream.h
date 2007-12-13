@@ -51,7 +51,7 @@ class RealtimeMedia;
  * MediaStreamSender and MediaStreamReceiver
  */
 
-class LIBMINISIP_API MediaStream : public MObject{
+class LIBMINISIP_API RealtimeMediaStream : public MObject{
 	public:
 		/**
 		 * Starts the transmission or reception of a the stream.
@@ -83,7 +83,7 @@ class LIBMINISIP_API MediaStream : public MObject{
 		 */
 		std::list<std::string> getSdpAttributes();
 
-		virtual std::string getMemObjectType() const {return "MediaStream";}
+		virtual std::string getMemObjectType() const {return "RealtimeMediaStream";}
 		bool disabled;
 
 		std::string getCallId(){return callId;}
@@ -160,7 +160,7 @@ class LIBMINISIP_API MediaStream : public MObject{
 
 	protected:
 		MRef<CryptoContext *> getCryptoContext( uint32_t ssrc, uint16_t seq_no );
-		MediaStream( std::string callId, MRef<RealtimeMedia *> );
+		RealtimeMediaStream( std::string callId, MRef<RealtimeMedia *> );
 		std::string callId;
 		MRef<RealtimeMedia *> media;
 		uint32_t csbId;
@@ -181,7 +181,7 @@ class LIBMINISIP_API MediaStream : public MObject{
  * given session. It is responsible for decryption and replay protection
  * in the case of SRTP.
  */
-class LIBMINISIP_API MediaStreamReceiver : public MediaStream{
+class LIBMINISIP_API RealtimeMediaStreamReceiver : public RealtimeMediaStream{
 	public:
 		/**
 		 * Constructor, called by the MediaHandler when creating
@@ -196,7 +196,7 @@ class LIBMINISIP_API MediaStreamReceiver : public MediaStream{
 		 * used to obtain contact IP address and port in NAT
 		 * traversal mechanism
 		 */
-		MediaStreamReceiver( std::string callId,
+		RealtimeMediaStreamReceiver( std::string callId,
 				MRef<RealtimeMedia *> media,
 				MRef<RtpReceiver *> rtpReceiver,
 				MRef<RtpReceiver *> rtp6Receiver = NULL );
@@ -205,7 +205,7 @@ class LIBMINISIP_API MediaStreamReceiver : public MediaStream{
 		virtual std::string getDebugString();
 #endif
 
-		virtual std::string getMemObjectType() const {return "MediaStreamReceiver";}
+		virtual std::string getMemObjectType() const {return "RealtimeMediaStreamReceiver";}
 
 		/**
 		 * Starts the reception of a the stream, by subscribing to
@@ -306,7 +306,7 @@ class LIBMINISIP_API MediaStreamReceiver : public MediaStream{
  * a specific media Session. It holds the CODEC instance selected for
  * this peer, and is responsible for encryption.
  */
-class LIBMINISIP_API MediaStreamSender : public MediaStream{
+class LIBMINISIP_API RealtimeMediaStreamSender : public RealtimeMediaStream{
 	public:
 		/**
 		 * Constructor, used by the MediaHandler during the
@@ -317,7 +317,7 @@ class LIBMINISIP_API MediaStreamSender : public MediaStream{
 		 * to which the data should be sent. If NULL a new one
 		 * is created
 		 */
-		MediaStreamSender( std::string callId,
+		RealtimeMediaStreamSender( std::string callId,
 				   MRef<RealtimeMedia *> media,
 				   MRef<UDPSocket *> senderSock=NULL,
 				   MRef<UDPSocket *> sender6Sock=NULL );
@@ -326,7 +326,7 @@ class LIBMINISIP_API MediaStreamSender : public MediaStream{
 		virtual std::string getDebugString();
 #endif
 
-		virtual std::string getMemObjectType() const {return "MediaStreamSender";}
+		virtual std::string getMemObjectType() const {return "RealtimeMediaStreamSender";}
 
 		/**
 		 * Returns the CODEC instance currently selected for
@@ -352,26 +352,26 @@ class LIBMINISIP_API MediaStreamSender : public MediaStream{
 		 * the peer is expecting to receive the data. This
 		 * is extracted from the received session description
 		 * (SDP).
-		 * @param port the port to which the MediaStreamSender should
+		 * @param port the port to which the RealtimeMediaStreamSender should
 		 * send
 		 */
 		virtual void setPort( uint16_t port );
 
 		/**
 		 * Returns the port to which data is sent.
-		 * @retunrs the port to which the MediaStreamSender is sending
+		 * @retunrs the port to which the RealtimeMediaStreamSender is sending
 		 * data, or 0 if it was not set
 		 */
 		virtual uint16_t getPort();
 
 		/**
-		 * Used by the Media to send data, if the MediaStreamSender
+		 * Used by the Media to send data, if the RealtimeMediaStreamSender
 		 * has subscribed to the Media. The data will be encrypted
 		 * if required, and encapsulated in an RTP packet.
 		 * @param data a pointer to the data to send
 		 * @param length the lenght of the data to send
 		 * @param ts the timestamp to use in RTP header, or
-		 * NULL if the MediaStreamSender should decide it
+		 * NULL if the RealtimeMediaStreamSender should decide it
 		 * @param marker whether or not the marker should be set
 		 * in the RTP header
 		 * @param dtmf whether or not the data is a DTMF signal

@@ -37,6 +37,7 @@
 
 #include<libminisip/media/zrtp/ZrtpHostBridgeMinisip.h>
 #include<libminisip/media/Media.h>
+#include<libminisip/media/ReliableMedia.h>
 #include<libminisip/media/RtpReceiver.h>
 #include<libminisip/media/MediaCommandString.h>
 #include<libmnetutil/UDPSocket.h>
@@ -121,22 +122,36 @@ MRef<Session *> MediaHandler::createSession( MRef<SipIdentity*> id, string callI
 
 	for( i = media.begin(); i != media.end(); i++ ){
 		MRef<Media *> m = *i;
-		MRef<RealtimeMedia*> rm = dynamic_cast<RealtimeMedia*>(*m);
+		MRef<RealtimeMedia*> rtm = dynamic_cast<RealtimeMedia*>(*m);
+		MRef<ReliableMedia*> relm = dynamic_cast<ReliableMedia*>(*m);
 
-		if( rm && rm->receive ){
+		if (relm){
+			//TODO: SDP support for reliable media not implemented
+			if (relm->isClient){
+			
+			
+			}
+			if (relm->isServer){
+				
+				
+			}
+		
+		}
+
+		if( rtm && rtm->receive ){
 			if( ipProvider )
 				rtpReceiver = new RtpReceiver( ipProvider, callId );
 
 			if( ip6Provider )
 				rtp6Receiver = new RtpReceiver( ip6Provider, callId );
 
-			MRef<MediaStreamReceiver *> rStream;
-			rStream = new MediaStreamReceiver( callId, rm, rtpReceiver, rtp6Receiver );
-			session->addMediaStreamReceiver( rStream );
+			MRef<RealtimeMediaStreamReceiver *> rStream;
+			rStream = new RealtimeMediaStreamReceiver( callId, rtm, rtpReceiver, rtp6Receiver );
+			session->addRealtimeMediaStreamReceiver( rStream );
 
 			// Need to dereference MRef:s, Can't compare MRef:s
 			// of different types
-			if( *rm == *audioMedia ) {
+			if( *rtm == *audioMedia ) {
 				CallRecorder * cr;
 				cr = new CallRecorder( audioMedia, rtpReceiver, ipProvider );
 				session->callRecorder = cr;
@@ -154,7 +169,7 @@ MRef<Session *> MediaHandler::createSession( MRef<SipIdentity*> id, string callI
 #endif
 		}
 		
-		if( rm->send ){
+		if( rtm && rtm->send ){
 		    if( !rtpReceiver && !ipProvider.isNull() ){
 			rtpReceiver = new RtpReceiver( ipProvider, callId );
 		    }
@@ -171,9 +186,9 @@ MRef<Session *> MediaHandler::createSession( MRef<SipIdentity*> id, string callI
 		    if( rtp6Receiver )
 			    sock6 = rtp6Receiver->getSocket();
 
-		    MRef<MediaStreamSender *> sStream;
-		    sStream = new MediaStreamSender( callId, rm, sock, sock6 );
-		    session->addMediaStreamSender( sStream );
+		    MRef<RealtimeMediaStreamSender *> sStream;
+		    sStream = new RealtimeMediaStreamSender( callId, rtm, sock, sock6 );
+		    session->addRealtimeMediaStreamSender( sStream );
 #ifdef ZRTP_SUPPORT
 		    if(/*securityConfig.use_zrtp*/ id->use_zrtp) {
 #ifdef DEBUG_OUTPUT

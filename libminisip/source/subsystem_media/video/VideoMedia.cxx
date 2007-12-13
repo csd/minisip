@@ -139,7 +139,7 @@ void VideoMedia::registerMediaSource( uint32_t ssrc, string callId ){
 	
 }
 
-void VideoMedia::unRegisterMediaSource( uint32_t ssrc ){
+void VideoMedia::unregisterMediaSource( uint32_t ssrc ){
 	MRef<VideoMediaSource *> source = getSource( ssrc );
 
 	if( source ){
@@ -173,7 +173,7 @@ MRef<VideoMediaSource *> VideoMedia::getSource( uint32_t ssrc ){
 	return NULL;
 }
 
-void VideoMedia::registerMediaSender( MRef<MediaStreamSender *> sender ){
+void VideoMedia::registerMediaSender( MRef<RealtimeMediaStreamSender *> sender ){
         sendersLock.lock();
         if( senders.size() == 0 ){
                 sendersLock.unlock();
@@ -186,7 +186,7 @@ void VideoMedia::registerMediaSender( MRef<MediaStreamSender *> sender ){
 }
 
 
-void VideoMedia::unRegisterMediaSender( MRef<MediaStreamSender *> sender ){
+void VideoMedia::unregisterMediaSender( MRef<RealtimeMediaStreamSender *> sender ){
         sendersLock.lock();
         senders.remove( sender );
         sendersLock.unlock();

@@ -148,7 +148,7 @@ class LIBMINISIP_API SoundIO : public MObject{
                                                 int32_t nrsamples, 
                                                 bool stereo);
 						
-		void unRegisterRecorderReceiver( SoundRecorderCallback *callback );
+		void unregisterRecorderReceiver( SoundRecorderCallback *callback );
 						
 		/**
 		 * Starts the thread that "polls" the soundcard for data
@@ -166,7 +166,7 @@ class LIBMINISIP_API SoundIO : public MObject{
 
 		void registerSource(MRef<SoundSource *> source);
 
-		void unRegisterSource(int sourceId);
+		void unregisterSource(int sourceId);
 
 		/**
 		 * Starts thread that takes data from queue 

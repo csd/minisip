@@ -60,10 +60,10 @@ class LIBMINISIP_API VideoMedia : public RealtimeMedia,
 
 		virtual void sendVideoData( byte_t * data, uint32_t length, uint32_t ts, bool marker=false );
 
-		virtual void registerMediaSender( MRef<MediaStreamSender *> sender );
-		virtual void unRegisterMediaSender( MRef<MediaStreamSender *> sender );
+		virtual void registerMediaSender( MRef<RealtimeMediaStreamSender *> sender );
+		virtual void unregisterMediaSender( MRef<RealtimeMediaStreamSender *> sender );
 		virtual void registerMediaSource( uint32_t ssrc, std::string callId );
-		virtual void unRegisterMediaSource( uint32_t ssrc );
+		virtual void unregisterMediaSource( uint32_t ssrc );
 		virtual void handleMHeader( MRef<SdpHeaderM *> m );
 
 

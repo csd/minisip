@@ -77,6 +77,8 @@ libmediahandler_src = source/subsystem_media/MediaHandler.cxx \
 			source/subsystem_media/MediaStream.cxx \
 			source/subsystem_media/Media.cxx \
 			source/subsystem_media/RealtimeMedia.cxx \
+			source/subsystem_media/ReliableMedia.cxx \
+			source/subsystem_media/ReliableMediaServer.cxx \
 			source/subsystem_media/RtpReceiver.cxx \
 			source/subsystem_media/MediaCommandString.cxx \
 			source/subsystem_media/AudioMedia.cxx \

@@ -103,7 +103,7 @@ void AudioMedia::setAudioForwarding(bool b){
 	audioForwarding=b;
 }
 
-void AudioMedia::registerMediaSender( MRef<MediaStreamSender *> sender ){
+void AudioMedia::registerRealtimeMediaSender( MRef<RealtimeMediaStreamSender *> sender ){
 	sendersLock.lock();
 	if( senders.empty() ){
 		sendersLock.unlock();
@@ -112,9 +112,9 @@ void AudioMedia::registerMediaSender( MRef<MediaStreamSender *> sender ){
 	}
 
 	//Don't add if it's already in the list. This is so that we support
-	//multiple calls to MediaStream::start().
+	//multiple calls to RealtimeMediaStream::start().
 	bool found=false;
-	list<MRef<MediaStreamSender *> >::iterator i;
+	list<MRef<RealtimeMediaStreamSender *> >::iterator i;
 	for (i=senders.begin(); i!=senders.end(); i++)
 		if ( *i == sender)
 			found = true;
@@ -123,7 +123,7 @@ void AudioMedia::registerMediaSender( MRef<MediaStreamSender *> sender ){
 	sendersLock.unlock();
 }
 
-void AudioMedia::unRegisterMediaSender( MRef<MediaStreamSender *> sender ){
+void AudioMedia::unregisterRealtimeMediaSender( MRef<RealtimeMediaStreamSender *> sender ){
 	bool emptyList;
 	sendersLock.lock();
 	senders.remove( sender );
@@ -143,10 +143,10 @@ void AudioMedia::registerMediaSource( uint32_t ssrc, string callId ){
 	sources.push_back( source );
 }
 
-void AudioMedia::unRegisterMediaSource( uint32_t ssrc ){
+void AudioMedia::unregisterMediaSource( uint32_t ssrc ){
 	std::list< MRef<AudioMediaSource *> >::iterator iSource;
 
-	soundIo->unRegisterSource( ssrc );
+	soundIo->unregisterSource( ssrc );
 
 	for( iSource = sources.begin(); iSource != sources.end(); iSource ++ ){
 		if( (*iSource)->getSsrc() == ssrc ){
@@ -203,8 +203,8 @@ void AudioMedia::sendData( byte_t * data, uint32_t length, uint32_t ts, bool mar
 		for( uint32_t i = 0; i<length; i++ ) zeroData[i] = 0; 
 	}
 	
-	list< MRef<MediaStreamSender *> >::iterator i;
-	list< MRef<MediaStreamReceiver *> >::iterator ir;
+	list< MRef<RealtimeMediaStreamSender *> >::iterator i;
+	list< MRef<RealtimeMediaStreamReceiver *> >::iterator ir;
 	list< MRef<Session*> >::iterator is;
 	sendersLock.lock();
 
@@ -265,14 +265,14 @@ void AudioMedia::startRinging( string ringtoneFile ){
 }
 
 void AudioMedia::stopRinging(){
-	soundIo->unRegisterSource( RINGTONE_SOURCE_ID );
+	soundIo->unregisterSource( RINGTONE_SOURCE_ID );
 }
 
 #ifdef DEBUG_OUTPUT
 string AudioMedia::getDebugString() {
 	string ret;
 	ret = getMemObjectType() + ": this=" + itoa(reinterpret_cast<int64_t>(this));
-	for( std::list< MRef<MediaStreamSender *> >::iterator it = senders.begin();
+	for( std::list< MRef<RealtimeMediaStreamSender *> >::iterator it = senders.begin();
 				it != senders.end(); it++ ) {
 		ret += (*it)->getDebugString() + ";";
 	}

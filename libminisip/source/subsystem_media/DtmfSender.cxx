@@ -54,18 +54,18 @@ void DtmfSender::timeout( DtmfEvent * event ){
 }
 
 void DtmfSender::sendPayload( byte_t payload[], bool mark, uint32_t * ts ){
-        std::list<MRef<MediaStreamSender *> >::iterator iSender;
+        std::list<MRef<RealtimeMediaStreamSender *> >::iterator iSender;
 
-        session->mediaStreamSendersLock.lock();
-        for( iSender =  session->mediaStreamSenders.begin();
-             iSender != session->mediaStreamSenders.end();
+        session->realtimeMediaStreamSendersLock.lock();
+        for( iSender =  session->realtimeMediaStreamSenders.begin();
+             iSender != session->realtimeMediaStreamSenders.end();
              iSender++ ){
 
                 if( !(**iSender)->disabled ){
-                        ((MediaStreamSender *)(**iSender))->send( payload, 4, ts, mark, true );
+                        ((RealtimeMediaStreamSender *)(**iSender))->send( payload, 4, ts, mark, true );
                 }
 
         }
-        session->mediaStreamSendersLock.unlock();
+        session->realtimeMediaStreamSendersLock.unlock();
 
 }
