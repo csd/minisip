@@ -31,6 +31,7 @@
 
 #include<libminisip/media/rtp/CryptoContext.h>
 #include<libminisip/media/RealtimeMedia.h>
+#include<libminisip/media/ReliableMedia.h>
 #include"RtpReceiver.h"
 #include<libminisip/media/rtp/SRtpPacket.h>
 
@@ -45,55 +46,113 @@ class UDPSocket;
 class SdpHeaderM;
 class IpProvider;
 class RealtimeMedia;
+class ReliableMedia;
+
+
+class LIBMINISIP_API MediaStream : public MObject {
+public:
+	MediaStream(std::string callId_, MRef<Media*> m): callId(callId_),media(m){
+	
+	}
+	/**
+	 * Starts the transmission or reception of a the stream.
+	 */
+	virtual void start() = 0;
+
+	/**
+	 * Stops the transmission or reception of a the stream.
+	 */
+	virtual void stop() = 0;
+
+#ifdef DEBUG_OUTPUT
+	virtual std::string getDebugString();
+#endif
+
+	/**
+	 * Returns the media type corresponding to this stream
+	 * (video, audio...) as it appears in the session
+	 * description (SDP).
+	 * @returns the type as a string
+	 */
+	std::string getSdpMediaType();/* audio, video, application... */
+
+	/**
+	 * Returns additional media attributes that are to appear
+	 * in the session description (SDP) as a: header.
+	 * @returns the attributes as a list of string, each
+	 * of them should go into a a: header
+	 */
+	std::list<std::string> getSdpAttributes();
+
+
+	std::string getCallId(){return callId;}
+
+	/**
+	 * Used to query the port on which the media is received for
+	 * a receiver, respectively where it is sent to for a sender
+	 * @returns the port.
+	 */
+	virtual uint16_t getPort()=0;
+
+	/**
+	  Returns an MRef to the Media object used by this media stream.
+	  Use with care.
+	  */
+	MRef<Media *> getMedia() { return media; }
+
+protected:
+	std::string callId;
+	MRef<Media *> media;
+};
+
+class LIBMINISIP_API ReliableMediaStream : public MediaStream {
+public:
+	ReliableMediaStream(std::string callId, MRef<ReliableMedia*> m);
+
+	std::string getTransport(){return "TCP";} //TODO: support other (secure) transports
+
+	/**
+	 * Examples
+	 *                      Media formats
+	 *                         vvvvvv
+	 * m = audio 12345 RTP/AVP 0 1 99
+	 *
+	 *                     vvv
+	 * m = image 12345 TCP t38
+	 *
+	 * @return  The list of formats supported by the reliable media
+	 * 	    session.
+	 */
+	virtual std::string getMediaFormats(){
+		return mediaFormats;
+	}
+
+	virtual void start(){}
+	virtual void stop(){}
+
+	virtual uint16_t getPort();
+	virtual uint16_t getPort(std::string type);
+
+protected:
+	uint16_t port;
+	std::string mediaFormats;
+
+
+
+private:
+
+};
+
 
 /**
  * Abstract class that implements common functions to a
- * MediaStreamSender and MediaStreamReceiver
+ * RealtimeMediaStreamSender and RealtimeMediaStreamReceiver
  */
-
-class LIBMINISIP_API RealtimeMediaStream : public MObject{
+class LIBMINISIP_API RealtimeMediaStream : public MediaStream {
 	public:
-		/**
-		 * Starts the transmission or reception of a the stream.
-		 */
-		virtual void start() = 0;
-
-		/**
-		 * Stops the transmission or reception of a the stream.
-		 */
-		virtual void stop() = 0;
-
-#ifdef DEBUG_OUTPUT
-		virtual std::string getDebugString();
-#endif
-
-		/**
-		 * Returns the media type corresponding to this stream
-		 * (video, audio...) as it appears in the session
-		 * description (SDP).
-		 * @returns the type as a string
-		 */
-		std::string getSdpMediaType();/* audio, video, application... */
-
-		/**
-		 * Returns additional media attributes that are to appear
-		 * in the session description (SDP) as a: header.
-		 * @returns the attributes as a list of string, each
-		 * of them should go into a a: header
-		 */
-		std::list<std::string> getSdpAttributes();
 
 		virtual std::string getMemObjectType() const {return "RealtimeMediaStream";}
 		bool disabled;
-
-		std::string getCallId(){return callId;}
-
-		/**
-		 * Used to query the port on which the media is received for
-		 * a receiver, respectively where it is sent to for a sender
-		 * @returns the port.
-		 */
-		virtual uint16_t getPort()=0;
 
 		/**
 		 * Used to check a m: header in a session description
@@ -117,11 +176,6 @@ class LIBMINISIP_API RealtimeMediaStream : public MObject{
 		 */
 		void setKeyAgreement( MRef<KeyAgreement *> ka );
 
-		/**
-		Returns an MRef to the Media object used by this media stream.
-		Use with care.
-		*/
-		MRef<RealtimeMedia *> getMedia() { return media; }
 #ifdef ZRTP_SUPPORT
 		/**
 		 * Set the ZRTP implementation host brigde for this media stream.
@@ -161,8 +215,7 @@ class LIBMINISIP_API RealtimeMediaStream : public MObject{
 	protected:
 		MRef<CryptoContext *> getCryptoContext( uint32_t ssrc, uint16_t seq_no );
 		RealtimeMediaStream( std::string callId, MRef<RealtimeMedia *> );
-		std::string callId;
-		MRef<RealtimeMedia *> media;
+		MRef<RealtimeMedia *> realtimeMedia;
 		uint32_t csbId;
 
 		std::string localPayloadType; //For RTP media, this is a number

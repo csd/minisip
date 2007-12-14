@@ -270,6 +270,22 @@ fi
 AM_CONDITIONAL(ONLINECONF_SUPPORT, [test "x${onlineconf_support}" = "xyes"])
 
 
+# VNC SUPPORT
+
+AC_ARG_ENABLE(vnc,
+    AS_HELP_STRING([--enable-vnc],
+    	[enables support for presentation sharing using vnc-rfb (under development).])
+   )
+
+
+if test "x${enable_vnc}" = "xyes"; then
+   vnc_support="yes"
+   AC_DEFINE(VNC_SUPPORT, [], [Support configuration stored online])
+fi
+AM_CONDITIONAL(VNC_SUPPORT, [test "x${vnc_support}" = "xyes"])
+
+
+
 
 dnl #############
 dnl VIDEO SUPPORT

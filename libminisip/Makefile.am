@@ -258,6 +258,21 @@ endif PORTAUDIO_SUPPORT
 libspaudio_src = source/subsystem_media/spaudio/SpAudio.cxx
 
 #
+# VNC plugin
+#
+if VNC_SUPPORT
+libvnc_src = source/subsystem_media/vnc/MediaSharedWorkspace.cxx \
+		source/subsystem_media/vnc/MediaSharedWorkspace.h \
+		source/subsystem_media/vnc/MediaSharedWorkspacePlugin.cxx \
+		source/subsystem_media/vnc/MediaSharedWorkspacePlugin.h
+else
+libvnc_src =
+endif
+
+
+
+
+#
 # Video plugin
 #
 if VIDEO_SUPPORT
@@ -278,6 +293,9 @@ mvideo_la_LIBADD = libminisip_video.la libminisip.la $(MUTIL_LIBS)
 
         libvideo_libadd =
         display_src = source/subsystem_media/video/display/VideoDisplay.cxx
+
+
+
 
 #
 # X11 display plugin
@@ -442,6 +460,7 @@ libminisip_la_SOURCES = source/Minisip.cxx \
 			$(libp2t_src) \
 			$(librtp_src) \
 			$(libmsrp_src) \
+			$(libvnc_src) \
 			$(libzrtp_src) \
 			$(libsdp_src) \
 			$(libsoundcard_src) \

@@ -122,6 +122,12 @@ class LIBMINISIP_API Session : public MObject{
 		 */
 		bool setSdpOffer ( MRef<SdpPacket *> offer, std::string peerUri );
 
+		void addReliableMediaSession(MRef<ReliableMediaStream*> rsess){
+			realtimeMediaStreamSendersLock.lock();
+			reliableMediaSessions.push_back(rsess);
+			realtimeMediaStreamSendersLock.unlock();
+		}
+
 		/**
 		 * Adds a RealtimeMediaStreamReceiver to this media session. Used
 		 * by the media handler to add a media stream per
@@ -261,6 +267,7 @@ class LIBMINISIP_API Session : public MObject{
 		 * packet can not be used.
 		 */
 		bool addRealtimeMediaToOffer(MRef<SdpPacket*> result, const std::string &peerUri, bool anatSupported, std::string transport);
+		bool addReliableMediaToOffer(MRef<SdpPacket*> result, const std::string &peerUri, bool anatSupported);
 
 		bool started;
 		void addStreams();
@@ -271,6 +278,8 @@ class LIBMINISIP_API Session : public MObject{
 		MRef<SdpPacket *> emptySdp();
 		MRef<RealtimeMediaStreamReceiver *> matchFormat( MRef<SdpHeaderM *> m, 
 			uint32_t iFormat, MRef<IPAddress *> &remoteAddress );
+
+		std::list<MRef<ReliableMediaStream*> > reliableMediaSessions;
 
 		typedef std::list< MRef<RealtimeMediaStreamSender *> > RealtimeMediaStreamSenders;
 		std::list< MRef<RealtimeMediaStreamReceiver *> > realtimeMediaStreamReceivers;

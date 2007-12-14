@@ -30,10 +30,9 @@
 #include<libminisip/libminisip_config.h>
 
 #include<libminisip/media/Media.h>
-#include<libminisip/media/codecs/Codec.h>
-#include<libminisip/media/rtp/RtpPacket.h>
 #include<libminisip/media/MediaStream.h>
 
+class ReliableMediaStream;
 /**
  * Handles RTP based media (typically audio and video streams).
  * It holds a list of the CODEC relevant for
@@ -45,10 +44,12 @@
 class LIBMINISIP_API ReliableMedia : public Media {
 	public:
 
-		bool isClient;
-		bool isServer;
+//		bool isClient;
+//		bool isServer;
 
 		~ReliableMedia();
+
+		virtual MRef<ReliableMediaStream*> createMediaStream(std::string callId)=0;
 
 		virtual std::string getSdpMediaType();
 

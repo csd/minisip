@@ -47,21 +47,21 @@
 
 using namespace std;
 
-RealtimeMediaStream::RealtimeMediaStream( string cid, MRef<RealtimeMedia *> m) : callId(cid), media(m),ka(NULL) {
+RealtimeMediaStream::RealtimeMediaStream( string cid, MRef<RealtimeMedia *> m) : MediaStream(cid,*m), realtimeMedia(m) /*callId(cid), media(m)*/,ka(NULL) {
 	disabled = false;
 #ifdef ZRTP_SUPPORT
 	zrtpBridge = NULL;
 #endif
 }
 
-std::string RealtimeMediaStream::getSdpMediaType(){
+std::string MediaStream::getSdpMediaType(){
 	if( media ){
 		return media->getSdpMediaType();
 	}
 	return "";
 }
 
-list<string> RealtimeMediaStream::getSdpAttributes(){
+list<string> MediaStream::getSdpAttributes(){
 	return media->getSdpAttributes();
 }
 
@@ -91,7 +91,7 @@ bool RealtimeMediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
         //	int i;
         string sdpPayloadType = m->getFormat( formatIndex );
 
-        media->handleMHeader( m );
+        realtimeMedia->handleMHeader( m );
 
         // pn507 This checks for "Audio"
         if( m->getMedia() != getSdpMediaType() ){
@@ -101,7 +101,7 @@ bool RealtimeMediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
         sdpRtpMap = m->getRtpMap( sdpPayloadType );
 	sdpFmtpParam = m->getFmtpParam( sdpPayloadType );
 
-	std::list<MRef<Codec *> > codecs = media->getAvailableCodecs();
+	std::list<MRef<Codec *> > codecs = realtimeMedia->getAvailableCodecs();
 	std::list<MRef<Codec *> >::iterator iC;
 	string sdpName;
 	string sdpRate;
@@ -148,6 +148,25 @@ bool RealtimeMediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
         }
         return false;
 }
+
+
+ReliableMediaStream::ReliableMediaStream(std::string callId, MRef<ReliableMedia*> m) 
+		: MediaStream(callId, *m)
+{
+	
+
+}
+
+
+uint16_t ReliableMediaStream::getPort(){
+	return 33333; //FIXME: Fixed when RFB source is commited... blame Erik
+}
+
+uint16_t ReliableMediaStream::getPort(std::string type){
+	return 33333;
+}
+
+
 
 MRef<CryptoContext *> RealtimeMediaStream::initCrypto( uint32_t ssrc, uint16_t seq_no ){
 	MRef<CryptoContext *> cryptoContext;
@@ -322,7 +341,7 @@ void RealtimeMediaStreamReceiver::stop(){
 
 	ssrcListLock.lock();
 	for( i = ssrcList.begin(); i != ssrcList.end(); i++ ){
-		media->unregisterMediaSource( *i );
+		realtimeMedia->unregisterMediaSource( *i );
 	}
 	ssrcList.clear();
 	ssrcListLock.unlock();
@@ -409,7 +428,7 @@ void RealtimeMediaStreamReceiver::handleRtpPacket( MRef<SRtpPacket *> packet, st
 
 	gotSsrc( packetSsrc, callId );
 
-	media->playData( *packet );
+	realtimeMedia->playData( *packet );
 }
 
 void RealtimeMediaStreamReceiver::gotSsrc( uint32_t ssrc, string callId ){
@@ -424,7 +443,7 @@ void RealtimeMediaStreamReceiver::gotSsrc( uint32_t ssrc, string callId ){
 	}
 
 	massert(callId.size()>0);
-	media->registerMediaSource( ssrc, callId );
+	realtimeMedia->registerMediaSource( ssrc, callId );
 	ssrcList.push_back( ssrc );
 	ssrcListLock.unlock();
 }
@@ -467,11 +486,11 @@ RealtimeMediaStreamSender::RealtimeMediaStreamSender( string callid, MRef<Realti
 }
 
 void RealtimeMediaStreamSender::start(){
-	media->registerRealtimeMediaSender( this );
+	realtimeMedia->registerRealtimeMediaSender( this );
 }
 
 void RealtimeMediaStreamSender::stop(){
-	media->unregisterRealtimeMediaSender( this );
+	realtimeMedia->unregisterRealtimeMediaSender( this );
 	senderSock = NULL;
 	sender6Sock = NULL;
 
@@ -614,7 +633,7 @@ void RealtimeMediaStreamSender::setRemoteAddress( MRef<IPAddress *> ra){
 }
 
 #ifdef DEBUG_OUTPUT
-string RealtimeMediaStream::getDebugString() {
+string MediaStream::getDebugString() {
 	string ret;
 	ret = getMemObjectType() + " this=" + itoa(reinterpret_cast<int64_t>(this)) +
 		": port=" + itoa(getPort());
@@ -672,7 +691,7 @@ bool RealtimeMediaStreamSender::matches( MRef<SdpHeaderM *> m, uint32_t formatIn
 	bool result = RealtimeMediaStream::matches( m, formatIndex );
 
 	if( result && !selectedCodec ){
-		selectedCodec = media->createCodecInstance(
+		selectedCodec = realtimeMedia->createCodecInstance(
 				atoi( localPayloadType.c_str() )  );
 		payloadType = (uint8_t)atoi(m->getFormat( formatIndex ).c_str());
 	}
@@ -683,3 +702,4 @@ bool RealtimeMediaStreamSender::matches( MRef<SdpHeaderM *> m, uint32_t formatIn
 uint32_t RealtimeMediaStreamSender::getSsrc(){
 	return ssrc;
 }
+

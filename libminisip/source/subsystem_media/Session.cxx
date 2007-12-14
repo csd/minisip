@@ -406,6 +406,96 @@ bool Session::addRealtimeMediaToOffer(MRef<SdpPacket*> result, const string &pee
 
 }
 
+bool Session::addReliableMediaToOffer(MRef<SdpPacket*> result, const string &peerUri, bool anatSupported){
+	list< MRef<ReliableMediaStream*> >::iterator i;
+	std::list<std::string>::iterator iAttribute;
+	std::list<std::string> attributes;
+
+	string type;
+	uint16_t localPort = 0;
+	MRef<SdpHeaderM *> m;
+	std::list<MRef<Codec *> > codecs;
+	std::list<MRef<Codec *> >::iterator iC;
+//	uint8_t payloadType;
+	string rtpmap;
+//	bool anat = false;
+
+	for( i = reliableMediaSessions.begin(); i != reliableMediaSessions.end(); i++ ){
+		massert(*i);
+		type = (*i)->getSdpMediaType();
+		m = new SdpHeaderM( type, localPort, 1, (*i)->getTransport() );
+
+		//cerr << "EEEE: trying to add formats <"<<(*i)->getMediaFormats()<<">"<<endl;
+		m->addFormat( "vnc" /*(*i)->getMediaFormats()*/ );
+		result->addHeader( *m );
+
+		attributes = (*i)->getSdpAttributes();
+		for( iAttribute = attributes.begin(); iAttribute != attributes.end(); iAttribute ++ ){
+			MRef<SdpHeaderA*> a = new SdpHeaderA("a=X");
+			a->setAttributes( *iAttribute );
+			m->addAttribute( *a );
+		}
+
+#if ADD_ANAT_HEADER_TO_RELIABLE_MEDIA_FIXME
+		if( anat ){
+			MRef<SdpHeaderM*> m4 = m;
+			MRef<SdpHeaderM*> m6 = new SdpHeaderM( **m );
+
+			// IPv4
+			m4->setPort( (*i)->getPort("IP4") );
+
+			MRef<SdpHeaderA*> mid2 = new SdpHeaderA( "a=mid:2" );
+
+			m4->addAttribute( mid2 );
+
+			MRef<SdpHeaderC*> conn4 = new SdpHeaderC( "IN", "IP4", localIpString );
+			conn4->set_priority( m4->getPriority() );
+			m4->setConnection( *conn4 );
+
+			// IPv6
+			m6->setPort( (*i)->getPort("IP6") );
+
+			MRef<SdpHeaderA*> mid1 = new SdpHeaderA( "a=mid:1" );
+			m6->addAttribute( mid1 );
+
+
+			MRef<SdpHeaderC*> conn6 = new SdpHeaderC( "IN", "IP6", localIp6String );
+			conn6->set_priority( m6->getPriority() );
+			m6->setConnection( *conn6 );
+
+			result->addHeader( *m6 );
+		}
+		else
+#endif
+		{
+			string ipString;
+			string addrtype;
+
+			if( !localIpString.empty() ){
+				ipString = localIpString;
+				addrtype = "IP4";
+			}
+			else{
+				ipString = localIp6String;
+				addrtype = "IP6";
+			}
+
+			MRef<SdpHeaderC*> c = new SdpHeaderC("IN", addrtype, ipString );
+			m->setConnection(c);
+
+			m->setPort( (*i)->getPort( addrtype ) );
+		}
+
+	}
+
+#ifdef DEBUG_OUTPUT	
+	cerr << "Session::getSdpOffer: " << endl << result->getString() << endl << endl;
+#endif
+
+	return true;
+}
+
+
 
 MRef<SdpPacket *> Session::getSdpOffer( const string &peerUri, bool anatSupported ){ // used by the initiator when creating the first message
 	string keyMgmtMessage;
@@ -458,11 +548,13 @@ MRef<SdpPacket *> Session::getSdpOffer( const string &peerUri, bool anatSupporte
 		transport = "RTP/AVP";
 	}
 
-
-
 	if (!addRealtimeMediaToOffer(result, peerUri, anatSupported, transport)){
 		return NULL;
 	}
+	if (!addReliableMediaToOffer(result, peerUri, anatSupported) ){
+		return NULL;
+	}
+
 	return result;
 }
 

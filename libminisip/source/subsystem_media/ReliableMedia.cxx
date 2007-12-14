@@ -6,8 +6,8 @@
 using namespace std;
 
 ReliableMedia::ReliableMedia(string type, bool isClient_, bool isServer_)
-		: isClient(isClient_),
-		isServer(isServer_), 
+		: /*isClient(isClient_),
+		isServer(isServer_), */
 		sdpType(type)
 {
 

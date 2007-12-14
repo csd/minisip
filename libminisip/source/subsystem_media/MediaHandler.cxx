@@ -126,16 +126,7 @@ MRef<Session *> MediaHandler::createSession( MRef<SipIdentity*> id, string callI
 		MRef<ReliableMedia*> relm = dynamic_cast<ReliableMedia*>(*m);
 
 		if (relm){
-			//TODO: SDP support for reliable media not implemented
-			if (relm->isClient){
-			
-			
-			}
-			if (relm->isServer){
-				
-				
-			}
-		
+			session->addReliableMediaSession( relm->createMediaStream(callId) );
 		}
 
 		if( rtm && rtm->receive ){
