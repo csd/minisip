@@ -40,7 +40,11 @@
 #endif
 
 #include"AudioPlugin.h"
+
+#ifdef VNC_SUPPORT
 #include"vnc/MediaSharedWorkspacePlugin.h"
+#endif
+
 
 using namespace std;
 
@@ -71,6 +75,8 @@ MediaPlugin::~MediaPlugin(){
 
 MediaRegistry::MediaRegistry(){
 	registerPlugin( new AudioPlugin( NULL ) );
+#ifdef VNC_SUPPORT
 	registerPlugin( new SharedWorkspacePlugin( NULL ) );
+#endif
 }
 
