@@ -139,6 +139,8 @@ class LIBMINISIP_API RealtimeMedia : public Media {
 		 */
 		MRef<CodecState *> createCodecInstance( uint8_t payloadType );
 
+		//std::list< MRef<RealtimeMediaStreamSender *> > getMediaSenders(){return senders;}
+
 	protected:
 		RealtimeMedia( MRef<Codec *> defaultCodec );
 

@@ -52,6 +52,7 @@ class LIBMINISIP_API VideoMedia : public RealtimeMedia,
 
 	public:
 		VideoMedia( MRef<Codec *> codec, MRef<VideoDisplay *> display, MRef<ImageMixer *> mixer, MRef<Grabber *> = NULL, uint32_t receivingWidth = 176, uint32_t receivingHeight=144 );
+
 		virtual std::string getMemObjectType() const {return "VideoMedia";}
 
 		virtual std::string getSdpMediaType();

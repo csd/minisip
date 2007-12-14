@@ -49,10 +49,15 @@
 using namespace std;
 
 Media::Media(){
+	mediaForwarding=false;
 }
 
 Media::~Media(){
 
+}
+
+void Media::setMediaForwarding(bool forw){
+	mediaForwarding=forw;
 }
 
 list<string> Media::getSdpAttributes(){

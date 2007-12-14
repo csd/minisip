@@ -159,6 +159,7 @@ ReliableMediaStream::ReliableMediaStream(std::string callId, MRef<ReliableMedia*
 }
 
 
+/*
 uint16_t ReliableMediaStream::getPort(){
 	return 33333; //FIXME: Fixed when RFB source is commited... blame Erik
 }
@@ -166,7 +167,7 @@ uint16_t ReliableMediaStream::getPort(){
 uint16_t ReliableMediaStream::getPort(std::string type){
 	return 33333;
 }
-
+*/
 
 
 MRef<CryptoContext *> RealtimeMediaStream::initCrypto( uint32_t ssrc, uint16_t seq_no ){
@@ -620,6 +621,13 @@ void RealtimeMediaStreamSender::send( byte_t * data, uint32_t length, uint32_t *
         }
 #endif
 
+}
+
+void RealtimeMediaStreamSender::sendRtpPacket(MRef<RtpPacket*> rtp){
+	if( remoteAddress->getAddressFamily() == AF_INET && senderSock )
+		rtp->sendTo( **senderSock, **remoteAddress, remotePort );
+	else if( remoteAddress->getAddressFamily() == AF_INET6 && sender6Sock )
+		rtp->sendTo( **sender6Sock, **remoteAddress, remotePort );
 }
 
 void RealtimeMediaStreamSender::setRemoteAddress( MRef<IPAddress *> ra){

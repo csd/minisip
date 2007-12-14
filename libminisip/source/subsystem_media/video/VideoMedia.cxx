@@ -86,8 +86,6 @@ void VideoMedia::handleMHeader( MRef< SdpHeaderM * > m ){
         }
 }
 
-
-
 void VideoMedia::playData( MRef<RtpPacket *> packet ){
 
 	MRef<VideoMediaSource *> source = getSource( packet->getHeader().SSRC );
@@ -95,6 +93,18 @@ void VideoMedia::playData( MRef<RtpPacket *> packet ){
 	if( source ){
 		source->playData( packet );
 	}
+
+/// VIDEO FORWARD CODE BEGIN
+	if (mediaForwarding){
+		list< MRef<RealtimeMediaStreamSender *> >::iterator i;
+		sendersLock.lock();
+		for( i = senders.begin(); i != senders.end(); i++ ){
+			(*i)->sendRtpPacket( packet );
+		}
+		sendersLock.unlock();
+	}
+/// VIDEO FORWARD CODE END
+	
 }
 
 
@@ -345,7 +355,8 @@ void VideoMediaSource::playData( MRef<RtpPacket *> packet ){
 	else{
 		expectedSeqNo = seqNo + 1;
 	}	
-	
+
+
 }
 
 void VideoMediaSource::addPacketToFrame( MRef<RtpPacket *> packet ){
@@ -364,3 +375,4 @@ void VideoMediaSource::addPacketToFrame( MRef<RtpPacket *> packet ){
                 packetLoss = false;
         }
 }
+

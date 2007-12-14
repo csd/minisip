@@ -125,6 +125,8 @@ class LIBMINISIP_API MediaHandler : public virtual MObject, public SessionRegist
 		bool muteAllButOne;
 #endif
 
+		MRef<Media*> getMedia(std::string sdpType);
+
 	private:
 		void init();
 

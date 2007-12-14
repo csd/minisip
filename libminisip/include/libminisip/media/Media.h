@@ -42,46 +42,49 @@ class MediaHandler;
  * example video or audio.  
  */
 class LIBMINISIP_API Media : public MObject{
-	public:
+public:
 
-		~Media();
+	~Media();
 
-		/**
-		 * Returns the media type as used in the SDP (audio or video).
-		 * @returns the media type as a string
-		 */
-		virtual std::string getSdpMediaType()=0;
+	/**
+	 * Returns the media type as used in the SDP (audio or video).
+	 * @returns the media type as a string
+	 */
+	virtual std::string getSdpMediaType()=0;
 
-		
-		/**
-		 * Used to query media specific attributes to add in the
-		 * session description (e.g. framesize).
-		 * @returns a list of attributes (as string) to add in
-		 * a: headers in the session description
-		 */
-		std::list<std::string> getSdpAttributes();
 
-		/**
-		 * Add a media attribute to use in session descriptions (SDP).
-		 * @attribute the attribute as a string, as it will appear
-		 * in a: headers in the SDP
-		 */
-		void addSdpAttribute( std::string attribute );
-		
-		/**
-		 * Used to adapt the medium to a received session description
-		 * (e.g. change the framesize). This is likely to 
-		 * be a problem with multiple calls and should
-		 * be called carefully.
-		 * @param m a reference to the received m: SDP header
-		 * on which the media should be tweaked
-		 */
-		virtual void handleMHeader( MRef<SdpHeaderM *> m );
+	void setMediaForwarding(bool);
 
-	protected:
-		Media();
-		
-		std::list<std::string> sdpAttributes;
+	/**
+	 * Used to query media specific attributes to add in the
+	 * session description (e.g. framesize).
+	 * @returns a list of attributes (as string) to add in
+	 * a: headers in the session description
+	 */
+	std::list<std::string> getSdpAttributes();
+
+	/**
+	 * Add a media attribute to use in session descriptions (SDP).
+	 * @attribute the attribute as a string, as it will appear
+	 * in a: headers in the SDP
+	 */
+	void addSdpAttribute( std::string attribute );
+
+	/**
+	 * Used to adapt the medium to a received session description
+	 * (e.g. change the framesize). This is likely to 
+	 * be a problem with multiple calls and should
+	 * be called carefully.
+	 * @param m a reference to the received m: SDP header
+	 * on which the media should be tweaked
+	 */
+	virtual void handleMHeader( MRef<SdpHeaderM *> m );
+
+protected:
+	Media();
+
+	std::list<std::string> sdpAttributes;
+	bool mediaForwarding;
 };
 
 

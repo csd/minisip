@@ -125,11 +125,11 @@ public:
 	 */
 	virtual std::string getMediaFormats()=0;
 
-	virtual void start(){}
+/*	virtual void start(){}
 	virtual void stop(){}
-
-	virtual uint16_t getPort();
-	virtual uint16_t getPort(std::string type);
+*/
+//	virtual uint16_t getPort();
+	virtual uint16_t getPort(std::string type)=0;
 
 protected:
 	uint16_t port;
@@ -451,6 +451,7 @@ class LIBMINISIP_API RealtimeMediaStreamSender : public RealtimeMediaStream{
 		void sendZrtp(unsigned char* data, int length,
                               unsigned char* payload, int payLen);
 
+
 		/**
 		 * Get the current Seq number of this packet
 		 *
@@ -459,6 +460,8 @@ class LIBMINISIP_API RealtimeMediaStreamSender : public RealtimeMediaStream{
 		 */
 		uint16_t getSeqNo() { return seqNo; };
 #endif
+
+		void sendRtpPacket(MRef<RtpPacket*> rtp);
 
 		/**
 		 * Used by the Session to specify the IP address

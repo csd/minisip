@@ -89,6 +89,7 @@ void MediaHandler::init(){
 			if( !audioMedia && audio ){
 				audioMedia = audio;
 			}
+
 		}
 	}
 
@@ -241,14 +242,25 @@ void MediaHandler::handleCommand(string subsystem, const CommandString& command 
 	}
 
 	if( command.getOp() == MediaCommandString::audio_forwarding_enable){
-		audioMedia->setAudioForwarding(true);
+		getMedia("audio")->setMediaForwarding(true);
 		return;
 	}
 
 	if( command.getOp() == MediaCommandString::audio_forwarding_disable){
-		audioMedia->setAudioForwarding(false);
+		getMedia("audio")->setMediaForwarding(false);
 		return;
 	}
+
+	if( command.getOp() == MediaCommandString::video_forwarding_enable){
+		getMedia("video")->setMediaForwarding(true);
+		return;
+	}
+
+	if( command.getOp() == MediaCommandString::video_forwarding_disable){
+		getMedia("video")->setMediaForwarding(false);
+		return;
+	}
+
 
 	if( command.getOp() == MediaCommandString::send_dtmf){
 		MRef<Session *> session = Session::registry->getSession( command.getDestinationId() );
@@ -346,6 +358,15 @@ void MediaHandler::sessionCallRecorderStart( string callid, bool start ) {
 	sessionsLock.unlock();
 }
 
+MRef<Media*> MediaHandler::getMedia(std::string sdpType){
+	list<MRef<Media*> >::iterator i;
+	for (i=media.begin(); i!=media.end(); i++){
+		if ((*i)->getSdpMediaType()==sdpType){
+			return *i;
+		}
+	}
+	return NULL;
+}
 
 
 #ifdef DEBUG_OUTPUT	

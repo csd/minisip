@@ -71,8 +71,6 @@ class LIBMINISIP_API AudioMedia : public RealtimeMedia, public SoundRecorderCall
 		virtual std::string getSdpMediaType();
 
 
-		void setAudioForwarding(bool);
-
 		/**
 		* Play the given RTP packet on this medium. This includes
 		* decoding if relevant.
@@ -177,8 +175,6 @@ class LIBMINISIP_API AudioMedia : public RealtimeMedia, public SoundRecorderCall
 		#endif
 		std::list< MRef<AudioCodec *> > codecs;
 		std::list< MRef<AudioMediaSource *> > sources;
-		bool audioForwarding;
-		
 };
 
 class LIBMINISIP_API AudioMediaSource : public BasicSoundSource{

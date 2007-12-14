@@ -81,8 +81,6 @@ AudioMedia::AudioMedia( MRef<SoundIO *> soundIo_,
 	receive = true;
 	send = true;
 
-	audioForwarding=false;
-
 	// pn430 Changed for multicodec
 	//MRef<AudioCodec *> acodec = ((AudioCodec *)*codec);
 	
@@ -97,10 +95,6 @@ AudioMedia::AudioMedia( MRef<SoundIO *> soundIo_,
 
 string AudioMedia::getSdpMediaType(){
         return "audio";
-}
-
-void AudioMedia::setAudioForwarding(bool b){
-	audioForwarding=b;
 }
 
 void AudioMedia::registerRealtimeMediaSender( MRef<RealtimeMediaStreamSender *> sender ){
@@ -239,7 +233,7 @@ void AudioMedia::sendData( byte_t * data, uint32_t length, uint32_t ts, bool mar
 			// TODO: Copying the last received audio is not the
 			// optimal thing to do. We should have a jitter
 			// buffer that handled re-ordered packets and such.
-			if (audioForwarding){
+			if (mediaForwarding){
 				std::list< MRef<AudioMediaSource *> >::iterator iSource;
 				for( iSource = sources.begin(); iSource != sources.end(); iSource ++ ){
 					if ( (*iSource)->getCallId()!= (*i)->getCallId() ){
