@@ -7,17 +7,9 @@
 #include<libminisip/media/MediaCommandString.h>
 #include<libminisip/signaling/conference/ConferenceControl.h>
 #include<libminisip/signaling/conference/ConfMessageRouter.h>
-#include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
-#include<libminisip/contacts/ContactDb.h>
-#include<libminisip/contacts/PhoneBook.h>
 
 
-
-//cleanup, how to get username and domain separately
-//set_session_sound_settings also in incoming_available?
-//audio_forwarding_enable is done ok in invite_ok?
-//should it be done also in incoming_available?
-
+//do we have access to the paths of the config files from here???
 
 
 using namespace std;
@@ -45,16 +37,16 @@ class MyGui : public Gui{
 				for( entryIter = contactEntries.begin(); entryIter != contactEntries.end(); entryIter++ ){
                                         if( SipUri((*entryIter)->getUri()) == SipUri(command.getParam()) ){                 
 					        cerr << "MyGui: incoming call from: " << command.getParam() << endl;
-                	                        CommandString resp(command.getDestinationId(), "accept_invite");
-                                		sendCommand("sip", resp);
 
 						callId = command.getDestinationId();
-						CommandString cmdstr(callId,
-		                                        MediaCommandString::audio_forwarding_enable/*,
-                		                        "senders", "ON"*/);
-                                		sendCommand("media", cmdstr);
 
-                                                cerr << "***** INCOMING *** AVAILABLE ***** " << description << endl;
+                	                        CommandString resp(callId, "accept_invite");
+                                		sendCommand("sip", resp);
+
+						CommandString cmdstr(callId, MediaCommandString::audio_forwarding_enable);
+                                		sendCommand("media", cmdstr);
+						CommandString cmdstr2(callId, MediaCommandString::video_forwarding_enable);
+                                		sendCommand("media", cmdstr2);
 					}
                                 }
                         }
@@ -62,6 +54,12 @@ class MyGui : public Gui{
 			//registered suceessfully with ser
                         if(command.getOp() == "register_ok"){ 
 			        inviteAllContacts();
+				//callUser("2000@dhcp-125-198.ssvl.kth.se");
+				//callUser("2001@dhcp-125-198.ssvl.kth.se");
+				//callUser("2002@dhcp-125-198.ssvl.kth.se");
+				////callUser("bbishaj@ekiga.net");
+				////callUser("erik@users.minisip.org");
+				//callUser("9999@pstn-gw.ssvl.kth.se");
                         }
 
 			//the user accepted the call
@@ -72,13 +70,14 @@ class MyGui : public Gui{
                                 	"senders", "ON");
                 		sendCommand("media", cmdstr1);
 				
-				CommandString cmdstr2( callId,
-                                        MediaCommandString::audio_forwarding_enable/*,
-                                        "senders", "ON"*/);
+				CommandString cmdstr2( callId, MediaCommandString::audio_forwarding_enable);
                                 sendCommand("media", cmdstr2);
+				CommandString cmdstr(callId, MediaCommandString::video_forwarding_enable);
+                                		sendCommand("media", cmdstr);
 
 				description = "ACCEPT_CALL " + callId;
 
+				cerr << "EEEE: number of entries: " << contactEntries.size()<<endl; 
 				for( entryIter = contactEntries.begin(); entryIter != contactEntries.end(); entryIter++ ){
 					if( SipUri((*entryIter)->getUri()) == SipUri(command.getParam()) ){
 						cerr << "***** ACCEPTED *** CALL ***** " << description << endl;
@@ -126,6 +125,7 @@ class MyGui : public Gui{
 						break;
 		              		}
 		      		}
+			
 			}
 			cleanup();
 		}
@@ -191,7 +191,9 @@ class MyGui : public Gui{
                         std::string rmContactFile_cmd;
 
 			myIdentity = 	    config->defaultIdentity->getSipUri();
-			rmSerUser_cmd =     "./script rm " + myIdentity.getUserIpString() + " " + myIdentity.getIp(); // domain_name
+			rmSerUser_cmd =     "./script rm " + myIdentity.getUserIpString(); // + username + domain_name
+			//test10 dhcp-125-198.ssvl.kth.se
+			//serctl rm " + myIdentity.getUserIpString();
 			rmConfigFile_cmd =  "rm ";
 			rmContactFile_cmd = "rm ";
 
