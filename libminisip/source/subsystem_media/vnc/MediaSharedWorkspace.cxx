@@ -9,14 +9,14 @@ using namespace std;
 class SWSMediaStream : public ReliableMediaStream {
 public:
 	SWSMediaStream( std::string callId, MRef<ReliableMedia*> m );
-	std::string getSdpMediaType();
+	std::string getMediaFormats();
 };
 
 SWSMediaStream::SWSMediaStream( std::string callId, MRef<ReliableMedia*> m ) : ReliableMediaStream(callId,m) {
 
 }
 
-string SWSMediaStream::getSdpMediaType(){
+string SWSMediaStream::getMediaFormats(){
 	return "vnc";
 }
 

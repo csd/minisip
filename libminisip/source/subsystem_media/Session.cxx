@@ -425,8 +425,7 @@ bool Session::addReliableMediaToOffer(MRef<SdpPacket*> result, const string &pee
 		type = (*i)->getSdpMediaType();
 		m = new SdpHeaderM( type, localPort, 1, (*i)->getTransport() );
 
-		//cerr << "EEEE: trying to add formats <"<<(*i)->getMediaFormats()<<">"<<endl;
-		m->addFormat( "vnc" /*(*i)->getMediaFormats()*/ );
+		m->addFormat( (*i)->getMediaFormats() );
 		result->addHeader( *m );
 
 		attributes = (*i)->getSdpAttributes();

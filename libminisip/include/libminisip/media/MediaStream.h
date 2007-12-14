@@ -123,9 +123,7 @@ public:
 	 * @return  The list of formats supported by the reliable media
 	 * 	    session.
 	 */
-	virtual std::string getMediaFormats(){
-		return mediaFormats;
-	}
+	virtual std::string getMediaFormats()=0;
 
 	virtual void start(){}
 	virtual void stop(){}

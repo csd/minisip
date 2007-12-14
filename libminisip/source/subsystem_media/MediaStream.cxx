@@ -55,6 +55,7 @@ RealtimeMediaStream::RealtimeMediaStream( string cid, MRef<RealtimeMedia *> m) :
 }
 
 std::string MediaStream::getSdpMediaType(){
+	massert(media);
 	if( media ){
 		return media->getSdpMediaType();
 	}
