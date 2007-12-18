@@ -90,7 +90,7 @@ void VideoMedia::playData( MRef<RtpPacket *> packet ){
 
 	MRef<VideoMediaSource *> source = getSource( packet->getHeader().SSRC );
 
-	if( source ){
+	if(false /* source */){ //FIXME: Deliberately break playing video, introduced Dec 18 2007, must be removed same day
 		source->playData( packet );
 	}
 
