@@ -90,11 +90,11 @@ void VideoMedia::playData( MRef<RtpPacket *> packet ){
 
 	MRef<VideoMediaSource *> source = getSource( packet->getHeader().SSRC );
 
-	if(false /* source */){ //FIXME: Deliberately break playing video, introduced Dec 18 2007, must be removed same day
+	if( source ){ //FIXME: Deliberately break playing video, introduced Dec 18 2007, must be removed same day
 		source->playData( packet );
 	}
 
-/// VIDEO FORWARD CODE BEGIN
+#ifdef VIDEO_FORWARD_CODE_REMOVETHIS
 	if (mediaForwarding){
 		list< MRef<RealtimeMediaStreamSender *> >::iterator i;
 		sendersLock.lock();
@@ -103,7 +103,7 @@ void VideoMedia::playData( MRef<RtpPacket *> packet ){
 		}
 		sendersLock.unlock();
 	}
-/// VIDEO FORWARD CODE END
+#endif VIDEO_FORWARD_CODE_END
 	
 }
 
