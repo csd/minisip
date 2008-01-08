@@ -8,86 +8,78 @@
 #include<libminisip/signaling/conference/ConferenceControl.h>
 #include<libminisip/signaling/conference/ConfMessageRouter.h>
 
-
-//do we have access to the paths of the config files from here???
-
-
 using namespace std;
 
 class MyGui : public Gui{
-		std::string 			   currentconfname;
+		std::string        currentconfname;
+		ConferenceControl *currentconf;
+		MRef<ConfMessageRouter *> confCallback;
 		MRef<SipSoftPhoneConfiguration *>  config;
-		ConferenceControl 		  *currentconf;
-		MRef<ConfMessageRouter *> 	   confCallback;
 		std::list<MRef<ContactEntry *> >   contactEntries;
 	
 	public:
 		/***********************************
                 the method that handles the commands
                 ***********************************/
-                void handleCommand(const CommandString &command){
+		void handleCommand(const CommandString &command){
 			std::string callId;
 			std::string description;
 			list<MRef<ContactEntry *> >::iterator entryIter;
 
-                        cerr << "****MyGui: handleCommand called: " << endl;
+			cerr << "****MyGui: handleCommand called: " << endl;
                         
 			if(command.getOp() == "incoming_available"){
 				//accepts a call only if it is in the list of contacts
 				for( entryIter = contactEntries.begin(); entryIter != contactEntries.end(); entryIter++ ){
-                                        if( SipUri((*entryIter)->getUri()) == SipUri(command.getParam()) ){                 
-					        cerr << "MyGui: incoming call from: " << command.getParam() << endl;
+					if( SipUri((*entryIter)->getUri()) == SipUri(command.getParam())){
+						cerr << "MyGui: incoming call from: " << command.getParam() << endl;
 
 						callId = command.getDestinationId();
+						CommandString resp(callId, "accept_invite");
+						sendCommand("sip", resp);
 
-                	                        CommandString resp(callId, "accept_invite");
-                                		sendCommand("sip", resp);
-
-						CommandString cmdstr(callId, MediaCommandString::audio_forwarding_enable);
-                                		sendCommand("media", cmdstr);
+						CommandString cmdstr(callId, 	MediaCommandString::audio_forwarding_enable);
+						sendCommand("media", cmdstr);
 						CommandString cmdstr2(callId, MediaCommandString::video_forwarding_enable);
-                                		sendCommand("media", cmdstr2);
+						sendCommand("media", cmdstr2);
 					}
-                                }
-                        }
+				}
+			}
 
 			//registered suceessfully with ser
-                        if(command.getOp() == "register_ok"){ 
-			        inviteAllContacts();
-				//callUser("2000@dhcp-125-198.ssvl.kth.se");
-				//callUser("2001@dhcp-125-198.ssvl.kth.se");
-				//callUser("2002@dhcp-125-198.ssvl.kth.se");
-				////callUser("bbishaj@ekiga.net");
-				////callUser("erik@users.minisip.org");
+			if(command.getOp() == "register_ok"){ 
+				//inviteAllContacts();
+				//callUser("2004@dhcp-125-198.ssvl.kth.se");
+				callUser("2001@dhcp-125-198.ssvl.kth.se");
+				callUser("2002@dhcp-125-198.ssvl.kth.se");
+				//callUser("bbishaj@ekiga.net");
+				//callUser("erik@users.minisip.org");
 				//callUser("9999@pstn-gw.ssvl.kth.se");
-                        }
+			}
 
 			//the user accepted the call
 			if(command.getOp() == "invite_ok"){
 				callId = command.getDestinationId();
-                		CommandString cmdstr1( callId,
-                                	MediaCommandString::set_session_sound_settings,
-                                	"senders", "ON");
-                		sendCommand("media", cmdstr1);
+				CommandString cmdstr1( callId, MediaCommandString::set_session_sound_settings, "senders", "ON");
+				sendCommand("media", cmdstr1);
 				
 				CommandString cmdstr2( callId, MediaCommandString::audio_forwarding_enable);
-                                sendCommand("media", cmdstr2);
+				sendCommand("media", cmdstr2);
 				CommandString cmdstr(callId, MediaCommandString::video_forwarding_enable);
-                                		sendCommand("media", cmdstr);
+				sendCommand("media", cmdstr);
 
 				description = "ACCEPT_CALL " + callId;
 
 				cerr << "EEEE: number of entries: " << contactEntries.size()<<endl; 
 				for( entryIter = contactEntries.begin(); entryIter != contactEntries.end(); entryIter++ ){
-					if( SipUri((*entryIter)->getUri()) == SipUri(command.getParam()) ){
+					if( SipUri((*entryIter)->getUri()) == SipUri(command.getParam())){
 						cerr << "***** ACCEPTED *** CALL ***** " << description << endl;
 						(*entryIter)->setDesc(description);
 					}
 				}
 			}
 			//the user ended the call
-			// id=asdflskfjlklserjldkj, op=remote_hang_up
-                	if(command.getOp() == "remote_hang_up"){
+			if(command.getOp() == "remote_hang_up"){
 				cerr << "*****HANGUP*****: " << endl;
 	
 				for( entryIter = contactEntries.begin(); entryIter != contactEntries.end(); entryIter++ ){
@@ -115,19 +107,17 @@ class MyGui : public Gui{
 		
 			//sleep(DURATION_TIME);
 			while(waiting){
-				sleep(10);
+				sleep(60);
 
 				waiting = 0;
 				for( entryIter = contactEntries.begin(); entryIter != contactEntries.end(); entryIter++ ){
 					//at least one user is still in a call
 		       			if((*entryIter)->getDesc().substr(0,11) == "ACCEPT_CALL"){
-						waiting = 1;
-						break;
+							waiting = 1;
+							break;
 		              		}
-		      		}
-			
+				}
 			}
-			cleanup();
 		}
 
 		/*********************************
@@ -146,9 +136,9 @@ class MyGui : public Gui{
 
 			phonebooks = config->phonebooks;
 			for( phonebookIter = phonebooks.begin(); phonebookIter != phonebooks.end(); phonebookIter++ ){
-                		persons = (*phonebookIter)->getPersons();
+				persons = (*phonebookIter)->getPersons();
 				for( personIter = persons.begin(); personIter != persons.end(); personIter++ ){
-			                entries = (*personIter)->getEntries();
+					entries = (*personIter)->getEntries();
 					//contactEntries = entries;
 					for( entryIter = entries.begin(); entryIter != entries.end(); entryIter++ ){
 						contactEntries.push_back(*entryIter);
@@ -158,26 +148,26 @@ class MyGui : public Gui{
 						callUser(uri);
 						//cerr << "OTHER CONTACT: " << uri << endl;
 					}	
-                		}
-                	}
+				}
+			}
 		}
 		
 		/**********************************
 		for making a regular call to a user
 		***********************************/
 		void callUser(string user){
-                        CommandString invite("", SipCommandString::invite, user);
-                        CommandString resp = callback->handleCommandResp("sip", invite);
+			CommandString invite("", SipCommandString::invite, user);
+			CommandString resp = callback->handleCommandResp("sip", invite);
 		}
 
-                /*******************************
-                this is for disconnecting a user
-                ********************************/
-                void hangupUser(){
-                        CommandString hup("", SipCommandString::hang_up);
-                        hup.setParam3(currentconfname);
-                        confCallback->guicb_handleConfCommand(hup);
-                }
+		/*******************************
+		this is for disconnecting a user
+		********************************/
+		void hangupUser(){
+			CommandString hup("", SipCommandString::hang_up);
+			hup.setParam3(currentconfname);
+			confCallback->guicb_handleConfCommand(hup);
+		}
 
 		/**********************
 		remove the ser user
@@ -187,20 +177,20 @@ class MyGui : public Gui{
 		void cleanup(){
 			SipUri 	    myIdentity;
 			std::string rmSerUser_cmd;
-                        std::string rmConfigFile_cmd;
-                        std::string rmContactFile_cmd;
+			std::string rmConfigFile_cmd;
+			std::string rmContactFile_cmd;
 
-			myIdentity = 	    config->defaultIdentity->getSipUri();
-			rmSerUser_cmd =     "./script rm " + myIdentity.getUserIpString(); // + username + domain_name
-			//test10 dhcp-125-198.ssvl.kth.se
-			//serctl rm " + myIdentity.getUserIpString();
-			rmConfigFile_cmd =  "rm ";
-			rmContactFile_cmd = "rm ";
+			myIdentity = config->defaultIdentity->getSipUri();
 
-		/*	system(rmSerUser_cmd.c_str());
+			rmSerUser_cmd     = "export SIP_DOMAIN=" + myIdentity.getIp() + "; echo heslo | serctl rm " + myIdentity.getUserName();
+			rmConfigFile_cmd  = "rm `locate ConfigFiles/PhoneBook/"   + myIdentity.getUserName() + ".cfg`";
+			rmContactFile_cmd = "rm `locate ConfigFiles/Conferences/" + myIdentity.getUserName() + ".cfg`";
+
+cerr << "##### HERE #####" << rmSerUser_cmd << endl;
+
+			system(rmSerUser_cmd.c_str());
 			system(rmConfigFile_cmd.c_str());
 			system(rmContactFile_cmd.c_str());
-		*/
 		}
 
 		/*****************
@@ -219,8 +209,8 @@ class MyGui : public Gui{
 		}
 
 		/******************************************************
-                method needed because defined as virtual in super class
-                *******************************************************/
+		method needed because defined as virtual in super class
+		*******************************************************/
 		bool configDialog(MRef<SipSoftPhoneConfiguration *> conf){
 			cerr << "MyGui: configDialog called"<<endl;return false;
 		}
@@ -233,52 +223,51 @@ class MyGui : public Gui{
 //********************************
 int main( int argc, char *argv[] )
 {
-        merr.setPrintStreamName(true);
-        mout.setPrintStreamName(true);
-        mdbg.setPrintStreamName(true);
+	merr.setPrintStreamName(true);
+	mout.setPrintStreamName(true);
+	mdbg.setPrintStreamName(true);
 
 #if defined(DEBUG_OUTPUT) || !defined(WIN32)
-        cerr << endl << "Starting MiniSIP GTK ... welcome!" << endl << endl;
+	cerr << endl << "Starting MiniSIP GTK ... welcome!" << endl << endl;
 #endif
 
-        setupDefaultSignalHandling(); //Signal handlers are created for all
-                                      //threads created with libmutil/Thread.h
-                                      //For the main thread we have to
-                                      //install them
+	setupDefaultSignalHandling(); 	//Signal handlers are created for all
+									//threads created with libmutil/Thread.h
+									//For the main thread we have to
+									//install them
 ////#ifndef DEBUG_OUTPUT
 ////        redirectOutput( UserConfig::getFileName( "minisip.log" ).c_str() );
 ////#endif
 
-        cerr << "Creating GTK GUI"<< endl;
+	cerr << "Creating GTK GUI"<< endl;
 
 	MRef<MyGui *> gui = new MyGui();
 
+	Minisip minisip( *gui, argc, argv );
 
-        Minisip minisip( *gui, argc, argv );
-
-
-        if( minisip.startSip() > 0 ) {
+	if(minisip.startSip() > 0){
 #ifdef DEBUG_OUTPUT
-                minisip.startDebugger();
+		minisip.startDebugger();
 #else
-                //in non-debug mode, send merr to the gui
-                merr.setExternalHandler( dynamic_cast<DbgHandler *>( *gui ) );
-                mout.setExternalHandler( dynamic_cast<DbgHandler *>( *gui ) );
-                mdbg.setExternalHandler( dynamic_cast<DbgHandler *>( *gui ) );
+		//in non-debug mode, send merr to the gui
+		merr.setExternalHandler( dynamic_cast<DbgHandler *>( *gui ) );
+		mout.setExternalHandler( dynamic_cast<DbgHandler *>( *gui ) );
+		mdbg.setExternalHandler( dynamic_cast<DbgHandler *>( *gui ) );
 #endif  // DEBUG_OUTPUT
 
-                minisip.runGui();
+		minisip.runGui();
 
 #ifndef DEBUG_OUTPUT
-                merr.setExternalHandler( NULL );
-                mout.setExternalHandler( NULL );
-                mdbg.setExternalHandler( NULL );
+		merr.setExternalHandler( NULL );
+		mout.setExternalHandler( NULL );
+		mdbg.setExternalHandler( NULL );
 #endif
-        } else {
-                cerr << endl << "ERROR while starting SIP!" << endl << endl;
-        }
+	}
+	else{
+		cerr << endl << "ERROR while starting SIP!" << endl << endl;
+	}
 
 	gui->cleanup();
-        minisip.exit();
+	minisip.exit();
 }
                                 
