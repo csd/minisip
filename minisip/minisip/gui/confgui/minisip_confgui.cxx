@@ -48,13 +48,15 @@ class MyGui : public Gui{
 
 			//registered suceessfully with ser
 			if(command.getOp() == "register_ok"){ 
-				//inviteAllContacts();
-				//callUser("2004@dhcp-125-198.ssvl.kth.se");
+				inviteAllContacts();
+				/*
+				callUser("2004@dhcp-125-198.ssvl.kth.se");
 				callUser("2001@dhcp-125-198.ssvl.kth.se");
 				callUser("2002@dhcp-125-198.ssvl.kth.se");
-				//callUser("bbishaj@ekiga.net");
-				//callUser("erik@users.minisip.org");
-				//callUser("9999@pstn-gw.ssvl.kth.se");
+				callUser("bbishaj@ekiga.net");
+				callUser("erik@users.minisip.org");
+				callUser("9999@pstn-gw.ssvl.kth.se");
+				*/
 			}
 
 			//the user accepted the call
