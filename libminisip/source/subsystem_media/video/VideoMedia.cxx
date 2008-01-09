@@ -183,7 +183,7 @@ MRef<VideoMediaSource *> VideoMedia::getSource( uint32_t ssrc ){
 	return NULL;
 }
 
-void VideoMedia::registerMediaSender( MRef<RealtimeMediaStreamSender *> sender ){
+void VideoMedia::registerRealtimeMediaSender( MRef<RealtimeMediaStreamSender *> sender ){
         sendersLock.lock();
         if( senders.size() == 0 ){
                 sendersLock.unlock();
@@ -196,7 +196,7 @@ void VideoMedia::registerMediaSender( MRef<RealtimeMediaStreamSender *> sender )
 }
 
 
-void VideoMedia::unregisterMediaSender( MRef<RealtimeMediaStreamSender *> sender ){
+void VideoMedia::unregisterRealtimeMediaSender( MRef<RealtimeMediaStreamSender *> sender ){
         sendersLock.lock();
         senders.remove( sender );
         sendersLock.unlock();
