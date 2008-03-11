@@ -83,10 +83,14 @@ Certificate* Certificate::load( const std::string cert_filename )
 
 Certificate* Certificate::load( const std::string cert_filename,
 				const std::string private_key_filename ){
+	cerr <<"EEEE: osslcert::load 1"<<endl;
 	MRef<PrivateKey*> PrivateKey = new OsslPrivateKey( private_key_filename );
+	cerr <<"EEEE: osslcert::load 2"<<endl;
 	Certificate* cert = new OsslCertificate( cert_filename );
 
+	cerr <<"EEEE: osslcert::load 3"<<endl;
 	cert->setPk( PrivateKey );
+	cerr <<"EEEE: osslcert::load 4"<<endl;
 	return cert;
 }
 
@@ -135,7 +139,7 @@ OsslCertificate::OsslCertificate( X509 * Osslcert ){
 	cert = Osslcert;
 }
 
-OsslCertificate::OsslCertificate( const string &cert_filename ){
+OsslCertificate::OsslCertificate( const string &cert_filename ) : Certificate(){
 	FILE * fp;
 
 	fp = fopen( cert_filename.c_str(), "r" );
@@ -640,9 +644,9 @@ OsslPrivateKey::OsslPrivateKey( const string &file ){
 }
 
 
-bool OsslPrivateKey::checkCert( MRef<Certificate*> cert ){
-	MRef<OsslCertificate*> ssl_cert =
-		dynamic_cast<OsslCertificate*>( *cert );
+bool OsslPrivateKey::checkCert( Certificate* cert ){
+	OsslCertificate* ssl_cert =
+		dynamic_cast<OsslCertificate*>( cert );
 
 	if( !ssl_cert ){
 		// Not an OpenSSL Certificate!

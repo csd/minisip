@@ -103,7 +103,7 @@ class LIBMCRYPTO_API GtlsPrivateKey: public PrivateKey{
 
 		const std::string &getFile() const;
 
-		bool checkCert( MRef<Certificate*> cert );
+		bool checkCert( Certificate* cert );
 
 		int signData( unsigned char * data, int data_length,
 			       unsigned char * sign,

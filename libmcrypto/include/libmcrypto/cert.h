@@ -240,7 +240,13 @@ class LIBMCRYPTO_API PrivateKey: public MObject{
 
 		virtual const std::string &getFile() const = 0;
 
-		virtual bool checkCert( MRef<Certificate *> cert)=0;
+		//Note that the parameter is not a MRef because of
+		//implementation issues. We want to allow
+		//Certificate::setPk to be used on objects not using
+		//MRefs. (If this parameter used MRefs, then the
+		//cert is garbage collected if there is no other
+		//reference to it)
+		virtual bool checkCert( Certificate * cert)=0;
 
 		virtual int signData( unsigned char * data, int data_length,
 				       unsigned char * sign,

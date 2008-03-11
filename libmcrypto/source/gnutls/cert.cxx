@@ -1006,9 +1006,9 @@ GtlsPrivateKey::GtlsPrivateKey(char * pkInput, int length,
 }
 
 
-bool GtlsPrivateKey::checkCert( MRef<Certificate*> cert ){
-	MRef<GtlsCertificate*> Gtlscert =
-		dynamic_cast<GtlsCertificate*>( *cert );
+bool GtlsPrivateKey::checkCert( Certificate* cert ){
+	GtlsCertificate* Gtlscert =
+		dynamic_cast<GtlsCertificate*>( cert );
 
 	if( !Gtlscert ){
 		return false;
