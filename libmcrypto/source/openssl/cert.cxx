@@ -83,14 +83,9 @@ Certificate* Certificate::load( const std::string cert_filename )
 
 Certificate* Certificate::load( const std::string cert_filename,
 				const std::string private_key_filename ){
-	cerr <<"EEEE: osslcert::load 1"<<endl;
-	MRef<PrivateKey*> PrivateKey = new OsslPrivateKey( private_key_filename );
-	cerr <<"EEEE: osslcert::load 2"<<endl;
+	MRef<PrivateKey*> privateKey = new OsslPrivateKey( private_key_filename );
 	Certificate* cert = new OsslCertificate( cert_filename );
-
-	cerr <<"EEEE: osslcert::load 3"<<endl;
-	cert->setPk( PrivateKey );
-	cerr <<"EEEE: osslcert::load 4"<<endl;
+	cert->setPk( privateKey );
 	return cert;
 }
 
