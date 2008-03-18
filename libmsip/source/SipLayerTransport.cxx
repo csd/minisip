@@ -988,7 +988,7 @@ void SipLayerTransport::sendMessage(MRef<SipMessage*> pack,
 		mdbg("signaling/sip") << "Transport error in SipLayerTransport: " << message << endl;
 		cerr << "SipLayerTransport: sendMessage: exception thrown! " << message << endl;
 #endif
-		CommandString transportError( pack->getBranch()+pack->getCSeqMethod(), 
+		CommandString transportError( branch + pack->getCSeqMethod(), 
 					      SipCommandString::transport_error,
 					      "SipLayerTransport: "+message );
 		SipSMCommand transportErrorCommand(
