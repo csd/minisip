@@ -52,6 +52,7 @@ msip_src =           source/SipDialogConfig.cxx \
 		     source/SipSMCommand.cxx \
 		     source/SipCommandString.cxx \
 		     source/SipTimers.cxx \
+		     source/SipMessageContentUnknown.cxx \
 		     source/SipMessageContentIM.cxx \
 		     source/SipMessageContentFactory.cxx \
 		     source/SipMessageContentMime.cxx \

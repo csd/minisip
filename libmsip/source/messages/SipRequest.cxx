@@ -270,7 +270,7 @@ void SipRequest::init(string &build_from){
 	string requestLine;
 
 	// Skip white space
-	start = build_from.find_first_not_of( ' ', start );
+	start = build_from.find_first_not_of( " \r\n\t", start );
 	if( (int)start == (int)string::npos ){
 		throw SipExceptionInvalidMessage("SipRequest malformed - first line did not contain any non whitespace character");
 	}
@@ -293,7 +293,7 @@ void SipRequest::init(string &build_from){
 		throw SipExceptionInvalidMessage("SipRequest malformed - could not find method");
 	}
 
-	method = build_from.substr( start, pos - start );
+	method = requestLine.substr( start, pos - start );
 	#ifdef DEBUG_OUTPUT
 	cerr << "SipRequest::init - method = " << method << endl;
 	#endif

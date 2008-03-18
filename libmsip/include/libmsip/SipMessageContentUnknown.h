@@ -22,51 +22,28 @@
 */
 
 
-/* Name
- * 	SipHeaderSubject.h
- * Author
- * 	Erik Eliasson, eliasson@it.kth.se
- * Purpose
- * 
-*/
-
-#ifndef SIPHEADERMAXFORWARD_H
-#define SIPHEADERMAXFORWARD_H
+#ifndef _SIPMESSAGECONTENTUNKNOWN_H
+#define _SIPMESSAGECONTENTUNKNOWN_H
 
 #include<libmsip/libmsip_config.h>
 
+#include<libmsip/SipMessageContent.h>
+#include<iostream>
 
-#include<libmsip/SipHeader.h>
+MRef<SipMessageContent*> LIBMSIP_API sipUnknownMessageContentFactory(const std::string &, const std::string &ContentType);
 
-/**
- * @author Erik Eliasson
-*/
+class LIBMSIP_API SipMessageContentUnknown : public SipMessageContent{
+public:
+	SipMessageContentUnknown(std::string m, std::string contentType);
+	
+	virtual std::string getMemObjectType() const {return "SipMessageContentUnknown";}
+	
+	virtual std::string getString() const;
 
-extern SipHeaderFactoryFuncPtr sipHeaderMaxForwardsFactory;
-
-class LIBMSIP_API SipHeaderValueMaxForwards: public SipHeaderValue{
-	public:
-		SipHeaderValueMaxForwards(int32_t mf);
-		SipHeaderValueMaxForwards(const std::string &build_from);
-
-		virtual ~SipHeaderValueMaxForwards();
-
-                virtual std::string getMemObjectType() const {return "SipHeaderMaxForwards";}
-		
-		/**
-		 * returns string representation of the header
-		 */
-		std::string getString() const; 
-
-		/**
-		 * @return The IP address of the contact header.
-		 */
-		int32_t getMaxForwards() const;
-		
-		void setMaxForwards(int32_t max);
-
-	private:
-		int32_t max;
+	virtual std::string getContentType() const;
+private:
+	std::string msg;
+	std::string contentType;
 };
 
 #endif

@@ -72,9 +72,9 @@ int32_t SipHeaderValueMaxForwards::getMaxForwards() const{
 	return max;
 }
 
-/*
+
 void SipHeaderValueMaxForwards::setMaxForwards(int32_t m){
 	max=m;
 }
-*/
+
 

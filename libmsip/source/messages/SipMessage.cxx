@@ -41,6 +41,7 @@
 
 #include<libmnetutil/Socket.h>
 #include<libmsip/SipMessageContentFactory.h>
+#include<libmsip/SipMessageContentUnknown.h>
 #include<libmsip/SipHeaderContentLength.h>
 #include<libmsip/SipHeaderVia.h>
 #include<libmsip/SipHeaderFrom.h>
@@ -99,10 +100,14 @@ SipMessage::~SipMessage(){
 MRef<SipMessage*> SipMessage::createMessage(string &data){
 	
 	size_t n = data.size();
+	size_t start = 0;
 
-	if (n>3   &&    (data[0]=='S'||data[0]=='s') &&
-			(data[1]=='I'||data[1]=='i') &&
-			(data[2]=='P'||data[2]=='p' )){
+	while ( start<n && isWS(data[start]))
+		start++;
+
+	if (n>3   &&    (data[start+0]=='S'||data[start+0]=='s') &&
+			(data[start+1]=='I'||data[start+1]=='i') &&
+			(data[start+2]=='P'||data[start+2]=='p' )){
 		return MRef<SipMessage*>(new SipResponse(data));
 	}else{
 		return new SipRequest(data);
@@ -227,15 +232,21 @@ SipMessage::SipMessage(string &buildFrom)
 {
 	uint32_t i;
 
-	for (i=0; buildFrom[i]!='\r' && buildFrom[i]!='\n'; i++){
-		if(i==buildFrom.size()){
+	uint32_t start=0;
+	uint32_t blen=buildFrom.size();
+
+	//skip whitespace (can be there if received over reliable transport)
+	while (start<blen && isWS(buildFrom[start]))
+		start++;
+
+	//Skip first line (they are parsed by sub-class)
+	for (i=start; buildFrom[i]!='\r' && buildFrom[i]!='\n'; i++){
+		if(i==blen){
 #ifdef DEBUG_OUTPUT
 			cerr << "SipMessage::SipMessage: Size is too short - throwing exception"<< endl;
 #endif
 			throw SipExceptionInvalidMessage("SIP Message too short");
 		}
-		//header = header + buildFrom[i];
-
 	}
 	
 	int contentStart = parseHeaders(buildFrom, i);
@@ -253,13 +264,12 @@ SipMessage::SipMessage(string &buildFrom)
 			SipMessageContentFactoryFuncPtr contentFactory = contentFactories.getFactory( contentType );
 			if (contentFactory){
 				MRef<SipMessageContent*> smcref = contentFactory(contentbuf, contentType );
-				setContent(smcref);
-			}else{ //TODO: Better error handling
-				merr << "WARNING: No SipMessageContentFactory found for content type "<<contentType <<endl;
+				setContent( new SipMessageContentUnknown( contentbuf, contentType ));
 			}
 			
-		}else{ //TODO: Better error handling
+		}else{
 			merr << "WARNING: Sip message has content, but no content type! Content ignored."<< endl;
+			setContent( new SipMessageContentUnknown( contentbuf, "unknown" ));
 		}
 	}
 }
