@@ -264,11 +264,13 @@ SipMessage::SipMessage(string &buildFrom)
 			SipMessageContentFactoryFuncPtr contentFactory = contentFactories.getFactory( contentType );
 			if (contentFactory){
 				MRef<SipMessageContent*> smcref = contentFactory(contentbuf, contentType );
+				setContent( smcref );
+			}else{
 				setContent( new SipMessageContentUnknown( contentbuf, contentType ));
 			}
 			
 		}else{
-			merr << "WARNING: Sip message has content, but no content type! Content ignored."<< endl;
+			merr << "WARNING: unknown content type"<<endl;
 			setContent( new SipMessageContentUnknown( contentbuf, "unknown" ));
 		}
 	}

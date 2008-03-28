@@ -34,6 +34,7 @@ class LIBMSIP_API SipUtils{
 
 		static bool startsWith(std::string line, std::string part);
 
+		static int findEndOfHeader(const char *buf, unsigned bufSize,  int &startIndex);
 		static int findEndOfHeader(const std::string &s, int &startIndex);
 		
 	

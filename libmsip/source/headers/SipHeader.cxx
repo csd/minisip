@@ -223,7 +223,8 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 
 		if( ht == "ACCEPT-CONTACT" ) {
 			value_params = split(values[i],true,'\n');
-			value_zero = value_params[0];
+			if (value_params.size()>0)
+				value_zero = value_params[0];
 			// 				cerr<<"valueline.substr(2): "+valueline.substr(2)<<endl;
 		} else if( ht == "CONTACT" ) {
 			size_t ltPos = values[i].find( '<' );
@@ -241,7 +242,8 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 						';' );
 			} else { //if there is no < or >, then just split into parameters ...
 				value_params = split(values[i],true,';');
-				value_zero = value_params[0];
+				if (value_params.size()>0)
+					value_zero = value_params[0];
 			}
 		} else if( ht == "FROM" ||
 				ht == "TO" ||
@@ -260,11 +262,13 @@ MRef<SipHeader *> SipHeader::parseHeader(const string &line){
 						';' );
 			} else { //if there is no < or >, then just split into parameters ...
 				value_params = split(values[i],true,';');
-				value_zero = value_params[0];
+				if (value_params.size()>0)
+					value_zero = value_params[0];
 			}
 		} else {
 			value_params = split(values[i],true,paramSeparator);
-			value_zero = value_params[0];
+			if (value_params.size()>0)
+				value_zero = value_params[0];
 		}
 
 //		cerr << "PARSER: Header type is: "<< headerType << endl;

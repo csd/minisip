@@ -43,7 +43,14 @@ bool SipUtils::startsWith(std::string line, std::string part){
 }
 
 int SipUtils::findEndOfHeader(const string &buf, int &startIndex){
-	unsigned bufSize = (unsigned)buf.size();
+	return findEndOfHeader(buf.c_str(), (unsigned)buf.size(), startIndex);
+}
+
+/**
+ * @startIndex will be adjusted to the start of the header (i.e.
+ * 	incremented past any whitespace).
+ */
+int SipUtils::findEndOfHeader(const char *buf, unsigned bufSize,  int &startIndex){
 	int endi=bufSize;
 	unsigned i;
 	int parserState=0;  	// Parser states:
@@ -89,7 +96,7 @@ int SipUtils::findEndOfHeader(const string &buf, int &startIndex){
 				return i-3;
 		
 		}
-/* alt. impl. that might be easier to understand
+/* alt. impl. that might be easier to understand (left here for documentation purposes)
 		switch (parserState){
 			case 0:
 				switch (c){

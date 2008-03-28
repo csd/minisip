@@ -35,6 +35,7 @@
 #include<winsock2.h>
 #endif
 
+#include<libmsip/SipUtils.h>
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipRequest.h>
 #include<libmsip/SipException.h>
@@ -248,29 +249,45 @@ void SipMessageParser::expandBuffer(){
 	length += BUFFER_UNIT;
 }
 
-uint32_t SipMessageParser::findContentLength(){
-	uint32_t i = 0;
-	const char * contentLengthString = "\nContent-Length: ";
+/**
+ * Purpose: Used to find content length value (both long and short ("l:")
+ * form is supported). 
+ */
+static int32_t findIntHeaderValue(char*buf, uint32_t buflen, string hName){
+	hName = "\n"+hName;
+	uint32_t nlen = hName.length();
 
-	for( i = 0; i + 17 < index; i++ ){
-		if( strNCaseCmp( contentLengthString, (char *)(buffer + i) , 17  ) == 0 ){
-			uint32_t j = 0;
-			string num;
-			
-			while( i + j + 17 < index && (buffer[i+j+17] == ' ' || buffer[i+j+17] == '\t') ){
-				j++;
-			}
-			
-			for( ; i + 17 + j < index ; j++ ){
-				if( buffer[i+j+17] >= '0' && buffer[i+j+18] <= '9' ){
-					num += buffer[i+j+17];
-				}
-				else break;
-			}
-			return atoi( num.c_str() );
+	//search whole buffer on each position
+	for (int i=0; i+nlen < buflen; i++){
+		if( strNCaseCmp( hName.c_str(), (char *)(buf + i) , nlen  ) == 0 ){
+			uint32_t hnend = i+nlen;
+			while (hnend<buflen&& isWS(buf[hnend] ) )
+					hnend++;
+			//Break if not content length header (for example
+			//on header "Content-Length-Somethingelse:")
+			if (buf[hnend]!=':')
+				continue;
+
+			hnend++;
+
+			int tmpi=i;
+			uint32_t hend = SipUtils::findEndOfHeader((const char*)buf,buflen,tmpi);
+			uint32_t valstart=hnend;
+			while (valstart < hend && isWS(buf[valstart]))
+				valstart++;
+			return atoi(buf+valstart);
 		}
 	}
-	return 0;
+	return -1;
+}
+
+uint32_t SipMessageParser::findContentLength(){
+	int32_t clen = findIntHeaderValue((char*)buffer, index, "Content-Length");
+	if (clen<0)
+		clen = findIntHeaderValue((char*)buffer, index, "l");
+	if (clen<0)
+		clen=0;
+	return clen;
 }
 
 class StreamThreadData : public InputReadyHandler{
