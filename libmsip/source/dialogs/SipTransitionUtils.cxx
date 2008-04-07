@@ -93,7 +93,7 @@ bool LIBMSIP_API transitionMatchSipResponse(
 			      source, destination, respFilter ) )
 		return false;
 
-	return command.getCommandPacket()->getCSeqMethod() == cseqMethod;
+	return cseqMethod=="*" || command.getCommandPacket()->getCSeqMethod() == cseqMethod;
 }
 
 
