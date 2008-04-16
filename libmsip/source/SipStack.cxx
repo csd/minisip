@@ -189,3 +189,7 @@ bool SipStack::getDebugPrintPackets(){
 std::string SipStack::getStackStatusDebugString(){
 	return STACK->getStackStatusDebugString();
 }
+
+std::string SipStack::createClientTransaction(MRef<SipRequest*> req){
+	return STACK->createClientTransaction(req);
+}

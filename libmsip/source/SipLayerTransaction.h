@@ -36,6 +36,7 @@
 class SipCommandDispatcher;
 class SipTransaction;
 class SipLayerTransport;
+class SipRequest;
 
 class SipLayerTransaction: public SipSMCommandReceiver{
 	public:
@@ -65,6 +66,15 @@ class SipLayerTransaction: public SipSMCommandReceiver{
 		virtual std::string getMemObjectType() const {return "SipLayerTransaction";}
 		
 		virtual bool handleCommand(const SipSMCommand &cmd);
+
+		/**
+		 * Creates client transaction, and let's it start handle
+		 * request.
+		 *
+		 * @return transaction ID (branch) of the newly created
+		 * 	transaction.
+		 */
+		std::string createClientTransaction( MRef<SipRequest*> req );
 		
 	private:
 		void addTransaction(MRef<SipTransaction*> t);

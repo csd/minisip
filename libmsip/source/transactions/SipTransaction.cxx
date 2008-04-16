@@ -128,7 +128,7 @@ bool SipTransaction::a1000_anyState_terminated_canceltransaction(const SipSMComm
 {
 		//Notify the TU that the transaction is terminated
 		SipSMCommand cmdterminated(
-			CommandString( getBranch()+getCSeqMethod(), SipCommandString::transaction_terminated),
+			CommandString( getTransactionId(), SipCommandString::transaction_terminated),
 			SipSMCommand::transaction_layer,
 			SipSMCommand::transaction_layer);
 		
@@ -150,7 +150,7 @@ void SipTransaction::setBranch(string b) {
 
 void SipTransaction::handleTimeout(const string &c){
         SipSMCommand cmd(
-			CommandString(getBranch()+getCSeqMethod(),c),
+			CommandString(getTransactionId(),c),
 			SipSMCommand::transaction_layer,
 			SipSMCommand::transaction_layer);
         dispatcher->enqueueTimeout( this, cmd);
@@ -222,7 +222,7 @@ bool SipTransaction::isUnreliable() {
 
 bool SipTransaction::handleCommand(const SipSMCommand &command){
 #ifdef DEBUG_OUTPUT
-	mdbg("signaling/sip") << "SipTransaction:handleCommand: branch <"<< getBranch()<< "> got command "<<command<<endl;
+	mdbg("signaling/sip") << "SipTransaction:handleCommand: tid<"<< getTransactionId()<< "> got command "<<command<<endl;
 #endif
         if (! (command.getDestination()==SipSMCommand::transaction_layer
 				/*|| command.getDestination()==SipSMCommand::ANY*/)){

@@ -103,6 +103,8 @@ class SipStackInternal : public SipSMCommandReceiver, public Runnable{
 
 		void free();
 
+		std::string createClientTransaction(MRef<SipRequest*>);
+
 	protected:
 		void startSipServers();
 		void startSipsServers();

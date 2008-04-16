@@ -90,6 +90,8 @@ class SipTransaction : public StateMachine<SipSMCommand,std::string>{
 		
 		std::string getBranch();
 		void setBranch(std::string branch);
+
+		std::string getTransactionId(){ return getBranch() + getCSeqMethod(); }
 				
 		void send(MRef<SipMessage*>  pack, bool addVia, std::string branch=""); // if not specified branch, use the attribute one - ok in most cases.
 		void setSocket(Socket * sock);

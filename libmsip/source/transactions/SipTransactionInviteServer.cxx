@@ -254,7 +254,7 @@ bool SipTransactionInviteServer::a4_proceeding_terminated_err( const SipSMComman
 		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 
 		SipSMCommand cmdterminated(
-				CommandString( getBranch()+getCSeqMethod(), SipCommandString::transaction_terminated),
+				CommandString( getTransactionId(), SipCommandString::transaction_terminated),
 				SipSMCommand::transaction_layer,
 				SipSMCommand::dispatcher);
 		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE );
@@ -283,7 +283,7 @@ bool SipTransactionInviteServer::a5_proceeding_terminated_2xx( const SipSMComman
 		send(command.getCommandPacket(), false);
 
 		SipSMCommand cmd(
-				CommandString( getBranch()+getCSeqMethod(), SipCommandString::transaction_terminated),
+				CommandString( getTransactionId(), SipCommandString::transaction_terminated),
 				SipSMCommand::transaction_layer,
 				SipSMCommand::dispatcher);
 		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
@@ -386,7 +386,7 @@ bool SipTransactionInviteServer::a9_completed_terminated_errOrTimerH( const SipS
 		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );
 
 		SipSMCommand cmdterminated(
-				CommandString( getBranch()+getCSeqMethod(), SipCommandString::transaction_terminated),
+				CommandString( getTransactionId(), SipCommandString::transaction_terminated),
 				SipSMCommand::transaction_layer,
 				SipSMCommand::dispatcher);
 		dispatcher->enqueueCommand( cmdterminated, HIGH_PRIO_QUEUE );
@@ -409,7 +409,7 @@ bool SipTransactionInviteServer::a10_confirmed_terminated_timerI( const SipSMCom
 				SipSMCommand::transaction_layer))
 	{
 		SipSMCommand cmd(
-				CommandString( getBranch()+getCSeqMethod(), SipCommandString::transaction_terminated),
+				CommandString( getTransactionId(), SipCommandString::transaction_terminated),
 				SipSMCommand::transaction_layer,
 				SipSMCommand::dispatcher);
 		dispatcher->enqueueCommand( cmd, HIGH_PRIO_QUEUE );

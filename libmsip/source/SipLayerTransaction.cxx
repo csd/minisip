@@ -48,6 +48,26 @@ SipLayerTransaction::~SipLayerTransaction(){
 		(*i).second->freeStateMachine();
 }
 
+string SipLayerTransaction::createClientTransaction( MRef<SipRequest*> req ){
+
+	MRef<SipTransaction*> newTransaction;
+
+	newTransaction = SipTransaction::create(dispatcher->getSipStackInternal(), 
+			req, 
+			true, 
+			handleAck);
+
+	if (newTransaction){
+		addTransaction(newTransaction);
+		bool handled = newTransaction->handleCommand( SipSMCommand(*req, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer));
+		if (!handled){
+			cerr <<"ERROR: TransactionLayer::defaultCommandHandler: Transaction refused command: "<<req<<endl;
+		}
+		return newTransaction->getTransactionId();
+	}
+	return "";
+}
+
 bool SipLayerTransaction::defaultCommandHandler(const SipSMCommand &cmd){
 	
 	MRef<SipTransaction*> newTransaction;
@@ -96,7 +116,7 @@ MRef<SipTransaction*> SipLayerTransaction::getTransaction(string tid){
 
 void SipLayerTransaction::addTransaction(MRef<SipTransaction*> t){
 	massert(t->getBranch().size()>0);
-	transactions[t->getBranch()+t->getCSeqMethod()]=t;
+	transactions[t->getTransactionId()]=t;
 }
 
 void SipLayerTransaction::removeTransaction(string tid){

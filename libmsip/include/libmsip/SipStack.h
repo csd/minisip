@@ -275,6 +275,22 @@ class LIBMSIP_API SipStack : public CommandReceiver, public Runnable{
 		void enqueueTimeout(MRef<SipDialog*> receiver, const SipSMCommand &cmd);
 		void enqueueCommand(const SipSMCommand &cmd, int queue=LOW_PRIO_QUEUE);
 
+		/**
+		 * Creates a client transaction, and lets it start handling
+		 * a request.
+		 *
+		 * This allows the TU to know the branch parameter that 
+		 * a request will have.
+		 *
+		 * NOTE: A UA should NOT need to use this method. Only in
+		 * special cases, the UA (or dialog layer, to be more
+		 * specific), needs to know about the transaction ID of a
+		 * newly created transaction.
+		 *
+		 * @return Transaction id of newly created transaction.
+		 */
+		std::string createClientTransaction(MRef<SipRequest*>);
+
 		void setCallback(MRef<CommandReceiver*> callback);	//Rename to setMessageRouterCallback?
 		MRef<CommandReceiver*> getCallback();	
 		void setConfCallback(MRef<CommandReceiver*> callback); // Hack to make the conference calling work - should not be here FIXME
