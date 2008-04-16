@@ -285,7 +285,7 @@ bool SipDialogRegister::a10_trying_failed_transporterror( const SipSMCommand &co
 	
 	if (transitionMatch(command, 
 				SipCommandString::transport_error,
-				SipSMCommand::transport_layer,
+				IGN,
 				SipSMCommand::dialog_layer)){
 		
 		//Mark the identity as currently un-registered
