@@ -33,7 +33,6 @@
 #include<config.h>
 
 #include<libmsip/SipHeaderProxyAuthorization.h>
-#include<libmutil/vmd5.h>
 
 using namespace std;
 

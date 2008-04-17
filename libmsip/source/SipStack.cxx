@@ -193,3 +193,8 @@ std::string SipStack::getStackStatusDebugString(){
 std::string SipStack::createClientTransaction(MRef<SipRequest*> req){
 	return STACK->createClientTransaction(req);
 }
+
+void SipStack::setInformTransactionTerminate(bool doInform){
+	return STACK->setInformTransactionTerminate(doInform);
+}
+

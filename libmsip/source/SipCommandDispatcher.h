@@ -105,6 +105,17 @@ class SipCommandDispatcher : public MObject{
 		Needs to be moved to private and use set/get functions
 		*/
 		MRef<SipDialog*> managementHandler;
+
+		/**
+		 * If set to true, the SipStack will send the following SipSMCommand from 
+		 * the transaction_layer to the dialog_layer:
+		 * 	op=transaction_terminated
+		 *      param=transaction id
+		 * This makes it possible for applications to know when a
+		 * transaction has terminated, and is/will be removed from
+		 * memory.
+		 */
+		void setInformTransactionTerminate(bool doInform){informTuOnTransactionTerminate=doInform;}
 		                
 	private:
 		MRef<CommandReceiver*> callback;
@@ -132,6 +143,14 @@ class SipCommandDispatcher : public MObject{
                 on stack shutdown.
                 */
                 bool keepRunning;
+
+		/**
+		 * If true, the SipStack will send the following SipSMCommand from 
+		 * the transaction_layer to the dialog_layer:
+		 * 	op=transaction_terminated
+		 *      param=transaction id
+		 */
+		bool informTuOnTransactionTerminate;
 
 };
 

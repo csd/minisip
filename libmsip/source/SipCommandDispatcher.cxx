@@ -303,6 +303,15 @@ bool SipCommandDispatcher::maintainenceHandleCommand(const SipSMCommand &c){
 			t=NULL;
 			transactionLayer->removeTransaction(tid);
 			MRef<SipDialog*> d = dialogLayer->getDialog(cid);
+
+			if (informTuOnTransactionTerminate){
+				SipSMCommand tterm(
+						CommandString( cid, SipCommandString::transaction_terminated, tid ),
+						SipSMCommand::transaction_layer,
+						SipSMCommand::dialog_layer 
+						);
+			}
+
 			//It is ok to not find a dialog (transaction
 			//without dialog).
 			if (d){

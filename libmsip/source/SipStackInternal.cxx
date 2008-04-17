@@ -576,3 +576,9 @@ int32_t SipStackInternal::getLocalSipPort(bool usesStun, const string &transport
 std::string SipStackInternal::createClientTransaction(MRef<SipRequest*> req){
 	return dispatcher->getLayerTransaction()->createClientTransaction(req);
 }
+
+void SipStackInternal::setInformTransactionTerminate(bool doInform){
+	        return dispatcher->setInformTransactionTerminate(doInform);
+}
+
+
