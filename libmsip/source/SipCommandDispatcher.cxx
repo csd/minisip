@@ -310,6 +310,8 @@ bool SipCommandDispatcher::maintainenceHandleCommand(const SipSMCommand &c){
 						SipSMCommand::transaction_layer,
 						SipSMCommand::dialog_layer 
 						);
+
+				enqueueCommand(tterm, HIGH_PRIO_QUEUE);
 			}
 
 			//It is ok to not find a dialog (transaction
