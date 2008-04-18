@@ -333,6 +333,14 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		 */
 		MRef<SipHeaderValueWWWAuthenticate*> getHeaderValueWWWAuthenticate(int i);
 
+
+		/**
+		 * Removes a header value from the packet. If it is the
+		 * only value in the header then the entire header is
+		 * removed as well.
+		 */
+		void removeHeaderValue(MRef<SipHeaderValue*>);
+
 	protected:
 
 		/**
@@ -343,13 +351,16 @@ class LIBMSIP_API SipMessage : public SipMessageContent{
 		 */
 		bool addLine(std::string line);
 		
-		/**
-		 * Gets the i:th header of a certain type. In most cases,
-		 * users are 
-		 */
-		MRef<SipHeader*> getHeaderOfType(int t, int i=0);
 		
 		void removeHeader(MRef<SipHeader*> header);
+
+		/**
+		 * Gets the i:th header of a certain type. In most cases,
+		 * users want to access header values, and then they should
+		 * use getHeaderValueNo() instead.
+		 */
+		MRef<SipHeader*> getHeaderOfType(int t, int i=0);
+
 
 	private: 
 		minilist<MRef<SipHeader*> > headers;

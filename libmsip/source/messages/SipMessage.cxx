@@ -344,6 +344,24 @@ void SipMessage::removeFirstVia(){
 	}
 }
 
+void SipMessage::removeHeaderValue(MRef<SipHeaderValue*> hval){
+	int hi=0;
+	MRef<SipHeader*> hdr;
+	for (; hdr=getHeaderOfType( hval->getType(), hi ) ; hi++ ){
+		for (int vi=0; vi<hdr->getNoValues(); vi++){
+			if (hval== hdr->getHeaderValue(vi) ){
+				if (hdr->getNoValues()>1){
+					hdr->removeHeaderValue(vi);
+				}else{
+					removeHeader(hdr);
+				}
+			}
+			
+		}
+	
+	}
+}
+
 string SipMessage::getBranch(){
 	MRef<SipHeaderValue*> firstVia = getHeaderValueNo( SIP_HEADER_TYPE_VIA, 0 );
 	if (firstVia){
