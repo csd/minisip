@@ -412,9 +412,6 @@ SipDialogFileTransferClient::SipDialogFileTransferClient(MRef<SipStack*> stack,
 			useSTUN(use_stun),
 			phoneConf(pconf)
 {
-	dialogState.localTag = itoa(rand());
-	//dialogState.remoteUri="mafe@minisip.org";
-
 	setUpStateMachine();
 }
 

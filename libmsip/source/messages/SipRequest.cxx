@@ -281,9 +281,6 @@ void SipRequest::init(string &build_from){
 	}
 
 	requestLine = build_from.substr( start, end - start );
-	#ifdef DEBUG_OUTPUT
-	cerr << "SipRequest::init - requestLine = " << requestLine << endl;
-	#endif
 	start = 0;
 	end = requestLine.length();
 
@@ -294,9 +291,6 @@ void SipRequest::init(string &build_from){
 	}
 
 	method = requestLine.substr( start, pos - start );
-	#ifdef DEBUG_OUTPUT
-	cerr << "SipRequest::init - method = " << method << endl;
-	#endif
 
 	// Parse version
 	pos2 = requestLine.rfind( ' ', end - 1 );
@@ -316,10 +310,6 @@ void SipRequest::init(string &build_from){
 	if( !uri.isValid() ){
 		throw SipExceptionInvalidMessage("SipRequest malformed - uri");
 	}
-
-	#ifdef DEBUG_OUTPUT
-	cerr << "SipRequest::init - uri = " << uri.getString() << endl;
-	#endif
 }
 
 SipRequest::~SipRequest(){

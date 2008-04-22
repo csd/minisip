@@ -71,6 +71,7 @@ SipDialog::SipDialog(MRef<SipStack*> stack, MRef<SipIdentity*> identity, string 
 	}
 
 	this->dialogState.seqNo=100 * (rand()%9+1);
+	dialogState.localTag = itoa(rand());
 	dialogState.remoteSeqNo=-1;
 	dialogState.secure=false;	//TODO: this variable is not maintained 
 	 				//properly, right?! (this at least does not leave it uninitialized) -EE 

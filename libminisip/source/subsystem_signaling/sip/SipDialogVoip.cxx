@@ -589,8 +589,6 @@ SipDialogVoip::SipDialogVoip(	MRef<SipStack*> stack,
 		useStun(stun),
 		lastInvite(NULL)
 {
-	dialogState.localTag = itoa(rand());
-	
 	/* We will fill that later, once we know if that succeeded */
 	logEntry = NULL;
 

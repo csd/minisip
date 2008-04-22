@@ -344,7 +344,6 @@ SipDialogPresenceClient::SipDialogPresenceClient(MRef<SipStack*> stack,
                 	SipDialog(stack,ident, ""),
 			useSTUN(use_stun)
 {
-	dialogState.localTag = itoa(rand());
 	setUpStateMachine();
 }
 

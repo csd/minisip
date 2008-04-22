@@ -458,7 +458,6 @@ SipDialogRegister::SipDialogRegister(MRef<SipStack*> stack, MRef<SipIdentity*> i
 			guiFeedback(true)
 {
 	setUpStateMachine();
-	dialogState.localTag = itoa(rand());
 	myDomain = getDialogConfig()->sipIdentity->getSipUri().getIp();
 }
 

@@ -1173,8 +1173,6 @@ SipDialogP2Tuser::SipDialogP2Tuser(MRef<SipStack*> stack, MRef<SipDialogConfig*>
 //	getDialogConfig().callId = itoa(rand())+"@"+getDialogConfig().inherited->localIpString;
 	/*getDialogConfig().callId*/ dialogState.callId = itoa(rand())+"@"+getDialogConfig()->inherited->externalContactIP;
 	
-	dialogState.localTag=itoa(rand());
-	
 	/* We will fill that later, once we know if that succeeded */
 	logEntry = NULL;
 

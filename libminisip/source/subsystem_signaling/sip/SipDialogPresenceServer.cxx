@@ -229,7 +229,6 @@ SipDialogPresenceServer::SipDialogPresenceServer(MRef<SipStack*> stack,
 			useSTUN(use_stun),
 			onlineStatus("online")
 {
-	dialogState.localTag=itoa(rand());
 	setUpStateMachine();
 }
 

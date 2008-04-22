@@ -943,8 +943,6 @@ SipDialogConfVoip::SipDialogConfVoip(MRef<ConfMessageRouter*> confCb, MRef<SipSt
 	//cerr << "CONFDIALOG: "+ ((*list)[1]).uri << endl;
 	//cerr << "CONFDIALOG: "+itoa(numConnected)<< endl;
 	
-	dialogState.localTag = itoa(rand());
-	
 	/* We will fill that later, once we know if that succeeded */
 	logEntry = NULL;
 
@@ -961,8 +959,6 @@ SipDialogConfVoip::SipDialogConfVoip(MRef<ConfMessageRouter*> confCb, MRef<SipSt
 	//cerr<<"SDCVididididididididididdididi "+confId<<endl;
 	//cerr << "CONFDIALOG: received"<< endl;
 	type="connect";
-	
-	dialogState.localTag = itoa(rand());
 	
 	/* We will fill that later, once we know if that succeeded */
 	logEntry = NULL;

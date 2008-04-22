@@ -120,7 +120,7 @@ MRef<SipTransport*> SipTransportRegistry::findTransport( const string &protocol,
 
 		if( transport->isSecure() == secure &&
 		    transport->getProtocol() == lcProt ){
-			mdbg << "SipTransport: transport found!!! =  " << lcProt << endl;
+			//mdbg << "SipTransport: transport found!!! =  " << lcProt << endl;
 			return transport;
 		}
 	}

@@ -343,8 +343,6 @@ SipDialogFileTransferServer::SipDialogFileTransferServer(MRef<SipStack*> stack,
                 	SipDialog(stack,ident,callId),
 			phoneConf(pconf)
 {
-	dialogState.localTag=itoa(rand());
-	
 	setUpStateMachine();
 }
 
