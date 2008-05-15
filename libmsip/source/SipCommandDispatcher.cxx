@@ -313,7 +313,7 @@ bool SipCommandDispatcher::maintainenceHandleCommand(const SipSMCommand &c){
 			return true;
 		}else if (c.getCommandString().getOp()==SipCommandString::call_terminated){
 			return dialogLayer->removeDialog(c.getDestinationId());
-		}else if ( 	c.getCommandString().getOp() == SipCommandString::sip_stack_shutdown ||
+		}else if (  managementHandler && (c.getCommandString().getOp() == SipCommandString::sip_stack_shutdown ||
 				c.getCommandString().getOp() == SipCommandString::register_all_identities ||
 				c.getCommandString().getOp() == SipCommandString::register_all_identities_done ||
 				c.getCommandString().getOp() == SipCommandString::unregister_all_identities ||
@@ -321,7 +321,7 @@ bool SipCommandDispatcher::maintainenceHandleCommand(const SipSMCommand &c){
 				c.getCommandString().getOp() == SipCommandString::terminate_all_calls ||
 				c.getCommandString().getOp() == SipCommandString::terminate_all_calls_done ||
 				c.getCommandString().getOp() == SipCommandString::call_terminated_early ||
-				c.getCommandString().getOp() == SipCommandString::register_ok) { 
+				c.getCommandString().getOp() == SipCommandString::register_ok ) ) { 
 			//commands that are only interesting to the management dialog ...
 			//Refurbish the command ... or the SipDialog::handleCmd won't let it through
 			SipSMCommand cmd( c.getCommandString(),
@@ -330,7 +330,7 @@ bool SipCommandDispatcher::maintainenceHandleCommand(const SipSMCommand &c){
 			managementHandler->handleCommand(cmd);
 			return true;
 			
-		}else if ( c.getCommandString().getOp() == SipCommandString::sip_stack_shutdown_done) { 
+		}else if ( managementHandler && c.getCommandString().getOp() == SipCommandString::sip_stack_shutdown_done) { 
 			
 //			SipSMCommand cmd( c.getCommandString(),
 //					SipSMCommand::dispatcher,
