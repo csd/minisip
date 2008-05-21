@@ -324,10 +324,12 @@ bool SipCommandDispatcher::maintainenceHandleCommand(const SipSMCommand &c){
 				c.getCommandString().getOp() == SipCommandString::register_ok ) ) { 
 			//commands that are only interesting to the management dialog ...
 			//Refurbish the command ... or the SipDialog::handleCmd won't let it through
-			SipSMCommand cmd( c.getCommandString(),
-					SipSMCommand::dispatcher,
-					SipSMCommand::dialog_layer);	//It's a SipDialog sub-class
-			managementHandler->handleCommand(cmd);
+			if (managementHandler){
+				SipSMCommand cmd( c.getCommandString(),
+						SipSMCommand::dispatcher,
+						SipSMCommand::dialog_layer);	//It's a SipDialog sub-class
+				managementHandler->handleCommand(cmd);
+			}
 			return true;
 			
 		}else if ( managementHandler && c.getCommandString().getOp() == SipCommandString::sip_stack_shutdown_done) { 
