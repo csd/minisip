@@ -885,11 +885,16 @@ void SipLayerTransport::updateContact(MRef<SipMessage*> pack,
 		contactUri.setIp( ip );
 		contactUri.setTransport( transport->getProtocol() );
 
-		if(ipv6 || socket->getType() != SOCKET_TYPE_UDP){
+//NOTE: We make the UDP and IPv4 exception for STUN reasons. However, since
+//we set the IP above, this is broken. If we make this exception, then
+//the contact uri will not have the correct port if we run on any port
+//except 5060.
+//
+//		if(ipv6 || socket->getType() != SOCKET_TYPE_UDP){
 
 			// Update port if not UDP and IPv4
 			contactUri.setPort( port );
-		}
+//		}
 
 		contactUri.removeParameter("minisip");
 		contactp->setUri( contactUri );
