@@ -51,8 +51,15 @@ class LIBMINISIP_API SRtpPacket : public RtpPacket{
 			unsigned ssrc);
 		virtual ~SRtpPacket();
 
+		/**
+		 * Reads a (S)RTP packet from a socket.
+		 */
 		static SRtpPacket *readPacket( UDPSocket &udp_sock,  MRef<IPAddress *>&from, int timeout=-1);
-		// static????
+
+		/**
+		 * Reads a (S)RTP packet from a memory buffer.
+		 */
+		static SRtpPacket *readPacket( byte_t *buf, unsigned buflen);
 
 		void protect( MRef<CryptoContext *> scontext );
 		int unprotect( MRef<CryptoContext *> scontext );

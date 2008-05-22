@@ -197,29 +197,31 @@ SRtpPacket::~SRtpPacket(){
 
 SRtpPacket *SRtpPacket::readPacket(UDPSocket &srtp_socket, MRef<IPAddress *> &from, int timeout) {
 #define UDP_SIZE 65536
-    int i;
-    uint8_t buf[UDP_SIZE];
+	int i;
+	uint8_t buf[UDP_SIZE];
+	int32_t port;
+	i = srtp_socket.recvFrom((char*)buf, UDP_SIZE, from, port);
+	if( i < 0 ){
+#ifdef DEBUG_OUTPUT
+		merror("recvfrom:");
+#endif
+		return NULL;
+	}
+	return readPacket(buf, i);
+}
+
+SRtpPacket *SRtpPacket::readPacket(byte_t *buf, unsigned buflen) {
+#define UDP_SIZE 65536
     uint8_t j;
     uint8_t cc;
-    //memset( buf, '\0', UDP_SIZE );
-    int32_t port;
 
-    i = srtp_socket.recvFrom((char*)buf, UDP_SIZE, from, port);
-
-    if( i < 0 ){
-#ifdef DEBUG_OUTPUT
-	merror("recvfrom:");
-#endif
-	return NULL;
-    }
-
-    if( i < 12 ){
+    if( buflen < 12 ){
 	/* too small to contain an RTP header */
 	return NULL;
     }
 
     cc = buf[0] & 0x0F;
-    if( i < 12 + cc * 4 ){
+    if( buflen < 12 + cc * 4 ){
 	/* too small to contain an RTP header with cc CCSRC */
 	return NULL;
     }
@@ -238,7 +240,7 @@ SRtpPacket *SRtpPacket::readPacket(UDPSocket &srtp_socket, MRef<IPAddress *> &fr
     for( j = 0 ; j < cc ; j++ )
 	hdr.addCSRC( U32_AT( buf + 12 + j*4 ) );
 
-    int datalen = i - 12 - cc*4;
+    int datalen = buflen - 12 - cc*4;
 
     unsigned char *data = (unsigned char *)&buf[ 12 + 4*cc ];
 
