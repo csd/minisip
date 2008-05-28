@@ -956,8 +956,10 @@ void Session::start(){
 		if( ! (*iR)->disabled ){
 			if( ka ){
 				(*iR)->setKeyAgreement( ka );
+				(*iR)->flushCryptoContexts();
 			}
 			(*iR)->start();
+		}else{
 		}
 	}
 	

@@ -210,6 +210,12 @@ class LIBMINISIP_API RealtimeMediaStream : public MediaStream {
 		void setKeyAgreementZrtp(MRef<CryptoContext *>cx);
 #endif
 
+		void flushCryptoContexts(){
+			kaLock.lock();
+			cryptoContexts.clear();
+			kaLock.unlock();
+		}
+
 	protected:
 		MRef<CryptoContext *> getCryptoContext( uint32_t ssrc, uint16_t seq_no );
 		RealtimeMediaStream( std::string callId, MRef<RealtimeMedia *> );
@@ -336,6 +342,7 @@ class LIBMINISIP_API RealtimeMediaStreamReceiver : public RealtimeMediaStream{
 		 */
 		virtual void handleRtpPacketExt(MRef<SRtpPacket *> packet);
 #endif
+
 	protected:
 		std::list<MRef<Codec *> > codecList;
 		MRef<RtpReceiver *> rtpReceiver;

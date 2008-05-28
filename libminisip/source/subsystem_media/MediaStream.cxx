@@ -221,15 +221,16 @@ MRef<CryptoContext *> RealtimeMediaStream::initCrypto( uint32_t ssrc, uint16_t s
 #endif
 #endif
 
-		if( csId != 0 ){
+//		if( csId != 0 ){
 			cryptoContext = new CryptoContext( ssrc, roc, seq_no, keydr,
 			ealg, aalg, masterKey, 16, masterSalt, 14, ekeyl, akeyl, skeyl, encr, auth, autht );
 
 			cryptoContext->derive_srtp_keys( 0 );
-		}
-		else{
-			cryptoContext = new CryptoContext( ssrc );
-		}
+//		}
+//		else{
+//			cerr << "EEEE: WARNING - csId is NULL"<<endl;
+//			cryptoContext = new CryptoContext( ssrc );
+//		}
 	}
 
 	cryptoContexts.push_back( cryptoContext );
