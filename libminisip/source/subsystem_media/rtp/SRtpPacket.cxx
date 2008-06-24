@@ -186,6 +186,13 @@ SRtpPacket::SRtpPacket(RtpHeader hdr, unsigned char *content, int content_length
 	this->mki = NULL;
 }
 
+SRtpPacket::SRtpPacket(RtpHeader hdr, unsigned char *content, int content_length):
+    RtpPacket(hdr, content, content_length ), encrypted(false), tag_length(0), mki_length(0){
+
+    this->tag = NULL;
+    this->mki = NULL;
+}
+
 
 SRtpPacket::~SRtpPacket(){
     if( mki )

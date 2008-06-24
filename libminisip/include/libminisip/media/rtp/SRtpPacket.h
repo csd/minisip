@@ -49,6 +49,7 @@ class LIBMINISIP_API SRtpPacket : public RtpPacket{
 		SRtpPacket( unsigned char *content, int content_length,
 			int seq_no, unsigned timestamp,
 			unsigned ssrc);
+		SRtpPacket(RtpHeader hdr, unsigned char *content, int content_length);
 		virtual ~SRtpPacket();
 
 		/**

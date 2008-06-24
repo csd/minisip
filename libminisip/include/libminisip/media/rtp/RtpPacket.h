@@ -48,7 +48,7 @@ class LIBMINISIP_API RtpPacket: public MObject {
 		RtpPacket();
 		RtpPacket(unsigned char *content, int content_length, int seq_no,
                           unsigned timestamp, unsigned ssrc);
-		RtpPacket(RtpHeader hdr, unsigned char *content, int content_length);
+		RtpPacket(const RtpHeader &hdr, unsigned char *content, int content_length);
 		virtual ~RtpPacket();
 
 		static RtpPacket *readPacket(UDPSocket &udp_sock, int timeout=-1);

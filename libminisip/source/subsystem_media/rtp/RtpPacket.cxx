@@ -73,7 +73,7 @@ RtpPacket::RtpPacket(unsigned char *content_, int cl,
 	this->content = NULL;
 }
 
-RtpPacket::RtpPacket(RtpHeader hdr, unsigned char *content_, int cl): header(hdr) {
+RtpPacket::RtpPacket(const RtpHeader &hdr, unsigned char *content_, int cl): header(hdr) {
 
     extensionLength = 0;
     extensionHeader = NULL;
