@@ -376,9 +376,7 @@ void SipSoftPhoneConfiguration::save(){
 		backend->save( cmdActionsPath + "params", params );
 	}
 
-#ifdef VIDEO_SUPPORT
 	backend->save( "video_device", videoDevice );
-#endif
 	backend->save( "frame_width", frameWidth );
 	backend->save( "frame_height", frameHeight );
 
@@ -845,9 +843,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 		ii++;
 	}while( true );
 
-#ifdef VIDEO_SUPPORT
 	videoDevice = backend->loadString( "video_device", "" );
-#endif
 	//Even if we can't send video, we might be able to display it.
 	//Therefore this is not within the VIDEO_SUPPORT ifdef
 	frameWidth = backend->loadInt( "frame_width", 176 );

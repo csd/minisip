@@ -112,7 +112,7 @@ bool RealtimeMediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
 
 	for( iC = codecs.begin(); iC != codecs.end(); iC ++ ){
 		string codecRtpMap;
-		uint8_t codecPayloadType;
+		int codecPayloadType;
 
 		codecRtpMap = (*iC)->getSdpMediaAttributes();
 		codecPayloadType = (*iC)->getSdpMediaType();
@@ -131,7 +131,7 @@ bool RealtimeMediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
 
 			bool sdpRtpMapEqual = !strCaseCmp( codecName.c_str(), sdpName.c_str() ) && codecRate == sdpRate && codecParam == sdpParam;
                         if ( sdpRtpMapEqual ) {
-				localPayloadType = codecPayloadType;
+				localPayloadType = itoa(codecPayloadType);
                                 return true;
                         }
                         else {
@@ -141,7 +141,7 @@ bool RealtimeMediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
                 }
                 else{
                         if( sdpPayloadType == itoa(codecPayloadType) ){
-				localPayloadType = codecPayloadType;
+				localPayloadType = itoa(codecPayloadType);
                                 return true;
                         }else{
 			}
@@ -474,7 +474,7 @@ RealtimeMediaStreamSender::RealtimeMediaStreamSender( string callid, MRef<Realti
 	seqNo = (uint16_t)rand();
 	ssrc = rand();
 	lastTs = rand();
-        payloadType = 255;
+        payloadType = "255";
 	setMuted( true );
 	muteCounter = 0;
 	if( senderSocket ){
@@ -586,7 +586,7 @@ void RealtimeMediaStreamSender::send( byte_t * data, uint32_t length, uint32_t *
 	}
 
 	packet = new SRtpPacket( data, length, seqNo++, lastTs, ssrc );
-
+	
 	if( dtmf ){
 		packet->getHeader().setPayloadType( 101 );
 	}
@@ -700,10 +700,12 @@ bool RealtimeMediaStreamSender::muteKeepAlive( uint32_t max ) {
 bool RealtimeMediaStreamSender::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
 	bool result = RealtimeMediaStream::matches( m, formatIndex );
 
+	
 	if( result && !selectedCodec ){
 		selectedCodec = realtimeMedia->createCodecInstance(
 				atoi( localPayloadType.c_str() )  );
-		payloadType = (uint8_t)atoi(m->getFormat( formatIndex ).c_str());
+		payloadType = itoa( (uint8_t)atoi(m->getFormat( formatIndex ).c_str()) )  ;
+		result=true;
 	}
 
 	return result;
