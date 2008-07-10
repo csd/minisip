@@ -37,6 +37,8 @@
 
 #include<libmutil/stringutils.h>
 
+#include<stdlib.h>
+
 using namespace std;
 
 MRef<SipHeaderValue *> expiresFactory(const string &build_from){

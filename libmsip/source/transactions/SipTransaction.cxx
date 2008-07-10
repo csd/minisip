@@ -48,6 +48,8 @@
 #include"SipTransactionNonInviteClient.h"
 #include<libmsip/SipTransitionUtils.h>
 
+#include<stdlib.h>
+
 using namespace std;
 
 SipTransaction::SipTransaction(MRef<SipStackInternal*> stackInternal, 

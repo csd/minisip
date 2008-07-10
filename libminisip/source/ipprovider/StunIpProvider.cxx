@@ -33,6 +33,8 @@
 #include<libmnetutil/NetworkException.h>
 #include<libmstun/STUN.h>
 
+#include<stdlib.h>
+
 #ifdef _WIN32_WCE
 #	include"../include/minisip_wce_extra_includes.h"
 #endif

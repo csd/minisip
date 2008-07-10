@@ -39,6 +39,8 @@
 #include<iostream>
 #endif
 
+#include<stdlib.h> //atoi()
+
 using namespace std;
 
 SdpHeaderT::SdpHeaderT(string buildFrom):SdpHeader(SDP_HEADER_TYPE_T, 5){

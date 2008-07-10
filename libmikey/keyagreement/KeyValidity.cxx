@@ -27,6 +27,7 @@
 #include<libmikey/MikeyException.h>
 #include<libmikey/MikeyDefs.h>
 #include<assert.h>
+#include<string.h>
 #include<libmutil/stringutils.h>
 
 using namespace std;

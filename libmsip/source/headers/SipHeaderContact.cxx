@@ -34,10 +34,10 @@
 #include<config.h>
 
 #include<libmutil/stringutils.h>
-
 #include<libmsip/SipHeaderContact.h>
-
 #include<libmsip/SipDialogConfig.h> //needed for the DEFAULT_SIPPROXY_EXPIRES_VALUE_SECONDS define ...
+
+#include<stdlib.h>
 
 using namespace std;
 

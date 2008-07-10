@@ -26,6 +26,7 @@
 #include<config.h>
 
 #include<iostream>
+#include<string.h>
 
 #ifdef LINUX
 #	include<netinet/in.h>

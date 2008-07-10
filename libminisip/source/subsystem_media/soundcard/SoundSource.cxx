@@ -30,6 +30,7 @@
 #include<libmutil/mtime.h>
 
 #include<iostream>
+#include<string.h>
 
 #include<libmutil/stringutils.h> //for debug ... remove
 

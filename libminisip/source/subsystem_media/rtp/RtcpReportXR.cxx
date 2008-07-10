@@ -27,6 +27,7 @@
 #include<libminisip/media/rtp/RtcpReportXR.h>
 //#include<netinet/in.h>
 #include<iostream>
+#include<stdlib.h> //exit()
 
 using namespace std;
 

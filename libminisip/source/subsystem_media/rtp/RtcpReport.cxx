@@ -29,6 +29,7 @@
 #include<libminisip/media/rtp/RtcpReportRR.h>
 #include<libminisip/media/rtp/RtcpReportSDES.h>
 #include<libminisip/media/rtp/RtcpReportXR.h>
+#include<stdlib.h> //exit()
 
 #ifdef DEBUG_OUTPUT
 #	include<iostream>

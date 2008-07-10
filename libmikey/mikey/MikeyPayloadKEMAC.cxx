@@ -27,6 +27,7 @@
 #include<libmikey/MikeyPayloadKEMAC.h>
 #include<libmikey/MikeyException.h>
 #include<assert.h>
+#include<string.h>
 #include<libmcrypto/aes.h>
 #include<libmutil/stringutils.h>
 

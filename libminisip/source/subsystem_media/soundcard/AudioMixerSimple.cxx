@@ -34,6 +34,9 @@
 #include<libminisip/media/soundcard/AudioMixerSimple.h>
 #include<libminisip/media/soundcard/SoundSource.h>
 
+#include<string.h>
+#include<stdlib.h> //abs()
+
 using namespace std;
 
 AudioMixerSimple::AudioMixerSimple() {

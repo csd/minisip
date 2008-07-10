@@ -51,6 +51,7 @@
 #include<libmcrypto/SipSim.h>
 
 #include<map>
+#include<string.h>
 
 #include"MikeyMessageDH.h"
 #include"MikeyMessagePSK.h"

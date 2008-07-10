@@ -34,6 +34,7 @@
 
 #include<iostream>
 #include<fstream>
+#include<string.h>
 
 #include<libmutil/mtime.h>
 #include<libmutil/merror.h>

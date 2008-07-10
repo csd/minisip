@@ -25,6 +25,7 @@
 #include<config.h>
 #include<libmikey/MikeyPayloadSP.h>
 #include<libmikey/MikeyException.h>
+#include<stdlib.h>
 
 using namespace std;
 

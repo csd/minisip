@@ -45,7 +45,8 @@
 #include<libmutil/termmanip.h>
 #include<libmutil/dbg.h>
 #include<libmsip/SipSMCommand.h>
-#include <time.h>
+#include<time.h>
+#include<stdlib.h>
 #include<libminisip/gui/LogEntry.h>
 #include<libmsip/SipCommandString.h>
 #include<libminisip/media/SubsystemMedia.h>

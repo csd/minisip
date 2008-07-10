@@ -42,6 +42,8 @@
 #	include"../include/minisip_wce_extra_includes.h"
 #endif
 
+#include<string.h>
+
 using namespace std;
 
 AudioMixerSpatial::AudioMixerSpatial(MRef<SpAudio *> spatial) {

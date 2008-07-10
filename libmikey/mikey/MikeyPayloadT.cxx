@@ -31,6 +31,7 @@
 #include<libmutil/mtime.h>
 
 #include<assert.h>
+#include<string.h>
 
 #ifdef _MSC_VER
 #	include<Winsock2.h>

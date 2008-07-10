@@ -37,6 +37,7 @@
 #include<libminisip/media/MediaStream.h>
 #include<libmutil/stringutils.h>
 #include<libmutil/massert.h>
+#include<string.h>
 
 #define SOURCE_QUEUE_SIZE 7
 

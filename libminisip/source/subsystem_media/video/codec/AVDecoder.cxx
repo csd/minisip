@@ -28,6 +28,7 @@
 #include<libminisip/media/video/VideoException.h>
 
 #include<iostream>
+#include<string.h>
 
 
 /* used by ffmpeg to get a frame from the ImageHandler */

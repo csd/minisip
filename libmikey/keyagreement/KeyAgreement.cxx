@@ -28,6 +28,7 @@
 #include<libmikey/MikeyPayloadSP.h>
 #include<libmikey/MikeyMessage.h>
 #include<string.h>
+#include<stdlib.h>
 #include<libmcrypto/hmac.h>
 #include<libmcrypto/rand.h>
 

@@ -3,6 +3,8 @@
 
 #include<libminisip/media/RealtimeMedia.h>
 
+#include<string.h>
+
 using namespace std;
 
 RealtimeMedia::RealtimeMedia(MRef<Codec *> codec ){

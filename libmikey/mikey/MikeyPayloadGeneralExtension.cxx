@@ -23,9 +23,10 @@
 */
 
 
-#include <assert.h>
 #include<config.h>
 #include<libmikey/MikeyPayloadGeneralExtension.h>
+#include<assert.h>
+#include<stdlib.h>
 
 //Constructor when receiving Mikey message i.e. contruct MikeyPayloadGeneralExtensions from bytestream.
 MikeyPayloadGeneralExtensions::MikeyPayloadGeneralExtensions(byte_t *start, int lengthLimit):MikeyPayload(start){

@@ -30,6 +30,7 @@
 #include<stdlib.h>
 #include<time.h>
 #include<sys/types.h>
+#include<string.h>
 #include<libmcrypto/rand.h>
 
 #ifndef _MSC_VER

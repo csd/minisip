@@ -27,6 +27,7 @@
 
 #include"SimpleResampler.h"
 #include<iostream>
+#include<string.h>
 
 
 SimpleResampler::SimpleResampler( uint32_t inputFreq, uint32_t outputFreq, 

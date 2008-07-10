@@ -35,6 +35,7 @@
 #include<stdio.h>
 #include<signal.h>
 #include<time.h>
+#include<stdlib.h>
 #include<libmutil/stringutils.h>
 #include<libmutil/mtime.h>
 

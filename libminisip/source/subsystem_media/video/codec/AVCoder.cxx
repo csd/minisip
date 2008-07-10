@@ -33,6 +33,7 @@
 #include<stdio.h>
 #include<fcntl.h>
 #include<iostream>
+#include<string.h>
 
 using namespace std;
 #define AVCODEC_MAX_VIDEO_FRAME_SIZE (3*1024*1024)

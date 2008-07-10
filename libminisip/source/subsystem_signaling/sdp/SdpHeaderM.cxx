@@ -42,6 +42,7 @@
 using namespace std;
 
 #include<libminisip/signaling/sdp/SdpHeaderA.h>
+#include<stdlib.h>
 
 SdpHeaderM::SdpHeaderM(string buildFrom) : SdpHeader(SDP_HEADER_TYPE_M, 8){
 

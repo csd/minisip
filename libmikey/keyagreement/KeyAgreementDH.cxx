@@ -31,6 +31,7 @@
 #include<libmcrypto/OakleyDH.h>
 #include<libmcrypto/SipSim.h>
 #include<algorithm>
+#include<string.h>
 
 #ifdef SCSIM_SUPPORT
 #include<libmcrypto/SipSimSmartCardGD.h>

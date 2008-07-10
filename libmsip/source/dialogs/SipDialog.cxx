@@ -53,6 +53,8 @@
 #include<libmutil/CommandString.h>
 #include<libmutil/termmanip.h>
 
+#include<stdlib.h>
+
 using namespace std;
 
 SipDialog::SipDialog(MRef<SipStack*> stack, MRef<SipIdentity*> identity, string cid):

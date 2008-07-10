@@ -31,6 +31,7 @@
 #include<libmutil/massert.h>
 #include<libminisip/media/rtp/CryptoContext.h>
 #include<libmikey/MikeyPayloadSP.h>
+#include<string.h>
 
 CryptoContext::CryptoContext( uint32_t ssrc_ ):
 	ssrc(ssrc_),

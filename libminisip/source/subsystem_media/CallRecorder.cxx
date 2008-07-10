@@ -33,6 +33,8 @@
 #include<libmutil/mtime.h>
 #include<libmutil/CircularBuffer.h>
 
+#include<string.h>
+
 #define AUDIO_FRAME_DURATION_MS 20
 
 using namespace std;

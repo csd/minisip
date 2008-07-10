@@ -32,6 +32,7 @@
 #include<libmnetutil/NetworkFunctions.h>
 #include<libmutil/massert.h>
 #include<libmsip/SipTransport.h>
+#include<stdlib.h>
 
 using namespace std;
 

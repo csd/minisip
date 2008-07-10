@@ -26,6 +26,7 @@
 #include<libmikey/MikeyPayloadV.h>
 #include<libmikey/MikeyException.h>
 #include<assert.h>
+#include<string.h>
 
 MikeyPayloadV::MikeyPayloadV( int macAlgValue, byte_t * verDataPtr ){
 	this->payloadTypeValue = MIKEYPAYLOAD_V_PAYLOAD_TYPE;

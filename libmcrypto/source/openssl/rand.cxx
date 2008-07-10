@@ -25,6 +25,7 @@
 
 #include <openssl/rand.h>
 #include <libmcrypto/rand.h>
+#include <string.h>
 
 bool Rand::randomize(void *buffer, size_t length)
 {
