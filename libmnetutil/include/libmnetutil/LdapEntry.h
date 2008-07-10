@@ -28,6 +28,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include<string.h>
 
 /**
  * Class used internally by LdapEntry

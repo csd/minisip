@@ -6,6 +6,7 @@
 #include<string.h>
 #include<iostream>
 #include<stdio.h>
+#include<stdlib.h>
 #include<libmutil/Exception.h>
 
 void massertFailed(const char *expr, const char *file, const char *baseFile, int line) {

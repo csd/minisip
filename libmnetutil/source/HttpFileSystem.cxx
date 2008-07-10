@@ -3,6 +3,8 @@
 
 #include<libmnetutil/HttpFileSystem.h>
 #include<libmnetutil/HttpDownloader.h>
+#include<string.h>
+#include<stdlib.h>
 
 using namespace std;
 

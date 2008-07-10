@@ -35,6 +35,8 @@
 #include <vector>
 #include <map>
 #include <iostream>
+#include <string.h>
+#include <stdlib.h>
 
 #define BUFFERSIZE 4096
 

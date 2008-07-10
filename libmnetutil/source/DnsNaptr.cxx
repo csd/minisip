@@ -28,6 +28,7 @@
 #include<regex.h>
 #endif
 #include<algorithm>
+#include<string.h>
 
 using namespace std;
 

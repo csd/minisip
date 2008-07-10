@@ -6,6 +6,8 @@
 #include <execinfo.h>
 #include <signal.h>
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #endif
 
 using namespace std;

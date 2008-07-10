@@ -225,7 +225,8 @@ IP6Address::IP6Address(struct sockaddr_in6 * addr){
 #ifdef DARWIN
 		num_ip[i] = ((sockaddr_in6 *)sockaddress)->sin6_addr.__u6_addr.__u6_addr16[i];
 #else
-		num_ip[i] = ((sockaddr_in6 *)sockaddress)->sin6_addr.in6_u.u6_addr16[i];
+//		num_ip[i] = ((sockaddr_in6 *)sockaddress)->sin6_addr.in6_u.u6_addr16[i];
+		num_ip[i] = ((sockaddr_in6 *)sockaddress)->sin6_addr.s6_addr16[i];
 #endif
 #endif
 #endif

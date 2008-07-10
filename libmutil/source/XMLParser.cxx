@@ -29,6 +29,7 @@
 #include<libmutil/stringutils.h>
 #include<iostream>
 #include<sys/types.h>
+#include <stdlib.h>
 
 using namespace std;
 

@@ -34,6 +34,8 @@
 
 #ifdef WIN32
 # include <winsock2.h>
+#else
+#include<sys/select.h>
 #endif
 
 class LIBMNETUTIL_API InputReadyHandler: public virtual MObject {

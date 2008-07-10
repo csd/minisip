@@ -24,6 +24,7 @@
 #include<config.h>
 
 #include<libmutil/Timestamp.h>
+#include <string.h>
 
 Timestamp ts;
 

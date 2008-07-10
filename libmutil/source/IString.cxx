@@ -19,6 +19,7 @@
 #include<config.h>
 #include<libmutil/IString.h>
 #include<libmutil/massert.h>
+#include <string.h>
 
 #include<iostream>
 

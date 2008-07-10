@@ -33,6 +33,7 @@
 
 #include <string>
 #include <iostream>
+#include <string.h>
 
 #define BUFFERSIZE 4096
 

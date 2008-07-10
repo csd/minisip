@@ -39,6 +39,8 @@
 #include<libmutil/dbg.h>
 #include<libmutil/stringutils.h>
 
+#include <stdlib.h>
+
 #include<vector>
 #include<locale>
 

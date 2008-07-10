@@ -44,6 +44,8 @@
 #include<libmutil/Exception.h>
 #include<libmutil/massert.h>
 #include<libmutil/mtime.h>
+#include<stdlib.h>
+#include<string.h>
 
 using namespace std;
 

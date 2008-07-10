@@ -29,6 +29,7 @@
 #include<libmnetutil/NetworkFunctions.h>
 
 #include<iostream>
+#include<algorithm>
 
 #include <stdlib.h>
 #include <stdio.h>
