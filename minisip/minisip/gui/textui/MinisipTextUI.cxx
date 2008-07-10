@@ -23,6 +23,7 @@
 #include<config.h>
 
 #include<stdio.h>
+#include<stdlib.h>
 #include<vector>
 #include"MinisipTextUI.h"
 #include<libminisip/signaling/conference/ConferenceControl.h>
