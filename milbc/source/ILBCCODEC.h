@@ -29,7 +29,7 @@
 
 #include<string>
 
-#include<libminisip/codecs/Codec.h>
+#include<libminisip/media/codecs/Codec.h>
 
 #include"ilbc/iLBC_define.h"
 #include"ilbc/iLBC_encode.h"
