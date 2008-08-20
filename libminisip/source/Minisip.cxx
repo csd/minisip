@@ -352,7 +352,21 @@ int Minisip::startSip() {
 		// FIXME: This should be done more often
 		localIpString = externalContactIP = ipProvider->getExternalIp();                
 
-		MRef<UDPSocket*> udpSocket = new UDPSocket( phoneConf->sipStackConfig->preferedLocalSipPort );
+		bool done;
+		int port = phoneConf->sipStackConfig->preferedLocalSipPort;
+		MRef<UDPSocket*> udpSocket;
+		int ntries = 8;
+		do{
+			done=true;
+			try{
+				udpSocket = new UDPSocket( port );
+			}catch(NetworkException &){
+				phoneConf->sipStackConfig->preferedLocalSipPort = port = 32768+rand()%32000;
+				done=false;
+			
+			}
+			ntries--;
+		}while (!done && ntries>0);
 
 		// TODO call getExternalPort on the real UDPSocket:s
 		// when they are created

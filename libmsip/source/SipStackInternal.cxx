@@ -507,13 +507,25 @@ void SipStackInternal::startServer( MRef<SipTransport*> transport,
 		}
 	}
 
-	dispatcher->getLayerTransport()->startServer( transport,
-				ipString, 
-				config->localIp6String, 
-				port, 
-				externalUdpPort,
-				config->cert, 
-				config->cert_db );
+	bool done=false;
+	int ntries=8;
+	while (!done && ntries>0){
+
+		try{
+			dispatcher->getLayerTransport()->startServer( transport,
+					ipString, 
+					config->localIp6String, 
+					port, 
+					externalUdpPort,
+					config->cert, 
+					config->cert_db );
+			done=true;
+		}catch(Exception &e){
+			port = config->externalContactUdpPort = rand()%32000+32000;
+		}catch(...){
+			throw;
+		}
+	}
 }
 	
 
