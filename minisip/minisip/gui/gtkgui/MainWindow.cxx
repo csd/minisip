@@ -42,6 +42,8 @@
 #include"DtmfWidget.h"
 #include"TransportList.h"
 
+#include<glib.h>
+
 #ifndef WIN32
 #	include"TrayIcon.h"
 #endif
@@ -455,6 +457,14 @@ void MainWindow::gotCommand(){
 		doDisplayErrorMessage( command.getParam() );
 		return;
 	}
+
+	if( command.getOp() == "ask_password" ){
+		string user =command["identityUri"];
+		string realm=command["realm"];
+		//doDisplayErrorMessage( "WARNING: Could not authenticate user &lt;"+user+ "&gt; to realm &lt;"+realm+"&gt;. Wrong password?" );
+		doDisplayErrorMessage( "WARNING: Could not authenticate user "+user+ " to realm "+realm+". Wrong password?" );
+		return;
+	}
 	
 	for( i = callWidgets.begin(); i != callWidgets.end(); i++ ){
 		if( (*i)->handleCommand( command ) ){
@@ -569,11 +579,11 @@ void MainWindow::gotPacket( int32_t /*i*/ ){
 
 void MainWindow::displayMessage( string s, int /*style*/ ){
 	handleCommand( CommandString( "", "error_message", 
-		Glib::locale_to_utf8( s ) ) );
+		Glib::locale_to_utf8( g_markup_escape_text( s.c_str(), s.length()) ) ) );
 }
 
 void MainWindow::doDisplayErrorMessage( string s ){
-	Gtk::MessageDialog dialog( s, Gtk::MESSAGE_ERROR );
+	Gtk::MessageDialog dialog( g_markup_escape_text(s.c_str(), s.length()), Gtk::MESSAGE_ERROR );
 	dialog.run();
 }
 

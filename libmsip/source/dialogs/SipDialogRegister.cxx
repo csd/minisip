@@ -221,6 +221,7 @@ bool SipDialogRegister::a3_trying_askpassword_40x( const SipSMCommand &command){
 			SipCommandString::ask_password, 
 			getDialogConfig()->sipIdentity->getSipRegistrar()->getUri().getIp());
 		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
+		cmdstr["identityUri"] = getDialogConfig()->sipIdentity->getSipUri().getString();
 		cmdstr["realm"] = realm;
 
 		getSipStack()->getCallback()->handleCommand("gui", cmdstr );
@@ -293,6 +294,7 @@ bool SipDialogRegister::a10_trying_failed_transporterror( const SipSMCommand &co
 		
 		CommandString cmdstr( dialogState.callId, SipCommandString::transport_error);
 		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
+		cmdstr["identityUri"] = getDialogConfig()->sipIdentity->getSipUri().getString();
 		getSipStack()->getCallback()->handleCommand("gui", cmdstr );
 		return true;
 	}else{
@@ -338,6 +340,7 @@ bool SipDialogRegister::a12_registred_trying_proxyregister( const SipSMCommand &
 		
 		CommandString cmdstr(dialogState.callId, SipCommandString::register_sent);
 		cmdstr["identityId"] = getDialogConfig()->sipIdentity->getId();
+		cmdstr["identityUri"] = getDialogConfig()->sipIdentity->getSipUri().getString();
 		getSipStack()->getCallback()->handleCommand("gui", cmdstr );
 		return true;
 	}else{
