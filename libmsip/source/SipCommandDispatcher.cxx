@@ -38,7 +38,9 @@ SipCommandDispatcher::SipCommandDispatcher(
 		MRef<SipStackInternal*> stackInternal, 
 		MRef<SipLayerTransport*> transp)
 			:sipStackInternal(stackInternal),
-			keepRunning(true){
+			keepRunning(true),
+			informTuOnTransactionTerminate(false)
+{
 
 	transportLayer = transp;
 	transactionLayer = new SipLayerTransaction(this,transportLayer);
