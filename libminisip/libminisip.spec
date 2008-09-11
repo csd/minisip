@@ -1,33 +1,33 @@
 %define name		libminisip
-%define version		0.3.1
+%define version		0.7.2
 %define release		1
 
 %define major		0
 %define lib_name	%{name}%{major}
 
-Summary: 		Application layer library to easily create GUI based apps
+Summary: 		Application layer library to easily secure VoIP support to applications
 Name:			%{name}
 Version:		%{version}
 Release:		%{release}
-Packager:		Johan Bilien <jobi@via.ecp.fr>
+Packager:		Erik Eliasson <ere@kth.se>
 License:		GPL
-URL:			http://www.minisip.org/libminisip/
+URL:			http://www.minisip.org/
 Group:			System/Libraries
 Source:			http://www.minisip.org/source/%{name}-%{version}.tar.gz
 BuildRoot:		%_tmppath/%name-%version-%release-root
 
 %description
-Application layer library to easily create GUI based apps
+Application layer library to easily secure VoIP support to applications
 
 %package -n %{lib_name}
 Summary: 		Application layer library to easily create GUI based apps
 Group:			System/Libraries
 Provides:		%{name}
-Requires:       	libmutil0 >= 0.3.1, libmnetutil0 >= 0.3.1, libmikeyl0 >= 0.3.1, libmsipl0 >= 0.3.1, 
+Requires:       	libmutil0 >= 0.7.2, libmnetutil0 >= 0.7.2, libmikeyl0 >= 0.7.2, libmsipl0 >= 0.7.2, 
 
 
 %description -n %{lib_name}
-Application layer library to easily create GUI based apps
+Application layer library to easily secure VoIP support to applications
 
 
 %package -n %{lib_name}-devel
@@ -38,7 +38,7 @@ Requires:       	%{lib_name} = %{version}
 
 
 %description -n %{lib_name}-devel
-Application layer library to easily create GUI based apps
+Application layer library to easily secure VoIP support to applications
 
 This package includes the development files (headers and static library)
 
@@ -75,12 +75,6 @@ rm -rf %buildroot
 
 
 %changelog
-* Fri Mar 18 2005 Johan Bilien <jobi@via.ecp.fr>
-- new upstream release
-* Fri Feb 18 2005 Johan Bilien <jobi@via.ecp.fr>
-- new upstream release
-* Mon Nov 22 2004 Johan Bilien <jobi@via.ecp.fr>
-- new upstream release
-* Wed Jun 9 2004 Johan Bilien <jobi@via.ecp.fr>
+* Thu Oct 11 2008 Erik Eliasson <ere@kth.se>
 - initial release
 

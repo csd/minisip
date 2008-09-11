@@ -1,11 +1,11 @@
-%define name		libmikey
+%define name		libstun
 %define version		0.7.2
 %define release		1
 
 %define major		0
 %define lib_name	%{name}%{major}
 
-Summary: 		A C++ library implementing the Multimedia Internet KEYing protocol.
+Summary: 		A C++ library providing STUN client utilities
 Name:			%{name}
 Version:		%{version}
 Release:		%{release}
@@ -17,36 +17,32 @@ Source:			http://www.minisip.org/source/%{name}-%{version}.tar.gz
 BuildRoot:		%_tmppath/%name-%version-%release-root
 
 %description
-libmikey is a C++ library that implements the Multimedia Internet KEYing.
-This protocol aims to provide a key exchange for secure multimedia streaming.
-It is usually embedded in SIP or RTSP session setup.
+libmstun provides support for implementing STUN in client applications.
+It is used by the minisip project.
 
 %package -n %{lib_name}
-Summary: 		A C++ library implementing the Multimedia Internet KEYing protocol.
+Summary: 		A C++ library providing various utilities
 Group:			System/Libraries
 Provides:		%{name}
-Requires:       	openssl >= 0.9.6
 Requires:       	libmutil0 >= 0.7.2
 
 
 %description -n %{lib_name}
-libmikey is a C++ library that implements the Multimedia Internet KEYing.
-This protocol aims to provide a key exchange for secure multimedia streaming.
-It is usually embedded in SIP or RTSP session setup.
+libmstun is a library providing STUN support for client applications.
+It is used by the minisip project.
 
 
 
 %package -n %{lib_name}-devel
-Summary: 		Development files for the libmikey library.
+Summary: 		Development files for the libmstun library.
 Group:          	Development/C
 Provides:       	%name-devel
 Requires:       	%{lib_name} = %{version}
 
 
 %description -n %{lib_name}-devel
-libmikey is a C++ library that implements the Multimedia Internet KEYing.
-This protocol aims to provide a key exchange for secure multimedia streaming.
-It is usually embedded in SIP or RTSP session setup.
+libmstun is a library providing STUN support for client applications.
+It is used by the minisip project.
 
 This package includes the development files (headers and static library)
 
@@ -84,13 +80,5 @@ rm -rf %buildroot
 
 %changelog
 * Thu Oct 11 2008 Erik Eliasson <ere@kth.se>
-- new upstream release
-* Fri Mar 18 2005 Johan Bilien <jobi@via.ecp.fr>
-- new upstream release
-* Fri Feb 18 2005 Johan Bilien <jobi@via.ecp.fr>
-- new upstream release
-* Mon Nov 22 2004 Johan Bilien <jobi@via.ecp.fr>
-- new upstream release
-* Thu May 6 2004 Johan Bilien <jobi@via.ecp.fr>
-- initial release
+- Initial relase
 

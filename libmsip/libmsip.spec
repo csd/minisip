@@ -1,5 +1,5 @@
 %define name		libmsip
-%define version		0.3.1
+%define version		0.7.2
 %define release		1
 
 %define major		0
@@ -24,7 +24,7 @@ RFC3261.
 Summary: 		A C++ library implementing the SIP protocol.
 Group:			System/Libraries
 Provides:		%{name}
-Requires:       	libmutil0 >= 0.3.1
+Requires:       	libmutil0 >= 0.7.2
 
 
 %description -n %{lib_name}
@@ -79,6 +79,8 @@ rm -rf %buildroot
 
 
 %changelog
+* Thu Oct 11 2008 Erik Eliasson <ere@kth.se>
+- new upstream release
 * Fri Mar 18 2005 Johan Bilien <jobi@via.ecp.fr>
 - new upstream release
 * Fri Feb 18 2005 Johan Bilien <jobi@via.ecp.fr>

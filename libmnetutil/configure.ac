@@ -3,7 +3,7 @@ dnl Process this file with autoconf to produce a configure script.
 
 dnl AC_PREREQ(2.57)
 
-m4_MINISIP_PACKAGE_VERSION(libmnetutil, mnetutil, 0, 3, 1)
+m4_MINISIP_PACKAGE_VERSION(libmnetutil, mnetutil, 0, 7, 2)
 m4_MINISIP_PACKAGE_CONTACT([Erik Eliasson], [eliasson@imit.kth.se])
 dnl m4_MINISIP_PACKAGE_RELEASED
 m4_MINISIP_LIBRARY_VERSION(0, 0, 0)

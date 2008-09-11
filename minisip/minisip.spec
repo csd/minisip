@@ -1,21 +1,21 @@
 %define name		minisip
-%define version		0.7.1
+%define version		0.7.2
 %define release		1
 
 Summary: 		A secure SIP user agent
 Name:			%{name}
 Version:		%{version}
 Release:		%{release}
-Packager:		Johan Bilien <jobi@via.ecp.fr>
+Packager:		Erik Eliasson <ere@kth.se>
 License:		GPL
 URL:			http://www.minisip.org/
 Group:			Applications/Communication
 Source:			http://www.minisip.org/source/%{name}-%{version}.tar.gz
 BuildRoot:		%_tmppath/%name-%version-%release-root
-Requires:		libmikey0 >= 0.4.1
-Requires:		libmutil0 >= 0.3.1
-Requires:		libmnetutil0 >= 0.3.1
-Requires:		libmsip0 >= 0.3.1
+Requires:		libmikey0 >= 0.7.2
+Requires:		libmutil0 >= 0.7.2
+Requires:		libmnetutil0 >= 0.7.2
+Requires:		libmsip0 >= 0.7.2
 Requires:		libglademm2 >= 0.2 
 
 
@@ -47,6 +47,8 @@ rm -rf %buildroot
 /usr/share/minisip/insecure.png
 
 %changelog
+* Thu Oct 11 2008 Erik Eliasson <ere@kth.se>
+- new upstream release
 * Fri Mar 17 2005 Johan Bilien <jobi@via.ecp.fr>
 - new upstream release
 * Fri Feb 17 2005 Johan Bilien <jobi@via.ecp.fr>

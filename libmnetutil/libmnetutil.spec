@@ -1,5 +1,5 @@
 %define name		libmnetutil
-%define version		0.3.1
+%define version		0.7.2
 %define release		1
 
 %define major		0
@@ -11,7 +11,7 @@ Version:		%{version}
 Release:		%{release}
 Packager:		Johan Bilien <jobi@via.ecp.fr>
 License:		GPL
-URL:			http://www.minisip.org/libmutil/
+URL:			http://www.minisip.org/
 Group:			System/Libraries
 Source:			http://www.minisip.org/source/%{name}-%{version}.tar.gz
 BuildRoot:		%_tmppath/%name-%version-%release-root
@@ -25,8 +25,7 @@ by the minisip project.
 Summary: 		A C++ library providing various utilities
 Group:			System/Libraries
 Provides:		%{name}
-Requires:       	openssl >= 0.9.6
-Requires:       	libmutil0 >= 0.3.1
+Requires:       	libmutil0 >= 0.7.2
 
 
 %description -n %{lib_name}
@@ -37,7 +36,7 @@ by the minisip project.
 
 
 %package -n %{lib_name}-devel
-Summary: 		Development files for the libmikey library.
+Summary: 		Development files for the libmnetutil library.
 Group:          	Development/C
 Provides:       	%name-devel
 Requires:       	%{lib_name} = %{version}
@@ -83,6 +82,8 @@ rm -rf %buildroot
 
 
 %changelog
+* Thu Oct 11 2008 Erik Eliasson <ere@kth.se>
+- new upstream release
 * Fri Mar 18 2005 Johan Bilien <jobi@via.ecp.fr>
 - new upstream release
 * Fri Feb 18 2005 Johan Bilien <jobi@via.ecp.fr>
