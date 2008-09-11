@@ -104,6 +104,8 @@ AccountDialog::AccountDialog( Glib::RefPtr<Gnome::Glade::Xml>  theRefXml,
 	
 	securitySettings = new SecuritySettings( refXml, certDialog );
 
+	passwordEntry->set_visibility(FALSE); //hide password phrase under *
+
 	autodetectProxyCheckChanged();
 
 	dialogWindow->show_all();
