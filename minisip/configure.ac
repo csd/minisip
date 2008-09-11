@@ -320,5 +320,6 @@ AC_CONFIG_FILES([minisip/Makefile
 			minisip/win32/Makefile
 			minisip/win32/minisip-res.rc
 			share/Makefile
+			debian/Makefile
 			Makefile])
 AC_OUTPUT

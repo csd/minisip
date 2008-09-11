@@ -2,6 +2,7 @@ SUBDIRS = \
 	win32 \
 	include \
 	m4 \
+	debian \
 	source \
 	. \
 	tests

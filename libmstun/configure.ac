@@ -39,6 +39,7 @@ AC_CONFIG_FILES([
 		Makefile
 		libmstun.pc
 		m4/Makefile
+		debian/Makefile
 		include/Makefile
 		include/libmstun/Makefile
 		source/Makefile

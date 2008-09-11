@@ -1,4 +1,4 @@
-SUBDIRS = include m4 win32 source .
+SUBDIRS = include m4 win32 source debian . 
 #DIST_SUBDIRS = $(SUBDIRS) debian
 
 #EXTRA_DIST = libmstun.spec

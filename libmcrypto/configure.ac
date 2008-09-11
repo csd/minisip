@@ -105,6 +105,7 @@ AC_CONFIG_FILES([
 		include/libmcrypto/gnutls/Makefile
 		include/libmcrypto/openssl/Makefile
 		m4/Makefile
+		debian/Makefile
 		source/Makefile
 		source/gnutls/Makefile
 		source/openssl/Makefile

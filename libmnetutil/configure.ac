@@ -106,6 +106,7 @@ AC_CONFIG_FILES([
 		m4/Makefile 
 		tests/Makefile
 		udns/Makefile
+		debian/Makefile
 		win32/Makefile 
 		win32/libmnetutil-res.rc
 	])

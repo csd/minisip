@@ -51,6 +51,7 @@ AC_CONFIG_FILES([
 		libmikey.pc 
 		include/Makefile 
 		m4/Makefile 
+		debian/Makefile 
 		tests/Makefile
 		win32/Makefile 
 		win32/libmikey-res.rc

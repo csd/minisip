@@ -9,7 +9,7 @@ else
 	desktopdir = $(datadir)/applications
 endif
 
-SUBDIRS = include share minisip
+SUBDIRS = include share minisip debian
 
 dist-hook:
 	for i in test_cert Documentation; do \

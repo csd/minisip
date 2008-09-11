@@ -1,6 +1,6 @@
 pkgconfigdir = $(libdir)/pkgconfig
 
-SUBDIRS = libltdl include win32 . examples m4
+SUBDIRS = libltdl include win32 . examples m4 debian
 DIST_SUBDIRS = $(SUBDIRS)
 EXTRA_DIST = libmutil.spec
 

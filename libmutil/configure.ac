@@ -139,6 +139,7 @@ AC_CONFIG_FILES([
 		include/Makefile
 		m4/Makefile
 		win32/Makefile
+		debian/Makefile
 		win32/libmutil-res.rc
 		libmutil.pc
 	])

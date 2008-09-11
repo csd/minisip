@@ -1,7 +1,7 @@
 pkgconfigdir = $(libdir)/pkgconfig
 pluginsdir = $(pkglibdir)/plugins
 
-SUBDIRS = include m4 . tests
+SUBDIRS = include m4 . tests debian
 DIST_SUBDIRS = $(SUBDIRS)
 EXTRA_DIST = libminisip.spec
 
