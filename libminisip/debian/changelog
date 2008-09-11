@@ -1,0 +1,41 @@
+libmsip (0.3.1-2) unstable; urgency=low
+
+  * Create proper packages, on kind suggestion from Filip Van Raemdonck
+      <mechanix@debian.org>:
+          - Add builddeps.
+          - Link to all libraries.
+          - Create shlibs file.
+          - Use dh_install to move files around.
+
+ -- Johan Bilien <jobi@via.ecp.fr>  Fri, 19 Aug 2005 11:40:58 +0200
+
+libmsip (0.3.1-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Johan Bilien <jobi@bilien.org>  Fri, 18 Mar 2005 10:20:30 +0100
+
+libmsip (0.3.0-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Johan Bilien <jobi@bilien.org>  Thu, 17 Feb 2005 14:22:52 +0100
+
+libmsip (0.2.2-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Johan Bilien <jobi@via.ecp.fr>  Mon, 22 Nov 2004 14:47:56 +0100
+
+libmsip (0.2.1-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Johan Bilien <jobi@via.ecp.fr>  Tue, 19 Oct 2004 00:29:07 +0200
+
+libmsip (0.2-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Johan Bilien <jobi@via.ecp.fr>  Wed, 13 Oct 2004 11:06:32 +0200
+
