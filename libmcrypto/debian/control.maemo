@@ -1,0 +1,24 @@
+Source: libmcrypto
+Priority: optional
+Maintainer: Erik Eliasson <ere@kth.se>
+Build-Depends: debhelper (>= 4.0.0), libmutil-dev (>= 0.3.0)
+Standards-Version: 3.6.1
+
+Package: libmcrypto0
+Section: libs
+Architecture: any
+Depends: libmutil0 (>=0.3.1)
+Description: different utilities classes for portable cryptography C++
+ development.
+ .
+ This package contains the libmcrypto0 runtime library.
+
+Package: libmcrypto-dev
+Section: devel
+Architecture: any
+Depends: libmcrypto0 (= ${Source-Version}), libssl-dev (>= 0.9.7), libmutil-dev (>= 0.3.1)
+Description: different utilities classes for portable crypto C++
+ development.
+ .
+ This package contains the header files and static library needed to
+ compile applications that use libmcrypto0.
