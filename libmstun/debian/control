@@ -15,7 +15,7 @@ Description: different utilities classes for portable stun client C++ developmen
 Package: libmstun-dev
 Section: devel
 Architecture: any
-Depends: libmstun0 (= ${Source-Version}), libmnetutil-dev (>= 0.3.1)
+Depends: libmstun0 (= ${Source-Version}), libmnetutil-dev (>= 0.8.0)
 Description: different utilities classes for portable stun client C++ development
  .
  This package contains the header files and static library needed to
