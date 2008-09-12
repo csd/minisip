@@ -8,7 +8,7 @@ pkgincludedir=${includedir}/@PACKAGE@
 Name: @PACKAGE@
 Description: Minisip Cryptography Library (AES, base64, HMAC, X509)
 Version: @VERSION@
-Requires: libmutil >= 0.3.1, libmnetutil >= 0.3.1
+Requires: libmutil >= 0.8.0, libmnetutil >= 0.8.0
 Libs: -L${libdir} -lmcrypto
 Libs.private: @MINISIP_LIBS@ @OPENSSL_LIBS@ @GNUTLS_LIBS@ @SCSIM_LIBS@ @LIBS@
 Cflags: -I${includedir}

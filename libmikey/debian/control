@@ -1,7 +1,7 @@
 Source: libmikey
 Priority: optional
 Maintainer: Johan Bilien <jobi@via.ecp.fr>
-Build-Depends: debhelper (>= 4.0.0), pkg-config, libssl-dev (>= 0.9.7), libmutil-dev (>= 0.3.1)
+Build-Depends: debhelper (>= 4.0.0), pkg-config, libssl-dev (>= 0.9.7), libmutil-dev (>= 0.8.0)
 Standards-Version: 3.6.1
 
 Package: libmikey0
@@ -18,7 +18,7 @@ Description: C++ implementation of the MIKEY (RFC3830) protocol
 Package: libmikey-dev
 Section: devel
 Architecture: any
-Depends: libmikey0 (= ${Source-Version}), libmutil-dev (>= 0.3.1)
+Depends: libmikey0 (= ${Source-Version}), libmutil-dev (>= 0.8.0)
 Description: C++ implementation of the MIKEY (RFC3830) protocol
  libmikey implements the Multimedia Internet KEYing protocol, in a C++
  library. The MIKEY protocol provides authentication and key agreement

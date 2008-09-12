@@ -1,5 +1,5 @@
 %define name		libstun
-%define version		0.7.2
+%define version		0.8.0
 %define release		1
 
 %define major		0
@@ -24,7 +24,7 @@ It is used by the minisip project.
 Summary: 		A C++ library providing various utilities
 Group:			System/Libraries
 Provides:		%{name}
-Requires:       	libmutil0 >= 0.7.2
+Requires:       	libmutil0 >= 0.8.0
 
 
 %description -n %{lib_name}

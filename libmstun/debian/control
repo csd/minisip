@@ -1,7 +1,7 @@
 Source: libmstun
 Priority: optional
 Maintainer: Erik Eliasson <ere@kth.se>
-Build-Depends: debhelper (>= 4.0.0), pkg-config, libmnetutil-dev (>= 0.3.1)
+Build-Depends: debhelper (>= 4.0.0), pkg-config, libmnetutil-dev (>= 0.8.0)
 Standards-Version: 3.6.1
 
 Package: libmstun0

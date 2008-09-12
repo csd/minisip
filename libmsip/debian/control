@@ -1,7 +1,7 @@
 Source: libmsip
 Priority: optional
 Maintainer: Johan Bilien <jobi@via.ecp.fr>
-Build-Depends: debhelper (>= 4.0.0), pkg-config, libmutil-dev (>= 0.3.1), libmnetutil-dev (>= 0.3.1)
+Build-Depends: debhelper (>= 4.0.0), pkg-config, libmutil-dev (>= 0.8.0), libmnetutil-dev (>= 0.8.0)
 Standards-Version: 3.6.1
 
 Package: libmsip0
@@ -18,7 +18,7 @@ Description: C++ implementation of the SIP (RFC3261) protocol
 Package: libmsip-dev
 Section: devel
 Architecture: any
-Depends: libmsip0 (= ${Source-Version}), libmnetutil-dev (>= 0.3.1)
+Depends: libmsip0 (= ${Source-Version}), libmnetutil-dev (>= 0.8.0)
 Description: C++ implementation of the SIP (RFC3261) protocol
  libmsip implements the Session Initiation Protocol, in a C++
  library. The SIP protocol is used mostly to initialize Voice over IP

@@ -8,7 +8,7 @@ pkgincludedir=${includedir}/@PACKAGE@
 Name: @PACKAGE@
 Description: Minisip VoIP Application Support Library
 Version: @VERSION@
-Requires: libmutil >= 0.3.1, libmcrypto >= 0.3.1, libmnetutil >= 0.3.1, libmikey >= 0.3.1, libmsip >= 0.3.1
+Requires: libmutil >= 0.8.0, libmcrypto >= 0.8.0, libmnetutil >= 0.8.0, libmikey >= 0.8.0, libmsip >= 0.8.0
 Libs: -L${libdir} -lminisip
 Libs.private: @MINISIP_LIBS@ @LIBS@
 Cflags: -I${includedir}

@@ -1,5 +1,5 @@
 %define name		libminisip
-%define version		0.7.2
+%define version		0.8.0
 %define release		1
 
 %define major		0
@@ -23,7 +23,7 @@ Application layer library to easily secure VoIP support to applications
 Summary: 		Application layer library to easily create GUI based apps
 Group:			System/Libraries
 Provides:		%{name}
-Requires:       	libmutil0 >= 0.7.2, libmnetutil0 >= 0.7.2, libmikeyl0 >= 0.7.2, libmsipl0 >= 0.7.2, 
+Requires:       	libmutil0 >= 0.8.0, libmnetutil0 >= 0.8.0, libmikeyl0 >= 0.8.0, libmsipl0 >= 0.8.0, 
 
 
 %description -n %{lib_name}

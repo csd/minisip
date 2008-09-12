@@ -84,7 +84,7 @@ else
 AC_CHECK_FUNCS([getifaddrs getnameinfo getaddrinfo freeaddrinfo])
 fi
 
-AM_MINISIP_CHECK_LIBMUTIL([0.3.1])
+AM_MINISIP_CHECK_LIBMUTIL([0.8.0])
 AM_MINISIP_CHECK_COMPLETE
 
 AC_CHECK_FUNCS([poll])

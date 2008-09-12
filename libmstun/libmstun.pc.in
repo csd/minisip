@@ -8,7 +8,7 @@ pkgincludedir=${includedir}/@PACKAGE@
 Name: @PACKAGE@
 Description: Minisip STUN Protocol Support Library
 Version: @VERSION@
-Requires: libmutil >= 0.3.1, libmnetutil >= 0.3.1
+Requires: libmutil >= 0.8.0, libmnetutil >= 0.8.0
 Libs: -L${libdir} -lmstun
 Libs.private: @LIBS@
 Cflags: -I${includedir}

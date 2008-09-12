@@ -12,10 +12,10 @@ URL:			http://www.minisip.org/
 Group:			Applications/Communication
 Source:			http://www.minisip.org/source/%{name}-%{version}.tar.gz
 BuildRoot:		%_tmppath/%name-%version-%release-root
-Requires:		libmikey0 >= 0.7.2
-Requires:		libmutil0 >= 0.7.2
-Requires:		libmnetutil0 >= 0.7.2
-Requires:		libmsip0 >= 0.7.2
+Requires:		libmikey0 >= 0.8.0
+Requires:		libmutil0 >= 0.8.0
+Requires:		libmnetutil0 >= 0.8.0
+Requires:		libmsip0 >= 0.8.0
 Requires:		libglademm2 >= 0.2 
 
 

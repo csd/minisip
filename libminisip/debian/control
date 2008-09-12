@@ -1,7 +1,7 @@
 Source: libminisip
 Priority: optional
 Maintainer: Erik Eliasson <ere@kth.se>
-Build-Depends: debhelper (>= 4.0.0), pkg-config, libmsip-dev (>= 0.3.1), libmikey-dev (>= 0.4.1)
+Build-Depends: debhelper (>= 4.0.0), pkg-config, libmsip-dev (>= 0.8.0), libmikey-dev (>= 0.8.0)
 Standards-Version: 3.6.1
 
 Package: libminisip0
@@ -15,7 +15,7 @@ Description: C++ SIP based software telephone.
 Package: libminisip-dev
 Section: devel
 Architecture: any
-Depends: libminisip0 (= ${Source-Version}), libmsip-dev (>= 0.3.1)
+Depends: libminisip0 (= ${Source-Version}), libmsip-dev (>= 0.8.0)
 Description: C++ SIP based software telephone.
  .
  This package contains the header files and static library needed to

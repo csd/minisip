@@ -1,5 +1,5 @@
 %define name		libmcrypto
-%define version		0.7.2
+%define version		0.8.0
 %define release		1
 
 %define major		0
@@ -25,7 +25,7 @@ Summary: 		A C++ library providing various utilities
 Group:			System/Libraries
 Provides:		%{name}
 Requires:       	openssl >= 0.9.6
-Requires:       	libmnetutil0 >= 0.7.2
+Requires:       	libmnetutil0 >= 0.8.0
 
 
 %description -n %{lib_name}

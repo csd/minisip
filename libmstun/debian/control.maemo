@@ -1,13 +1,13 @@
 Source: libmstun
 Priority: optional
 Maintainer: Erik Eliasson <ere@kth.se>
-Build-Depends: debhelper (>= 4.0.0), libmnetutil-dev (>=0.3.1)
+Build-Depends: debhelper (>= 4.0.0), libmnetutil-dev (>=0.8.0)
 Standards-Version: 3.6.1
 
 Package: libmstun0
 Section: libs
 Architecture: any
-Depends: libmutil0 (>=0.3.1)
+Depends: libmutil0 (>=0.8.0)
 Description: different utilities classes for portable STUN client C++ development
  .
  This package contains the libmstun0 runtime library.
@@ -15,7 +15,7 @@ Description: different utilities classes for portable STUN client C++ developmen
 Package: libmstun-dev
 Section: devel
 Architecture: any
-Depends: libmstun0 (= ${Source-Version}), libmnetutil-dev (>= 0.3.1)
+Depends: libmstun0 (= ${Source-Version}), libmnetutil-dev (>= 0.8.0)
 Description: different utilities classes for portable STUN client C++ development
  .
  This package contains the header files and static library needed to
