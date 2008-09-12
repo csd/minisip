@@ -2,7 +2,7 @@ dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 
 
-m4_MINISIP_PACKAGE_VERSION(libmstun, mstun, 0, 5, 0)
+m4_MINISIP_PACKAGE_VERSION(libmstun, mstun, 0, 8, 0)
 m4_MINISIP_PACKAGE_CONTACT([The Minisip developer team], [minisip-users@minisip.org])
 dnl m4_MINISIP_PACKAGE_RELEASED
 m4_MINISIP_LIBRARY_VERSION(0, 0, 0)

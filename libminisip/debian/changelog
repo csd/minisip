@@ -1,6 +1,5 @@
-libminisip (0.3-1) unstable; urgency=low
+libminisip (0.8) unstable; urgency=low
 
-  * Initial Release.
+  * Initial release
 
- -- Erik Eliasson <ere@kth.se>  Wed, 10 Oct 2008 12:00:00 +0200
-
+ -- Erik Eliasson <erik@dev.minisip.org>  Fri, 12 Sep 2008 12:35:35 +0200

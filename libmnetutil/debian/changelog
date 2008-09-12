@@ -1,3 +1,9 @@
+libmnetutil (0.8) unstable; urgency=low
+
+  * Version bump
+
+ -- Erik Eliasson <erik@dev.minisip.org>  Fri, 12 Sep 2008 12:31:20 +0200
+
 libmnetutil (0.3.1-2) unstable; urgency=low
 
   * Create proper packages:

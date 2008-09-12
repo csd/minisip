@@ -1,3 +1,9 @@
+libmutil (0.8) unstable; urgency=low
+
+  * Version bump
+
+ -- Erik Eliasson <erik@dev.minisip.org>  Fri, 12 Sep 2008 12:30:58 +0200
+
 libmutil (0.3.1-2) unstable; urgency=low
 
   * Create proper packages, on kind suggestion from Filip Van Raemdonck

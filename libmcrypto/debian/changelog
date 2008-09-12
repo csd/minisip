@@ -1,12 +1,5 @@
-libmcrypto (0.4.0-1) unstable; urgency=low
+libmcrypto (0.8) unstable; urgency=low
 
-  * New nightly build.
+  * Initial release
 
- -- erik <erik@dhcp-125-208.ssvl.kth.se>  Thu, 11 Sep 2008 14:40:09 +0200
-
-libmcrypto (0.4-1) unstable; urgency=low
-
-  * Initial Release.
-
- -- Erik Eliasson <ere@kth.se>  Wed, 10 Oct 2008 12:00:00 +0200
-
+ -- Erik Eliasson <erik@dev.minisip.org>  Fri, 12 Sep 2008 12:32:03 +0200

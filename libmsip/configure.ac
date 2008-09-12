@@ -3,7 +3,7 @@ dnl Process this file with autoconf to produce a configure script.
 
 dnl AC_PREREQ(2.57)
 
-m4_MINISIP_PACKAGE_VERSION(libmsip, msip, 0, 7, 2)
+m4_MINISIP_PACKAGE_VERSION(libmsip, msip, 0, 8, 0)
 m4_MINISIP_PACKAGE_CONTACT([Erik Eliasson], [ere@kth.se])
 dnl m4_MINISIP_PACKAGE_RELEASED
 m4_MINISIP_LIBRARY_VERSION(0, 0, 0)
