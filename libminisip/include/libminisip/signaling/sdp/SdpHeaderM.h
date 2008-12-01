@@ -38,6 +38,7 @@
 
 #include<libminisip/signaling/sdp/SdpHeader.h>
 #include<libminisip/signaling/sdp/SdpHeaderC.h>
+#include<libminisip/signaling/sdp/SdpHeaderI.h>
 #include<vector>
 
 class SdpHeaderA;
@@ -82,6 +83,9 @@ class LIBMINISIP_API SdpHeaderM : public SdpHeader{
 		void setConnection( MRef<SdpHeaderC*> c );
 		MRef<SdpHeaderC*> getConnection();
 		
+		void setInformation(MRef<SdpHeaderI*> i);
+		MRef<SdpHeaderI*> getInformation();
+		
 	private:
 		std::string media;
 		int32_t port;
@@ -90,6 +94,6 @@ class LIBMINISIP_API SdpHeaderM : public SdpHeader{
 		std::vector<std::string> formats;
 		std::list<MRef<SdpHeaderA*> >attributes;
 		MRef<SdpHeaderC*> connection;
+		MRef<SdpHeaderI*> information;
 };
-
 #endif

@@ -202,6 +202,9 @@ string SdpHeaderM::getString(){
 
 	if( connection )
 		ret += "\r\n" + connection->getString();
+		
+	if( information )
+		ret += "\r\n" + information->getString();		
 
 	return ret;
 }
@@ -268,4 +271,11 @@ void SdpHeaderM::setConnection( MRef<SdpHeaderC*> c ){
 
 MRef<SdpHeaderC*> SdpHeaderM::getConnection(){
 	return connection;
+}
+void SdpHeaderM::setInformation(MRef<SdpHeaderI*> i) {
+	information = i;
+}
+
+MRef<SdpHeaderI*> SdpHeaderM::getInformation() {
+	return information;
 }
