@@ -75,9 +75,14 @@ SdpPacket::SdpPacket(string build_from) /*: MObject("SdpPacket")*/{
 			case 's':
 				addHeader(MRef<SdpHeader*>(new SdpHeaderS(lines[i])));
 				break;
-			case 'i':
-				addHeader(MRef<SdpHeader*>(new SdpHeaderI(lines[i])));
+			case 'i':{
+				MRef<SdpHeaderI*> in = new SdpHeaderI(lines[i]);
+				if( lastM )
+					lastM->setInformation(in);
+				else
+					addHeader(*in);
 				break;
+				}
 			case 'c':{
 				MRef<SdpHeaderC*> c = new SdpHeaderC(lines[i]);
 				if( lastM )
