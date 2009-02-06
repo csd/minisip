@@ -24,7 +24,11 @@
 
 #ifndef AVDECODER_H
 #define AVDECODER_H
+
+extern "C"{
 #include<avcodec.h>
+}
+
 #include<libmutil/MemObject.h>
 #include<string>
 

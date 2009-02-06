@@ -27,6 +27,8 @@
 #include<sys/time.h>
 #include<libminisip/media/video/VideoException.h>
 #include<X11/Xatom.h>
+#include<stdlib.h>
+#include<string.h>
 
 using namespace std;
 
