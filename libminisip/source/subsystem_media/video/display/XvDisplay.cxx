@@ -26,6 +26,7 @@
 #include"XvDisplay.h"
 #include<sys/time.h>
 #include<libminisip/media/video/VideoException.h>
+#include<stdlib.h>
 
 using namespace std;
 
