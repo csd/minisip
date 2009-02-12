@@ -29,6 +29,8 @@
 #include <windows.h>
 #include <winldap.h>
 #else
+//FIXME: We use a depricated version of the API.
+#define LDAP_DEPRECATED 1
 #include <ldap.h>
 #endif
 #endif

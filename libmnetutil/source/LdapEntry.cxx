@@ -30,6 +30,9 @@
 #include <winldap.h>
 #include <winber.h>
 #else
+// FIXME: We use the deprecated API. This should be updated to the newest
+// one.
+#define LDAP_DEPRECATED 1
 #include <ldap.h>
 #include <lber.h>
 #endif
