@@ -317,8 +317,8 @@ dnl first check for libavcodec
           FFMPEG_CFLAGS="`ffmpeg-config --cflags`"
           FFMPEG_LIBS="`ffmpeg-config --libs avcodec`"
 	else
-	  FFMPEG_CFLAGS=
-	  FFMPEG_LIBS="-lavcodec -lz"
+	  FFMPEG_CFLAGS="`pkg-config libavcodec --cflags`"
+	  FFMPEG_LIBS="`pkg-config libavcodec --libs`"
 	fi
 
 	LIBS="${FFMPEG_LIBS} ${LIBS}"
