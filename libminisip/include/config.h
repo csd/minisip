@@ -47,7 +47,7 @@
 #	endif	 // DLL_EXPORT
 #endif	// LIBMINISIP_EXPORTS
 
-#define SOUND_CARD_FREQ 48000
+#define SOUND_CARD_FREQ 16000
 
 #if defined _MSC_VER || defined __MINGW32__
 #	ifndef WIN32
