@@ -77,7 +77,7 @@ MRef<Media*> AudioPlugin::createMedia( MRef<SipSoftPhoneConfiguration *> config 
 	MRef<SoundIO *> soundIo = new SoundIO( sounddevin, sounddevout,
 					       config->soundIOmixerType, 
 					       2,  //number of channels
-					       48000 ); //sampling rate
+					       SOUND_CARD_FREQ ); //sampling rate
 
 	std::list<MRef<Codec *> > codecList;
 	std::list<std::string>::iterator iCodec;
