@@ -291,6 +291,38 @@ dnl #############
 dnl VIDEO SUPPORT
 dnl #############
 
+
+dnl compile for Matrox Imaging library
+AC_ARG_ENABLE(mil,
+    AS_HELP_STRING([--enable-mil],
+    	[enables Matrox Imaging Library support for HD grabbing (default disabled)]),
+    [ if test "${enable_mil}" = "yes"
+      then
+	LDFLAGS_SAVE="${LDFLAGS}"
+	CPPFLAGS_SAVE="${CPPFLAGS}"
+	MATROX_LDFLAGS="-L${MILDIR}/lib"
+	MATROX_CPPFLAGS="-I${MILDIR}/include"
+	LDFLAGS="${LDFLAGS} ${MATROX_LDFLAGS}"
+	CPPFLAGS="${CPPFLAGS} ${MATROX_CPPFLAGS}"
+	AC_CHECK_HEADERS([mil.h],
+         [
+             AC_CHECK_LIB([mil],[main], [
+               VIDEO_GRABBER="${VIDEO_GRABBER} mil}"
+               MATROX_VIDEO_GRABBER="yes"
+               AC_DEFINE(MATROX_SUPPORT, [], [Compile Matrox imaging library grabber support. Wrong MILDIR environmen variablet?])
+               MATROX_LIBS="-lmil"
+               ], [AC_MSG_ERROR([Could not find MIL library (-lmil) Wrong MILDIR environment variable?])], [-lmil])
+               AC_SUBST(MATROX_LIBS)
+               AC_SUBST(MATROX_LDFLAGS)
+               AC_SUBST(MATROX_CPPFLAGS)
+             ], [AC_MSG_ERROR([Could not find mil.h])] )
+
+	LDFLAGS="${LDFLAGS_SAVE}"
+	CPPFLAGS="${CPPFLAGS_SAVE}"
+      fi ])
+
+
+
 AC_ARG_ENABLE(sdl,
     AS_HELP_STRING([--enable-sdl],
     	[enables SDL video output (if present)]))
@@ -457,6 +489,7 @@ AC_SUBST(X_EXTRA_LIBS)
 AM_CONDITIONAL(VIDEO_SUPPORT, test "${enable_video}" = "yes")
 AM_CONDITIONAL(V4L_VIDEO_GRABBER, test "${V4L_VIDEO_GRABBER}" = "yes")
 AM_CONDITIONAL(DC1394_VIDEO_GRABBER, test "${DC1394_VIDEO_GRABBER}" = "yes")
+AM_CONDITIONAL(MATROX_VIDEO_GRABBER, test "${MATROX_VIDEO_GRABBER}" = "yes")
 AM_CONDITIONAL(XV_VIDEO_DISPLAY, test "${XV_VIDEO_DISPLAY}" = "yes")
 AM_CONDITIONAL(SDL_VIDEO_DISPLAY, test "${SDL_VIDEO_DISPLAY}" = "yes")
 

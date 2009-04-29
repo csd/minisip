@@ -350,6 +350,17 @@ mdc1394_la_SOURCES = source/subsystem_media/video/grabber/Dc1394Grabber.cxx \
 mdc1394_la_LIBADD = libminisip_video.la libminisip.la $(MINISIP_LIBS) $(DC1394_LIBS)
 endif
 
+
+if MATROX_VIDEO_GRABBER
+plugins_LTLIBRARIES += matrox.la
+matrox_la_CPPFLAGS = $(MINISIP_CFLAGS) $(AVCODEC_CPPFLAGS) $(FFMPEG_CFLAGS) $(MATROX_CPPFLAGS)
+matrox_la_LDFLAGS = $(plugins_LDFLAGS) $(MATROX_LDFLAGS)
+matrox_la_SOURCES = source/subsystem_media/video/grabber/MatroxGrabber.cxx \
+                        source/subsystem_media/video/grabber/MatroxGrabber.h
+matrox_la_LIBADD = libminisip_video.la libminisip.la $(MINISIP_LIBS) $(MATROX_LIBS)
+endif
+
+
         mixer_src = source/subsystem_media/video/mixer/ImageMixer.cxx
 
         codec_src = source/subsystem_media/video/codec/AVCoder.cxx \
