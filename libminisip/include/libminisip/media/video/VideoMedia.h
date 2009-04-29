@@ -47,6 +47,9 @@ class AVDecoder;
 class ImageMixer;
 class RtpPacket;
 
+//1920x1080x3 - uncompressed full-hd RGBA 24
+#define MAX_ENCODED_FRAME_SIZE 6220800
+
 class LIBMINISIP_API VideoMedia : public RealtimeMedia,
 				  public VideoEncoderCallback{
 
@@ -119,8 +122,9 @@ class LIBMINISIP_API VideoMediaSource : public MObject {
 		uint32_t width;
 		uint32_t height;
 
-		byte_t frame[100000];
+		byte_t frame[MAX_ENCODED_FRAME_SIZE];
 		uint32_t index;
+		uint32_t nbytesReceived;
 		bool packetLoss;
 		bool firstSeqNo;
 		uint16_t expectedSeqNo;
