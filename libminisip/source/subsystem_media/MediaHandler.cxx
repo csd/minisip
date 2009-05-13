@@ -141,6 +141,10 @@ MRef<Session *> MediaHandler::createSession( MRef<SipIdentity*> id, string callI
 			rStream = new RealtimeMediaStreamReceiver( callId, rtm, rtpReceiver, rtp6Receiver );
 			session->addRealtimeMediaStreamReceiver( rStream );
 
+/* FIXME: The call recorder makes the audio output sound bad. Most likely,
+ * it causes incoming audio to be put into the jitter buffer twice which
+ * makes it overflow. Not sure why. FIXME.
+
 			// Need to dereference MRef:s, Can't compare MRef:s
 			// of different types
 			if( *rtm == *audioMedia ) {
@@ -148,6 +152,8 @@ MRef<Session *> MediaHandler::createSession( MRef<SipIdentity*> id, string callI
 				cr = new CallRecorder( audioMedia, rtpReceiver, ipProvider );
 				session->callRecorder = cr;
 			}
+*/
+
 #ifdef ZRTP_SUPPORT
 		    if(/*securityConfig.use_zrtp*/ id->use_zrtp) {
 #ifdef DEBUG_OUTPUT
