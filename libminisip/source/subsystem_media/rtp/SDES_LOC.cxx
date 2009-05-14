@@ -33,7 +33,7 @@
 
 using namespace std;
 
-SDES_LOC::SDES_LOC(void *buildfrom, int max_length){
+SDES_LOC::SDES_LOC(void *buildfrom, int /*max_length*/){
 	unsigned char *lengthptr = (unsigned char *)buildfrom;
 	lengthptr++;
 	length=*lengthptr;

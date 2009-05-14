@@ -111,7 +111,6 @@ void SdpHeaderA::getAttFromFileSelector(){
 			filename = ( attributes.substr(pos2+2,(searchname-pos2-2)) );
 			//cerr<<filename<<endl;
 		}	
-		else;
 		if( attributes.substr(pos, 4) == "type"){
 			type = true;
 			searchtype = (int)attributes.find(" ",pos2);
@@ -119,7 +118,6 @@ void SdpHeaderA::getAttFromFileSelector(){
 			filetype = ( attributes.substr(pos2+1,(searchtype-pos2)) );
 			//cerr<<filetype<<endl;
 		}
-		else;
 		if( attributes.substr(pos, 4) == "size"){
 			size = true;
 			searchsize = (int)attributes.find(" ", pos2);
@@ -127,7 +125,6 @@ void SdpHeaderA::getAttFromFileSelector(){
 			filesizes = ( attributes.substr(pos2+1,(searchsize-pos2)) );
 			//cerr<<filesizes<<endl;
 		}	
-		else;
 		if( attributes.substr(pos, 4) == "hash"){
 			hash = true;
 			poshash = (int)attributes.find( ":", pos2+1);
@@ -136,7 +133,6 @@ void SdpHeaderA::getAttFromFileSelector(){
 			//cerr<<"used hash "<<hashused<<endl;
 			//cerr<<"hash "<<hashforfile<<endl;
 		}
-		else;
 	
 		pos2++;
 		pos = pos2;

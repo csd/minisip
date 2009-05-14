@@ -42,7 +42,7 @@ using namespace std;
 
 CallRecorder::CallRecorder(  MRef<AudioMedia *> aMedia, 
 				MRef<RtpReceiver *> rtpReceiver_,
-				MRef<IpProvider *> ipProvider ):
+				MRef<IpProvider *> /*ipProvider*/ ):
 		RealtimeMediaStreamReceiver( "callrecorder", (RealtimeMedia *)*aMedia, rtpReceiver_ ),
 		enabledMic(false),
 		enabledNtwk(false),
@@ -119,7 +119,7 @@ void CallRecorder::setFilename( string name, int ssrc ) {
 
 //we receive the audio from the mic via this function ...(from SoundIO)
 //length is in samples
-void CallRecorder::srcb_handleSound(void *samplearr, int nSamples) {
+void CallRecorder::srcb_handleSound(void *samplearr, int /*nSamples*/) {
 	//printf( "YY" );
 	if( !allowStart ) { return; }
 	if( !enabledMic ) { return; }
@@ -140,7 +140,7 @@ void CallRecorder::srcb_handleSound(void *samplearr, int nSamples) {
 
 //This function receives the audio from the mediastreamreceiver, that is,
 //from the network
-void CallRecorder::handleRtpPacket( MRef<SRtpPacket *> packet, MRef<IPAddress *> from ) {
+void CallRecorder::handleRtpPacket( MRef<SRtpPacket *> packet, MRef<IPAddress *> /*from*/ ) {
 	if( !allowStart ) { return; }
 	if( ! enabledNtwk ) { return; }
 

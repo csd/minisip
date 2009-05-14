@@ -33,7 +33,7 @@
 
 using namespace std;
 
-SDES_PHONE::SDES_PHONE(void *buildfrom, int max_length){
+SDES_PHONE::SDES_PHONE(void *buildfrom, int /*max_length*/){
 	unsigned char *lengthptr = (unsigned char *)buildfrom;
 	lengthptr++;
 	length=*lengthptr;

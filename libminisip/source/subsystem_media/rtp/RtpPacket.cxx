@@ -142,7 +142,7 @@ void RtpPacket::sendTo(UDPSocket &udp_sock, IPAddress &to_addr, int port){
     delete [] bytes;
 }
 
-RtpPacket *RtpPacket::readPacket(UDPSocket &rtp_socket, int timeout){
+RtpPacket *RtpPacket::readPacket(UDPSocket &rtp_socket, int /*timeout*/){
 #define UDP_SIZE 65536
     int i;
     uint8_t buf[UDP_SIZE];
@@ -226,7 +226,7 @@ int RtpPacket::size() {
     return header.size() + content_length + extensionLength + zrtpChecksum;
 }
 
-bool RtpPacket::checkZrtpChecksum(bool check) {
+bool RtpPacket::checkZrtpChecksum(bool /*check*/) {
     if (content_length >= 2) {
         content_length -= 2;
     }
