@@ -36,6 +36,9 @@
 
 #include<libmutil/CircularBuffer.h>
 
+//jitter buffer size in units of 20ms
+#define CIRCULAR_BUFFER_SIZE 5
+
 using namespace std;
 
 SoundSource::SoundSource(int id, string cId):sourceId(id),callid(cId){
@@ -93,7 +96,7 @@ BasicSoundSource::BasicSoundSource(int32_t id,
 	//         For now, we do 20ms * 5 = 100ms
 	//	We can set this even smaller ... but then we may have problems
 	//	if rtp packets come in burst  ... 
-	cbuff = new CircularBuffer( iFrames * oNChannels * 3 );
+	cbuff = new CircularBuffer( iFrames * oNChannels * CIRCULAR_BUFFER_SIZE );
 
 	/* spatial audio initialization */
 	leftch = new short[1028];
