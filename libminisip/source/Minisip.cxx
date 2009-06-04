@@ -181,10 +181,11 @@ Minisip::Minisip( MRef<Gui *> g, int /*argc*/, char **argv ) : gui(g){
 
 	string pluginPath = argv ? argv[0] : "";
 	int i=0;
-	char *a;
+	char *a=NULL;
 	do{	
 		char *path;
-		a = argv[i++];
+		if (argv)
+			a = argv[i++];
 		if (a && a[0]=='-'){
 			switch (a[1]){
 				case 'p':

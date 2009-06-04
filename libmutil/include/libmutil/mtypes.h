@@ -6,7 +6,7 @@
 #ifdef _MSC_VER
 
 #ifndef int8_t
-typedef char int8_t;
+typedef signed char int8_t;
 #endif
 
 #ifndef uint8_t

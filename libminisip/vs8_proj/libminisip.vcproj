@@ -185,6 +185,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\source\subsystem_media\RealtimeMedia.cxx"
+				>
+			</File>
+			<File
+				RelativePath="..\source\subsystem_media\ReliableMedia.cxx"
+				>
+			</File>
+			<File
 				RelativePath="..\source\subsystem_media\soundcard\AudioMixer.cxx"
 				>
 			</File>
@@ -576,6 +584,14 @@
 			</File>
 			<File
 				RelativePath="..\include\libminisip\media\AudioMedia.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\libminisip\media\RealtimeMedia.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\libminisip\media\ReliableMedia.h"
 				>
 			</File>
 			<File

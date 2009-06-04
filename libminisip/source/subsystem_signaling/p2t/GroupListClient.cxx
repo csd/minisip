@@ -36,7 +36,7 @@
 
 #ifdef WIN32
 /* Headerfiles for Windows */
-#include <winsock.h>
+#include <winsock2.h>
 #include <io.h>
 
 #else

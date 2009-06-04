@@ -371,6 +371,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\source\SipMessageContentUnknown.cxx"
+				>
+			</File>
+			<File
 				RelativePath="..\source\messages\SipRequest.cxx"
 				>
 			</File>
@@ -666,6 +670,10 @@
 			</File>
 			<File
 				RelativePath="..\include\libmsip\SipMessageContentMime.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\libmsip\SipMessageContentUnknown.h"
 				>
 			</File>
 			<File
