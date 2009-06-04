@@ -25,6 +25,7 @@ pkginclude_HEADERS = libmsip/SipHeader.h \
                      libmsip/SipHeaderRequire.h \
                      libmsip/SipHeaderRoute.h \
                      libmsip/SipHeaderSubject.h \
+                     libmsip/SipHeaderSnakeSM.h \
                      libmsip/SipHeaderSubscriptionState.h \
                      libmsip/SipHeaderSupported.h \
                      libmsip/SipHeaderString.h \

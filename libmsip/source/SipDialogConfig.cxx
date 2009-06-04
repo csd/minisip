@@ -345,8 +345,8 @@ void SipIdentity::setPsk( string key ){
 // SipTransportConfig::SipTransportConfig(){
 // }
 
-SipTransportConfig::SipTransportConfig( const std::string &name ):
-		name( name ), enabled( false )
+SipTransportConfig::SipTransportConfig( const std::string &_name ):
+		name( _name ), enabled( false )
 {
 }
 
@@ -358,8 +358,8 @@ bool SipTransportConfig::isEnabled() const{
 	return enabled;
 }
 
-void SipTransportConfig::setEnabled( bool enabled ){
-	this->enabled = enabled;
+void SipTransportConfig::setEnabled( bool _enabled ){
+	this->enabled = _enabled;
 }
 
 int SipTransportConfig::operator==( const SipTransportConfig &dev ) const{
@@ -393,7 +393,7 @@ SipDialogConfig::SipDialogConfig(MRef<SipStack*> stack) {
 
 void SipDialogConfig::useIdentity(
 			MRef<SipIdentity*> id,
-			string transport)
+			string /*transport*/ )
 {
 	this->sipIdentity=id;
 //	inherited->sipIdentity = identity;

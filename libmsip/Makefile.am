@@ -106,6 +106,7 @@ msip_src =           source/SipDialogConfig.cxx \
                      source/headers/SipHeaderRoute.cxx \
                      source/headers/SipHeaderString.cxx \
                      source/headers/SipHeaderSubject.cxx \
+                     source/headers/SipHeaderSnakeSM.cxx \
                      source/headers/SipHeaderSubscriptionState.cxx \
                      source/headers/SipHeaderSupported.cxx \
                      source/headers/SipHeaderTo.cxx \
