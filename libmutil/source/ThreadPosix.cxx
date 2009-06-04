@@ -186,6 +186,9 @@ static void signalHandler(int signum, siginfo_t* info, void*ptr) {
 #endif	// SIGSEGV_NOSTACK
 }
 
+#ifndef SA_ONESHOT
+#define SA_ONESHOT SA_RESETHAND
+#endif
 
 static bool handleSignal(int sig){
 	struct sigaction sa;
@@ -443,7 +446,7 @@ bool Thread::kill( const ThreadHandle &h) {
 ThreadHandle Thread::getCurrent() {
 	ThreadHandle th;
 	//*((pthread_t*)th.hptr) = pthread_self();
-	th.handle = pthread_self();
+	th.handle = (uint64_t)pthread_self();
         return th;
 }
 
