@@ -261,6 +261,7 @@ class LIBMSIP_API SipDialog : public SipSMCommandReceiver, public StateMachine<S
 		
 		bool updateAuthentication( MRef<SipResponse*> resp,
 					   MRef<SipHeaderValueProxyAuthenticate*> auth);
+		void clearAuthentications();
 	private:
 		
 		///the dialog configuration

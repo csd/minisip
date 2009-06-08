@@ -175,6 +175,11 @@ bool SipDialogRegister::a1_trying_registred_2xx( const SipSMCommand &command){
 				SipCommandString::proxy_register);
 		} 
 
+		//Un-registering is done in the same dialog. With (a
+		//configuration of?) opensips, we don't un-register
+		//correctly by using the authentication state from
+		//when we registred.
+		clearAuthentications();
 		return true;
 	}else{
 		return false;

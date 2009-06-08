@@ -295,8 +295,13 @@ void SipDialog::sendSipMessage( MRef<SipMessage*> msg, int queue ){
 	(*(MRef<SipStackInternal*> *) callConfig->sipStack->sipStackInternal)->getDispatcher()->enqueueCommand( cmd, queue );
 }
 
+void SipDialog::clearAuthentications(){
+	dialogState.auths.clear();
+}
+
 bool SipDialog::updateAuthentication( MRef<SipResponse*> resp,
 				      MRef<SipHeaderValueProxyAuthenticate*> auth){
+
 	if (strCaseCmp(auth->getAuthMethod().c_str(), "DIGEST"))
 		return false;
 
