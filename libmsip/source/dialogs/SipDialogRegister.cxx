@@ -179,7 +179,7 @@ bool SipDialogRegister::a1_trying_registred_2xx( const SipSMCommand &command){
 		//configuration of?) opensips, we don't un-register
 		//correctly by using the authentication state from
 		//when we registred.
-		clearAuthentications();
+//		clearAuthentications();
 		return true;
 	}else{
 		return false;
