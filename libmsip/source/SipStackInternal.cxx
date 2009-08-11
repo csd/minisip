@@ -57,6 +57,7 @@
 #include<libmsip/SipHeaderAuthorization.h>
 #include<libmsip/SipHeaderRequire.h>
 #include<libmsip/SipHeaderSubject.h>
+#include<libmsip/SipHeaderSnakeSM.h>
 #include<libmsip/SipHeaderSubscriptionState.h>
 #include<libmsip/SipHeaderSupported.h>
 #include<libmsip/SipHeaderUnsupported.h>
@@ -109,6 +110,7 @@ SipStackInternal::SipStackInternal( MRef<SipStackConfig *> stackConfig )
 	SipHeader::headerFactories.addFactory("Require", sipHeaderRequireFactory);
 	SipHeader::headerFactories.addFactory("Refer-To", sipHeaderReferToFactory);
 	SipHeader::headerFactories.addFactory("Route", sipHeaderRouteFactory);
+	SipHeader::headerFactories.addFactory("Snake-SM", sipHeaderSnakeSMFactory);
 	SipHeader::headerFactories.addFactory("Subject", sipHeaderSubjectFactory);
 	SipHeader::headerFactories.addFactory("s", sipHeaderSubjectFactory);
 	SipHeader::headerFactories.addFactory("Subscription-State", sipHeaderSubscriptionStateFactory);
