@@ -34,6 +34,7 @@
 #include<libmsip/SipResponse.h>
 #include<libmsip/SipHeaderContact.h>
 #include<libmsip/SipHeaderFrom.h>
+#include<libmsip/SipHeaderSnakeSM.h>
 #include<libmsip/SipHeaderSupported.h>
 #include<libmsip/SipAuthenticationDigest.h>
 #include<libmsip/SipCommandString.h>
@@ -166,6 +167,15 @@ bool SipDialogRegister::a1_trying_registred_2xx( const SipSMCommand &command){
 		//this is for the shutdown dialog 
 		SipSMCommand cmd( cmdstr, SipSMCommand::dialog_layer, SipSMCommand::dispatcher );
 		getSipStack()->enqueueCommand( cmd, HIGH_PRIO_QUEUE ); 
+
+		MRef<SipHeaderValue*> snakehdr = pkt->getHeaderValueNo(SIP_HEADER_TYPE_SNAKESM, 0);
+		if (snakehdr){
+			MRef<SipHeaderValueSnakeSM*> h = dynamic_cast<SipHeaderValueSnakeSM*>(*snakehdr);
+			string serviceManager=h->getString();
+			CommandString cmdstr( dialogState.callId, "service_manager", serviceManager);
+			getSipStack()->getCallback()->handleCommand("snake", cmdstr );
+		}
+
 
 		//request a timeout to retx a proxy_register only if we are registered ... 
 		//otherwise we would just be unregistering every now and then ...
