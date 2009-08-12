@@ -44,24 +44,20 @@ PresenceService::PresenceService(MRef<CommandReceiver*> c, MRef<SipSoftPhoneConf
 void PresenceService::registerContacts(){
 	list<string> contacts;
 
-	cerr << "EEEE: Contacts: "<<endl;
 	std::list<MRef<PhoneBook *> >::iterator i;
 	for (i=pconf->phonebooks.begin(); i!=pconf->phonebooks.end() ; i++){
 		list< MRef<PhoneBookPerson *> > persons = (*i)->getPersons();
 		list< MRef<PhoneBookPerson *> >::iterator j;
 		for (j=persons.begin(); j!=persons.end(); j++){
-			cerr << "EEEE: name="<<(*j)->getName()<<endl;
 			list< MRef<ContactEntry *> > entries = (*j)->getEntries();
 			list< MRef<ContactEntry *> >::iterator ent;
 			for (ent=entries.begin(); ent!=entries.end(); ent++){
-				cerr << "EEEE: uri="<<(*ent)->getUri()<<endl;
 				contacts.push_back( (*ent)->getUri() );
 			}
 		
 		}
 	}
 
-	cerr << "EEEE: PresenceService::registerContacts started"<<endl;
 	bool quit=false;
 	axutil_env_t *env = NULL;
 	axis2_char_t *client_home = NULL;
@@ -72,9 +68,7 @@ void PresenceService::registerContacts(){
 	env = axutil_env_create_all("alltest.log", AXIS2_LOG_LEVEL_TRACE);
 	client_home = AXIS2_GETENV("AXIS2C_HOME");
 
-	cerr<<"EEEE: connecting to callback web service at "<< url <<endl;
 	stub = axis2_stub_create_PresenceAgentUserStubService(env, client_home, endpoint_uri);
-	cerr<<"EEEE: connecting to callback web service done"<<endl;
 
 	adb_setContactList8_t* req_c = adb_setContactList8_create(env);
 
@@ -84,8 +78,6 @@ void PresenceService::registerContacts(){
 	list<string>::iterator si;
 	for (si=contacts.begin(); si!=contacts.end(); si++){
 		adb_setContactList_add_contactAddress(req, env, (*si).c_str() );
-
-
 	}
 	adb_setContactList8_set_setContactList(req_c, env, req);
 
@@ -123,6 +115,96 @@ void PresenceService::registerContacts(){
 
 }
 
+void PresenceService::statusUpdated(){
+	cerr << "EEEE: PresenceService::statusUpdated running"<<endl;
+	list<string> contacts;
+
+	std::list<MRef<PhoneBook *> >::iterator i;
+	for (i=pconf->phonebooks.begin(); i!=pconf->phonebooks.end() ; i++){
+		list< MRef<PhoneBookPerson *> > persons = (*i)->getPersons();
+		list< MRef<PhoneBookPerson *> >::iterator j;
+		for (j=persons.begin(); j!=persons.end(); j++){
+			list< MRef<ContactEntry *> > entries = (*j)->getEntries();
+			list< MRef<ContactEntry *> >::iterator ent;
+			for (ent=entries.begin(); ent!=entries.end(); ent++){
+				contacts.push_back( (*ent)->getUri() );
+			}
+		
+		}
+	}
+
+	bool quit=false;
+	axutil_env_t *env = NULL;
+	axis2_char_t *client_home = NULL;
+	axis2_char_t *endpoint_uri = NULL;
+	axis2_stub_t *stub = NULL;
+
+	endpoint_uri = (axis2_char_t*)url.c_str();
+	env = axutil_env_create_all("alltest.log", AXIS2_LOG_LEVEL_TRACE);
+	client_home = AXIS2_GETENV("AXIS2C_HOME");
+
+	stub = axis2_stub_create_PresenceAgentUserStubService(env, client_home, endpoint_uri);
+
+	adb_getStatuses10_t* req_c = adb_getStatuses10_create(env);
+	adb_getStatuses_t* req = adb_getStatuses_create( env );
+	adb_getStatuses_set_sessionId(req, env, id.c_str() );
+
+	list<string>::iterator si;
+	for (si=contacts.begin(); si!=contacts.end(); si++){
+		adb_getStatuses_add_userAddress(req, env, (*si).c_str() );
+	}
+
+	adb_getStatuses10_set_getStatuses(req_c, env, req);
+
+	adb_getStatusesResponse0_t* resp_c = axis2_stub_op_PresenceAgentUserStubService_getStatuses(stub, env, req_c );
+
+	adb_getStatusesResponse_t* resp = adb_getStatusesResponse0_get_getStatusesResponse(resp_c, env);
+
+	int n = adb_getStatusesResponse_sizeof_userStatus(resp, env);
+	cerr << "EEEE: PresenceService::statusUpdated checking statuses for n="<<n<<endl;
+
+	for(int i = 0; i < n; i ++ ){
+		adb_userStatus_t* status = adb_getStatusesResponse_get_userStatus_at(resp, env, i);
+		string uri = adb_userStatus_get_sipAddress(status, env);
+		adb_statusType_t* type= adb_userStatus_get_type(status, env);
+		string t = adb_statusType_get_statusType(type,env);
+
+
+		std::list<MRef<PhoneBook *> >::iterator i;
+		for (i=pconf->phonebooks.begin(); i!=pconf->phonebooks.end() ; i++){
+			list< MRef<PhoneBookPerson *> > persons = (*i)->getPersons();
+			list< MRef<PhoneBookPerson *> >::iterator j;
+			for (j=persons.begin(); j!=persons.end(); j++){
+				list< MRef<ContactEntry *> > entries = (*j)->getEntries();
+				list< MRef<ContactEntry *> >::iterator ent;
+				for (ent=entries.begin(); ent!=entries.end(); ent++){
+					if ((*ent)->getUri()== uri){
+
+						if (t=="ONLINE" && !(*ent)->isOnline() ){
+							cerr << "----->STATUS CHANGE: "<< uri<<" is "<<t<<endl;
+							CommandString cmd("",SipCommandString::remote_presence_update,uri,"online");
+							callback->handleCommand("gui", cmd);
+						}
+						if (t=="OFFLINE" && (*ent)->isOnline() ){
+							cerr << "----->STATUS CHANGE: "<< uri<<" is "<<t<<endl;
+							CommandString cmd("",SipCommandString::remote_presence_update,uri,"offline");
+							callback->handleCommand("gui", cmd);
+						}
+
+					
+					}
+				}
+
+			}
+		}
+
+	}
+
+
+
+
+}
+
 
 CallbackService::CallbackService(MRef<CommandReceiver*> c, string i, string u){
 	callback=c;
@@ -136,7 +218,6 @@ void CallbackService::start(){
 }
 
 void CallbackService::run(){
-	cerr << "EEEE: CallbackService::run started"<<endl;
 	bool quit=false;
 	axutil_env_t *env = NULL;
 		axis2_char_t *client_home = NULL;
@@ -147,9 +228,7 @@ void CallbackService::run(){
 		env = axutil_env_create_all("alltest.log", AXIS2_LOG_LEVEL_TRACE);
 		client_home = AXIS2_GETENV("AXIS2C_HOME");
 
-		cerr<<"EEEE: connecting to callback web service at "<< url <<endl;
 		stub = axis2_stub_create_ServicesManagerUserStubService(env, client_home, endpoint_uri);
-		cerr<<"EEEE: connecting to callback web service done"<<endl;
 
 		while (!quit){
 			adb_getEvents3_t* req_c0 = adb_getEvents3_create(env);
@@ -160,9 +239,9 @@ void CallbackService::run(){
 			adb_getEvents3_set_getEvents(req_c0,env,req);
 
 
-			cerr << "EEEE: callbackservice: calling getEvents..."<<endl;
+			cerr << "EEEE: CallbackService::run: calling ws..."<<endl;
 			adb_getEventsResponse0_t* resp_c0 = axis2_stub_op_CallbackServiceUserStubService_getEvents(stub,env, req_c0);
-			cerr << "EEEE: callbackservice: getEvents returned" << endl;
+			cerr << "EEEE: CallbackService::run: calling ws done"<<endl;
 
 
 			adb_getEventsResponse_t* resp = adb_getEventsResponse0_get_getEventsResponse( resp_c0, env );
@@ -180,8 +259,11 @@ void CallbackService::run(){
 
 				last_eid=eid;
 
-				CommandString cmd("",SipCommandString::remote_presence_update, recv, "online");
-				callback->handleCommand("gui", cmd);
+				if (string("USER_STATUS_CHANGED")==meth){
+					cerr << "EEEE: Detected USER_STATUS_CHANGED - sending snake_presence_update"<<endl;
+					CommandString cmd("","snake_presence_update");
+					callback->handleCommand("snake", cmd);
+				}
 
 			}
 			if (!nservices)
@@ -222,7 +304,7 @@ void SnakeClient::run(){
 
 
 	while (true){
-		Thread::msleep(1000);
+		Thread::msleep(10000);
 		cerr << "EEEE: SnakeClient: alive"<<endl;
 	}
 }
@@ -230,6 +312,11 @@ void SnakeClient::run(){
 
 void SnakeClient::handleCommand(std::string subsystem, const CommandString& command){
 	cerr <<"EEEE: SnakeClient::handleCommand: received "<< command.getOp() << endl;
+
+	if (command.getOp()=="snake_presence_update"){
+		if (presenceService)
+			presenceService->statusUpdated();
+	}
 
 	if (command.getOp()=="service_manager"){
 		string smurl = command.getParam();

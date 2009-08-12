@@ -53,6 +53,8 @@ class PresenceService : public MObject{
 
 		void registerContacts();
 
+		void statusUpdated();
+
 	private:
 		MRef<CommandReceiver*> callback;
 		MRef<SipSoftPhoneConfiguration*> pconf;
