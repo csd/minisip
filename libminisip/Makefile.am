@@ -119,6 +119,66 @@ libmsrp_src = source/subsystem_media/msrp/MSRPMessage.cxx \
 
 endif
 
+if SNAKE_SUPPORT
+
+# Note: adb_SipAddress.c, adb_SnakeException.c and adb_SnakeException0.c
+# exists in two places. They are identical, and only one is included here
+
+libsnake_src = source/subsystem_signaling/snakews/SnakeClient.cxx \
+	       source/subsystem_signaling/snakews/SnakeClient.h \
+	       source/subsystem_signaling/snakews/presenceagent_autogen_src/adb_getStatus2.c \
+	       source/subsystem_signaling/snakews/presenceagent_autogen_src/adb_getStatus.c \
+	       source/subsystem_signaling/snakews/presenceagent_autogen_src/adb_getStatuses10.c \
+	       source/subsystem_signaling/snakews/presenceagent_autogen_src/adb_getStatuses.c \
+	       source/subsystem_signaling/snakews/presenceagent_autogen_src/adb_getStatusesResponse0.c \
+	       source/subsystem_signaling/snakews/presenceagent_autogen_src/adb_getStatusesResponse.c \
+	       source/subsystem_signaling/snakews/presenceagent_autogen_src/adb_getStatusResponse3.c \
+	       source/subsystem_signaling/snakews/presenceagent_autogen_src/adb_getStatusResponse.c \
+	       source/subsystem_signaling/snakews/presenceagent_autogen_src/adb_IncorrectStatusTypeException9.c \
+	       source/subsystem_signaling/snakews/presenceagent_autogen_src/adb_IncorrectStatusTypeException.c \
+	       source/subsystem_signaling/snakews/presenceagent_autogen_src/adb_ServiceUnavailableException11.c \
+	       source/subsystem_signaling/snakews/presenceagent_autogen_src/adb_ServiceUnavailableException.c \
+	       source/subsystem_signaling/snakews/presenceagent_autogen_src/adb_setContactList8.c \
+	       source/subsystem_signaling/snakews/presenceagent_autogen_src/adb_setContactList.c \
+	       source/subsystem_signaling/snakews/presenceagent_autogen_src/adb_setContactListResponse1.c \
+	       source/subsystem_signaling/snakews/presenceagent_autogen_src/adb_setContactListResponse.c \
+	       source/subsystem_signaling/snakews/presenceagent_autogen_src/adb_setStatus7.c \
+	       source/subsystem_signaling/snakews/presenceagent_autogen_src/adb_setStatus.c \
+	       source/subsystem_signaling/snakews/presenceagent_autogen_src/adb_setStatusResponse6.c \
+	       source/subsystem_signaling/snakews/presenceagent_autogen_src/adb_setStatusResponse.c \
+	       source/subsystem_signaling/snakews/presenceagent_autogen_src/adb_SnakeException5.c \
+	       source/subsystem_signaling/snakews/presenceagent_autogen_src/adb_SnakeException.c \
+	       source/subsystem_signaling/snakews/presenceagent_autogen_src/adb_statusType.c \
+	       source/subsystem_signaling/snakews/presenceagent_autogen_src/adb_UnknownUserException4.c \
+	       source/subsystem_signaling/snakews/presenceagent_autogen_src/adb_UnknownUserException.c \
+	       source/subsystem_signaling/snakews/presenceagent_autogen_src/adb_UserNotRegisteredException12.c \
+	       source/subsystem_signaling/snakews/presenceagent_autogen_src/adb_UserNotRegisteredException.c \
+	       source/subsystem_signaling/snakews/presenceagent_autogen_src/adb_userStatus.c \
+	       source/subsystem_signaling/snakews/presenceagent_autogen_src/axis2_stub_PresenceAgentUserStubService.c \
+	       source/subsystem_signaling/snakews/callbackservice_autogen_src/adb_getEvents3.c \
+	       source/subsystem_signaling/snakews/callbackservice_autogen_src/adb_getEvents.c \
+	       source/subsystem_signaling/snakews/callbackservice_autogen_src/adb_getEventsResponse0.c \
+	       source/subsystem_signaling/snakews/callbackservice_autogen_src/adb_getEventsResponse.c \
+	       source/subsystem_signaling/snakews/callbackservice_autogen_src/adb_snakeEvent.c \
+	       source/subsystem_signaling/snakews/callbackservice_autogen_src/adb_SnakeException2.c \
+	       source/subsystem_signaling/snakews/callbackservice_autogen_src/adb_UserNotRegisteredException1.c \
+	       source/subsystem_signaling/snakews/callbackservice_autogen_src/axis2_stub_CallbackServiceUserStubService.c \
+	       source/subsystem_signaling/snakews/servicemanager_autogen_src/adb_getServices0.c \
+	       source/subsystem_signaling/snakews/servicemanager_autogen_src/adb_getServices.c \
+	       source/subsystem_signaling/snakews/servicemanager_autogen_src/adb_getServicesResponse1.c \
+	       source/subsystem_signaling/snakews/servicemanager_autogen_src/adb_getServicesResponse.c \
+	       source/subsystem_signaling/snakews/servicemanager_autogen_src/adb_service.c \
+	       source/subsystem_signaling/snakews/servicemanager_autogen_src/adb_ServiceUnavailableException4.c \
+	       source/subsystem_signaling/snakews/servicemanager_autogen_src/adb_SnakeException3.c \
+	       source/subsystem_signaling/snakews/servicemanager_autogen_src/adb_UserNotRegisteredException2.c \
+	       source/subsystem_signaling/snakews/servicemanager_autogen_src/axis2_stub_ServicesManagerUserStubService.c
+
+
+
+endif
+
+
+
 
 if ZRTP_SUPPORT
 libzrtp_src = source/subsystem_media/zrtp/ZrtpHostBridgeMinisip.cxx
@@ -471,6 +531,7 @@ libminisip_la_SOURCES = source/Minisip.cxx \
 			$(libp2t_src) \
 			$(librtp_src) \
 			$(libmsrp_src) \
+			$(libsnake_src) \
 			$(libvnc_src) \
 			$(libzrtp_src) \
 			$(libsdp_src) \

@@ -161,6 +161,17 @@ AC_ARG_ENABLE(msrp,
 AM_CONDITIONAL(MSRP_SUPPORT, test "${enable_msrp}" = "yes")
 
 
+dnl Snake web services support
+AC_ARG_ENABLE(snake,
+    AS_HELP_STRING([--enable-snake],
+		   [enable Snake web services support (default disabled)]),
+    [  if test "${enable_snake}" = "yes"
+       then
+	   AC_DEFINE(SNAKE_SUPPORT, [], [SNAKE support])
+	   CPPFLAGS="${CPPFLAGS} -I${AXIS2C_HOME}/include/axis2-1.6.0/"
+	   LDFLAGS="${LDFLAGS} -L${AXIS2C_HOME}/lib/ -laxutil -laxis2_engine -lneethi -laxis2_http_common -laxis2_axiom -laxis2_parser -lguththila"
+       fi ])
+AM_CONDITIONAL(SNAKE_SUPPORT, test "${enable_snake}" = "yes")
 
 dnl
 dnl PortAudio V19 support
