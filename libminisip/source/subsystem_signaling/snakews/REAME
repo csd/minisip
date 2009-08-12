@@ -1,0 +1,11 @@
+
+The code in the sub-directories have been auto-generated using the Axis
+WSDL2C tool. 
+Example: 
+  ./WSDL2C.sh -uri PresenceAgentBean.wsdl -u
+
+URL of files:
+ http://esb.hdviper.org:8080/hdviper-presenceagent-us/PresenceAgentUserStub?wsdl
+ http://esb.hdviper.org:8080/hdviper-callbackservice-us/CallbackServiceUserStub?wsdl
+ http://esb.hdviper.org:8080/hdviper-servicesmanager-us/ServicesManagerUserStub?wsdl
+
