@@ -92,52 +92,14 @@ MatroxGrabber::MatroxGrabber( string device ){
                 return;
         }
 
+	if (M_NULL==MdigAlloc(UserStruct.MilSystem, M_DEV0, "M_DEFAULT", M_DEFAULT, &UserStruct.MilDigitizer)){
         //if (M_NULL==MdigAlloc(UserStruct.MilSystem, M_DEV0, MIL_TEXT("/opt/matrox_imaging/drivers/vio/dcf/standard/hd_sdi_1280x720P_60Hz.dcf"), M_DEFAULT, &UserStruct.MilDigitizer)){
-        if (M_NULL==MdigAlloc(UserStruct.MilSystem, M_DEV0, MIL_TEXT("/opt/matrox_imaging/drivers/vio/dcf/standard/hd_sdi_1920x1080i_30Hz.dcf"), M_DEFAULT, &UserStruct.MilDigitizer)){
-    //    if (M_NULL==MdigAlloc(UserStruct.MilSystem, M_DEV0, MIL_TEXT("/opt/matrox_imaging/drivers/vio/dcf/standard/hd_rgb_1280x720p_50Hz.dcf"), M_DEFAULT, &UserStruct.MilDigitizer)){
+        //if (M_NULL==MdigAlloc(UserStruct.MilSystem, M_DEV0, MIL_TEXT("/opt/matrox_imaging/drivers/vio/dcf/standard/hd_sdi_1920x1080i_30Hz.dcf"), M_DEFAULT, &UserStruct.MilDigitizer)){
+        //if (M_NULL==MdigAlloc(UserStruct.MilSystem, M_DEV0, MIL_TEXT("/opt/matrox_imaging/drivers/vio/dcf/standard/hd_rgb_1280x720p_50Hz.dcf"), M_DEFAULT, &UserStruct.MilDigitizer)){
 	//if (M_NULL==MdigAlloc(UserStruct.MilSystem, M_DEV0, MIL_TEXT("/opt/matrox_imaging/drivers/vio/dcf/standard/ntsc.dcf"), M_DEFAULT, &UserStruct.MilDigitizer)){
                 cerr << "ERROR: could not allocate digitizer"<<endl;
                 return;
         }
-
-	/* Allocate and clear sequence and display images. */
-	MappControl(M_ERROR, M_PRINT_DISABLE);
-	for (UserStruct.NbFrames=0; UserStruct.NbFrames<NB_GRAB_MAX+2; UserStruct.NbFrames++)
-	{
-
-		MbufAllocColor(UserStruct.MilSystem, 
-					MdigInquire(UserStruct.MilDigitizer, M_SIZE_BAND, M_NULL), 
-					MdigInquire(UserStruct.MilDigitizer, M_SIZE_X, M_NULL), 
-					MdigInquire(UserStruct.MilDigitizer, M_SIZE_Y, M_NULL), 
-					8L+M_UNSIGNED, 
-					M_IMAGE + M_GRAB + M_NON_PAGED + M_BGR32 + M_HOST_MEMORY, 
-					&MilImage[UserStruct.NbFrames]); //Allocate grab buffer with three bands for RGB24 capture
-
-		if (MilImage[UserStruct.NbFrames])
-		{
-			MbufClear(MilImage[UserStruct.NbFrames], 0xFF);
-		}
-		else{
-			cerr << "EEEE: ERROR: could not allocate image buffer"<<endl;
-			break;
-		}	
-	}
-
-
-	MappControl(M_ERROR, M_PRINT_ENABLE);
-
-	/* Free buffers to leave space for possible temporary buffers. */
-	int n;
-	for (n=0; n<2 && UserStruct.NbFrames; n++)
-	{
-		UserStruct.NbFrames--;
-		MbufFree(MilImage[UserStruct.NbFrames]);
-	}
-
-	/* MIL event allocation for grab end hook. */
-	MthrAlloc(UserStruct.MilSystem, M_EVENT, M_DEFAULT, M_NULL, M_NULL, &UserStruct.GrabEndEvent);
-
-
 }
 
 void MatroxGrabber::open(){
@@ -180,6 +142,7 @@ void MatroxGrabber::stop(){
 /*loop that reads from the card (and calls handler->handle()) until stop() is called*/
 void MatroxGrabber::run(){
 	UserStruct.stopped = false;
+
 	read( handler );
 }
 
@@ -190,6 +153,46 @@ void MatroxGrabber::setHandler( ImageHandler * handler ){
 }
 
 void MatroxGrabber::read( ImageHandler * handler ){
+
+
+	/* Allocate and clear sequence and display images. */
+	MappControl(M_ERROR, M_PRINT_DISABLE);
+	for (UserStruct.NbFrames=0; UserStruct.NbFrames<NB_GRAB_MAX+2; UserStruct.NbFrames++)
+	{
+		MbufAllocColor(UserStruct.MilSystem, 
+					MdigInquire(UserStruct.MilDigitizer, M_SIZE_BAND, M_NULL), 
+					MdigInquire(UserStruct.MilDigitizer, M_SIZE_X, M_NULL), 
+					MdigInquire(UserStruct.MilDigitizer, M_SIZE_Y, M_NULL), 
+					8L+M_UNSIGNED, 
+					M_IMAGE + M_GRAB + M_NON_PAGED + M_BGR32 + M_HOST_MEMORY, 
+					&MilImage[UserStruct.NbFrames]); //Allocate grab buffer with three bands for RGB24 capture
+
+		if (MilImage[UserStruct.NbFrames])
+		{
+			MbufClear(MilImage[UserStruct.NbFrames], 0xFF);
+		}
+		else{
+			cerr << "EEEE: ERROR: could not allocate image buffer"<<endl;
+			break;
+		}	
+	}
+
+
+	MappControl(M_ERROR, M_PRINT_ENABLE);
+
+	/* Free buffers to leave space for possible temporary buffers. */
+	int n;
+	for (n=0; n<2 && UserStruct.NbFrames; n++)
+	{
+		UserStruct.NbFrames--;
+		MbufFree(MilImage[UserStruct.NbFrames]);
+	}
+
+	/* MIL event allocation for grab end hook. */
+	MthrAlloc(UserStruct.MilSystem, M_EVENT, M_DEFAULT, M_NULL, M_NULL, &UserStruct.GrabEndEvent);
+
+
+
 
 	/* Put digitizer in asynchronous mode. */
 	MdigControl(UserStruct.MilDigitizer, M_GRAB_MODE, M_ASYNCHRONOUS);
@@ -225,7 +228,8 @@ void MatroxGrabber::read( ImageHandler * handler ){
 		MbufInquire(UserStruct.MilImage[ frameindex ], M_HOST_ADDRESS, &rgb32ptr);
 		memcpy(frame->data[0], rgb32ptr, width * height * 4 );
 		frame->mTime = mtime();
-		handler->handle( frame );
+		if (!UserStruct.stopped)
+			handler->handle( frame );
 	}
 
 	/* Wait for end of last grab. */
@@ -240,7 +244,6 @@ void MatroxGrabber::read( ImageHandler * handler ){
 	MthrFree(UserStruct.GrabEndEvent);
 
 	/* Free allocations. */
-	int n;
 	for (n=0; n<UserStruct.NbFrames; n++)
 	{
 		MbufFree(UserStruct.MilImage[n]);
