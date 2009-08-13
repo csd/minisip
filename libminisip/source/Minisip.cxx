@@ -87,6 +87,10 @@
 #include<libminisip/media/zrtp/ZrtpHostBridgeMinisip.h>
 #endif
 
+#ifdef SNAKE_SUPPORT
+#include"subsystem_signaling/snakews/SnakeClient.h"
+#endif
+
 #include<stdlib.h>
 
 #ifdef OSSO_SUPPORT
@@ -470,6 +474,16 @@ int Minisip::startSip() {
 		//		gui->handleCommand(pupd);
 
 		//sip->run();
+#ifdef SNAKE_SUPPORT
+		MRef<SnakeClient*> snake = new SnakeClient(phoneConf);
+
+		messageRouter->addSubsystem("snake",*snake);
+		snake->setCallback(*messageRouter);
+
+		Thread t(*snake);
+
+
+#endif
 	}
 
 	catch(exception &exc){
@@ -547,6 +561,7 @@ int Minisip::runGui(){
 void Minisip::startDebugger(){
 	cerr << "startDebugger" << endl;
 	consoleDbg = MRef<ConsoleDebugger*>(new ConsoleDebugger(phoneConf));
+	consoleDbg->setMediaHandler(subsystemMedia);
 	MRef<Thread *> consoleDbgThread = consoleDbg->start();
 }
 
