@@ -177,6 +177,11 @@ void MinisipTextUI::handleCommand(const CommandString &cmd){
 		displayMessage("Register to proxy "+cmd.getParam()+" OK", green);
 	}
 
+	if (cmd.getOp()=="call_terminated"){
+		handled=true;
+		//we ignore this command
+	}
+
 	if (cmd.getOp()=="file_transfer_done"){
 		handled=true;
 		state="IDLE";
