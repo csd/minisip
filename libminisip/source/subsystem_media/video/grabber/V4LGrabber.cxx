@@ -462,26 +462,29 @@ void V4LGrabber::read( ImageHandler * handler ){
 
 void V4LGrabber::close(){
 	mdbg << "V4LGrabber: Close" << endl;
+
 	stop();
 
-	grabberLock.lock();
-	unmapMemory();
+	if (fd!=-1){
+		grabberLock.lock();
+		unmapMemory();
 
-	::close( fd );
-	fd = -1;
-	grabberLock.unlock();
+		::close( fd );
+		fd = -1;
+		grabberLock.unlock();
+	}
 }
 
 void V4LGrabber::unmapMemory(){
 	uint32_t i;
-	
+
 	for( i = 1 ; i < nFrames ; i++ ){
 		delete buffers[i];
 	}
-	
+
 	if( munmap( buffers[0]->start, buffers[0]->length ) < 0 ){
 		merror( "munmap" );
-                throw VideoException( strerror( errno ) );
+		throw VideoException( strerror( errno ) );
 	}
 
 	delete buffers[0];

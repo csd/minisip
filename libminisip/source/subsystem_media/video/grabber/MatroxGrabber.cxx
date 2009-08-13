@@ -173,6 +173,7 @@ void MatroxGrabber::printImageFormat(){
 }
 
 void MatroxGrabber::stop(){
+	//Note: this can be called even if open has not been done.
 	UserStruct.stopped = true;
 }
 
