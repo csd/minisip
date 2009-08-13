@@ -31,6 +31,13 @@
 #include<string.h>
 
 
+#include <sys/time.h>
+#include <time.h>
+
+
+
+using namespace std;
+
 /* used by ffmpeg to get a frame from the ImageHandler */
 
 int AVDecoder::ffmpegGetBuffer( struct AVCodecContext * context, AVFrame * frame ){
@@ -66,10 +73,11 @@ AVDecoder::AVDecoder():handler(NULL),codec( NULL ),context( NULL ){
 	avcodec_init();
 	avcodec_register_all();
 
-	codec = avcodec_find_decoder( CODEC_ID_H263 );
+	codec = avcodec_find_decoder( CODEC_ID_H264 );
 
 	if( codec == NULL ){
-		throw VideoException( "libavcodec does not support H263" );
+		cerr << "EEEE: Error: libavcodec does not support H264"<<endl;
+		throw VideoException( "libavcodec does not support H264" );
 	}
 
 	context = avcodec_alloc_context();
@@ -107,15 +115,30 @@ void AVDecoder::setHandler( ImageHandler * handler ){
 
 }
 
+#define REPORT_N 50
 
 void AVDecoder::decodeFrame( uint8_t * data, uint32_t length ){
 
+
+        static struct timeval lasttime;
+        static int i=0;
+        i++;
+        if (i%REPORT_N==1){
+                struct timeval now;
+                gettimeofday(&now, NULL);
+                int diffms = (now.tv_sec-lasttime.tv_sec)*1000+(now.tv_usec-lasttime.tv_usec)/1000;
+                float sec = (float)diffms/1000.0f;
+                printf("%d frames in %fs\n", REPORT_N, sec);
+                printf("FPS: %f\n", (float)REPORT_N/(float)sec );
+                lasttime=now;
+        }
+
 	int ret;
-	AVFrame * decodedFrame;
+	AVFrame * decodedFrame=NULL;
 	int gotFrame = 0;
 
 	decodedFrame = avcodec_alloc_frame();
-	
+
 	ret = avcodec_decode_video( context, decodedFrame,
 			&gotFrame, data, length );
 

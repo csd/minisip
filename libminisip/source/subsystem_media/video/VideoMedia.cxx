@@ -47,7 +47,7 @@ using namespace std;
 VideoMedia::VideoMedia( MRef<Codec *> codec, MRef<VideoDisplay *> display, MRef<ImageMixer *> mixer, MRef<Grabber *> grabber, uint32_t receivingWidth, uint32_t receivingHeight ):
                 RealtimeMedia( codec ),grabber(grabber),display(display),mixer(mixer),receivingWidth(receivingWidth),receivingHeight(receivingHeight){
 
-        this->codec = dynamic_cast<VideoCodec *>(*codec);
+        this->codec = dynamic_cast<MVideoCodec *>(*codec);
         massert( this->codec );
         receive = true;         
 	send = (!grabber.isNull());
@@ -104,7 +104,7 @@ void VideoMedia::playData( MRef<RtpPacket *> packet ){
 		}
 		sendersLock.unlock();
 	}
-#endif VIDEO_FORWARD_CODE_END
+#endif //VIDEO_FORWARD_CODE_END
 	
 }
 
@@ -203,7 +203,7 @@ void VideoMedia::unregisterRealtimeMediaSender( MRef<RealtimeMediaStreamSender *
         sendersLock.unlock();
 
         if( senders.size() == 0 ){
-                ((VideoCodec *)*codec)->stopSend();
+                ((MVideoCodec *)*codec)->stopSend();
         }
 }
 
@@ -361,13 +361,41 @@ void VideoMediaSource::playData( MRef<RtpPacket *> packet ){
 }
 
 void VideoMediaSource::addPacketToFrame( MRef<RtpPacket *> packet ){
+
+	if (!packet->getContent())
+		return;
+
         if( !packetLoss ){
-	 	packet->getContent()[0] = 0;
-                memcpy( frame + index, packet->getContent() , packet->getContentLength()  );
-                index += packet->getContentLength();
+		uint8_t *data= packet->getContent();
+		int len = packet->getContentLength();
+		int pt = data[0]&0x1F;
+		int extraHeaderLen=0;
+
+		if (index==0){
+			extraHeaderLen=3;
+			(frame+index)[0]=0;
+			(frame+index)[1]=0;
+			(frame+index)[2]=1;
+		}
+
+		if (pt==28){
+			if (data[1]&0x80){
+				int type=data[1]&0x1F;
+				data[1]=data[0]&224;
+				data[1]=data[1]|type;
+				data= &data[1];
+				len-=1;
+			}else{
+				data+=2;
+				len-=2;
+			}
+		}
+
+                memcpy( frame + index + extraHeaderLen, data , len  );
+                index += len + extraHeaderLen;
         }
 
-        if( packet->getHeader().marker ){
+        if( packet->getHeader().marker ){ //FIXME: if we only lose the last marker RTP packet, will we concatenate two pictures?
                 if( ! packetLoss ){
                         /* We have a frame */
                         decoder->decodeFrame( frame, index );

@@ -34,7 +34,9 @@
 
 #include<libmutil/MemObject.h>
 
+
 extern "C"{
+#include<video_codec.h>
 #include<avcodec.h>
 }
 #define AVCODEC_MAX_VIDEO_FRAME_SIZE (3*1024*1024)
@@ -42,7 +44,7 @@ extern "C"{
 typedef uint8_t byte_t;
 
 class VideoEncoderCallback;
-
+//struct Video;
 
 class LIBMINISIP_API AVEncoder: public ImageHandler, public MObject{
 	public:
@@ -68,9 +70,13 @@ class LIBMINISIP_API AVEncoder: public ImageHandler, public MObject{
 		void close();
 
 	private:
-		/* libavcodec stuff */
-		AVCodecContext * context;
-		AVCodec * codec;
+		/*VideoCodec*/ void *videoCodec;
+		/*Video*/ void *video;
+
+		void make_h264_header(unsigned char *buf, int packetization_mode, unsigned char nal_unit_octet, int frag_start, int frag_end);
+		void hdviper_h264_packetize_nal_unit(Video *v, unsigned char *h264_data, int size, int timecode, int last_nal_unit_of_frame);
+		void hdviper_h264_packetize(Video *v, int timecode);
+
 
 		VideoEncoderCallback * callback;
 	 	byte_t outBuffer[AVCODEC_MAX_VIDEO_FRAME_SIZE];

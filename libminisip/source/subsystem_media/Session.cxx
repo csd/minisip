@@ -892,6 +892,8 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
 					}
 
 					found = true;
+				}else{
+					//cerr << "EEEE: did not find receiver!"<<endl;
 				}
 			}
 		}

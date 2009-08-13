@@ -76,7 +76,7 @@ class LIBMINISIP_API ImageHandler{
 		virtual void handle( MImage * )=0;
 		
 		virtual MImage * provideImage()=0;
-		virtual MImage * provideImage( uint32_t ssrc ){ return provideImage(); };
+		virtual MImage * provideImage( uint32_t /*ssrc*/ ){ return provideImage(); };
 		virtual void releaseImage( MImage * )=0;
 		virtual bool providesImage()=0;
 

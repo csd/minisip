@@ -39,11 +39,11 @@ class VideoEncoderCallback;
 
 typedef uint8_t byte_t;
 
-class LIBMINISIP_API VideoCodec : public Codec{
+class LIBMINISIP_API MVideoCodec : public Codec{
 	public:
 
 		MRef<CodecState *> newInstance(){/*TODO*/ return NULL;};
-		VideoCodec();
+		MVideoCodec();
 
 		/* called by the Grabber directly */
 		void encode( MRef<MImage *> image );
@@ -62,9 +62,9 @@ class LIBMINISIP_API VideoCodec : public Codec{
 		void startSend( uint32_t width, uint32_t height );
 		void stopSend();
 
-		virtual std::string getMemObjectType() const {return "AVCodec";}
+		virtual std::string getMemObjectType() const {return "MVideoCodec";}
 
-		virtual std::string getPluginType()const{return "VideoCodec";}
+		virtual std::string getPluginType()const{return "MVideoCodec";}
 
 		virtual uint32_t getVersion() const;
 

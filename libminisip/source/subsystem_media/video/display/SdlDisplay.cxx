@@ -197,7 +197,9 @@ bool SdlDisplay::handlesChroma( uint32_t chroma ){
 }
 
 void SdlDisplay::displayImage( MImage * mimage ){
+
 	SDL_Overlay * overlay = (SDL_Overlay *)mimage->privateData;
+	massert( overlay );
 	SDL_Rect rect;
 
 	rect.x = 0;
@@ -208,7 +210,6 @@ void SdlDisplay::displayImage( MImage * mimage ){
 	SDL_UnlockYUVOverlay( overlay );
 	SDL_DisplayYUVOverlay( overlay , &rect );
 	SDL_LockYUVOverlay( overlay);
-
 }
 
 void SdlDisplay::handleEvents(){

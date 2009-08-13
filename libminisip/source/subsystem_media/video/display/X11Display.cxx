@@ -287,11 +287,14 @@ void X11Display::displayImage( MImage * mimage ){
 
         mdbg << "Called X11Display::displayImage" << endl;
 
+//	cerr << "EEEE: X11Display::displayImage running..."<<endl;
+
 	XPutImage( display, videoWindow, gc,
                     (XImage*)(mimage->privateData),
                     0 /*src_x*/, 0 /*src_y*/,
                     0 /*dest_x*/, 0 /*dest_y*/,
                     baseWindowWidth, baseWindowHeight );
+//	cerr << "EEEE: X11Display::displayImage done"<<endl;
 }
 
 uint32_t X11Display::getRequiredWidth(){

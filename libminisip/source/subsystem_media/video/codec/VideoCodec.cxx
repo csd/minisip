@@ -35,55 +35,55 @@
 
 using namespace std;
 
-VideoCodec::VideoCodec(){
+MVideoCodec::MVideoCodec(){
 	decoder = new AVDecoder();
 	coder = new AVEncoder();
 
 }
 
-void VideoCodec::encode( MRef<MImage *> image ){
+void MVideoCodec::encode( MRef<MImage *> image ){
 	coder->handle( *image );
 }
 
-void VideoCodec::decode( byte_t * inputData, uint32_t inputSize ){
+void MVideoCodec::decode( byte_t * inputData, uint32_t inputSize ){
 	decoder->decodeFrame( inputData, inputSize );
 }
 
-std::string VideoCodec::getCodecName(){
-	return std::string( "H.263" );
+std::string MVideoCodec::getCodecName(){
+	return std::string( "H.264" );
 }
 
-std::string VideoCodec::getCodecDescription(){
-	return std::string( "ITU-T H.263 Video Encoder/Decoder" );
+std::string MVideoCodec::getCodecDescription(){
+	return std::string( "X264 based H.264 Video Encoder/Decoder" );
 }
 
-uint8_t VideoCodec::getSdpMediaType(){
+uint8_t MVideoCodec::getSdpMediaType(){
 	return 105;
 }
 
-std::string VideoCodec::getSdpMediaAttributes(){
-	return std::string("h263-1998/90000");
+std::string MVideoCodec::getSdpMediaAttributes(){
+	return std::string("h264/90000");
 }
 
-void VideoCodec::setGrabber( MRef<Grabber *> grabber ){
+void MVideoCodec::setGrabber( MRef<Grabber *> grabber ){
 	this->grabber = grabber;
 	if( grabber ){
 		grabber->setHandler( *coder );
 	}
 }
 
-void VideoCodec::setDisplay( MRef<VideoDisplay *> display ){
+void MVideoCodec::setDisplay( MRef<VideoDisplay *> display ){
 	this->display = display;
 	if( display ){
 		decoder->setHandler( *display );
 	}
 }
 
-void VideoCodec::setEncoderCallback( VideoEncoderCallback * cb ){
+void MVideoCodec::setEncoderCallback( VideoEncoderCallback * cb ){
 	coder->setCallback( cb );
 }
 
-void VideoCodec::startSend( uint32_t width, uint32_t height){
+void MVideoCodec::startSend( uint32_t width, uint32_t height){
 	coder->init( width, height );
 
 	if( grabber ){
@@ -111,7 +111,7 @@ void VideoCodec::startSend( uint32_t width, uint32_t height){
 	
 }
 
-void VideoCodec::stopSend(){
+void MVideoCodec::stopSend(){
 	if( grabber ){
                 try{
 		grabber->close();
@@ -125,6 +125,6 @@ void VideoCodec::stopSend(){
 
 }
 
-uint32_t VideoCodec::getVersion() const{
+uint32_t MVideoCodec::getVersion() const{
 	return 0x00000001;
 }

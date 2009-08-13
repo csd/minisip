@@ -126,8 +126,9 @@ bool RealtimeMediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
 			string codecRate;
 			string codecParam;
 
-			if( !parseRtpMap(codecRtpMap, codecName, codecRate, codecParam) )
+			if( !parseRtpMap(codecRtpMap, codecName, codecRate, codecParam) ){
 				continue;
+			}
 
 			bool sdpRtpMapEqual = !strCaseCmp( codecName.c_str(), sdpName.c_str() ) && codecRate == sdpRate && codecParam == sdpParam;
                         if ( sdpRtpMapEqual ) {
@@ -141,6 +142,7 @@ bool RealtimeMediaStream::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
                 }
                 else{
                         if( sdpPayloadType == itoa(codecPayloadType) ){
+
 				localPayloadType = itoa(codecPayloadType);
                                 return true;
                         }else{
@@ -645,15 +647,15 @@ void RealtimeMediaStreamSender::setRemoteAddress( MRef<IPAddress *> ra){
 #ifdef DEBUG_OUTPUT
 string MediaStream::getDebugString() {
 	string ret;
-	ret = getMemObjectType() + " this=" + itoa(reinterpret_cast<int64_t>(this)) +
-		": port=" + itoa(getPort());
+	ret = getMemObjectType() + " this=" + itoa(reinterpret_cast<uint64_t>(this)) +
+		" media="+media->getSdpMediaType()+" port=" + itoa(getPort());
 
 	return ret;
 }
 string RealtimeMediaStreamReceiver::getDebugString() {
 	string ret;
-	ret = getMemObjectType() + " this=" + itoa(reinterpret_cast<int64_t>(this)) +
-		": listening port=" + itoa(getPort());
+	ret = getMemObjectType() + " this=" + itoa(reinterpret_cast<uint64_t>(this)) +
+		" media="+media->getSdpMediaType()+"; listening port=" + itoa(getPort());
 	for( std::list<uint32_t>::iterator it = ssrcList.begin();
 				it != ssrcList.end();
 				it++) {
@@ -664,8 +666,8 @@ string RealtimeMediaStreamReceiver::getDebugString() {
 string RealtimeMediaStreamSender::getDebugString() {
 	string ret;
 
-	ret = getMemObjectType() + " this=" + itoa(reinterpret_cast<int64_t>(this)) +
-		": port=" + itoa(getPort()) +
+	ret = getMemObjectType() + " this=" + itoa(reinterpret_cast<uint64_t>(this)) +
+		" media="+media->getSdpMediaType()+"; port=" + itoa(getPort()) +
 		"; remotePort=" + itoa(remotePort);
 
 	if( isMuted() == true )

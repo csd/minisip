@@ -39,7 +39,7 @@
 #define MAX_SOURCES 256
 
 class VideoEncoderCallback;
-class VideoCodec;
+class MVideoCodec;
 class VideoDisplay;
 class Grabber;
 class VideoMediaSource;
@@ -82,7 +82,7 @@ class LIBMINISIP_API VideoMedia : public RealtimeMedia,
 		MRef<Grabber *> grabber; // NULL if receive only
 		MRef<VideoDisplay *> display;
 		MRef<ImageMixer *> mixer;
-		MRef<VideoCodec *> codec;
+		MRef<MVideoCodec *> codec;
 
 		uint32_t receivingWidth;
 		uint32_t receivingHeight;

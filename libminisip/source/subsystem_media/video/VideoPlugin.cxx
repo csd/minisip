@@ -77,7 +77,7 @@ VideoPlugin::~VideoPlugin(){
 
 MRef<Media*> VideoPlugin::createMedia( MRef<SipSoftPhoneConfiguration *> config ){
 	MRef<Grabber *> grabber = GrabberRegistry::getInstance()->createGrabber( config->videoDevice );
-	MRef<VideoCodec *> videoCodec = new VideoCodec();
+	MRef<MVideoCodec *> videoCodec = new MVideoCodec();
 	MRef<ImageMixer *> mixer = NULL;//new ImageMixer();
 	MRef<VideoMedia *> videoMedia = new VideoMedia( *videoCodec, NULL/*display*/, mixer, grabber, config->frameWidth, config->frameHeight );
 	if( mixer ){
