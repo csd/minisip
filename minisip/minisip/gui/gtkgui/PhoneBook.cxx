@@ -303,11 +303,13 @@ void PhoneBookModel::setFont( Gtk::CellRenderer * renderer,
 		if( entry ){
 			string col;
 			if (entry->isOnline()){
-				col = "#20FF20";
-			}else if (entry->isOffline()){
-				col = "#FF2020";
-			}else{
 				col = "#0000FF";
+			}else if (entry->isOffline()){
+				//col = "#FF2020";
+				col = "#000000";
+			}else{
+				//col = "#0000FF";
+				col = "#000000";
 			}
 			textR->property_markup().set_value( 
 				entry->getDesc() + "\n     " + 
