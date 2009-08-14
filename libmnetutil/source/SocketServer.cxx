@@ -288,6 +288,9 @@ void SocketServer::closeSockets(){
 
 void SocketServer::run()
 {
+#ifdef DEBUG_OUTPUT
+	setThreadName("SocketServer::run");
+#endif
 	struct timeval timeout;
 	fd_set tmpl;
 	fd_set set;
