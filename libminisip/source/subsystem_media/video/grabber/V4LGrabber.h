@@ -60,6 +60,7 @@ class V4LGrabber : public Grabber{
 		virtual void read( ImageHandler * );
 		virtual void run();
 
+		virtual void start();
 		virtual void stop();
 		virtual void close();
 
@@ -91,6 +92,7 @@ class V4LGrabber : public Grabber{
 		Mutex grabberLock;
 
 		bool stopped;
+		MRef<Thread*> runthread;
 
 };
 

@@ -152,11 +152,24 @@ bool Dc1394Grabber::setImageChroma( uint32_t chroma ){
 void Dc1394Grabber::printImageFormat(){
 }
 
+void Dc1394Grabber::start(){
+	massert(!runthread);
+	runthread = new Thread(this);
+}
+
 void Dc1394Grabber::stop(){
 	stopped = true;
+	massert(runthread);
+	runthread->join();
+	runthread=NULL;
+
 }
 
 void Dc1394Grabber::run(){
+#ifdef DEBUG_OUTPUT
+	setThreadName("Dc1394Grabber::run");
+#endif
+
 	fprintf( stderr, "Start read()\n" );
 	stopped = false;
 	read( handler );

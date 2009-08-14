@@ -58,6 +58,7 @@ void GroupListServer::run(){
 	
 #ifdef DEBUG_OUTPUT
 	mdbg << "GroupListServer:: Accepting connections at " << ip<<":"<<(int)port<<end;
+	setThreadName("GroupListServer::run");
 #endif
 	
 	MRef<StreamSocket*> socket;

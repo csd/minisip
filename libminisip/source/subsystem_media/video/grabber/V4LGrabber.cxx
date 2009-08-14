@@ -319,11 +319,27 @@ void V4LGrabber::printImageFormat(){
 	}
 }
 
+void V4LGrabber::start(){
+	massert(!runthread); // we don't want to start a second thread
+       				// for a grabber object
+        runthread = new Thread(this);
+}
+
 void V4LGrabber::stop(){
 	stopped = true;
+ 	massert(runthread);
+        cerr << nowStr() << "EEEE: Grabber::joinThread: waiting for thread"<<endl;
+        runthread->join();
+        cerr << nowStr() << "EEEE: Grabber::joinThread: thread joined"<<endl;
+        runthread=NULL;
+
 }
 
 void V4LGrabber::run(){
+#ifdef DEBUG_OUTPUT
+	setThreadName("V4LGrabber::run");
+#endif
+
 	mdbg << "Start read()" << endl;
 	stopped = false;
 	read( handler );

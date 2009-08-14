@@ -10,7 +10,9 @@
 using namespace std;
 
 void MSRPReceiver::run(){
-
+#ifdef DEBUG_OUTPUT
+	setThreadName("MSRPReceiver::run");
+#endif
 	//Creating a server socket
 	
 	//MRef<IP4ServerSocket*> ssock = new IP4ServerSocket(SERVER_PORT);

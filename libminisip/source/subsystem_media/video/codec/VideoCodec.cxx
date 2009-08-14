@@ -100,7 +100,8 @@ void MVideoCodec::startSend( uint32_t width, uint32_t height){
 			return;
 		}
 
-		Thread t(*grabber);
+		//Thread t(*grabber);
+		grabber->start();
                 }
                 catch( VideoException & exc ){
                         merr << "Could not open the video capture device: "

@@ -54,6 +54,7 @@ class Dc1394Grabber : public Grabber{
 		//void read();
 		virtual void run();
 		virtual void stop();
+		virtual void start();
 
 		virtual void close();
 
@@ -78,6 +79,7 @@ class Dc1394Grabber : public Grabber{
 		bool handlerProvidesImage;
 
 		MImage * oldImage;
+		MRef<Thread*> runthread;
 
 };
 

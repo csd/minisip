@@ -218,6 +218,9 @@ void CallbackService::start(){
 }
 
 void CallbackService::run(){
+#ifdef DEBUG_OUTPUT
+	setThreadName("CallbackService (Snake)");
+#endif
 	bool quit=false;
 	axutil_env_t *env = NULL;
 		axis2_char_t *client_home = NULL;
@@ -276,39 +279,6 @@ void CallbackService::run(){
 SnakeClient::SnakeClient(MRef<SipSoftPhoneConfiguration*> conf){
 	pconf=conf;
 }
-
-void SnakeClient::run(){
-#if 0
-	axutil_env_t *env = NULL;
-	axis2_char_t *client_home = NULL;
-	axis2_char_t *endpoint_uri = NULL;
-	axis2_stub_t *stub = NULL;
-
-/*	endpoint_uri = "http://esb.hdviper.org:8080/hdviper-presenceagent/PresenceAgentBean";
-	env = axutil_env_create_all("alltest.log", AXIS2_LOG_LEVEL_TRACE);
-	client_home = AXIS2_GETENV("AXIS2C_HOME");
-
-	cerr<<"EEEE: connecting to presence agent web service..."<<endl;
-	stub = axis2_stub_create_PresenceAgentBeanService(env, client_home, endpoint_uri);
-	cerr<<"EEEE: connecting to presence agent web service done"<<endl;
-*/
-	endpoint_uri = "http://esb.hdviper.org:8080/hdviper-presenceagent/PresenceAgentBean";
-	env = axutil_env_create_all("alltest.log", AXIS2_LOG_LEVEL_TRACE);
-	client_home = AXIS2_GETENV("AXIS2C_HOME");
-
-	cerr<<"EEEE: connecting to presence agent web service..."<<endl;
-	stub = axis2_stub_create_CallbackServiceBeanService(env, client_home, endpoint_uri);
-	cerr<<"EEEE: connecting to presence agent web service done"<<endl;
-#endif
-
-
-
-	while (true){
-		Thread::msleep(10000);
-		cerr << "EEEE: SnakeClient: alive"<<endl;
-	}
-}
-
 
 void SnakeClient::handleCommand(std::string subsystem, const CommandString& command){
 	cerr <<"EEEE: SnakeClient::handleCommand: received "<< command.getOp() << endl;

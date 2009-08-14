@@ -81,7 +81,8 @@ void ConsoleDebugger::showHelp() {
 	cerr << "        - d/D : Turn on of the mdbg output stream (less verbosity)" << endl;
 	cerr << "        - p/P : Print IN and OUT packets on the screen" << endl;
 	cerr << endl;
-	cerr << "        - * : List all MObjects in memory (needs libmutil to use be configured with --enable-memdebug)" << endl;
+	cerr << "        - a/A : List all thread ids currently active" << endl;
+
 	cerr << "        - ; : More memory related debug output (object created or destroyed)" << endl;
 	cerr << endl;
 	cerr << "        - ( : Output StateMachine related debug messages (see StateMachine.h)" << endl;
@@ -101,6 +102,7 @@ void ConsoleDebugger::showHelp() {
 void ConsoleDebugger::run(){
 #ifdef DEBUG_OUTPUT
 	bool tmpSet;
+	setThreadName("ConsoleDebugger");
 #endif
 	
 	keepRunning = true;
@@ -170,6 +172,10 @@ void ConsoleDebugger::run(){
 				}
 				break;
 	
+			case 'a':
+			case 'A':
+				printThreads();
+				break;
 			case '<':
 			case '*':
 				showMem();

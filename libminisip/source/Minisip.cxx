@@ -183,6 +183,7 @@ static void loadPlugins(const string &argv0){
 */
 Minisip::Minisip( MRef<Gui *> g, int /*argc*/, char **argv ) : gui(g){
 
+	massert(g);
 	string pluginPath = argv ? argv[0] : "";
 	int i=0;
 	char *a=NULL;
@@ -479,10 +480,6 @@ int Minisip::startSip() {
 
 		messageRouter->addSubsystem("snake",*snake);
 		snake->setCallback(*messageRouter);
-
-		Thread t(*snake);
-
-
 #endif
 	}
 

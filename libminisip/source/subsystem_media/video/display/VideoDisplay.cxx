@@ -193,6 +193,9 @@ MImage * VideoDisplay::provideImage(){
 
 
 void VideoDisplay::run(){
+#ifdef DEBUG_OUTPUT
+	setThreadName("VideoDisplay::run");
+#endif
         MImage * imageToDisplay;
 
 

@@ -190,6 +190,9 @@ void RtpReceiver::join(){
 }
 
 void RtpReceiver::run(){
+#ifdef DEBUG_OUTPUT
+	setThreadName("RtpReceiver::run callId="+callId);
+#endif
 	MRef<SRtpPacket *> packet;
 
 	while( !kill ){

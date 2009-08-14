@@ -64,6 +64,7 @@ RtcpDebugMonitor::RtcpDebugMonitor(UDPSocket *s){
 void RtcpDebugMonitor::run(){
 #ifdef DEBUG_OUTPUT
 	cerr << "RTCP debug monitor loop started"<< endl;
+	setThreadName("RtcpDebugMonitor::run");
 #endif
 	while (1){
 	

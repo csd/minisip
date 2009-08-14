@@ -210,6 +210,9 @@ void SoundIO::fileIOTimeout(int ){
 }
 
 void *SoundIO::recorderLoop(void *sc_arg){
+#ifdef DEBUG_OUTPUT
+	setThreadName("SoundIO::recorderLoop");
+#endif
 	SoundIO *soundcard = (SoundIO *)sc_arg;
 	int32_t i;
 	short *buffers[2];	// Two sound buffers for "double buffering"
@@ -413,6 +416,9 @@ MRef<SoundSource *> SoundIO::getSoundSource(int32_t id){
 }
 
 void *SoundIO::playerLoop(void *arg){
+#ifdef DEBUG_OUTPUT
+	setThreadName("SoundIO::playerLoop");
+#endif
 	SoundIO *soundcard = (SoundIO *)arg;
 
 	short *outbuf = NULL;

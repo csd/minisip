@@ -63,7 +63,7 @@ class PresenceService : public MObject{
 };
 
 
-class LIBMINISIP_API SnakeClient : public virtual Runnable, public virtual CommandReceiver {
+class LIBMINISIP_API SnakeClient : public virtual CommandReceiver {
 	public:
 		SnakeClient(MRef<SipSoftPhoneConfiguration*> conf); //Phonebook in config needed for presence
 
@@ -71,8 +71,6 @@ class LIBMINISIP_API SnakeClient : public virtual Runnable, public virtual Comma
 		virtual CommandString handleCommandResp(std::string subsystem, const CommandString&);
 		void setCallback(MRef<CommandReceiver*> mr){callback=mr;}
 
-		void run();
-		
 		virtual std::string getMemObjectType() const {return "SnakeClient";}
 		
 	private:
