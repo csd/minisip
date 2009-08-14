@@ -199,6 +199,9 @@ MRef<CommandReceiver*> SipStackInternal::getConfCallback(){
 }
 
 void SipStackInternal::run(){
+#ifdef DEBUG_OUTPUT
+	setThreadName("SipStack");
+#endif
 	dispatcher->run();
 }
 
