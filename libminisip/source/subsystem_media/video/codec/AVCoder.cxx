@@ -40,6 +40,11 @@ extern "C"{
 	#include<avcodec.h>
 }
 
+#include<math.h>
+#include<sys/time.h>
+
+
+
 
 #define H264_SINGLE_NAL_UNIT_PACKET 0
 #define H264_AGGREGATION_PACKET 1
@@ -75,10 +80,12 @@ void AVEncoder::init( uint32_t width, uint32_t height ){
 
 	avcodec_init(); //perhaps needed for img_convert?
 
-	video->width=640;
-	video->height=480;
+	//video->width=640;
+	//video->height=480;
+	video->width=1280;
+	video->height=720;
 	video->fps=25;
-	videoCodec->bitrate=1024;
+	videoCodec->bitrate=5000;
 
 	hdviper_setup_video_encoder(videoCodec, VIDEO_CODEC_H264, video);
 
@@ -91,7 +98,33 @@ void AVEncoder::close(){
 	hdviper_destroy_video_encoder(videoCodec);
 }
 
+#define REPORT_N 100
+
 void AVEncoder::handle( MImage * image ){
+
+	massert(image);
+
+
+#if 0 //FPS measurement
+	static struct timeval lasttime;
+
+	static int i=0;
+        i++;
+
+	if (i%2==1)
+		return;
+
+        if (i%REPORT_N==0){
+                struct timeval now;
+                gettimeofday(&now, NULL);
+                int diffms = (now.tv_sec-lasttime.tv_sec)*1000+(now.tv_usec-lasttime.tv_usec)/1000;
+                float sec = (float)diffms/1000.0f;
+                printf("%d frames in %fs\n", REPORT_N, sec);
+                printf("FPS: %f\n", (float)REPORT_N/(float)sec );
+                lasttime=now;
+        }
+#endif
+
 
 	Video *video = (Video*)this->video;
 	VideoCodec *videoCodec = (VideoCodec*)this->videoCodec;
@@ -162,6 +195,11 @@ void AVEncoder::handle( MImage * image ){
 	rtp_ts+=3600;
 
 	hdviper_h264_packetize(video, rtp_ts);
+
+	if (mustFreeFrame){
+		avpicture_free( (AVPicture*)&frame );
+	}
+
 
 
 }
