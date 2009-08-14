@@ -133,7 +133,16 @@ private:
 };
 
 
-
 LIBMUTIL_API void setupDefaultSignalHandling();
+
+
+/*The following two functions does nothing without debug enabled*/
+
+/*For debugging: Sets a name/description of a thread*/
+LIBMUTIL_API void setThreadName(std::string descr, uint64_t tid=0);
+
+/*For debugging: Prints a list of threads that have been created
+  and have not exited */
+LIBMUTIL_API void printThreads();
 
 #endif

@@ -49,11 +49,82 @@
 
 using namespace std;
 
+
+
+#ifdef DEBUG_OUTPUT
+
+class tinfo{
+	public:
+		uint64_t id;
+		string name;
+};
+list<tinfo> threadNames;
+void addThread(uint64_t id, std::string name=""){
+	printf("THREAD: adding thread %lld\n", id);
+	tinfo inf;
+	inf.id=id;
+	inf.name=name;
+	threadNames.push_back(inf);
+}
+
+void delThread(uint64_t id){
+	printf("THREAD: removing thread %lld\n", id);
+	list<tinfo>::iterator i;
+	for (i=threadNames.begin(); i!=threadNames.end(); i++){
+		if ((*i).id==id){
+			threadNames.erase(i);
+			return;
+		}
+	}
+	cerr << "THREAD: warning, tried removing thread not in list"<<endl;
+}
+
+static void cleanupFunc(void *arg){
+	printf("EEEE: cleanupFunc called\n");
+	uint64_t id=(uint64_t)arg;
+	//uint64_t id = pthread_self();
+	delThread(id);
+}
+#endif
+
+void printThreads(){
+#ifdef DEBUG_OUTPUT
+	list<tinfo>::iterator i;
+	for (i=threadNames.begin(); i!=threadNames.end(); i++){
+		cerr << "THREAD: "<< (*i).id <<"\t"<<(*i).name<<endl;
+	}
+#endif	
+}
+
+void setThreadName(string descr, uint64_t tid){
+#ifdef DEBUG_OUTPUT
+	if (tid==0)
+		tid=(uint64_t)pthread_self();
+	list<tinfo>::iterator i;
+	for (i=threadNames.begin(); i!=threadNames.end(); i++){
+		if ((*i).id==(uint64_t)pthread_self()){
+			(*i).name = descr;
+			return;
+		}
+	}
+	addThread(tid);
+	setThreadName(descr);
+#endif
+}
+
 ThreadException::ThreadException(const char *desc):Exception(desc){
 
 }
 
 void startFunction( void* (*f)() ){
+
+
+#ifdef DEBUG_OUTPUT
+	uint64_t id = pthread_self();
+	addThread( id );
+	pthread_cleanup_push( (cleanupFunc) ,(void*)id );
+#endif
+	int i;
 	try{
 		(*f)();
 	}catch(Exception &e){
@@ -67,10 +138,19 @@ void startFunction( void* (*f)() ){
 	}catch(exception *e){
 		cerr << "Thread: caught exception:"<< flush << e->what()<<endl;
 	}
-
+#ifdef DEBUG_OUTPUT
+	pthread_cleanup_pop(0);
+	delThread( id );
+#endif
 }
 
 void *startFunctionArg( void* (*f)(void*), void* arg){
+
+#ifdef DEBUG_OUTPUT
+	uint64_t id = pthread_self();
+	addThread( (uint64_t)pthread_self());
+	pthread_cleanup_push( (cleanupFunc) ,(void*)id );
+#endif
 	try{
 		(*f)(arg);
 	}catch(Exception &e){
@@ -84,12 +164,22 @@ void *startFunctionArg( void* (*f)(void*), void* arg){
 	}catch(exception *e){
 		cerr << "Thread: caught exception:"<< flush << e->what()<<endl;
 	}
-
 	return NULL;
+#ifdef DEBUG_OUTPUT
+	delThread( id );
+	pthread_cleanup_pop(0);
+#endif
+
 }
 
 
 void startRunnable(MRef<Runnable*> r){
+#ifdef DEBUG_OUTPUT
+	uint64_t id = pthread_self();
+	addThread( (uint64_t)pthread_self());
+	pthread_cleanup_push( (cleanupFunc) ,(void*)id );
+#endif
+
 	try{
 		r->run();
 	}catch(Exception &e){
@@ -103,6 +193,11 @@ void startRunnable(MRef<Runnable*> r){
 	}catch(exception *e){
 		cerr << "Thread: caught exception:"<< flush << e->what()<<endl;
 	}
+#ifdef DEBUG_OUTPUT
+	delThread( id );
+	pthread_cleanup_pop(0);
+#endif
+
 }
 
 typedef struct tmpstruct{

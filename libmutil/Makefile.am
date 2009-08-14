@@ -55,6 +55,7 @@ mutil_src = \
 		source/merror.cxx \
 		source/TextUI.cxx \
 		source/Timestamp.cxx \
+		source/mtime.cxx \
 		$(mtime_src) \
 		source/stringutils.cxx \
 		source/vmd5.cxx \

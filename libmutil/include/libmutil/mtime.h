@@ -29,6 +29,7 @@
 #include <libmutil/libmutil_config.h>
 
 #include<libmutil/mtypes.h>
+#include<string>
 
 #if defined WIN32 || defined _MSC_VER
 	#include<time.h>
@@ -68,5 +69,7 @@ LIBMUTIL_API uint64_t mtime();
  * @return -1 if error, else otherwise
  */
 LIBMUTIL_API int msleep(int32_t msec);
+
+LIBMUTIL_API std::string nowStr();
 
 #endif

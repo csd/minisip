@@ -276,6 +276,9 @@ class TimeoutProvider : public Runnable{
                         synch_lock.unlock();
 		}
 		void run(){
+#ifdef DEBUG_OUTPUT
+			setThreadName("TimeoutProvider");
+#endif
 			loop();
 		}
 

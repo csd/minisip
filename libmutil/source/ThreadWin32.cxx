@@ -290,3 +290,6 @@ ThreadHandle::ThreadHandle(const ThreadHandle &h){
 
 
 
+LIBMUTIL_API void setThreadName(string,uint64_t){ }
+LIBMUTIL_API void printThreads(){ }
+
