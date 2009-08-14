@@ -47,6 +47,7 @@ int main( int argc, char *argv[] )
 
 #if defined(DEBUG_OUTPUT) || !defined(WIN32)
 	cerr << endl << "Starting MiniSIP GTK ... welcome!" << endl << endl;
+	setThreadName("main");
 #endif
 
 	setupDefaultSignalHandling(); //Signal handlers are created for all 

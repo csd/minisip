@@ -31,6 +31,9 @@ using namespace std;
 
 int main( int argc, char *argv[] )
 {
+#ifdef DEBUG_OUTPUT
+	setThreadName("main");
+#endif
 	merr.setPrintStreamName(true);
 	mout.setPrintStreamName(true);
 	mdbg.setPrintStreamName(true);
