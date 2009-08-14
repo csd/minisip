@@ -54,19 +54,6 @@ MPlugin * matrox_LTX_getPlugin( MRef<Library*> lib ){
 	return new MatroxPlugin( lib );
 }
 
-#if 0
-MIL_INT MFTYPE GrabStart(MIL_INT HookType, MIL_ID EventId, void MPTYPE *UserStructPtr)
-{
-	UserDataStruct *UserPtr=(UserDataStruct*)UserStructPtr;
-	UserPtr->NbGrabStart++;
-
-	/* Queue a new grab or stop the timer at the end. */
-	cerr << "EEEE: doing grabstarts MdigGrab..."<<endl;
-	MdigGrab(UserPtr->MilDigitizer, UserPtr->MilImage[ UserPtr->NbGrabStart%NB_GRAB_MAX] );
-	cerr << "EEEE: done doing grab"<<endl;
-	return 0; 
-}
-#endif
 
 MIL_INT MFTYPE GrabEnd(MIL_INT HookType, MIL_ID EventId, void MPTYPE *UserStructPtr)
 {
@@ -81,7 +68,14 @@ MIL_INT MFTYPE GrabEnd(MIL_INT HookType, MIL_ID EventId, void MPTYPE *UserStruct
 
 
 
-MatroxGrabber::MatroxGrabber( string device ){
+MatroxGrabber::MatroxGrabber( string dev ){
+	device=dev;
+	initialized=false;
+}
+
+void MatroxGrabber::init(){
+
+	initialized=true;
 	width=height=-1;
         if (M_NULL==MappAlloc(M_DEFAULT, &UserStruct.MilApplication)){
                 cerr << "ERROR: failed to allocate MIL application!"<<endl;
@@ -100,16 +94,24 @@ MatroxGrabber::MatroxGrabber( string device ){
                 cerr << "ERROR: could not allocate digitizer"<<endl;
                 return;
         }
+
+	width = MdigInquire(UserStruct.MilDigitizer, M_SIZE_X, M_NULL);
+	height= MdigInquire(UserStruct.MilDigitizer, M_SIZE_Y, M_NULL);
+	cerr << "MatroxGrabber: Info: grabber dimensions are "<< width<<"x"<<height<<endl;
+
+
 }
 
 void MatroxGrabber::open(){
-
-	/* Initialize hook structure. */
-	UserStruct.MilImage     = MilImage;
-	UserStruct.NbGrabStart  = 0;
-
-//	MdigHookFunction(UserStruct.MilDigitizer, M_GRAB_START, GrabStart, (void *)(&UserStruct));
-	MdigHookFunction(UserStruct.MilDigitizer, M_GRAB_END,   GrabEnd,   (void *)(&UserStruct));
+	massert(!startBlockSem);
+        massert(!runthread); // we don't want to start a second thread
+        			// for a grabber object
+        startBlockSem = new Semaphore();
+	initBlockSem = new Semaphore();
+        runthread = new Thread(this);
+        
+	initBlockSem->dec(); // wait for init to complete
+	initBlockSem=NULL;
 
 }
 
@@ -121,9 +123,7 @@ void MatroxGrabber::printCapabilities(){
 }
 
 void MatroxGrabber::getImageFormat(){
-	width = MdigInquire(UserStruct.MilDigitizer, M_SIZE_X, M_NULL);
-	height= MdigInquire(UserStruct.MilDigitizer, M_SIZE_Y, M_NULL);
-	cerr << "MatroxGrabber: Info: grabber dimensions are "<< width<<"x"<<height<<endl;
+	// done in init
 }
 
 bool MatroxGrabber::setImageChroma( uint32_t chroma ){
@@ -134,14 +134,42 @@ bool MatroxGrabber::setImageChroma( uint32_t chroma ){
 void MatroxGrabber::printImageFormat(){
 }
 
+void MatroxGrabber::start(){
+	UserStruct.stopped = false;
+	massert(startBlockSem);
+	startBlockSem->inc();
+}
+
 void MatroxGrabber::stop(){
 	//Note: this can be called even if open has not been done.
 	UserStruct.stopped = true;
+        massert(runthread);
+        runthread->join();
+        runthread=NULL;
 }
 
 /*loop that reads from the card (and calls handler->handle()) until stop() is called*/
 void MatroxGrabber::run(){
+#ifdef DEBUG_OUTPUT
+	setThreadName("MatroxGrabber::run");
+#endif
 	UserStruct.stopped = false;
+
+	if (!initialized)
+		init();
+
+	/* Initialize hook structure. */
+	UserStruct.MilImage     = MilImage;
+	UserStruct.NbGrabStart  = 0;
+
+	MdigHookFunction(UserStruct.MilDigitizer, M_GRAB_END,   GrabEnd,   (void *)(&UserStruct));
+
+	initBlockSem->inc(); // tell thread blocking in "open()" to continue.
+
+
+	startBlockSem->dec(); // wait until start() has been called
+	startBlockSem=NULL; // free
+
 
 	read( handler );
 }
@@ -153,7 +181,6 @@ void MatroxGrabber::setHandler( ImageHandler * handler ){
 }
 
 void MatroxGrabber::read( ImageHandler * handler ){
-
 
 	/* Allocate and clear sequence and display images. */
 	MappControl(M_ERROR, M_PRINT_DISABLE);
@@ -190,9 +217,6 @@ void MatroxGrabber::read( ImageHandler * handler ){
 
 	/* MIL event allocation for grab end hook. */
 	MthrAlloc(UserStruct.MilSystem, M_EVENT, M_DEFAULT, M_NULL, M_NULL, &UserStruct.GrabEndEvent);
-
-
-
 
 	/* Put digitizer in asynchronous mode. */
 	MdigControl(UserStruct.MilDigitizer, M_GRAB_MODE, M_ASYNCHRONOUS);
@@ -249,8 +273,9 @@ void MatroxGrabber::read( ImageHandler * handler ){
 		MbufFree(UserStruct.MilImage[n]);
 	}
 	//XXX: TODO: free resources
-//	MappFreeDefault(UserStruct.MilApplication, MilSystem, MilDisplay, UserStruct.MilDigitizer, MilImageDisp);
+	MappFreeDefault(UserStruct.MilApplication, UserStruct.MilSystem, M_NULL, UserStruct.MilDigitizer, M_NULL);
 
+	initialized=false;
 }
 
 void MatroxGrabber::close(){

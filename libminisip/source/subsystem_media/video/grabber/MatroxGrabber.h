@@ -29,6 +29,7 @@
 
 #include<stdint.h>
 #include<libmutil/Mutex.h>
+#include<libmutil/Semaphore.h>
 #include<libminisip/media/video/grabber/Grabber.h>
 
 #include<mil.h>
@@ -66,6 +67,7 @@ class MatroxGrabber : public Grabber{
 		//void read();
 		virtual void run();
 		virtual void stop();
+		virtual void start();
 
 		virtual void close();
 
@@ -75,7 +77,9 @@ class MatroxGrabber : public Grabber{
 		void setHandler( ImageHandler * handler );
 
 	private:
+		void init();
 
+		std::string device;
 		MIL_ID   MilImage[NB_GRAB_MAX];
 		MIL_TEXT_CHAR FrameIndex[10];
 		UserDataStruct UserStruct;
@@ -86,6 +90,11 @@ class MatroxGrabber : public Grabber{
 
 		Mutex grabberLock;
 		ImageHandler * handler;
+		
+		bool initialized;
+		MRef<Thread*> runthread;
+		MRef<Semaphore*> startBlockSem;
+		MRef<Semaphore*> initBlockSem;
 };
 
 class MatroxPlugin : public GrabberPlugin{
