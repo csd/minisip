@@ -35,6 +35,8 @@
 #include<iostream>
 #include<string.h>
 
+#include<swscale.h>
+
 extern "C"{
 	#include<video_codec.h>
 	#include<avcodec.h>
@@ -62,59 +64,83 @@ extern "C"{
 #define HDVIPER_RTP_PT_H263 120
 #define HDVIPER_RTP_PT_JPEG 26
 
+#define RTP_PAYLOAD_LEN 1400
 
 
 using namespace std;
 
 
 AVEncoder::AVEncoder() {
-	video = new Video;
-	videoCodec = new VideoCodec;
+	video=NULL;
+	videoCodec=NULL;
+	swsctx=NULL;
 
 
 }
 
 void AVEncoder::init( uint32_t width, uint32_t height ){
+	cerr << "AVEncoder::init("<<width<<","<<height<<")"<<endl;
+
+
 	Video *video = (Video*)this->video;
 	VideoCodec *videoCodec = (VideoCodec*)this->videoCodec;
 
+	if (video){
+		delete video;
+		video=NULL;
+	}
+	if (videoCodec){
+		hdviper_destroy_video_encoder(videoCodec);
+		delete videoCodec;
+		videoCodec=NULL;
+	}
+
+	this->video = video = new Video;
+	this->videoCodec = videoCodec = new VideoCodec;
+
 	avcodec_init(); //perhaps needed for img_convert?
 
-	//video->width=640;
-	//video->height=480;
-	video->width=320;
-	video->height=200;
-	video->fps=15;
-	videoCodec->bitrate=256;
+	video->width=1280;
+	video->height=720;
+	video->fps=25;
+	videoCodec->bitrate=1024;
 
 	hdviper_setup_video_encoder(videoCodec, VIDEO_CODEC_H264, video);
 
 	video->yuv=(unsigned char *)malloc(sizeof(unsigned char)*video->width*video->height*3/2);
 	video->compressed=(char *)malloc(sizeof(unsigned char)*videoCodec->bitrate*1000/8);
+
+	if (swsctx) //make handle() allocate a new context with the new dimensions and format
+		sws_freeContext( (struct SwsContext*)swsctx );
 }
 
 void AVEncoder::close(){
 	VideoCodec *videoCodec = (VideoCodec*)this->videoCodec;
-	hdviper_destroy_video_encoder(videoCodec);
+	if (videoCodec)
+		hdviper_destroy_video_encoder(videoCodec);
 }
 
-#define REPORT_N 100
+#define REPORT_N 50
 
 void AVEncoder::handle( MImage * image ){
 
 	massert(image);
 
 
-#if 0 //FPS measurement
+
+#if 1 //FPS measurement
 	static struct timeval lasttime;
 
 	static int i=0;
+	static int N=0;
         i++;
 
-	if (i%2==1)
-		return;
 
-        if (i%REPORT_N==0){
+//	if (i%5!=0)
+//		return;
+	N++;
+
+        if (N%REPORT_N==0){
                 struct timeval now;
                 gettimeofday(&now, NULL);
                 int diffms = (now.tv_sec-lasttime.tv_sec)*1000+(now.tv_usec-lasttime.tv_usec)/1000;
@@ -128,6 +154,14 @@ void AVEncoder::handle( MImage * image ){
 
 	Video *video = (Video*)this->video;
 	VideoCodec *videoCodec = (VideoCodec*)this->videoCodec;
+
+	if (!video || image->width!=video->width || image->height!=video->height){
+		cerr << "EEEE: AVCoder: doing init("<<image->width<<","<<image->height<<")"<<endl;
+		init(image->width, image->height);
+		cerr << "EEEE: done doing init"<<endl;
+		video = (Video*)this->video;
+		videoCodec = (VideoCodec*)this->videoCodec;
+	}
 
 	int ret;
 	AVFrame frame;
@@ -149,6 +183,7 @@ void AVEncoder::handle( MImage * image ){
 			break;
 		}
 
+		massert(video);
 		/* We will need a convertion */
 		avpicture_alloc( (AVPicture*)&frame, 
 				PIX_FMT_YUV420P, video->width,
@@ -157,12 +192,22 @@ void AVEncoder::handle( MImage * image ){
 		/* We must free frame ourselves */
 		mustFreeFrame = true;
 
+#if 0
 		/* Convert to the desired type (plannar YUV 420 ) */
 		if( img_convert( (AVPicture*)&frame, PIX_FMT_YUV420P, 
 					(AVPicture*)image, srcFormat,
 					video->width, video->height ) < 0 ){
 			throw VideoException( "Could not convert image to encoding format" );
 		}
+#else
+		
+
+		if (!swsctx)
+			swsctx = sws_getContext(image->width, image->height, srcFormat, image->width, image->height, PIX_FMT_YUV420P,SWS_FAST_BILINEAR, NULL,NULL,NULL);
+		struct SwsContext* ctx = (struct SwsContext*)swsctx;
+
+		sws_scale( ctx, image->data, image->linesize, 0, image->height, frame.data, frame.linesize);
+#endif
 	}
 	else{
 		/* We can use the picture as is */
@@ -239,7 +284,7 @@ void AVEncoder::hdviper_h264_packetize_nal_unit(Video *v, unsigned char *h264_da
 	unsigned char *video_dgm_ptr;
 
 	/* Does video data + headers fit in one packet? */
-	if(VIDEO_DGM_LEN >= size + RTP_HEADER_LEN) {
+	if(RTP_PAYLOAD_LEN >= size + RTP_HEADER_LEN) {
 		/* Single unit NAL case */
 		video_header_size = RTP_HEADER_LEN+1; /* note that header byte is also first byte of packet */
 		lastsize = dgm_payload_size = first_dgm_payload_size = size;
@@ -301,7 +346,7 @@ void AVEncoder::hdviper_h264_packetize_nal_unit(Video *v, unsigned char *h264_da
 
 			///send_rtp_packet((void *)video_dgm_ptr, cnt+video_header_size-1);
 			if( getCallback() ){
-				getCallback()->sendVideoData( video_dgm_ptr, cnt+video_header_size-1, timecode, true );   
+				getCallback()->sendVideoData( video_dgm_ptr, cnt+video_header_size-1, timecode, /*last_nal_unit_of_frame*/ true);   
 			}
 
 		} else {
@@ -321,7 +366,7 @@ void AVEncoder::hdviper_h264_packetize_nal_unit(Video *v, unsigned char *h264_da
 			}
 			///send_rtp_packet((void *)video_dgm_ptr, cnt+video_header_size);
 			if( getCallback() ){
-				getCallback()->sendVideoData( video_dgm_ptr, cnt+video_header_size, timecode, i==dgms-1 );
+				getCallback()->sendVideoData( video_dgm_ptr, cnt+video_header_size, timecode, /*(i==dgms-1) && last_nal_unit_of_frame*/ i==dgms-1 );
 			}
 
 		}

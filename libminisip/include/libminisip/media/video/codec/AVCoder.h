@@ -80,6 +80,8 @@ class LIBMINISIP_API AVEncoder: public ImageHandler, public MObject{
 
 		VideoEncoderCallback * callback;
 	 	byte_t outBuffer[AVCODEC_MAX_VIDEO_FRAME_SIZE];
+
+		void *swsctx;
 };
 
 
