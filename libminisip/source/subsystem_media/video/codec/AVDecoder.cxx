@@ -34,10 +34,10 @@
 #include <sys/time.h>
 #include <time.h>
 
-#include<swscale.h>
 
 extern "C"{
 #include<avcodec.h>
+#include<swscale.h>
 }
 
 
@@ -159,7 +159,7 @@ void AVDecoder::decodeFrame( uint8_t * data, uint32_t length ){
 				handler->resize(context->width, context->height);
 			}
                         if( needsConvert ){
-                               int ffmpegFormat;
+                               PixelFormat ffmpegFormat;
 
                                MImage * converted = NULL;
                                if( handler->providesImage() ){

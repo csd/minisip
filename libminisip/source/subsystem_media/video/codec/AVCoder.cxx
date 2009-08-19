@@ -35,11 +35,11 @@
 #include<iostream>
 #include<string.h>
 
-#include<swscale.h>
 
 extern "C"{
 	#include<video_codec.h>
 	#include<avcodec.h>
+	#include<swscale.h>
 }
 
 #include<math.h>

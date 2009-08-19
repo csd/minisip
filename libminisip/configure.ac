@@ -169,7 +169,7 @@ AC_ARG_ENABLE(snake,
        then
 	   AC_DEFINE(SNAKE_SUPPORT, [], [SNAKE support])
 	   CPPFLAGS="${CPPFLAGS} -I${AXIS2C_HOME}/include/axis2-1.6.0/"
-	   LDFLAGS="${LDFLAGS} -L${AXIS2C_HOME}/lib/ -laxutil -laxis2_engine -lneethi -laxis2_http_common -laxis2_axiom -laxis2_parser -lguththila"
+	   LDFLAGS="${LDFLAGS} -L${AXIS2C_HOME}/lib/ -laxutil -laxis2_engine -lneethi -laxis2_http_common -laxis2_axiom -laxis2_parser -lguththila -laxis2_minizip"
        fi ])
 AM_CONDITIONAL(SNAKE_SUPPORT, test "${enable_snake}" = "yes")
 
@@ -364,9 +364,36 @@ dnl first check for libavcodec
 	  FFMPEG_LIBS="`pkg-config libavcodec --libs`"
 	fi
 
+	dnl If pkg-config returned space, fallback to the following
+	if test "${FFMPEG_CFLAGS}" = " "
+        then
+	  FFMPEG_CFLAGS="-I/usr/include/ffmpeg -I/usr/include/libavcodec -I/usr/include/libswscale"
+        fi
+	if test "${FFMPEG_LDFLAGS}" = " "
+        then
+	  FFMPEG_LDFLAGS="-avcodec -lavutil"
+        fi
+
+	FFMPEG_LIBS="-lswscale ${FFMPEG_LIBS}"
+	AVCODEC_LDFLAGS="-lswscale ${AVCODEC_LDFLAGS}"
+
 	LIBS="${FFMPEG_LIBS} ${LIBS}"
 	CPPFLAGS="${CPPFLAGS} ${FFMPEG_CFLAGS} ${AVCODEC_CPPFLAGS}"
 	LDFLAGS="${LDFLAGS} ${AVCODEC_LDFLAGS}"
+
+	  AC_CHECK_LIB([swscale], [main], [], [AC_MSG_ERROR(
+	    [Could not locate libswscale, required for video features.])])
+
+	  AC_CHECK_HEADER([swscale.h], [],
+            [
+              AC_MSG_ERROR(
+	      [Could not locate swscale.h header files. Please install
+               the libswscale-dev package.]
+              )
+            ]
+          )
+
+
 
 	  AC_CHECK_HEADER([avcodec.h], [],
             [
