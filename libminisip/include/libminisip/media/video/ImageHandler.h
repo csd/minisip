@@ -84,6 +84,11 @@ class LIBMINISIP_API ImageHandler{
 
 		virtual uint32_t getRequiredWidth(){ return 0; };
 		virtual uint32_t getRequiredHeight(){ return 0; };
+
+		/*
+		 * Tells the handler that it should try to change its size.
+		 */
+		virtual void resize(int w, int h)=0;
 };
 
 #if 0

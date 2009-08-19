@@ -60,6 +60,8 @@ class LIBMINISIP_API AVEncoder: public ImageHandler, public MObject{
 
 		virtual uint32_t getRequiredWidth();
 		virtual uint32_t getRequiredHeight();
+
+		virtual void resize(int width, int height);
 		
 		uint8_t rtpPayload[10000];
                 uint32_t mbCounter;
