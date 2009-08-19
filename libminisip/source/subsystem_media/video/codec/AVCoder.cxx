@@ -45,6 +45,7 @@ extern "C"{
 #include<math.h>
 #include<sys/time.h>
 
+#include<swscale.h>
 
 
 
@@ -191,7 +192,6 @@ void AVEncoder::handle( MImage * image ){
 
 		/* We must free frame ourselves */
 		mustFreeFrame = true;
-
 #if 0
 		/* Convert to the desired type (plannar YUV 420 ) */
 		if( img_convert( (AVPicture*)&frame, PIX_FMT_YUV420P, 
@@ -413,6 +413,11 @@ uint32_t AVEncoder::getRequiredWidth(){
 uint32_t AVEncoder::getRequiredHeight(){
 	Video *video = (Video*)this->video;
 	return video->height;
+}
+
+void AVEncoder::resize(int w, int h){
+	cerr << "EEEE: warning: calling untested AVEncoder::resize()"<<endl;
+	init(w,h); //FIXME: init does not free any previously allocated resources
 }
 
 
