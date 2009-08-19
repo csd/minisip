@@ -62,7 +62,7 @@ uint8_t MVideoCodec::getSdpMediaType(){
 }
 
 std::string MVideoCodec::getSdpMediaAttributes(){
-	return std::string("h264/90000");
+	return std::string("H264/90000");
 }
 
 void MVideoCodec::setGrabber( MRef<Grabber *> grabber ){

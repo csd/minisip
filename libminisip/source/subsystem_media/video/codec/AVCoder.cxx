@@ -80,7 +80,7 @@ AVEncoder::AVEncoder() {
 }
 
 void AVEncoder::init( uint32_t width, uint32_t height ){
-	cerr << "AVEncoder::init("<<width<<","<<height<<")"<<endl;
+	//cerr << "AVEncoder::init("<<width<<","<<height<<")"<<endl;
 
 
 	Video *video = (Video*)this->video;
@@ -111,8 +111,8 @@ void AVEncoder::init( uint32_t width, uint32_t height ){
 	video->yuv=(unsigned char *)malloc(sizeof(unsigned char)*video->width*video->height*3/2);
 	video->compressed=(char *)malloc(sizeof(unsigned char)*videoCodec->bitrate*1000/8);
 
-	if (swsctx) //make handle() allocate a new context with the new dimensions and format
-		sws_freeContext( (struct SwsContext*)swsctx );
+//	if (swsctx) //make handle() allocate a new context with the new dimensions and format
+//		sws_freeContext( (struct SwsContext*)swsctx );
 }
 
 void AVEncoder::close(){
@@ -126,6 +126,7 @@ void AVEncoder::close(){
 void AVEncoder::handle( MImage * image ){
 
 	massert(image);
+	//cerr << "EEEE: AVEncoder::handle image of size "<< image->width<<"x"<<image->height<<endl;
 
 
 
@@ -157,9 +158,8 @@ void AVEncoder::handle( MImage * image ){
 	VideoCodec *videoCodec = (VideoCodec*)this->videoCodec;
 
 	if (!video || image->width!=video->width || image->height!=video->height){
-		cerr << "EEEE: AVCoder: doing init("<<image->width<<","<<image->height<<")"<<endl;
+		//cerr << "EEEE: AVCoder: doing init("<<image->width<<","<<image->height<<")"<<endl;
 		init(image->width, image->height);
-		cerr << "EEEE: done doing init"<<endl;
 		video = (Video*)this->video;
 		videoCodec = (VideoCodec*)this->videoCodec;
 	}
@@ -184,11 +184,11 @@ void AVEncoder::handle( MImage * image ){
 			break;
 		}
 
-		massert(video);
 		/* We will need a convertion */
 		avpicture_alloc( (AVPicture*)&frame, 
-				PIX_FMT_YUV420P, video->width,
-				video->height );
+				PIX_FMT_YUV420P, image->width,
+				image->height );
+		//cerr << "EEEE: allocated picture of dim "<<video->width<<"x"<<video->height<<endl;
 
 		/* We must free frame ourselves */
 		mustFreeFrame = true;
