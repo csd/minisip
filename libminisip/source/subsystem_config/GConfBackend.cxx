@@ -28,6 +28,7 @@
 
 #include <gconf/gconf.h>
 #include <gconf/gconf-client.h>
+#include <string.h>
 
 #ifdef MAEMO_SUPPORT
 #	define KEY_ROOT "/apps/maemo/minisip/"
