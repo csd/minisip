@@ -46,6 +46,7 @@ class X11Display: public VideoDisplay{
 		virtual bool handlesChroma( uint32_t chroma );
 		virtual uint32_t getRequiredWidth();
 		virtual uint32_t getRequiredHeight();
+		virtual void resize(int w, int h);
 
         protected:
 		uint32_t height;

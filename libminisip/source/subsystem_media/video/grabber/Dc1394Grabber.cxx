@@ -223,6 +223,8 @@ void Dc1394Grabber::read( ImageHandler * handler ){
 		image->linesize[0] = handlerInputWidth;
 		image->linesize[1] = handlerInputWidth / 2;
 		image->linesize[2] = handlerInputWidth / 2;
+		image->width=handlerInputWidth;
+		image->height=handlerInputHeight;
 
 		image->chroma = M_CHROMA_I420;
 	}

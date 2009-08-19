@@ -170,6 +170,8 @@ MImage * XvDisplay::allocateImage(){
 	MImage * mimage;
 
 	mimage = new MImage;
+	mimage->width=width;
+	mimage->height=height;
 
 	for( unsigned int i = 0; i < 3; i++ ){
 		mimage->data[i] = (uint8_t *)(image->data + image->offsets[i]);

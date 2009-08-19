@@ -226,7 +226,7 @@ bool V4LGrabber::setImageChroma( uint32_t chroma ){
         mdbg << "Depth: " << imageFormat->depth << endl;
 
 	if( ioctl( fd, VIDIOCSPICT,  imageFormat ) != 0 ){
-		merror( "VIDIOCSPICT" );
+		//merror( "VIDIOCSPICT" );
 		return false;
 	}
 
@@ -400,7 +400,7 @@ void V4LGrabber::read( ImageHandler * handler ){
 
 	/* start to capture the first frame */
 	if( ioctl( fd, VIDIOCMCAPTURE, &mMap ) != 0 ){
-		merror( "VIDIOCMCAPTURE" );
+		merror( "VIDIOCMCAPTURE (1)" );
                 throw VideoException( strerror( errno ) );
 	}
 	mdbg << "before loop" << endl;
@@ -408,6 +408,8 @@ void V4LGrabber::read( ImageHandler * handler ){
 
 	if( !handlerProvidesImage ){
                 image = new MImage;
+		image->width=width;
+		image->height=height;
 
 		memset(image, 0, sizeof(*image));
 
@@ -435,7 +437,7 @@ void V4LGrabber::read( ImageHandler * handler ){
 			mMap.frame = ( i + 1 ) % nFrames;
 			
 			if( ioctl( fd, VIDIOCMCAPTURE, &mMap ) != 0 ){
-				merror( "VIDIOCMCAPTURE" );
+				merror( "VIDIOCMCAPTURE (2)" );
                                 throw VideoException( strerror( errno ) );
 			}
 

@@ -256,6 +256,8 @@ VideoMediaSource::VideoMediaSource( uint32_t ssrc, uint32_t width, uint32_t heig
                 image->linesize[1] = width/2;
                 image->linesize[2] = width/2;
 		image->ssrc = ssrc;
+		image->width=width;
+		image->height=height;
                 emptyImages.push_back( image );
         }
 

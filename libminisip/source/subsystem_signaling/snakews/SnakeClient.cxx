@@ -141,9 +141,18 @@ void PresenceService::statusUpdated(){
 
 	endpoint_uri = (axis2_char_t*)url.c_str();
 	env = axutil_env_create_all("alltest.log", AXIS2_LOG_LEVEL_TRACE);
+	if (!env){
+		cerr << "EEEE: WARNING: env==NULL"<<endl;
+		return;
+	}
 	client_home = AXIS2_GETENV("AXIS2C_HOME");
 
 	stub = axis2_stub_create_PresenceAgentUserStubService(env, client_home, endpoint_uri);
+
+	if (!stub){
+		cerr << "EEEE: WARNING: stub==NULL"<<endl;
+		return;
+	}
 
 	adb_getStatuses10_t* req_c = adb_getStatuses10_create(env);
 	adb_getStatuses_t* req = adb_getStatuses_create( env );
@@ -337,6 +346,7 @@ void SnakeClient::handleCommand(std::string subsystem, const CommandString& comm
 			if (string("presence-agent")==sname){
 				presenceService = new PresenceService(callback, pconf, id, saddr);
 				presenceService->registerContacts();
+				presenceService->statusUpdated();
 			}
 
 

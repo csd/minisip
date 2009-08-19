@@ -111,6 +111,7 @@ VideoDisplay::~VideoDisplay(){
 }
 
 void VideoDisplay::start(){
+	show=true;
         showWindow();
 	thread = new Thread( this );        
 }
@@ -119,6 +120,7 @@ void VideoDisplay::stop(){
 	show = false;
 	//FIXME
         filledImagesSem.inc();
+	thread->join();
 }
 
 void VideoDisplay::showWindow(){
@@ -248,6 +250,8 @@ void VideoDisplay::run(){
         }
 
         filledImagesLock.unlock();
+
+        emptyImagesLock.unlock();
 
         hideWindow();
 

@@ -174,6 +174,8 @@ MImage * SdlDisplay::allocateImage(){
         mimage->linesize[0] = overlay->pitches[0];
         mimage->linesize[1] = overlay->pitches[2];
         mimage->linesize[2] = overlay->pitches[1];
+	mimage->width=width;
+	mimage->height=height;
 
         mimage->privateData = overlay;
 
