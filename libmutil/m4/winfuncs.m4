@@ -79,7 +79,7 @@ AC_DEFUN([AM_MINISIP_CHECK_WINFUNCS],
  [m4_pushdef([AC_Func_Name],m4_bpatsubst(m4_bpatsubst(AC_Func, ["], []),
 					 [(.*)],
 					 []))dnl
-  AH_TEMPLATE(AS_TR_CPP(HAVE_[]AC_Func_Name),
+  AH_TEMPLATE([AS_TR_CPP(HAVE_[]AC_Func_Name)],
                [Define to 1 if you have the `]AC_Func_Name[' function.])dnl
   m4_popdef([AC_Func_Name])])dnl
 for ac_func in $1
