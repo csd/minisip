@@ -34,6 +34,8 @@
 #include <sys/time.h>
 #include <time.h>
 
+#include<swscale.h>
+
 
 
 using namespace std;
@@ -69,6 +71,7 @@ void AVDecoder::ffmpegReleaseBuffer( struct AVCodecContext * context, AVFrame * 
 
 AVDecoder::AVDecoder():handler(NULL),codec( NULL ),context( NULL ){
 
+	swsctx=NULL;
 	/* Initialize AVcodec */
 	avcodec_init();
 	avcodec_register_all();
@@ -118,6 +121,7 @@ void AVDecoder::setHandler( ImageHandler * handler ){
 #define REPORT_N 50
 
 void AVDecoder::decodeFrame( uint8_t * data, uint32_t length ){
+	cerr << "EEEE: AVDecode::decode data of length="<<length<<endl;
 
 
         static struct timeval lasttime;
@@ -129,7 +133,7 @@ void AVDecoder::decodeFrame( uint8_t * data, uint32_t length ){
                 int diffms = (now.tv_sec-lasttime.tv_sec)*1000+(now.tv_usec-lasttime.tv_usec)/1000;
                 float sec = (float)diffms/1000.0f;
                 printf("%d frames in %fs\n", REPORT_N, sec);
-                printf("FPS: %f\n", (float)REPORT_N/(float)sec );
+                printf("FPS decode: %f\n", (float)REPORT_N/(float)sec );
                 lasttime=now;
         }
 
@@ -168,14 +172,21 @@ void AVDecoder::decodeFrame( uint8_t * data, uint32_t length ){
                                                ffmpegFormat = PIX_FMT_RGB24;
                                                break;
                                }
-
+#if 0
                                img_convert( (AVPicture *)converted,
                                             ffmpegFormat,
                                             (AVPicture *)decodedFrame, 
                                             PIX_FMT_YUV420P,
                                             handler->getRequiredWidth(),
                                             handler->getRequiredHeight() );
+#else
+				swsctx =  sws_getContext(context->width, context->height, ffmpegFormat, context->width, context->height, PIX_FMT_YUV420P,SWS_FAST_BILINEAR, NULL,NULL,NULL);
+                struct SwsContext* ctx = (struct SwsContext*)swsctx;
 
+                sws_scale( ctx, decodedFrame->data, decodedFrame->linesize, 0, context->height, converted->data, converted->linesize);
+
+
+#endif
                                handler->handle( converted );
                         }
                         
