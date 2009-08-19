@@ -25,9 +25,9 @@
 #ifndef AVDECODER_H
 #define AVDECODER_H
 
-extern "C"{
-#include<avcodec.h>
-}
+//extern "C"{
+//#include<avcodec.h>
+//}
 
 #include<libmutil/MemObject.h>
 #include<string>
@@ -38,6 +38,10 @@ extern "C"{
 
 class ImageHandler;
 class MImage;
+
+struct AVCodec;
+struct AVCodecContext;
+struct AVFrame;
 
 class LIBMINISIP_API AVDecoder : public MObject{
 	public:

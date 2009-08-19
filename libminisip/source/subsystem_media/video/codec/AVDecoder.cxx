@@ -36,6 +36,10 @@
 
 #include<swscale.h>
 
+extern "C"{
+#include<avcodec.h>
+}
+
 
 
 using namespace std;
