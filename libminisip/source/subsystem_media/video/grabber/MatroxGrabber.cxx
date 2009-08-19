@@ -232,6 +232,8 @@ void MatroxGrabber::read( ImageHandler * handler ){
 	frame->linesize[1] = 0;
 	frame->linesize[2] = 0;
 	frame->chroma = M_CHROMA_RV32;
+	frame->width=width;
+	frame->height=height;
 
 
 	while (!UserStruct.stopped)
