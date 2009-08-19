@@ -62,6 +62,8 @@ typedef struct MImage{
 	uint32_t chroma;
 	uint64_t mTime;      /* TimeStamp in msec */
 	void * privateData;  /* Can be used by the ImageHandlers */
+	uint32_t width;
+	uint32_t height;
 } MImage;
 
 /* Interface used by image encoders and display */
