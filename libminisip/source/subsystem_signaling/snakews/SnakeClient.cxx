@@ -216,6 +216,7 @@ void PresenceService::statusUpdated(){
 
 
 CallbackService::CallbackService(MRef<CommandReceiver*> c, string i, string u){
+	doStop=false;
 	callback=c;
 	id=i;
 	last_eid=0;
@@ -223,14 +224,17 @@ CallbackService::CallbackService(MRef<CommandReceiver*> c, string i, string u){
 }
 
 void CallbackService::start(){
-	Thread t(this);
+	thread = new Thread(this);
+}
+void CallbackService::stop(){
+	doStop=true;
+	thread->join();
 }
 
 void CallbackService::run(){
 #ifdef DEBUG_OUTPUT
 	setThreadName("CallbackService (Snake)");
 #endif
-	bool quit=false;
 	axutil_env_t *env = NULL;
 		axis2_char_t *client_home = NULL;
 		axis2_char_t *endpoint_uri = NULL;
@@ -242,7 +246,7 @@ void CallbackService::run(){
 
 		stub = axis2_stub_create_ServicesManagerUserStubService(env, client_home, endpoint_uri);
 
-		while (!quit){
+		while (!doStop){
 			adb_getEvents3_t* req_c0 = adb_getEvents3_create(env);
 			adb_getEvents_t* req = adb_getEvents_create(env);
 			adb_getEvents_set_sessionId( req, env, id.c_str() );
@@ -258,10 +262,10 @@ void CallbackService::run(){
 
 			adb_getEventsResponse_t* resp = adb_getEventsResponse0_get_getEventsResponse( resp_c0, env );
 
-			int nservices = adb_getEventsResponse_sizeof_event(resp,env);
+			int nevents= adb_getEventsResponse_sizeof_event(resp,env);
 
 
-			for(int i = 0; i < nservices; i ++ ){
+			for(int i = 0; i < nevents; i ++ ){
 				adb_snakeEvent_t* e = adb_getEventsResponse_get_event_at(resp, env, i);
 				int64_t eid = adb_snakeEvent_get_eventId(e, env);
 				axis2_char_t* meth= adb_snakeEvent_get_methodId(e, env);
@@ -278,7 +282,7 @@ void CallbackService::run(){
 				}
 
 			}
-			if (!nservices)
+			if (!nevents && !doStop)
 				Thread::msleep(2000);
 		}
 
@@ -296,6 +300,12 @@ void SnakeClient::handleCommand(std::string subsystem, const CommandString& comm
 		if (presenceService)
 			presenceService->statusUpdated();
 	}
+
+	if (command.getOp()=="snake_presence_update"){
+		if (presenceService)
+			presenceService->statusUpdated();
+	}
+
 
 	if (command.getOp()=="service_manager"){
 		string smurl = command.getParam();

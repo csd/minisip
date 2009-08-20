@@ -38,11 +38,14 @@ class CallbackService : public Runnable {
 
 		void run();
 		void start();
+		void stop();
 	private:
+		bool doStop;
 		MRef<CommandReceiver*> callback;
 		std::string id;
 		std::string url;
 		int64_t last_eid;
+		MRef<Thread*> thread;
 
 };
 
