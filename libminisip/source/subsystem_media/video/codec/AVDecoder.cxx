@@ -125,8 +125,6 @@ void AVDecoder::setHandler( ImageHandler * handler ){
 #define REPORT_N 50
 
 void AVDecoder::decodeFrame( uint8_t * data, uint32_t length ){
-	cerr << "EEEE: AVDecode::decode data of length="<<length<<endl;
-
 
         static struct timeval lasttime;
         static int i=0;
