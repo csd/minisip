@@ -157,6 +157,7 @@ void AVDecoder::decodeFrame( uint8_t * data, uint32_t length ){
 			if (context->width!=handler->getRequiredWidth() || context->height!=handler->getRequiredHeight()){
 				mdbg<<"AVDecoder trying to resize window"<<endl;
 				handler->resize(context->width, context->height);
+				swsctx=NULL;
 			}
                         if( needsConvert ){
                                PixelFormat ffmpegFormat;
@@ -189,7 +190,8 @@ void AVDecoder::decodeFrame( uint8_t * data, uint32_t length ){
                                             handler->getRequiredWidth(),
                                             handler->getRequiredHeight() );
 #else
-			       swsctx =  sws_getContext(context->width, context->height, PIX_FMT_YUV420P, context->width, context->height, ffmpegFormat,SWS_FAST_BILINEAR, NULL,NULL,NULL);
+			       if (!swsctx)
+				       swsctx =  sws_getContext(context->width, context->height, PIX_FMT_YUV420P, context->width, context->height, ffmpegFormat,SWS_FAST_BILINEAR, NULL,NULL,NULL);
 			       struct SwsContext* ctx = (struct SwsContext*)swsctx;
 			       sws_scale( ctx, decodedFrame->data, decodedFrame->linesize, 0, context->height, converted->data, converted->linesize);
 #endif
