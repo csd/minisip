@@ -310,21 +310,27 @@ void SnakeClient::handleCommand(std::string subsystem, const CommandString& comm
 		endpoint_uri = (axis2_char_t*)smurl.c_str();
 		env = axutil_env_create_all("alltest.log", AXIS2_LOG_LEVEL_TRACE);
 		client_home = AXIS2_GETENV("AXIS2C_HOME");
+		massert(env);
 
 		cerr<<"EEEE: connecting to service manager web service..."<<endl;
 		stub = axis2_stub_create_ServicesManagerUserStubService(env, client_home, endpoint_uri);
 		cerr<<"EEEE: connecting to service manager web service done"<<endl;
+		massert(stub);
 
 
 		adb_getServicesResponse1_t* resp;
 		adb_getServices0_t *request = adb_getServices0_create( env );
 		adb_getServices_t *req = adb_getServices_create( env );
+		massert(request);
+		massert(req);
 
 		adb_getServices_set_sessionId(req, env, id.c_str());
 
 		adb_getServices0_set_getServices( request, env, req);
 
+		cerr << "EEEE: calling getServices"<<endl;
 		resp = axis2_stub_op_ServicesManagerUserStubService_getServices( stub, env, request);
+		cerr << "EEEE: done calling getServices"<<endl;
 
 		adb_getServicesResponse_t* r = adb_getServicesResponse1_get_getServicesResponse(resp,env);
 
