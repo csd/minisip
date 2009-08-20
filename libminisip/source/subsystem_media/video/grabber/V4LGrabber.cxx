@@ -177,6 +177,14 @@ void V4LGrabber::getImageFormat(){
 }
 
 bool V4LGrabber::setImageSize( uint32_t width, uint32_t height ){
+
+	massert(v4lCapacity);
+	if (v4lCapacity && (width>v4lCapacity->maxwidth || height>v4lCapacity->maxheight)){
+		mdbg << "V4LGrabber::setImageSize: "<<width<<"x"<<height<<" is too large. Using "<<v4lCapacity->maxwidth<<"x"<<v4lCapacity->maxheight<<endl;
+		this->width=width=v4lCapacity->maxwidth;
+		this->height=height=v4lCapacity->maxheight;
+	}
+
         if( !imageWindow ){
 		getImageFormat();
         }
@@ -202,6 +210,7 @@ bool V4LGrabber::setImageSize( uint32_t width, uint32_t height ){
 }
 
 bool V4LGrabber::setImageChroma( uint32_t chroma ){
+
 	if( imageFormat == NULL ){
 		getImageFormat();
 	}
@@ -328,9 +337,9 @@ void V4LGrabber::start(){
 void V4LGrabber::stop(){
 	stopped = true;
  	massert(runthread);
-        cerr << nowStr() << "EEEE: Grabber::joinThread: waiting for thread"<<endl;
+        //cerr << nowStr() << "EEEE: Grabber::joinThread: waiting for thread"<<endl;
         runthread->join();
-        cerr << nowStr() << "EEEE: Grabber::joinThread: thread joined"<<endl;
+        //cerr << nowStr() << "EEEE: Grabber::joinThread: thread joined"<<endl;
         runthread=NULL;
 
 }
@@ -408,10 +417,9 @@ void V4LGrabber::read( ImageHandler * handler ){
 
 	if( !handlerProvidesImage ){
                 image = new MImage;
+		memset(image, 0, sizeof(*image));
 		image->width=width;
 		image->height=height;
-
-		memset(image, 0, sizeof(*image));
 
 		switch( mChroma ){
 			case M_CHROMA_I420:
