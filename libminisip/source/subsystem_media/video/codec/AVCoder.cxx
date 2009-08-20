@@ -101,8 +101,8 @@ void AVEncoder::init( uint32_t width, uint32_t height ){
 
 	avcodec_init(); //perhaps needed for img_convert?
 
-	video->width=1280;
-	video->height=720;
+	video->width=width;
+	video->height=height;
 	video->fps=25;
 	videoCodec->bitrate=1024;
 
@@ -127,8 +127,6 @@ void AVEncoder::handle( MImage * image ){
 
 	massert(image);
 	//cerr << "EEEE: AVEncoder::handle image of size "<< image->width<<"x"<<image->height<<endl;
-
-
 
 #if 1 //FPS measurement
 	static struct timeval lasttime;
@@ -234,6 +232,7 @@ void AVEncoder::handle( MImage * image ){
 	massert(frame.linesize[2] == video->width/2);
 	memcpy(&video->yuv[ video->width*video->height + video->width/2*video->height/2 ], frame.data[2], video->width/2*video->height/2 );
 
+	video->size_out=0;
 	hdviper_video_encode(videoCodec, video);
 
 	static int rtp_ts=0;
@@ -244,9 +243,6 @@ void AVEncoder::handle( MImage * image ){
 	if (mustFreeFrame){
 		avpicture_free( (AVPicture*)&frame );
 	}
-
-
-
 }
 
 int h264_start_code(unsigned char* p){
@@ -416,7 +412,6 @@ uint32_t AVEncoder::getRequiredHeight(){
 }
 
 void AVEncoder::resize(int w, int h){
-	cerr << "EEEE: warning: calling untested AVEncoder::resize()"<<endl;
 	init(w,h); //FIXME: init does not free any previously allocated resources
 }
 
