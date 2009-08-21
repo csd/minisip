@@ -90,8 +90,8 @@ void MVideoCodec::startSend( uint32_t width, uint32_t height){
                 try{
 		grabber->open();
 	
-		grabber->getCapabilities();
-		grabber->getImageFormat();
+//		grabber->getCapabilities();
+//		grabber->getImageFormat();
                 if( !grabber->setImageChroma( M_CHROMA_RV32 ) &&
 		    !grabber->setImageChroma( M_CHROMA_I420 ) ){
                         merr << "Could not select video capture chroma: "

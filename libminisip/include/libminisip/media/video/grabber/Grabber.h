@@ -39,8 +39,7 @@ class ImageMixer;
 class LIBMINISIP_API Grabber : public Runnable{
 	public:
 		virtual void open()=0;
-		virtual void getCapabilities()=0;
-		virtual void getImageFormat()=0;
+
 		virtual bool setImageChroma( uint32_t chroma )=0;
 
 		virtual void read( ImageHandler * )=0;
