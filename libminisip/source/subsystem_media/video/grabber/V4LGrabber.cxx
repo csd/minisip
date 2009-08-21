@@ -73,6 +73,9 @@ void V4LGrabber::open(){
 
 	mapMemory();
 
+	getCapabilities();
+	getImageFormat();
+
 }
 
 void V4LGrabber::getCapabilities(){

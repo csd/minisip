@@ -115,23 +115,9 @@ void MatroxGrabber::open(){
 
 }
 
-void MatroxGrabber::getCapabilities(){
-}
-
-void MatroxGrabber::printCapabilities(){
-
-}
-
-void MatroxGrabber::getImageFormat(){
-	// done in init
-}
-
 bool MatroxGrabber::setImageChroma( uint32_t chroma ){
 	cerr << "Warning: ignoring setImageChroma request for chroma "<< chroma <<endl;
 	return true;
-}
-
-void MatroxGrabber::printImageFormat(){
 }
 
 void MatroxGrabber::start(){
@@ -143,9 +129,11 @@ void MatroxGrabber::start(){
 void MatroxGrabber::stop(){
 	//Note: this can be called even if open has not been done.
 	UserStruct.stopped = true;
-        massert(runthread);
-        runthread->join();
-        runthread=NULL;
+        if (runthread){
+        	runthread->join();
+        	runthread=NULL;
+
+	}
 }
 
 /*loop that reads from the card (and calls handler->handle()) until stop() is called*/
@@ -256,8 +244,13 @@ void MatroxGrabber::read( ImageHandler * handler ){
 		MbufInquire(UserStruct.MilImage[ frameindex ], M_HOST_ADDRESS, &rgb32ptr);
 		memcpy(frame->data[0], rgb32ptr, width * height * 4 );
 		frame->mTime = mtime();
-		if (!UserStruct.stopped)
-			handler->handle( frame );
+		if (!UserStruct.stopped){
+			static int i=0;
+			i++;
+			if (i%2==1) //grabber does 50fps. We send 25fps.
+				handler->handle( frame );
+
+		}
 	}
 
 	/* Wait for end of last grab. */

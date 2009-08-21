@@ -57,9 +57,6 @@ class MatroxGrabber : public Grabber{
 
 		void open();
 		void getCapabilities();
-		void printCapabilities();
-		void printImageFormat();
-		void getImageFormat();
 		bool setImageChroma( uint32_t chroma );
 
 

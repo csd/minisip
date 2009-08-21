@@ -129,6 +129,10 @@ void Dc1394Grabber::open(){
 	}
 
 	dc1394_free_camera_nodes( cameraNodes );
+
+        getCapabilities();
+        getImageFormat();
+
 }
 
 void Dc1394Grabber::getCapabilities(){
