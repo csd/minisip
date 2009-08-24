@@ -392,6 +392,19 @@ msdl_la_SOURCES = source/subsystem_media/video/display/SdlDisplay.cxx \
 msdl_la_LIBADD = libminisip_video.la libminisip.la $(MUTIL_LIBS) $(XV_LIBS) $(SDL_LIBS) $(X_LIBS) $(X_EXTRA_LIBS)
 endif
 
+#
+# SDL-based OpenGL display plugin
+#
+if OPENGL_VIDEO_DISPLAY
+plugins_LTLIBRARIES += mopengl.la
+mopengl_la_LDFLAGS = $(plugins_LDFLAGS)
+mopengl_la_SOURCES = source/subsystem_media/video/display/OpenGLDisplay.cxx \
+			source/subsystem_media/video/display/OpenGLDisplay.h
+mopengl_la_LIBADD = libminisip_video.la libminisip.la $(MUTIL_LIBS) $(XV_LIBS) $(OPENGL_LIBS) $(X_LIBS) $(X_EXTRA_LIBS)
+endif
+
+
+
         grabber_src = source/subsystem_media/video/grabber/Grabber.cxx
 if V4L_VIDEO_GRABBER
         grabber_src += source/subsystem_media/video/grabber/V4LGrabber.cxx \

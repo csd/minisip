@@ -80,6 +80,7 @@ AVEncoder::AVEncoder() {
 }
 
 void AVEncoder::init( uint32_t width, uint32_t height ){
+	cerr << "=========================== doing AVEncoder::init============================"<<endl;
 	//cerr << "AVEncoder::init("<<width<<","<<height<<")"<<endl;
 
 
@@ -104,7 +105,7 @@ void AVEncoder::init( uint32_t width, uint32_t height ){
 	video->width=width;
 	video->height=height;
 	video->fps=25;
-	videoCodec->bitrate=1024;
+	videoCodec->bitrate=384;
 
 	hdviper_setup_video_encoder(videoCodec, VIDEO_CODEC_H264, video);
 
@@ -116,6 +117,7 @@ void AVEncoder::init( uint32_t width, uint32_t height ){
 }
 
 void AVEncoder::close(){
+	cerr << "=========================== doing AVEncoder::close============================"<<endl;
 	VideoCodec *videoCodec = (VideoCodec*)this->videoCodec;
 	if (videoCodec)
 		hdviper_destroy_video_encoder(videoCodec);

@@ -126,6 +126,7 @@ void AVDecoder::setHandler( ImageHandler * handler ){
 
 void AVDecoder::decodeFrame( uint8_t * data, uint32_t length ){
 
+	cerr <<"EEEE: doing AVDecoder::decodeFrame len="<<length<<endl;
         static struct timeval lasttime;
         static int i=0;
         i++;
@@ -193,10 +194,12 @@ void AVDecoder::decodeFrame( uint8_t * data, uint32_t length ){
 			       struct SwsContext* ctx = (struct SwsContext*)swsctx;
 			       sws_scale( ctx, decodedFrame->data, decodedFrame->linesize, 0, context->height, converted->data, converted->linesize);
 #endif
+			       cerr <<"EEEE: AVDecoder: decoded frame "<<endl;
 			       handler->handle( converted );
                         }
                         
                         else{
+			       cerr <<"EEEE: AVDecoder: decoded frame "<<endl;
                                 handler->handle( lastImage );
                         }
 			lastImage = NULL;

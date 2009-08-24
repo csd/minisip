@@ -38,7 +38,7 @@ VideoDisplayRegistry::VideoDisplayRegistry(): displayCounter( 0 ){
 
 MRef<VideoDisplay *> VideoDisplayRegistry::createDisplay( uint32_t width, uint32_t height ){
         MRef<VideoDisplay *> display = NULL;
-	const char *names[] = { "sdl", "xv", "x11", NULL };
+	const char *names[] = { "opengl", "sdl", "xv", "x11", NULL };
         
         displayCounterLock.lock();
 
@@ -111,12 +111,14 @@ VideoDisplay::~VideoDisplay(){
 }
 
 void VideoDisplay::start(){
+	cerr <<"EEEE: calling VideoDisplay::start"<<endl;
 	show=true;
         showWindow();
 	thread = new Thread( this );        
 }
 
 void VideoDisplay::stop(){
+	cerr <<"EEEE: calling VideoDisplay::stop"<<endl;
 	show = false;
 	//FIXME
         filledImagesSem.inc();
@@ -159,6 +161,7 @@ void VideoDisplay::hideWindow(){
 
 
 MImage * VideoDisplay::provideImage(){
+	cerr << "EEEE: running VideoDisplay::provideImage"<<endl;
         MImage * ret;
 
 
@@ -258,6 +261,7 @@ void VideoDisplay::run(){
 }
 
 void VideoDisplay::handle( MImage * mimage ){
+	cerr << "EEEE: doing VideoDisplay::handle"<<endl;
 
         filledImagesLock.lock();
         filledImages.push_back( mimage );

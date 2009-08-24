@@ -333,6 +333,9 @@ AC_ARG_ENABLE(mil,
       fi ])
 
 
+AC_ARG_ENABLE(opengl,
+    AS_HELP_STRING([--enable-opengl],
+    	[enables OpenGL video output (if present)]))
 
 AC_ARG_ENABLE(sdl,
     AS_HELP_STRING([--enable-sdl],
@@ -504,6 +507,25 @@ dnl check for SDL
 	     ], [], [${X_EXTRA_LIBS} -lXext ${XV_LIBS} ${X_LIBS} -lpthread] )
 	  ])
 
+dnl check for SDL-based OpenGL
+        AC_CHECK_HEADERS([SDL/SDL_ttf.h],
+	  [
+	   AC_CHECK_LIB([GLU],[main], [
+               if test "x${enable_opengl}" != "xno"
+               then
+	         VIDEO_DISPLAY="${VIDEO_DISPLAY} opengl"
+	         OPENGL_VIDEO_DISPLAY="yes"
+	         AC_DEFINE(OPENGL_SUPPORT, [], [Compile OpenGL support])
+                 X_EXTRA_LIBS="${X_EXTRA_LIBS} -lXext"
+		 OPENGL_LIBS="-lSDL -lGL -lGLU -lSDL_ttf"
+	         CPPFLAGS="${CPPFLAGS} ${X_CFLAGS}"
+
+		 AC_SUBST(OPENGL_LIBS)
+               fi
+	     ], [], [${X_EXTRA_LIBS} -lXext ${XV_LIBS} ${X_LIBS} -lpthread] )
+	  ])
+
+
 	CPPFLAGS="${CPPFLAGS_SAVE}"
 	LDFLAGS="${LDFLAGS_SAVE}"
 	LIBS="${LIBS_SAVE}"
@@ -530,6 +552,7 @@ AM_CONDITIONAL(DC1394_VIDEO_GRABBER, test "${DC1394_VIDEO_GRABBER}" = "yes")
 AM_CONDITIONAL(MATROX_VIDEO_GRABBER, test "${MATROX_VIDEO_GRABBER}" = "yes")
 AM_CONDITIONAL(XV_VIDEO_DISPLAY, test "${XV_VIDEO_DISPLAY}" = "yes")
 AM_CONDITIONAL(SDL_VIDEO_DISPLAY, test "${SDL_VIDEO_DISPLAY}" = "yes")
+AM_CONDITIONAL(OPENGL_VIDEO_DISPLAY, test "${OPENGL_VIDEO_DISPLAY}" = "yes")
 
 
 
