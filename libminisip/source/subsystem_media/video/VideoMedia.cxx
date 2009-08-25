@@ -362,48 +362,68 @@ void VideoMediaSource::playData( MRef<RtpPacket *> packet ){
 
 }
 
-void VideoMediaSource::addPacketToFrame( MRef<RtpPacket *> packet ){
+void VideoMediaSource::addPacketToFrame( MRef<RtpPacket *> packet){
+	unsigned char *content = packet->getContent();
+	uint32_t clen = packet->getContentLength();
+	bool marker= packet->getHeader().marker;
 
-	if (!packet->getContent())
+	//cerr << "EEEE: VideoMediaSource::addPacketToFrame: len="<<clen<< " seq="<<packet->getHeader().getSeqNo() << " timestamp="<<packet->getHeader().getTimestamp()<<" marker="<<marker<<endl;
+
+	if (!content || !clen)
 		return;
 
-        if( !packetLoss ){
-		uint8_t *data= packet->getContent();
-		int len = packet->getContentLength();
-		int pt = data[0]&0x1F;
-		int extraHeaderLen=0;
+	uint8_t nal = content[0];
+	uint8_t type= nal & 0x1f;
 
-		if (index==0){
-			extraHeaderLen=3;
-			(frame+index)[0]=0;
-			(frame+index)[1]=0;
-			(frame+index)[2]=1;
+	//cerr << "EEEE: VideoMediaSource::addPacketToFrame: type="<<(int)type<<endl;
+
+	massert( (type>=1 && type<=23) || type==28 );
+	
+	if (type>=1 && type<=23){
+		frame[index+0]=0;
+		frame[index+1]=0;
+		frame[index+2]=1;
+		index+=3;
+                memcpy( &frame[index] , content , clen  );
+		index+=clen;
+		if (marker){
+			decoder->decodeFrame( frame, index);
+			index=0;
+		}
+	}else if (type==28){
+		content++; // skip FU indicator
+		clen--;
+		
+		uint8_t fu_indicator = nal;
+		uint8_t fu_header = *content;
+		uint8_t start_bit = (fu_header&0x80)>>7;
+		uint8_t nal_type = (fu_header&0x1f);
+		uint8_t reconstructed_nal = fu_indicator&0xe0;
+		uint8_t end_bit = (fu_header&0x40)>>6;
+		
+		reconstructed_nal |= (nal_type & 0x1f);
+		//cerr <<"EEEE: VideoMediaSource::addPacketToFrame: reconstructed nal_type="<<(int)nal_type <<" start_bit="<<(int)start_bit<<" end_bit="<<(int)end_bit<<endl;
+
+		content++; //skip fu_header
+		clen--;
+
+		if (start_bit){
+			frame[index+0]=0;
+			frame[index+1]=0;
+			frame[index+2]=1;
+			frame[index+3]=reconstructed_nal;
+			index+=4;
 		}
 
-		if (pt==28){
-			if (data[1]&0x80){
-				int type=data[1]&0x1F;
-				data[1]=data[0]&224;
-				data[1]=data[1]|type;
-				data= &data[1];
-				len-=1;
-			}else{
-				data+=2;
-				len-=2;
-			}
+		memcpy(&frame[index], content, clen);
+		index+=clen;
+		if (/*end_bit*/ packet->getHeader().marker){
+			decoder->decodeFrame( frame, index);
+			index=0;
 		}
 
-                memcpy( frame + index + extraHeaderLen, data , len  );
-                index += len + extraHeaderLen;
-        }
+	}
+	
 
-        if( packet->getHeader().marker ){ //FIXME: if we only lose the last marker RTP packet, will we concatenate two pictures?
-                if( ! packetLoss ){
-                        /* We have a frame */
-                        decoder->decodeFrame( frame, index );
-                }
-                index = 0;
-                packetLoss = false;
-        }
 }
 

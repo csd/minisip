@@ -58,7 +58,7 @@ std::string MVideoCodec::getCodecDescription(){
 }
 
 uint8_t MVideoCodec::getSdpMediaType(){
-	return 105;
+	return 99;
 }
 
 std::string MVideoCodec::getSdpMediaAttributes(){
