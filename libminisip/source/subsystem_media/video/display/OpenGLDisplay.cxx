@@ -202,6 +202,10 @@ void OpenGLWindow::drawSurface(){
 
 	glTranslatef( 0, 0.0f, -20);
 
+	static int N=0;
+	N++;
+	glRotatef(((float)N)/5.0, 0.0F, 1.0F,0.0F);
+
 
 	displayListLock.lock();
 	list<OpenGLDisplay*>::iterator video;
@@ -210,22 +214,23 @@ void OpenGLWindow::drawSurface(){
 //		cerr << "EEEE: getting video texture for display "<< dummy++ <<endl;
 		struct mgl_gfx* gfx = (*video)->getTexture();
 		if (gfx->texture>0){
+//			cerr <<"aratio="<<gfx->aratio<<endl;
 //			cerr << "EEEE: ++++++++++++++ drawing texture "<<video_texture<<" +++++++++++++"<<endl;
 			glColor4f(1.0,1.0,1.0, 1.0 );
 			glBindTexture( GL_TEXTURE_2D, gfx->texture);
 			glBegin( GL_QUADS );
 
 			glTexCoord2f( 0, gfx->hu );
-			glVertex3f( /*-5.0*/ -(512.0/2.0)*SCALE, -5.0, 0.0f );
+			glVertex3f( /*-5.0*/ -(512.0/2.0)*SCALE, -5.0/gfx->aratio, 0.0f );
 
 			glTexCoord2f( gfx->wu, gfx->hu );
-			glVertex3f( 5.0, -5.0, 0.0f );
+			glVertex3f( 5.0, -5.0/gfx->aratio, 0.0f );
 
 			glTexCoord2f( gfx->wu, 0 );
-			glVertex3f( 5.0, 5.0, 0.0f );
+			glVertex3f( 5.0, 5.0/gfx->aratio, 0.0f );
 
 			glTexCoord2f( 0, 0 );
-			glVertex3f( -5.0, 5.0, 0.0f );
+			glVertex3f( -5.0, 5.0/gfx->aratio, 0.0f );
 			glEnd();
 		}
 	}
