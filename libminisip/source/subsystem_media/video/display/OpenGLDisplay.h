@@ -47,6 +47,13 @@
 
 class OpenGLWindow;
 
+struct mgl_gfx{
+	GLuint texture;
+	float wu;	//width usage of texture (0..1). How much of texture is rendered
+	float hu;	//height usage
+	float aratio;   // width/height
+};
+
 /**
  * A OpenGLDisplay represents one stream of images being displayed in
  * OpenGL. For this display it is not the same thing as a window
@@ -73,10 +80,12 @@ class OpenGLDisplay: public VideoDisplay{
 		/*
 		 * Must only be called by the thread doing OpenGL calls.
 		 */
-		int getTexture();
+		struct mgl_gfx* getTexture();
 
 	private:
-		int texture;
+//		int texture;
+		mgl_gfx gfx;
+
 		uint8_t *rgb;
 		bool newRgbData;
 		bool needUpload;

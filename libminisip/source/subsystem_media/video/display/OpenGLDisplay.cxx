@@ -161,9 +161,7 @@ void OpenGLWindow::addDisplay(OpenGLDisplay* displ){
 
 void OpenGLWindow::removeDisplay(OpenGLDisplay* displ){
 	displayListLock.lock();
-	cerr <<"EEEE:OpenGLDisplay::removeDisplay: size before remove: "<< displays.size()<<endl;
 	displays.remove(displ);
-	cerr <<"EEEE:OpenGLDisplay::removeDisplay: size after remove: "<< displays.size()<<endl;
 	displayListLock.unlock();
 }
 
@@ -205,57 +203,28 @@ void OpenGLWindow::drawSurface(){
 	glTranslatef( 0, 0.0f, -20);
 
 
-#if 0
-	queueLock.lock();
-	if (displayQueue.size()>0 && texture==-1){
-		cerr <<"EEEE: UPLOADING TEXTURE TO MEMORY"<<endl;
-		MImage* image = *displayQueue.begin();
-		glGenTextures( 1, &texture);
-		cerr << "EEEE: generated texture with id "<< texture << endl;
-		glBindTexture( GL_TEXTURE_2D, texture);
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-		cerr << "EEEE: texture dimensions: "<< image->width<<"x"<< image->height<<endl;
-
-//		for (int i=0; i<256*256; i++)
-//			image->data[0][i]=rand()%255;
-		glTexImage2D( GL_TEXTURE_2D, 0, 3, /*image->width*/256, /*image->height*/256, 0,
-				GL_BGR, GL_UNSIGNED_BYTE, image->data[0] );
-		
-		displayQueue.pop_front();
-
-	}else{
-		
-	}
-	queueLock.unlock(); // unlock before uploading...
-#endif
-
 	displayListLock.lock();
 	list<OpenGLDisplay*>::iterator video;
 	int dummy=1;
 	for (video=displays.begin(); video!=displays.end(); video++){
 //		cerr << "EEEE: getting video texture for display "<< dummy++ <<endl;
-		int video_texture = (*video)->getTexture();
-		if (video_texture>0){
+		struct mgl_gfx* gfx = (*video)->getTexture();
+		if (gfx->texture>0){
 //			cerr << "EEEE: ++++++++++++++ drawing texture "<<video_texture<<" +++++++++++++"<<endl;
 			glColor4f(1.0,1.0,1.0, 1.0 );
-			glBindTexture( GL_TEXTURE_2D, video_texture);
+			glBindTexture( GL_TEXTURE_2D, gfx->texture);
 			glBegin( GL_QUADS );
 
-			glTexCoord2i( 0, 1 );
+			glTexCoord2f( 0, gfx->hu );
 			glVertex3f( /*-5.0*/ -(512.0/2.0)*SCALE, -5.0, 0.0f );
 
-			glTexCoord2i( 1, 1 );
+			glTexCoord2f( gfx->wu, gfx->hu );
 			glVertex3f( 5.0, -5.0, 0.0f );
 
-			glTexCoord2i( 1, 0 );
+			glTexCoord2f( gfx->wu, 0 );
 			glVertex3f( 5.0, 5.0, 0.0f );
 
-			glTexCoord2i( 0, 0 );
+			glTexCoord2f( 0, 0 );
 			glVertex3f( -5.0, 5.0, 0.0f );
 			glEnd();
 		}
@@ -269,7 +238,6 @@ void OpenGLWindow::drawSurface(){
 
 
 	glFlush();
-//	cerr << "EEEE: doing SDL_GL_SwapBuffers()"<<endl;
 	SDL_GL_SwapBuffers();
 }
 
@@ -419,9 +387,9 @@ void OpenGLWindow::start(){
 	runCount++;
 
 	lock.unlock();
-	cerr << "EEEE: waiting for startWaitSem->dec()"<<endl;
+	//cerr << "EEEE: waiting for startWaitSem->dec()"<<endl;
 	startWaitSem->dec();
-	cerr << "EEEE: done waiting for startWaitSem->dec()"<<endl;
+	//cerr << "EEEE: done waiting for startWaitSem->dec()"<<endl;
 
 	cerr << "EEEE: after OpenGLWindow::start() runCount="<<runCount<<endl;
 }
@@ -432,9 +400,9 @@ void OpenGLWindow::stop(){
 	runCount--;
 	if (runCount==0){
 		doStop=true;
-		cerr <<"EEEE: waiting for OpenGLWindow thread..."<<endl;
+//		cerr <<"EEEE: waiting for OpenGLWindow thread..."<<endl;
 		thread->join();
-		cerr <<"EEEE: done waiting for OpenGLWindow thread..."<<endl;
+//		cerr <<"EEEE: done waiting for OpenGLWindow thread..."<<endl;
 		thread=NULL;
 	}
 	initialized=false;
@@ -502,6 +470,8 @@ void OpenGLWindow::initSdl(){
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER,    1);
 
 	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL,    1);
+
+	SDL_putenv((char*)"__GL_SYNC_TO_VBLANK=1");
 
 
 	sdlFlags = SDL_OPENGL | SDL_RESIZABLE;
@@ -596,7 +566,12 @@ OpenGLDisplay::OpenGLDisplay( uint32_t width, uint32_t height):VideoDisplay(){
 	this->height = height;
 	fullscreen = false;
 	nallocated=0;
-	texture=-1;
+
+	gfx.texture=-1;
+	gfx.aratio=1;
+	gfx.wu=1;
+	gfx.hu=1;
+
 	rgb=NULL;
 	needUpload=false;
 	newRgbData=false;
@@ -608,36 +583,33 @@ OpenGLDisplay::OpenGLDisplay( uint32_t width, uint32_t height):VideoDisplay(){
 	massert(window);
 }
 
-int OpenGLDisplay::getTexture(){
+struct mgl_gfx*  OpenGLDisplay::getTexture(){
 	dataLock.lock();
-	if (newRgbData){
-		newRgbData=false;
-		if (texture>0)
-			glDeleteTextures(1,(GLuint*)&texture);
-
-		glGenTextures( 1, (GLuint*)&texture);
-		cerr << "EEEE: generated texture with id "<< texture << endl;
-		glBindTexture( GL_TEXTURE_2D, texture);
+	if (gfx.texture==-1){
+		glGenTextures( 1, (GLuint*)&gfx.texture);
+		glBindTexture( GL_TEXTURE_2D, gfx.texture);
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		uint8_t *dummy_black=(uint8_t*)calloc(1,2048*2048*3);
+		massert(dummy_black);
+		glTexImage2D( GL_TEXTURE_2D, 0, 3, 2048, 2048, 0, GL_RGB, GL_UNSIGNED_BYTE, dummy_black );
+		free(dummy_black);
+	}
 
-//		cerr << "EEEE: texture dimensions: "<< image->width<<"x"<< image->height<<endl;
-//		uint8_t buf[3*8*3*8];
-//		for (int i=0; i<3*8*3*8; i++)
-//			buf[i]=rand()%255;
+	if (newRgbData){
+		massert(gfx.texture>0);
+		newRgbData=false;
+		glBindTexture( GL_TEXTURE_2D, gfx.texture);
 
-//		cerr << nowStr()<<"EEEE: OpenGLDisplay::getTexture(): starting rgb upload"<<endl;
-		glTexImage2D( GL_TEXTURE_2D, 0, 3, /*width*/1024, /*height*/1024, 0,
-				GL_BGR, GL_UNSIGNED_BYTE, rgb );
-//		cerr << nowStr()<<"EEEE: OpenGLDisplay::getTexture(): done rgb upload"<<endl;
-		
-
-
+		glTexSubImage2D( GL_TEXTURE_2D, 0, 0,0 , width, height, GL_RGB, GL_UNSIGNED_BYTE, rgb );
+		gfx.wu=width/2048.0F;
+		gfx.hu=height/2048.0F;
+		gfx.aratio = (float)width/(float)height;
 	}
 	dataLock.unlock();
-	return texture;
+	return &gfx;
 }
 
 void OpenGLDisplay::handle( MImage * mimage ){
@@ -649,7 +621,7 @@ void OpenGLDisplay::handle( MImage * mimage ){
 			delete rgb;
 		width=mimage->width;
 		height=mimage->height;
-		rgb = new uint8_t[width*height*3+1]; // +1 to avoid mesa bug
+		rgb = new uint8_t[width*height*3+16]; // +16 to avoid mesa bug
 	
 	}
 
