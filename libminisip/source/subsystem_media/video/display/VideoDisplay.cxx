@@ -161,7 +161,7 @@ void VideoDisplay::hideWindow(){
 
 
 MImage * VideoDisplay::provideImage(){
-	cerr << "EEEE: running VideoDisplay::provideImage"<<endl;
+//	cerr << "EEEE: running VideoDisplay::provideImage"<<endl;
         MImage * ret;
 
 
@@ -261,7 +261,7 @@ void VideoDisplay::run(){
 }
 
 void VideoDisplay::handle( MImage * mimage ){
-	cerr << "EEEE: doing VideoDisplay::handle"<<endl;
+//	cerr << "EEEE: doing VideoDisplay::handle"<<endl;
 
         filledImagesLock.lock();
         filledImages.push_back( mimage );

@@ -28,6 +28,8 @@
 #include<sys/time.h>
 #include<SDL/SDL_syswm.h>
 
+#include<libmutil/mtime.h>
+
 #include<iostream>
 
 using namespace std;
@@ -72,7 +74,10 @@ class OpenGLWindow : public Runnable {
 		void stop();
 		virtual void run();
 
-		void display(MImage* image, uint64_t source);
+//		void display(MImage* image, uint64_t source);
+
+		void addDisplay(OpenGLDisplay* displ);
+		void removeDisplay(OpenGLDisplay* displ);
 		
 		string getMemObjectType(){return "OpenGLWindow";}
 
@@ -83,6 +88,9 @@ class OpenGLWindow : public Runnable {
 		void windowResized(int w, int h);
 		bool isFullscreen();
 		void toggleFullscreen();
+
+		Mutex displayListLock;
+		list<OpenGLDisplay*> displays;
 		
 
 		//Counts how many times displays have called "start()"
@@ -140,22 +148,28 @@ OpenGLWindow::OpenGLWindow(int w, int h, bool fullscreen){
 
 }
 
-void OpenGLWindow::display(MImage* image, uint64_t sourceid){
-	queueLock.lock();
-	displayQueue.push_back(image);
-
-
-	queueLock.unlock();
-
-}
-
 #define REPORT_N 500
 
 #define SCALE (10.0/512.0)
 
 
+void OpenGLWindow::addDisplay(OpenGLDisplay* displ){
+	displayListLock.lock();
+	displays.push_back(displ);
+	displayListLock.unlock();
+}
+
+void OpenGLWindow::removeDisplay(OpenGLDisplay* displ){
+	displayListLock.lock();
+	cerr <<"EEEE:OpenGLDisplay::removeDisplay: size before remove: "<< displays.size()<<endl;
+	displays.remove(displ);
+	cerr <<"EEEE:OpenGLDisplay::removeDisplay: size after remove: "<< displays.size()<<endl;
+	displayListLock.unlock();
+}
+
+
 void OpenGLWindow::drawSurface(){
-	cerr << "EEEE: doing OpenGLWindow::drawSurface()"<<endl;
+//	cerr << "EEEE: doing OpenGLWindow::drawSurface()"<<endl;
         static struct timeval lasttime;
         static int i=0;
         i++;
@@ -165,7 +179,7 @@ void OpenGLWindow::drawSurface(){
                 int diffms = (now.tv_sec-lasttime.tv_sec)*1000+(now.tv_usec-lasttime.tv_usec)/1000;
                 float sec = (float)diffms/1000.0f;
                 printf("%d frames in %fs\n", REPORT_N, sec);
-                printf("FPS: %f\n", (float)REPORT_N/(float)sec );
+                printf("FPS_OPENGL: %f\n", (float)REPORT_N/(float)sec );
                 lasttime=now;
         }
 
@@ -191,7 +205,7 @@ void OpenGLWindow::drawSurface(){
 	glTranslatef( 0, 0.0f, -20);
 
 
-
+#if 0
 	queueLock.lock();
 	if (displayQueue.size()>0 && texture==-1){
 		cerr <<"EEEE: UPLOADING TEXTURE TO MEMORY"<<endl;
@@ -217,36 +231,45 @@ void OpenGLWindow::drawSurface(){
 	}else{
 		
 	}
-
-
-	
 	queueLock.unlock(); // unlock before uploading...
+#endif
 
-	if (texture>0){
-		cerr << "EEEE: ++++++++++++++ drawing texture +++++++++++++"<<endl;
-		glColor4f(1.0,1.0,1.0, 1.0 );
-		glBindTexture( GL_TEXTURE_2D, texture);
-		glBegin( GL_QUADS );
+	displayListLock.lock();
+	list<OpenGLDisplay*>::iterator video;
+	int dummy=1;
+	for (video=displays.begin(); video!=displays.end(); video++){
+//		cerr << "EEEE: getting video texture for display "<< dummy++ <<endl;
+		int video_texture = (*video)->getTexture();
+		if (video_texture>0){
+//			cerr << "EEEE: ++++++++++++++ drawing texture "<<video_texture<<" +++++++++++++"<<endl;
+			glColor4f(1.0,1.0,1.0, 1.0 );
+			glBindTexture( GL_TEXTURE_2D, video_texture);
+			glBegin( GL_QUADS );
 
-		glTexCoord2i( 0, 1 );
-		glVertex3f( /*-5.0*/ -(512.0/2.0)*SCALE, -5.0, 0.0f );
+			glTexCoord2i( 0, 1 );
+			glVertex3f( /*-5.0*/ -(512.0/2.0)*SCALE, -5.0, 0.0f );
 
-		glTexCoord2i( 1, 1 );
-		glVertex3f( 5.0, -5.0, 0.0f );
+			glTexCoord2i( 1, 1 );
+			glVertex3f( 5.0, -5.0, 0.0f );
 
-		glTexCoord2i( 1, 0 );
-		glVertex3f( 5.0, 5.0, 0.0f );
+			glTexCoord2i( 1, 0 );
+			glVertex3f( 5.0, 5.0, 0.0f );
 
-		glTexCoord2i( 0, 0 );
-		glVertex3f( -5.0, 5.0, 0.0f );
-		glEnd();
+			glTexCoord2i( 0, 0 );
+			glVertex3f( -5.0, 5.0, 0.0f );
+			glEnd();
+		}
 	}
+	displayListLock.unlock();
+
+
 
 
 	glPopMatrix();
 
 
 	glFlush();
+//	cerr << "EEEE: doing SDL_GL_SwapBuffers()"<<endl;
 	SDL_GL_SwapBuffers();
 }
 
@@ -318,7 +341,7 @@ void OpenGLWindow::run(){
 	SDL_Event event;
 	while(!doStop)
 	{
-		cerr << "EEEE: OpenGLWindow::run loop"<<endl;
+		//cerr << "EEEE: OpenGLWindow::run loop"<<endl;
 		while( SDL_PollEvent( &event ))
 		{
 			string url;
@@ -380,6 +403,7 @@ void OpenGLWindow::run(){
 	}
 
 	cerr <<"----------------EEEE: OpenGl thread quitting"<<endl;
+	SDL_Quit();
 } 
 
 
@@ -395,7 +419,9 @@ void OpenGLWindow::start(){
 	runCount++;
 
 	lock.unlock();
+	cerr << "EEEE: waiting for startWaitSem->dec()"<<endl;
 	startWaitSem->dec();
+	cerr << "EEEE: done waiting for startWaitSem->dec()"<<endl;
 
 	cerr << "EEEE: after OpenGLWindow::start() runCount="<<runCount<<endl;
 }
@@ -406,9 +432,12 @@ void OpenGLWindow::stop(){
 	runCount--;
 	if (runCount==0){
 		doStop=true;
+		cerr <<"EEEE: waiting for OpenGLWindow thread..."<<endl;
 		thread->join();
+		cerr <<"EEEE: done waiting for OpenGLWindow thread..."<<endl;
 		thread=NULL;
 	}
+	initialized=false;
 	lock.unlock();
 
 	cerr << "EEEE: after OpenGLWindow::stop() runCount="<<runCount<<endl;
@@ -566,6 +595,11 @@ OpenGLDisplay::OpenGLDisplay( uint32_t width, uint32_t height):VideoDisplay(){
 	this->width = width;
 	this->height = height;
 	fullscreen = false;
+	nallocated=0;
+	texture=-1;
+	rgb=NULL;
+	needUpload=false;
+	newRgbData=false;
 #if 0
 	baseWindowWidth = this->width;
 	baseWindowHeight = this->height;
@@ -574,14 +608,91 @@ OpenGLDisplay::OpenGLDisplay( uint32_t width, uint32_t height):VideoDisplay(){
 	massert(window);
 }
 
+int OpenGLDisplay::getTexture(){
+	dataLock.lock();
+	if (newRgbData){
+		newRgbData=false;
+		if (texture>0)
+			glDeleteTextures(1,(GLuint*)&texture);
+
+		glGenTextures( 1, (GLuint*)&texture);
+		cerr << "EEEE: generated texture with id "<< texture << endl;
+		glBindTexture( GL_TEXTURE_2D, texture);
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+//		cerr << "EEEE: texture dimensions: "<< image->width<<"x"<< image->height<<endl;
+//		uint8_t buf[3*8*3*8];
+//		for (int i=0; i<3*8*3*8; i++)
+//			buf[i]=rand()%255;
+
+//		cerr << nowStr()<<"EEEE: OpenGLDisplay::getTexture(): starting rgb upload"<<endl;
+		glTexImage2D( GL_TEXTURE_2D, 0, 3, /*width*/1024, /*height*/1024, 0,
+				GL_BGR, GL_UNSIGNED_BYTE, rgb );
+//		cerr << nowStr()<<"EEEE: OpenGLDisplay::getTexture(): done rgb upload"<<endl;
+		
+
+
+	}
+	dataLock.unlock();
+	return texture;
+}
+
+void OpenGLDisplay::handle( MImage * mimage ){
+//	cerr <<"EEEE: doing OpenGLDisplay::handle"<<endl;
+	dataLock.lock();
+	if (!rgb || width!=mimage->width || height!=mimage->height){
+		cerr << "EEEE: allocating RGB of size "<<mimage->width<<"x"<<mimage->height<<endl;
+		if (rgb)
+			delete rgb;
+		width=mimage->width;
+		height=mimage->height;
+		rgb = new uint8_t[width*height*3+1]; // +1 to avoid mesa bug
+	
+	}
+
+//	cerr << "linesizes: 0=="<<mimage->linesize[0]<<" 1="<<mimage->linesize[1]<<" 2="<<mimage->linesize[2]<<endl; 
+//	cerr << "width="<<width<<" height="<<height<<endl;
+//	cerr << "EEEE: copying data"<<endl;
+	massert(rgb);
+	memcpy(rgb, &mimage->data[0][0], width*height*3);
+/*	for (int i=0; i<width*height; i++){
+//		if (i%1024*1024==0){
+//			cerr <<"EEEE: i="<<i<<endl;
+//		}
+		if (i<2048){
+			cerr << (int)mimage->data[0][i]<<","<<(int)mimage->data[1][i]<<","<<(int)mimage->data[2][i]<<endl;
+		}
+		memcpy(rgb, &mimage->data[0][0], width*height*3);
+		rgb[i*3+0]=mimage->data[0][i];
+		rgb[i*3+1]=mimage->data[1][i];
+		rgb[i*3+2]=mimage->data[2][i];
+	}
+*/
+	newRgbData=true;
+//	cerr << "EEEE: OpenGLDisplay::handle: done copying new data"<<endl;
+	emptyImages.push_back(mimage);
+	dataLock.unlock();
+
+
+
+//	window->display(mimage, (uint64_t)this);
+}
+
+
+
 void OpenGLDisplay::start(){
 	cerr <<"EEEE: doing OpenGLDisplay::start"<<endl;
 	massert(window);
 	window->start();
+	window->addDisplay(this);
 }
 
 void OpenGLDisplay::stop(){
 	cerr <<"EEEE: doing OpenGLDisplay::stop"<<endl;
+	window->removeDisplay(this);
 	window->stop();
 }
 
@@ -677,7 +788,7 @@ void OpenGLDisplay::initWm(){
 #endif
 
 void OpenGLDisplay::resize(int w, int h){
-	cerr << "EEEE: doing OpenGLDisplay::resize("<<w<<","<<h<<")"<<endl;
+	cerr << "EEEE: doing OpenGLDisplay::resize("<<w<<","<<h<<") old size="<<width<<"x"<<height<<endl;
 	this->width=w;
 	this->height=h;
 //	stop();
@@ -698,21 +809,29 @@ void OpenGLDisplay::destroyWindow(){
 }
 
 MImage * OpenGLDisplay::provideImage(){
-	cerr <<"EEEE: WARNING: INTENTIONAL MEMORY LEAK"<<endl;
-	return allocateImage();
+	dataLock.lock();
+	if (emptyImages.size()==0){
+		emptyImages.push_back( allocateImage() );
+	}
+	MImage* ret = *emptyImages.begin();
+	emptyImages.pop_front();
+	dataLock.unlock();
+	return ret;
 }
 
 MImage * OpenGLDisplay::allocateImage(){
-	cerr << "EEEE: doing OpenGLDisplay::allocateImage"<<endl;
+	cerr << "EEEE: doing OpenGLDisplay::allocateImage of size "<< width<<"x"<<height<<endl;
 	MImage * mimage = new MImage;
+	nallocated++;
 
-	mimage->data[0] = /*overlay->pixels[0]*/ (uint8_t*)calloc(1,width*height+1);
-	mimage->data[1] = /*overlay->pixels[2]*/ (uint8_t*)calloc(1,width*height+1);
-	mimage->data[2] = /*overlay->pixels[1]*/ (uint8_t*)calloc(1,width*height+1);
+	mimage->data[0] = /*overlay->pixels[0]*/ (uint8_t*)calloc(1,width*height*3+1);
+	massert(mimage->data[0]);
+	mimage->data[1] = NULL /*overlay->pixels[2]*/ /* (uint8_t*)calloc(1,width*height+1)*/;
+	mimage->data[2] = NULL /*overlay->pixels[1]*/ /*(uint8_t*)calloc(1,width*height+1)*/;
 
-	mimage->linesize[0] =/* overlay->pitches[0]*/ width;
-	mimage->linesize[1] =/* overlay->pitches[2]*/ width;
-	mimage->linesize[2] =/* overlay->pitches[1]*/ width;
+	mimage->linesize[0] =/* overlay->pitches[0]*/ width*3;
+	mimage->linesize[1] =/* overlay->pitches[2]*/ /*width*/0;
+	mimage->linesize[2] =/* overlay->pitches[1]*/ /*width*/0;
 	mimage->width=width;
 	mimage->height=height;
 
@@ -737,7 +856,7 @@ bool OpenGLDisplay::handlesChroma( uint32_t chroma ){
 void OpenGLDisplay::displayImage( MImage * mimage ){
 	cerr <<"EEEE: doing OpenGLDisplay::displayImage"<<endl;
 
-	window->display(mimage, (uint64_t)this);
+	massert(1==0); //This should not be called?!
 
 }
 
@@ -797,13 +916,6 @@ void OpenGLDisplay::handleEvents(){
 	}
 #endif
 }
-
-void OpenGLDisplay::handle( MImage * mimage ){
-	cerr <<"EEEE: doing OpenGLDisplay::handle"<<endl;
-
-	window->display(mimage, (uint64_t)this);
-}
-
 
 OpenGLPlugin::OpenGLPlugin( MRef<Library *> lib ): VideoDisplayPlugin( lib ){
 }

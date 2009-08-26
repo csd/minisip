@@ -126,7 +126,7 @@ void AVDecoder::setHandler( ImageHandler * handler ){
 
 void AVDecoder::decodeFrame( uint8_t * data, uint32_t length ){
 
-	cerr <<"EEEE: doing AVDecoder::decodeFrame len="<<length<<endl;
+//	cerr <<"EEEE: doing AVDecoder::decodeFrame len="<<length<<endl;
         static struct timeval lasttime;
         static int i=0;
         i++;
@@ -136,7 +136,7 @@ void AVDecoder::decodeFrame( uint8_t * data, uint32_t length ){
                 int diffms = (now.tv_sec-lasttime.tv_sec)*1000+(now.tv_usec-lasttime.tv_usec)/1000;
                 float sec = (float)diffms/1000.0f;
                 printf("%d frames in %fs\n", REPORT_N, sec);
-                printf("FPS decode: %f\n", (float)REPORT_N/(float)sec );
+                printf("FPS_DECODE: %f\n", (float)REPORT_N/(float)sec );
                 lasttime=now;
         }
 
@@ -194,12 +194,12 @@ void AVDecoder::decodeFrame( uint8_t * data, uint32_t length ){
 			       struct SwsContext* ctx = (struct SwsContext*)swsctx;
 			       sws_scale( ctx, decodedFrame->data, decodedFrame->linesize, 0, context->height, converted->data, converted->linesize);
 #endif
-			       cerr <<"EEEE: AVDecoder: decoded frame "<<endl;
+//			       cerr <<"EEEE: AVDecoder: decoded frame "<<endl;
 			       handler->handle( converted );
                         }
                         
                         else{
-			       cerr <<"EEEE: AVDecoder: decoded frame "<<endl;
+//			       cerr <<"EEEE: AVDecoder: decoded frame "<<endl;
                                 handler->handle( lastImage );
                         }
 			lastImage = NULL;

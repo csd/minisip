@@ -43,6 +43,7 @@
 #include<libmutil/Thread.h>
 #include<libmutil/Mutex.h>
 #include<libmutil/CondVar.h>
+#include<list>
 
 class OpenGLWindow;
 
@@ -63,16 +64,32 @@ class OpenGLDisplay: public VideoDisplay{
 
 		virtual void resize(int w, int h);
 
+		virtual uint32_t getRequiredWidth(){ return width; };
+		virtual uint32_t getRequiredHeight(){ return height; };
+
 		virtual void start();
 		virtual void stop();
 
+		/*
+		 * Must only be called by the thread doing OpenGL calls.
+		 */
+		int getTexture();
+
 	private:
+		int texture;
+		uint8_t *rgb;
+		bool newRgbData;
+		bool needUpload;
+		Mutex dataLock;
 
 		uint32_t height;
 		uint32_t width;
 		bool fullscreen;
 
 		OpenGLWindow* window;
+
+		int nallocated;
+		std::list<MImage*> emptyImages;
 
 #if 0
 		uint32_t baseWindowHeight;

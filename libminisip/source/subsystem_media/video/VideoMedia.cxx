@@ -377,6 +377,10 @@ void VideoMediaSource::addPacketToFrame( MRef<RtpPacket *> packet){
 
 	//cerr << "EEEE: VideoMediaSource::addPacketToFrame: type="<<(int)type<<endl;
 
+	if (!((type>=1 && type<=23) || type==28)){
+		cerr << "VideoMediaSource::addPacketToFrame: WARNING: unexpected packet type: "<< (int)type<<endl;
+		cerr << "VideoMediaSource::addPacketToFrame: WARNING: shutting down for debugging"<<endl;
+	}
 	massert( (type>=1 && type<=23) || type==28 );
 	
 	if (type>=1 && type<=23){

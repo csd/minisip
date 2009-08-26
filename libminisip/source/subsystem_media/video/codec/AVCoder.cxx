@@ -148,7 +148,7 @@ void AVEncoder::handle( MImage * image ){
                 int diffms = (now.tv_sec-lasttime.tv_sec)*1000+(now.tv_usec-lasttime.tv_usec)/1000;
                 float sec = (float)diffms/1000.0f;
                 printf("%d frames in %fs\n", REPORT_N, sec);
-                printf("FPS: %f\n", (float)REPORT_N/(float)sec );
+                printf("FPS_ENCODE: %f\n", (float)REPORT_N/(float)sec );
                 lasttime=now;
         }
 #endif
@@ -264,6 +264,7 @@ void AVEncoder::make_h264_header(unsigned char *buf, int packetization_mode, uns
 		break;
 	case H264_AGGREGATION_PACKET:
 		*buf = nal_unit_octet;
+		massert(1==0);
 		// to be implemented...
 		break;
 	case H264_FRAGMENTATION_UNIT:
