@@ -152,6 +152,7 @@ class OpenGLWindow : public Runnable {
 
 
 		}
+		void updateVideoPositions();
 		void drawSurface();
 		void sdlQuit();
 		void windowResized(int w, int h);
@@ -219,13 +220,33 @@ OpenGLWindow::OpenGLWindow(int w, int h, bool fullscreen){
 
 #define REPORT_N 500
 
-#define SCALE (10.0/512.0)
+void OpenGLWindow::updateVideoPositions(){
+	int nvideos = displays.size();
 
+	list<OpenGLDisplay*>::iterator i;
+	for (i=displays.begin(); i!=displays.end(); i++){ //FIXME: this makes all videos full screen (last video is displayed on top)
+		mgl_gfx* gfx = (*i)->getTexture();
+		if (gfx->x1)
+			delete gfx->x1;
+		if (gfx->y1)
+			delete gfx->y1;
+		if (gfx->x2)
+			delete gfx->x2;
+		if (gfx->y2)
+			delete gfx->y2;
+		gfx->x1= new Animate(windowX0);
+		gfx->y1= new Animate(windowX0/gfx->aratio);
+		gfx->x2= new Animate(-windowX0);
+		gfx->y2= new Animate(-windowX0/gfx->aratio);
+	}
+}
 
 void OpenGLWindow::addDisplay(OpenGLDisplay* displ){
 	displayListLock.lock();
 	displays.push_back(displ);
 	displayListLock.unlock();
+
+	updateVideoPositions();
 }
 
 void OpenGLWindow::removeDisplay(OpenGLDisplay* displ){
@@ -292,16 +313,16 @@ void OpenGLWindow::drawSurface(){
 			glBindTexture( GL_TEXTURE_2D, gfx->texture);
 			glBegin( GL_QUADS );
 			glTexCoord2f( 0, gfx->hu );
-			glVertex3f(  -WINDOW_WIDTH, -WINDOW_WIDTH/gfx->aratio, 0.0f );
+			glVertex3f(  windowX0, windowX0/gfx->aratio, 0.0f );
 
 			glTexCoord2f( gfx->wu, gfx->hu );
-			glVertex3f( WINDOW_WIDTH, -WINDOW_WIDTH/gfx->aratio, 0.0f );
+			glVertex3f( -windowX0, windowX0/gfx->aratio, 0.0f );
 
 			glTexCoord2f( gfx->wu, 0 );
-			glVertex3f( WINDOW_WIDTH, WINDOW_WIDTH/gfx->aratio, 0.0f );
+			glVertex3f( -windowX0, -windowX0/gfx->aratio, 0.0f );
 
 			glTexCoord2f( 0, 0 );
-			glVertex3f( -WINDOW_WIDTH, WINDOW_WIDTH/gfx->aratio, 0.0f );
+			glVertex3f( windowX0, -windowX0/gfx->aratio, 0.0f );
 			glEnd();
 		}
 	}
@@ -663,6 +684,7 @@ OpenGLDisplay::OpenGLDisplay( uint32_t width, uint32_t height):VideoDisplay(){
 	fullscreen = false;
 	nallocated=0;
 
+	memset(&gfx, 0, sizeof(gfx));
 	gfx.texture=-1;
 	gfx.aratio=1;
 	gfx.wu=1;

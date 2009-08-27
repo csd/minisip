@@ -44,6 +44,7 @@
 #include<libmutil/Mutex.h>
 #include<libmutil/CondVar.h>
 #include<list>
+#include"Animate.h"
 
 class OpenGLWindow;
 
@@ -52,6 +53,11 @@ struct mgl_gfx{
 	float wu;	//width usage of texture (0..1). How much of texture is rendered
 	float hu;	//height usage
 	float aratio;   // width/height
+	Animate* x1;
+	Animate* y1;
+	Animate* x2;
+	Animate* y2;
+	Animate* alpha;
 };
 
 /**
@@ -83,7 +89,6 @@ class OpenGLDisplay: public VideoDisplay{
 		struct mgl_gfx* getTexture();
 
 	private:
-//		int texture;
 		mgl_gfx gfx;
 
 		uint8_t *rgb;
@@ -100,10 +105,6 @@ class OpenGLDisplay: public VideoDisplay{
 		int nallocated;
 		std::list<MImage*> emptyImages;
 
-#if 0
-		uint32_t baseWindowHeight;
-		uint32_t baseWindowWidth;
-#endif
 		void openDisplay();
 		virtual void createWindow();
 		virtual void destroyWindow();
@@ -113,20 +114,6 @@ class OpenGLDisplay: public VideoDisplay{
 		virtual MImage * allocateImage();
 		virtual void deallocateImage( MImage * image );
 		virtual void handleEvents();
-#if 0
-
-//		void initWm();
-
-//		Window window;
-		Display * display;
-
-
-//		SDL_Surface * surface;
-
-//		uint32_t flags;
-//		int bpp;        
-
-#endif
 };
 
 
