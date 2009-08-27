@@ -104,8 +104,8 @@ void AVEncoder::init( uint32_t width, uint32_t height ){
 
 	video->width=width;
 	video->height=height;
-	video->fps=25;
-	videoCodec->bitrate=384;
+	video->fps=15;
+	videoCodec->bitrate=256;
 
 	hdviper_setup_video_encoder(videoCodec, VIDEO_CODEC_H264, video);
 
@@ -138,7 +138,7 @@ void AVEncoder::handle( MImage * image ){
         i++;
 
 
-//	if (i%5!=0)
+//	if (i%7!=0)
 //		return;
 	N++;
 

@@ -63,6 +63,7 @@ MPlugin * mopengl_LTX_getPlugin( MRef<Library*> lib ){
  */
 
 
+#define DRAW_Z -20.0F
 
 class OpenGLWindow : public Runnable {
 	public:
@@ -82,7 +83,75 @@ class OpenGLWindow : public Runnable {
 		string getMemObjectType(){return "OpenGLWindow";}
 
 		static MRef<OpenGLWindow*> getWindow();
+
+		/**
+		 * Suggest good dimension of window. If there are multiple videos, then this will be ignored
+		 */
+		void sizeHint(int w, int h){
+			if (displays.size()<=1){
+				if (initialized && ! isFullscreen() ){
+					windowed_width  = w;
+					windowed_height = h;
+					windowResized(w,h);
+				}
+				if (!initialized){
+					windowed_width  = w;
+					windowed_height = h;
+				}
+			}
+		} 
 	private:
+		GLdouble windowX0;
+		GLdouble windowY0;
+		void findScreenCoords(){
+			GLdouble x=0;
+			GLdouble y=0;
+			GLdouble z=0;
+
+			GLdouble model[16];
+			GLdouble proj[16];
+			GLint view[4];
+			glGetDoublev(GL_PROJECTION_MATRIX, &proj[0]);
+			glGetDoublev(GL_MODELVIEW_MATRIX, &model[0]);
+			glGetIntegerv(GL_VIEWPORT, &view[0]);
+	
+
+			GLdouble winx;
+			GLdouble winy;
+			GLdouble winz;
+			GLdouble delta=40;
+			int i;
+			for (i=0; i<64; i++){
+
+				int ret = gluProject(x,y,z, model,proj,view, &winx, &winy, &winz);
+
+				if (winx<0)
+					x=x+delta;
+				else
+					x=x-delta;
+				delta=delta/2;
+			}
+			windowX0=x;
+
+			x=0;
+			delta=20;
+
+			for (i=0; i<64; i++){
+
+				int ret = gluProject(x,y,z, model,proj,view, &winx, &winy, &winz);
+
+				if (winy<0)
+					y=y+delta;
+				else
+					y=y-delta;
+				delta=delta/2;
+			}
+			windowY0=y;
+
+			cerr << "EEEE: findScreenCoords: window 0,0 is at coord "<<windowX0 << ","<< windowY0 <<",-20"<<endl;
+
+
+		}
 		void drawSurface();
 		void sdlQuit();
 		void windowResized(int w, int h);
@@ -165,6 +234,7 @@ void OpenGLWindow::removeDisplay(OpenGLDisplay* displ){
 	displayListLock.unlock();
 }
 
+#define WINDOW_WIDTH -windowX0
 
 void OpenGLWindow::drawSurface(){
 //	cerr << "EEEE: doing OpenGLWindow::drawSurface()"<<endl;
@@ -200,18 +270,20 @@ void OpenGLWindow::drawSurface(){
 
 	glPushMatrix();
 
-	glTranslatef( 0, 0.0f, -20);
+	glTranslatef( 0, 0.0f, DRAW_Z);
 
 	static int N=0;
 	N++;
-	glRotatef(((float)N)/5.0, 0.0F, 1.0F,0.0F);
+//	glRotatef(((float)N)/5.0, 0.0F, 1.0F,0.0F);
 
+	GLdouble x=0;
 
 	displayListLock.lock();
 	list<OpenGLDisplay*>::iterator video;
 	int dummy=1;
+	int nvideos=displays.size();
 	for (video=displays.begin(); video!=displays.end(); video++){
-//		cerr << "EEEE: getting video texture for display "<< dummy++ <<endl;
+//		cerr << "EEEE: getting video texture for display "<< dummy++"/"<<nvideos <<endl;
 		struct mgl_gfx* gfx = (*video)->getTexture();
 		if (gfx->texture>0){
 //			cerr <<"aratio="<<gfx->aratio<<endl;
@@ -219,28 +291,23 @@ void OpenGLWindow::drawSurface(){
 			glColor4f(1.0,1.0,1.0, 1.0 );
 			glBindTexture( GL_TEXTURE_2D, gfx->texture);
 			glBegin( GL_QUADS );
-
 			glTexCoord2f( 0, gfx->hu );
-			glVertex3f( /*-5.0*/ -(512.0/2.0)*SCALE, -5.0/gfx->aratio, 0.0f );
+			glVertex3f(  -WINDOW_WIDTH, -WINDOW_WIDTH/gfx->aratio, 0.0f );
 
 			glTexCoord2f( gfx->wu, gfx->hu );
-			glVertex3f( 5.0, -5.0/gfx->aratio, 0.0f );
+			glVertex3f( WINDOW_WIDTH, -WINDOW_WIDTH/gfx->aratio, 0.0f );
 
 			glTexCoord2f( gfx->wu, 0 );
-			glVertex3f( 5.0, 5.0/gfx->aratio, 0.0f );
+			glVertex3f( WINDOW_WIDTH, WINDOW_WIDTH/gfx->aratio, 0.0f );
 
 			glTexCoord2f( 0, 0 );
-			glVertex3f( -5.0, 5.0/gfx->aratio, 0.0f );
+			glVertex3f( -WINDOW_WIDTH, WINDOW_WIDTH/gfx->aratio, 0.0f );
 			glEnd();
 		}
 	}
 	displayListLock.unlock();
 
-
-
-
 	glPopMatrix();
-
 
 	glFlush();
 	SDL_GL_SwapBuffers();
@@ -353,6 +420,12 @@ void OpenGLWindow::run(){
 					return;
 				}
 
+/*				if (event.key.keysym.sym=='w'){
+					windowResized(rand()%800+100, rand()%800+100);
+					break;
+				}
+*/
+
 
 				if (event.key.keysym.sym == SDLK_RETURN &&
 						event.key.keysym.mod & KMOD_ALT){
@@ -383,17 +456,24 @@ void OpenGLWindow::run(){
 void OpenGLWindow::start(){
 	cerr << "EEEE: doing OpenGLWindow::start()"<<endl;
 	lock.lock();
-	startWaitSem = new Semaphore();
-	doStop=false;
-	if (runCount==0){
-		massert(!thread);
-		thread = new Thread(this);
+	bool useSem=false;
+	if (runCount<=0){
+		startWaitSem = new Semaphore();
+		useSem=true;
+		doStop=false;
+		if (runCount==0){
+			massert(!thread);
+			thread = new Thread(this);
+		}
+
 	}
 	runCount++;
 
 	lock.unlock();
+
 	//cerr << "EEEE: waiting for startWaitSem->dec()"<<endl;
-	startWaitSem->dec();
+	if (useSem)
+		startWaitSem->dec();
 	//cerr << "EEEE: done waiting for startWaitSem->dec()"<<endl;
 
 	cerr << "EEEE: after OpenGLWindow::start() runCount="<<runCount<<endl;
@@ -522,7 +602,8 @@ void OpenGLWindow::initSurface(){
 
 
 	glShadeModel(GL_SMOOTH);
-	glClearColor(0x04/255.0F,0x01/255.0F,0x16/255.0F,0);
+	//glClearColor(0x04/255.0F,0x01/255.0F,0x16/255.0F,0);
+	glClearColor(0.0F,0.0F,0.0F,0);
 	// set opengl viewport and perspective view
 	glViewport(0,0,cur_width,cur_height);
 	glMatrixMode(GL_PROJECTION);
@@ -557,6 +638,16 @@ void OpenGLWindow::initSurface(){
 
 	glDisable(GL_DEPTH_TEST);
 
+
+
+
+	glMatrixMode( GL_MODELVIEW );
+	glLoadIdentity();
+	glPushMatrix();
+	glTranslatef( 0, 0.0f, DRAW_Z);
+	findScreenCoords();
+	glPopMatrix();
+
 }
 
 
@@ -580,11 +671,9 @@ OpenGLDisplay::OpenGLDisplay( uint32_t width, uint32_t height):VideoDisplay(){
 	rgb=NULL;
 	needUpload=false;
 	newRgbData=false;
-#if 0
-	baseWindowWidth = this->width;
-	baseWindowHeight = this->height;
-#endif
+
 	window = * (OpenGLWindow::getWindow() );
+	window->sizeHint(width,height);
 	massert(window);
 }
 
@@ -618,7 +707,7 @@ struct mgl_gfx*  OpenGLDisplay::getTexture(){
 }
 
 void OpenGLDisplay::handle( MImage * mimage ){
-//	cerr <<"EEEE: doing OpenGLDisplay::handle"<<endl;
+	cerr <<"EEEE: doing OpenGLDisplay::handle on display "<<(uint64_t)this<<endl;
 	dataLock.lock();
 	if (!rgb || width!=mimage->width || height!=mimage->height){
 		cerr << "EEEE: allocating RGB of size "<<mimage->width<<"x"<<mimage->height<<endl;
@@ -630,24 +719,8 @@ void OpenGLDisplay::handle( MImage * mimage ){
 	
 	}
 
-//	cerr << "linesizes: 0=="<<mimage->linesize[0]<<" 1="<<mimage->linesize[1]<<" 2="<<mimage->linesize[2]<<endl; 
-//	cerr << "width="<<width<<" height="<<height<<endl;
-//	cerr << "EEEE: copying data"<<endl;
 	massert(rgb);
-	memcpy(rgb, &mimage->data[0][0], width*height*3);
-/*	for (int i=0; i<width*height; i++){
-//		if (i%1024*1024==0){
-//			cerr <<"EEEE: i="<<i<<endl;
-//		}
-		if (i<2048){
-			cerr << (int)mimage->data[0][i]<<","<<(int)mimage->data[1][i]<<","<<(int)mimage->data[2][i]<<endl;
-		}
-		memcpy(rgb, &mimage->data[0][0], width*height*3);
-		rgb[i*3+0]=mimage->data[0][i];
-		rgb[i*3+1]=mimage->data[1][i];
-		rgb[i*3+2]=mimage->data[2][i];
-	}
-*/
+	memcpy(rgb, &mimage->data[0][0], width*height*3); //TODO: don't copy since it is in correct format.
 	newRgbData=true;
 //	cerr << "EEEE: OpenGLDisplay::handle: done copying new data"<<endl;
 	emptyImages.push_back(mimage);
@@ -682,107 +755,21 @@ void OpenGLDisplay::init( uint32_t width, uint32_t height ){
 	cerr <<"EEEE: doing OpenGLDisplay::init("<<width<<","<<height<<")"<<endl;
 	this->width = width;
 	this->height=height;
-	//	window->init();
-#if 0
-	baseWindowWidth = this->width = width;
-	baseWindowHeight = this->height = height;
-#endif
 }
 
 void OpenGLDisplay::createWindow(){
 	cerr <<"EEEE: doing OpenGLDisplay::createWindow"<<endl;
-#if 0	
-	if( OpenGL_Init( OpenGL_INIT_VIDEO | OpenGL_INIT_EVENTTHREAD |OpenGL_INIT_NOPARACHUTE) < 0 ){
-		fprintf( stderr, "Could not initialize OpenGL: %s\n",
-				OpenGL_GetError() );
-		exit( 1 );
-	}
-
-	//        uint32_t flags;
-	//        int bpp;
-
-	flags = OpenGL_ANYFORMAT | OpenGL_HWPALETTE | OpenGL_HWSURFACE |
-		OpenGL_DOUBLEBUF | OpenGL_RESIZABLE;
-
-	bpp = OpenGL_VideoModeOK( baseWindowWidth, baseWindowHeight, 16, flags );
-
-	if( bpp == 0 ){
-		fprintf( stderr, "Could not find an OpenGL video mode\n" );
-		exit( 1 );
-	}
-
-	surface = OpenGL_SetVideoMode( baseWindowWidth, baseWindowHeight, bpp, flags );
-
-	if( surface == NULL ){
-		fprintf( stderr, "Could not set OpenGL video mode\n" );
-		exit( 1 );
-	}
-
-	initWm();
-
-
-	OpenGL_WM_SetCaption( "minisip video", "minisip video" );
-
-
-	OpenGL_LockSurface( surface );
-#endif
 }
-
-#if 0
-void OpenGLDisplay::initWm(){
-#ifdef IPAQ
-	if( !fullscreen ){
-		int ret;
-		OpenGL_SysWMinfo wmInfo;
-
-		OpenGL_VERSION( &wmInfo.version );
-		ret = OpenGL_GetWMInfo( &wmInfo );
-
-		if( ret > 0 ){
-			XClientMessageEvent event;
-			display = wmInfo.info.x11.display;
-			window = wmInfo.info.x11.wmwindow;
-			Atom type = XInternAtom( display, "_NET_WM_WINDOW_TYPE", False );
-			Atom typeDialog = XInternAtom(display, "_NET_WM_WINDOW_TYPE_DIALOG", False );
-
-			XChangeProperty( display, window, type,
-					XA_ATOM, 32, PropModeReplace,
-					(unsigned char *) &typeDialog, 1);
-
-
-
-			XUnmapWindow( display, window );
-			XResizeWindow( display, window, width, height );
-			XMapWindow( display, window );
-		}
-		else{
-			fprintf( stderr, "OpenGL Error when getting WM info: %s\n",
-					OpenGL_GetError() );
-		}
-	}
-#endif
-}
-#endif
 
 void OpenGLDisplay::resize(int w, int h){
 	cerr << "EEEE: doing OpenGLDisplay::resize("<<w<<","<<h<<") old size="<<width<<"x"<<height<<endl;
 	this->width=w;
 	this->height=h;
-//	stop();
-//	init(w,h);
-//	start();
-
+	window->sizeHint(w,h);
 }
 
 void OpenGLDisplay::destroyWindow(){
 	cerr << "EEEE: doing OpenGLDisplay::destroyWindow()"<<endl;
-#if 0
-	OpenGL_UnlockSurface( surface );
-
-	OpenGL_FreeSurface( surface );
-
-	OpenGL_QuitSubSystem( OpenGL_INIT_VIDEO );
-#endif
 }
 
 MImage * OpenGLDisplay::provideImage(){
@@ -793,6 +780,11 @@ MImage * OpenGLDisplay::provideImage(){
 	MImage* ret = *emptyImages.begin();
 	emptyImages.pop_front();
 	dataLock.unlock();
+	if (ret->width!=width||ret->height!=height){	//If there has been a resize, and the 
+							//MImage is allocated with the old size, re-allocate
+		deallocateImage(ret);
+		ret=allocateImage();
+	}
 	return ret;
 }
 
@@ -801,14 +793,14 @@ MImage * OpenGLDisplay::allocateImage(){
 	MImage * mimage = new MImage;
 	nallocated++;
 
-	mimage->data[0] = /*overlay->pixels[0]*/ (uint8_t*)calloc(1,width*height*3+1);
+	mimage->data[0] = (uint8_t*)calloc(1,width*height*3+1);
 	massert(mimage->data[0]);
-	mimage->data[1] = NULL /*overlay->pixels[2]*/ /* (uint8_t*)calloc(1,width*height+1)*/;
-	mimage->data[2] = NULL /*overlay->pixels[1]*/ /*(uint8_t*)calloc(1,width*height+1)*/;
+	mimage->data[1] = NULL;
+	mimage->data[2] = NULL;
 
-	mimage->linesize[0] =/* overlay->pitches[0]*/ width*3;
-	mimage->linesize[1] =/* overlay->pitches[2]*/ /*width*/0;
-	mimage->linesize[2] =/* overlay->pitches[1]*/ /*width*/0;
+	mimage->linesize[0] = width*3;
+	mimage->linesize[1] = 0;
+	mimage->linesize[2] = 0;
 	mimage->width=width;
 	mimage->height=height;
 
@@ -820,8 +812,6 @@ MImage * OpenGLDisplay::allocateImage(){
 void OpenGLDisplay::deallocateImage( MImage * mimage ){
 	cerr << "EEEE: doing OpenGLDisplay::deallocateImage()"<<endl;
 	free(mimage->data[0]);
-	free(mimage->data[1]);
-	free(mimage->data[2]);
 	delete mimage;
 }
 
@@ -839,59 +829,6 @@ void OpenGLDisplay::displayImage( MImage * mimage ){
 
 void OpenGLDisplay::handleEvents(){
 	cerr <<"EEEE: doing OpenGLDisplay::handleEvents"<<endl;
-#if 0
-	OpenGL_Event event;
-
-	while( OpenGL_PollEvent( &event ) ){
-		if( event.type == OpenGL_KEYDOWN && event.key.keysym.sym == OpenGLK_f || event.type == OpenGL_MOUSEBUTTONDOWN && event.button.button == OpenGL_BUTTON_LEFT ){
-#ifdef IPAQ
-			if( fullscreen ){
-				cerr << "not fullscreen" << endl;
-				baseWindowWidth = width;
-				baseWindowHeight = height;
-				fullscreen = false;
-			}
-			else{
-				cerr << "fullscreen" << endl;
-				baseWindowWidth = 240;
-				baseWindowHeight = 180;
-				fullscreen = true;
-			}
-
-			//XResizeWindow( display, window, baseWindowWidth, baseWindowHeight );
-			//XSync( display, false );
-			OpenGL_UnlockSurface( surface );
-
-			OpenGL_FreeSurface( surface );
-			surface = OpenGL_SetVideoMode( baseWindowWidth, 
-					baseWindowHeight, bpp, flags);
-			initWm();
-			OpenGL_LockSurface( surface );	
-			//			destroyWindow();
-			//			createWindow();
-
-
-#endif
-			if( fullscreen ){
-				OpenGL_WM_ToggleFullScreen( surface );
-			}
-			break;
-		}
-		else if( event.type == OpenGL_VIDEORESIZE ){
-			//XSync( display, false );
-			baseWindowWidth = event.resize.w;
-			baseWindowHeight = event.resize.h;
-
-			OpenGL_UnlockSurface( surface );
-			OpenGL_FreeSurface( surface );
-			surface = OpenGL_SetVideoMode( baseWindowWidth, 
-					baseWindowHeight, bpp, flags);
-			//			initWm();
-			OpenGL_LockSurface( surface );	
-		}
-
-	}
-#endif
 }
 
 OpenGLPlugin::OpenGLPlugin( MRef<Library *> lib ): VideoDisplayPlugin( lib ){

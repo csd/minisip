@@ -367,7 +367,7 @@ void VideoMediaSource::addPacketToFrame( MRef<RtpPacket *> packet){
 	uint32_t clen = packet->getContentLength();
 	bool marker= packet->getHeader().marker;
 
-	//cerr << "EEEE: VideoMediaSource::addPacketToFrame: len="<<clen<< " seq="<<packet->getHeader().getSeqNo() << " timestamp="<<packet->getHeader().getTimestamp()<<" marker="<<marker<<endl;
+	cerr << "EEEE: VideoMediaSource::addPacketToFrame: ssrc=" << ssrc << " len="<<clen<< " seq="<<packet->getHeader().getSeqNo() << " timestamp="<<packet->getHeader().getTimestamp()<<" marker="<<marker<<endl;
 
 	if (!content || !clen)
 		return;
