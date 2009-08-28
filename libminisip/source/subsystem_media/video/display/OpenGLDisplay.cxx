@@ -312,9 +312,20 @@ void OpenGLWindow::updateVideoPositions(){
 				break;
 			case 4:
 				//tex_x1
-				//if (video)
+				if (video_n==0 | video_n==2) tex_x1=leftx;
+				if (video_n==1 | video_n==3) tex_x1=0.0F;
 
-			
+				//tex_y1
+				if (video_n==0 | video_n==1) tex_y1=topy;
+				if (video_n==2 | video_n==3) tex_y1=0.0F;
+
+				//tex_x2
+				if (video_n==0 | video_n==2) tex_x2=0.0F;
+				if (video_n==1 | video_n==3) tex_x2=rightx;
+
+				//tex_y2
+				if (video_n==0 | video_n==1) tex_y2=0.0F;
+				if (video_n==2 | video_n==3) tex_y2=bottomy;
 				break;
 
 		}
