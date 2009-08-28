@@ -367,7 +367,7 @@ void VideoMediaSource::addPacketToFrame( MRef<RtpPacket *> packet){
 	uint32_t clen = packet->getContentLength();
 	bool marker= packet->getHeader().marker;
 
-	cerr << "EEEE: VideoMediaSource::addPacketToFrame: ssrc=" << ssrc << " len="<<clen<< " seq="<<packet->getHeader().getSeqNo() << " timestamp="<<packet->getHeader().getTimestamp()<<" marker="<<marker<<endl;
+//	cerr << "EEEE: VideoMediaSource::addPacketToFrame: ssrc=" << ssrc << " len="<<clen<< " seq="<<packet->getHeader().getSeqNo() << " timestamp="<<packet->getHeader().getTimestamp()<<" marker="<<marker<<endl;
 
 	if (!content || !clen)
 		return;
@@ -381,7 +381,7 @@ void VideoMediaSource::addPacketToFrame( MRef<RtpPacket *> packet){
 		cerr << "VideoMediaSource::addPacketToFrame: WARNING: unexpected packet type: "<< (int)type<<endl;
 		cerr << "VideoMediaSource::addPacketToFrame: WARNING: shutting down for debugging"<<endl;
 	}
-	massert( (type>=1 && type<=23) || type==28 );
+//	massert( (type>=1 && type<=23) || type==28 );
 	
 	if (type>=1 && type<=23){
 		frame[index+0]=0;

@@ -88,21 +88,26 @@ class OpenGLWindow : public Runnable {
 		 * Suggest good dimension of window. If there are multiple videos, then this will be ignored
 		 */
 		void sizeHint(int w, int h){
+			cerr <<"EEEE: doing sizeHint("<<w<<","<<h<<")"<<endl;
 			if (displays.size()<=1){
-				if (initialized && ! isFullscreen() ){
+//				if (initialized && ! isFullscreen() ){
+//					windowed_width  = w;
+//					windowed_height = h;
+//					windowResized(w,h);
+//				}
+//				if (!initialized){
 					windowed_width  = w;
 					windowed_height = h;
-					windowResized(w,h);
-				}
-				if (!initialized){
-					windowed_width  = w;
-					windowed_height = h;
-				}
+//				}
+			resized=true;
 			}
+	
 		} 
 	private:
+		int animation_ms;
 		GLdouble windowX0;
 		GLdouble windowY0;
+		bool resized;
 		void findScreenCoords(){
 			GLdouble x=0;
 			GLdouble y=0;
@@ -208,9 +213,11 @@ OpenGLWindow::OpenGLWindow(int w, int h, bool fullscreen){
 	initialized=false;
 	windowed_width=w;
 	windowed_height=h;
+	resized=false;
 	native_width=0;
 	native_height=0;
 	startFullscreen=fullscreen;
+	animation_ms=250;
 
 	gDrawSurface=NULL;
 
@@ -221,27 +228,155 @@ OpenGLWindow::OpenGLWindow(int w, int h, bool fullscreen){
 #define REPORT_N 500
 
 void OpenGLWindow::updateVideoPositions(){
+	cerr << "EEEE: doing updateVideoPositions()"<<endl;
 	int nvideos = displays.size();
 
 	list<OpenGLDisplay*>::iterator i;
-	for (i=displays.begin(); i!=displays.end(); i++){ //FIXME: this makes all videos full screen (last video is displayed on top)
+	int video_n=0;
+	for (i=displays.begin(); i!=displays.end(); i++, video_n++){ //FIXME: this makes all videos full screen (last video is displayed on top)
+		float leftx=windowX0;
+		float middlex=0.0F;
+		float rightx=-windowX0;
+		float topy=windowY0;
+		float middley=0.0F;
+		float bottomy=-windowY0;
+
 		mgl_gfx* gfx = (*i)->getTexture();
-		if (gfx->x1)
+
+		float tex_x1, tex_y1, tex_x2, tex_y2;
+		float middle;
+
+		
+		bool firstUpdate=false;
+		if (!gfx->x1){
+			firstUpdate=true;
+		}
+
+
+		switch (nvideos){
+			case -1:
+			case 0:
+				massert(1==0);
+				break;
+			case 1:
+				tex_x1=leftx;
+				tex_y1=topy;
+				tex_x2=rightx;
+				tex_y2=bottomy;
+				middle=0.0F;
+
+				break;
+			case 2:
+				if (video_n==0){
+					tex_x1=leftx;
+					tex_y1=topy /*tex_x1/gfx->aratio*/; //FIXME - should not be top
+					tex_x2=0.0F;
+					tex_y2=bottomy /*tex_x2/gfx->aratio*/; //FIXME
+					middlex=leftx/2;
+					middley=0; //FIXME
+				}else{
+					tex_x1=0.0F;
+					tex_y1=topy /*tex_x1/gfx->aratio*/; //FIXME - should not be top
+					tex_x2=rightx;
+					tex_y2=bottomy /*tex_x2/gfx->aratio*/; //FIXME
+					middlex=rightx;
+					middley=0; //FIXME
+				}
+
+				break;
+			case 3:
+				//tex_x1:
+				//
+				if (video_n==0) tex_x1=leftx;
+				if (video_n==1) tex_x1=0.0;
+				if (video_n==2) tex_x1=leftx/2;
+			
+				//tex_y1:
+				//
+				if (video_n==0) tex_y1=topy;
+				if (video_n==1) tex_y1=topy;
+				if (video_n==2) tex_y1=0.0F;
+
+			
+				//tex_x2:
+				//
+				if (video_n==0) tex_x2=0.0F;
+				if (video_n==1) tex_x2=rightx;
+				if (video_n==2) tex_x2=rightx/2;
+
+				//tex_y2:
+				//
+				if (video_n==0) tex_y2=0.0F;
+				if (video_n==1) tex_y2=0.0F;
+				if (video_n==2) tex_y2=bottomy;
+				break;
+			case 4:
+				//tex_x1
+				//if (video)
+
+			
+				break;
+
+		}
+		
+		float lastx1=tex_x1;
+		float lasty1=tex_y1;
+		float lastx2=tex_x2;
+		float lasty2=tex_y2;
+		
+
+		if (gfx->x1){
+			lastx1=gfx->x1->getVal();
 			delete gfx->x1;
-		if (gfx->y1)
+		}else{
+			if (nvideos>1){
+				lastx1=lastx2=middlex;	//grow from middle if it it did previously not exist
+				lasty1=lasty2=middley;
+			}else{
+				lastx1=tex_x1;
+				lasty1=tex_y1;
+				lastx2=tex_x2;
+				lasty2=tex_y2;
+			}
+		}
+		if (gfx->y1){
+			lasty1=gfx->y1->getVal();
 			delete gfx->y1;
-		if (gfx->x2)
+		}
+		if (gfx->x2){
+			lastx2=gfx->x2->getVal();
 			delete gfx->x2;
-		if (gfx->y2)
+		}
+		if (gfx->y2){
+			lasty2=gfx->y2->getVal();
 			delete gfx->y2;
-		gfx->x1= new Animate(windowX0);
-		gfx->y1= new Animate(windowX0/gfx->aratio);
-		gfx->x2= new Animate(-windowX0);
-		gfx->y2= new Animate(-windowX0/gfx->aratio);
+		}
+
+		float lastAlpha=0.0;
+		if (gfx->alpha){
+			lastAlpha=gfx->alpha->getVal();
+			delete gfx->alpha;
+		}
+
+
+		cerr << "EEEE: setting position of video "<< video_n <<" to " << tex_x1<<","<<tex_y1<<" "<<tex_x2<<","<<tex_y2<<endl;
+
+		gfx->x1= new Animate(animation_ms, lastx1, tex_x1, ANIMATE_STARTSTOP);
+		gfx->y1= new Animate(animation_ms, lasty1, tex_y1 /* /gfx->aratio */ , ANIMATE_STARTSTOP);
+		gfx->x2= new Animate(animation_ms, lastx2, tex_x2, ANIMATE_STARTSTOP);
+		gfx->y2= new Animate(animation_ms, lasty2, tex_y2 /* /gfx->aratio */, ANIMATE_STARTSTOP);
+		gfx->alpha= new Animate(animation_ms, lastAlpha, 1, ANIMATE_STARTSTOP);
+		gfx->x1->start();
+		gfx->y1->start();
+		gfx->x2->start();
+		gfx->y2->start();
+		gfx->alpha->start();
+		
 	}
 }
 
 void OpenGLWindow::addDisplay(OpenGLDisplay* displ){
+	cerr << "EEEE: doing addDisplay()"<<endl;
 	displayListLock.lock();
 	displays.push_back(displ);
 	displayListLock.unlock();
@@ -253,6 +388,7 @@ void OpenGLWindow::removeDisplay(OpenGLDisplay* displ){
 	displayListLock.lock();
 	displays.remove(displ);
 	displayListLock.unlock();
+	updateVideoPositions();
 }
 
 #define WINDOW_WIDTH -windowX0
@@ -309,20 +445,22 @@ void OpenGLWindow::drawSurface(){
 		if (gfx->texture>0){
 //			cerr <<"aratio="<<gfx->aratio<<endl;
 //			cerr << "EEEE: ++++++++++++++ drawing texture "<<video_texture<<" +++++++++++++"<<endl;
-			glColor4f(1.0,1.0,1.0, 1.0 );
+			float alpha=gfx->alpha->getVal();
+			//cerr <<"Alpha="<<alpha<<endl;
+			glColor4f(alpha,alpha,alpha, alpha );
 			glBindTexture( GL_TEXTURE_2D, gfx->texture);
 			glBegin( GL_QUADS );
 			glTexCoord2f( 0, gfx->hu );
-			glVertex3f(  windowX0, windowX0/gfx->aratio, 0.0f );
+			glVertex3f(  gfx->x1->getVal(), gfx->y1->getVal(), 0.0f );
 
 			glTexCoord2f( gfx->wu, gfx->hu );
-			glVertex3f( -windowX0, windowX0/gfx->aratio, 0.0f );
+			glVertex3f( gfx->x2->getVal(), gfx->y1->getVal(), 0.0f );
 
 			glTexCoord2f( gfx->wu, 0 );
-			glVertex3f( -windowX0, -windowX0/gfx->aratio, 0.0f );
+			glVertex3f( gfx->x2->getVal(), gfx->y2->getVal(), 0.0f );
 
 			glTexCoord2f( 0, 0 );
-			glVertex3f( windowX0, -windowX0/gfx->aratio, 0.0f );
+			glVertex3f( gfx->x1->getVal(), gfx->y2->getVal(), 0.0f );
 			glEnd();
 		}
 	}
@@ -364,26 +502,13 @@ bool OpenGLWindow::isFullscreen(){
 
 
 void OpenGLWindow::windowResized(int w, int h){
+	cerr<<"EEEE: doing OpenGLWindow::windowResized("<<w<<","<<h<<")"<<endl;
         windowed_width=w;
         windowed_height=h;
-#if 0
-        SDL_SetVideoMode(w, h, 16, SDL_OPENGL | SDL_RESIZABLE);
-        glViewport(0, 0, w, h);
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        gluPerspective(45,(double)w/(double)h,1.0,200.0);
-#endif
+
         initSurface();
 
-/*      glOrtho(0, 1, 1, 0, -1, 1);
-
-        glClear(GL_COLOR_BUFFER_BIT);
-        glColor3f(1.0, 1.0, 1.0);
-        glBegin(GL_LINES);
-        glVertex2i(0, 0); glVertex2i(1, 1);
-        glVertex2i(1, 0); glVertex2i(0, 1);
-        glEnd();
-*/
+	updateVideoPositions();
         SDL_GL_SwapBuffers();
 }
 
@@ -465,6 +590,11 @@ void OpenGLWindow::run(){
 			}
 
 		} // -- while event in queue
+
+		if (resized){
+			windowResized(windowed_width,windowed_height);
+			resized=false;
+		}
 		drawSurface();
 //		Thread::msleep(500);
 	}
@@ -729,7 +859,7 @@ struct mgl_gfx*  OpenGLDisplay::getTexture(){
 }
 
 void OpenGLDisplay::handle( MImage * mimage ){
-	cerr <<"EEEE: doing OpenGLDisplay::handle on display "<<(uint64_t)this<<endl;
+//	cerr <<"EEEE: doing OpenGLDisplay::handle on display "<<(uint64_t)this<<endl;
 	dataLock.lock();
 	if (!rgb || width!=mimage->width || height!=mimage->height){
 		cerr << "EEEE: allocating RGB of size "<<mimage->width<<"x"<<mimage->height<<endl;
@@ -858,3 +988,4 @@ OpenGLPlugin::OpenGLPlugin( MRef<Library *> lib ): VideoDisplayPlugin( lib ){
 
 OpenGLPlugin::~OpenGLPlugin(){
 }
+
