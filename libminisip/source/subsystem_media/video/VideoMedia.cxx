@@ -243,7 +243,9 @@ VideoMediaSource::VideoMediaSource( uint32_t ssrc, uint32_t width, uint32_t heig
 	index = 0;
 	packetLoss = false;
 	firstSeqNo = true;
-	expectedSeqNo = 0;
+	//expectedSeqNo = 0;
+	lastSeqNo=0;
+	lastPlayedSeqNo=0;
 	savedPacket = NULL;
         display = NULL;
 
@@ -313,8 +315,112 @@ void VideoMediaSource::addFilledImage( MImage * image ){
 MRef<AVDecoder *> VideoMediaSource::getDecoder(){
 	return decoder;
 }
+// 65536 1
+int rtpSeqDiff(int prev, int now){
+	int *largest;
+	int *smallest;
+	if (prev>now){
+		largest= &prev;
+		smallest=&now;
+	}else{
+		largest=&now;
+		smallest=&prev;
+	}
+
+	int ldiff=*largest - *smallest;
+	cerr <<"EEEE: ldiff="<<ldiff<<endl;
+
+	if (ldiff > 0xFFFF-1000){ //undo wrapping so that later sequence numbers are larger
+		*smallest+=0x10000;
+		cerr <<"Detected wrap!"<<endl;
+	}
+
+	cerr << "now="<<now<<" prev="<<prev<<endl;
+	int ret = now-prev;
+	cerr << "EEEE: rtpSeqDiff: returning "<< ret<<endl;
+	return ret;
+}
+
+void VideoMediaSource::enqueueRtp(MRef<RtpPacket*> rtp){
+	cerr << "EEEE: VideoMediaSource::enqueueRtp seq="<< rtp->getHeader().getSeqNo()<<endl;
+	if (rtpReorderBuf.size()==0){
+		rtpReorderBuf.push_front(rtp);
+	}else{
+		int mySeq = rtp->getHeader().getSeqNo();
+		list<MRef<RtpPacket*> >::iterator i=rtpReorderBuf.begin();
+		while (i!=rtpReorderBuf.end() && (mySeq > (*i)->getHeader().getSeqNo()))
+			i++;
+		rtpReorderBuf.insert(i,rtp);
+	}
+
+	cerr << "EEEE: after enqueueRtp: sequence numbers: ";
+	list<MRef<RtpPacket*> >::iterator i;
+	for (i=i=rtpReorderBuf.begin(); i!=rtpReorderBuf.end(); i++)
+		cerr << (*i)->getHeader().getSeqNo()<<" ";
+	cerr <<endl;
+}
+
+void VideoMediaSource::playSaved(){
+	while (rtpReorderBuf.size()>0 && rtpSeqDiff(lastPlayedSeqNo, (*rtpReorderBuf.begin())->getHeader().getSeqNo()  )==1){
+		cerr << "EEEE: playing another queued packet"<<endl;
+		MRef<RtpPacket*> packet=*rtpReorderBuf.begin();
+		int seqNo = packet->getHeader().getSeqNo();
+		addPacketToFrame( packet );
+		rtpReorderBuf.pop_front();
+		lastSeqNo=seqNo;
+		lastPlayedSeqNo=seqNo;
+	}
+
+}
 
 void VideoMediaSource::playData( MRef<RtpPacket *> packet ){
+
+	int seqNo = packet->getHeader().getSeqNo();
+
+	cerr << "EEEE: playData: lastseq="<<lastPlayedSeqNo<<", seqNo="<<seqNo<<endl;
+
+	if( firstSeqNo ){
+		//expectedSeqNo = seqNo;
+		lastSeqNo = seqNo;
+		lastSeqNo--;
+		firstSeqNo = false;
+		lastPlayedSeqNo=lastSeqNo;
+	}
+
+	int rtpDiff= rtpSeqDiff(lastPlayedSeqNo,seqNo);
+
+	if (rtpDiff==1){ // no packet loss
+		addPacketToFrame(packet);
+		lastSeqNo = seqNo;
+		lastPlayedSeqNo=lastSeqNo;
+		playSaved();
+		return;
+	}
+
+	if (rtpDiff<0){
+		cerr << "EEEE: seq no "<< seqNo <<" too late - dropping"<<endl;
+		return;
+	}
+
+	//it's not hte packet we expected. We'll put it in the list of
+	//future packets.
+	
+	enqueueRtp(packet);
+
+
+	if (rtpDiff>4){
+		cerr << "EEEE: packet loss detected - plaaying quueued packeet"<<endl;
+		lastPlayedSeqNo=(*(rtpReorderBuf.begin()))->getHeader().getSeqNo();
+		lastPlayedSeqNo--; 	//fake that it's time for the first in queue to play
+		lastSeqNo=lastPlayedSeqNo;
+
+		playSaved();
+		
+
+	}
+
+
+#if 0
 	int seqNo = packet->getHeader().getSeqNo();
 
 	if( firstSeqNo ){
@@ -359,7 +465,7 @@ void VideoMediaSource::playData( MRef<RtpPacket *> packet ){
 		expectedSeqNo = seqNo + 1;
 	}	
 
-
+#endif
 }
 
 void VideoMediaSource::addPacketToFrame( MRef<RtpPacket *> packet){
@@ -379,7 +485,7 @@ void VideoMediaSource::addPacketToFrame( MRef<RtpPacket *> packet){
 
 	if (!((type>=1 && type<=23) || type==28)){
 		cerr << "VideoMediaSource::addPacketToFrame: WARNING: unexpected packet type: "<< (int)type<<endl;
-		cerr << "VideoMediaSource::addPacketToFrame: WARNING: shutting down for debugging"<<endl;
+//		cerr << "VideoMediaSource::addPacketToFrame: WARNING: shutting down for debugging"<<endl;
 	}
 //	massert( (type>=1 && type<=23) || type==28 );
 	

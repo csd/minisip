@@ -84,6 +84,13 @@ class OpenGLWindow : public Runnable {
 
 		static MRef<OpenGLWindow*> getWindow();
 
+		/*
+		 * OpenGL implementations limits the size of a texture
+		 * to NxN where N=2^m.
+		 * This method returns N.
+		 */
+		int getTextureMaxSize(){return t_max_size;}
+
 		/**
 		 * Suggest good dimension of window. If there are multiple videos, then this will be ignored
 		 */
@@ -166,6 +173,9 @@ class OpenGLWindow : public Runnable {
 
 		Mutex displayListLock;
 		list<OpenGLDisplay*> displays;
+		bool displaysChanged;
+
+		int t_max_size;
 		
 
 		//Counts how many times displays have called "start()"
@@ -218,8 +228,11 @@ OpenGLWindow::OpenGLWindow(int w, int h, bool fullscreen){
 	native_height=0;
 	startFullscreen=fullscreen;
 	animation_ms=250;
+	displaysChanged=false;
 
 	gDrawSurface=NULL;
+
+	t_max_size=0;
 
 	bpp=0;
 
@@ -390,9 +403,8 @@ void OpenGLWindow::addDisplay(OpenGLDisplay* displ){
 	cerr << "EEEE: doing addDisplay()"<<endl;
 	displayListLock.lock();
 	displays.push_back(displ);
+	displaysChanged=true;
 	displayListLock.unlock();
-
-	updateVideoPositions();
 }
 
 void OpenGLWindow::removeDisplay(OpenGLDisplay* displ){
@@ -445,6 +457,11 @@ void OpenGLWindow::drawSurface(){
 //	glRotatef(((float)N)/5.0, 0.0F, 1.0F,0.0F);
 
 	GLdouble x=0;
+
+	if (displaysChanged){
+		updateVideoPositions();
+		displaysChanged=false;
+	}
 
 	displayListLock.lock();
 	list<OpenGLDisplay*>::iterator video;
@@ -761,6 +778,9 @@ void OpenGLWindow::initSurface(){
 	GLint texSize;
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &texSize);
 	printf("INFO: max texture size: %dx%d\n",texSize,texSize);
+	t_max_size=texSize;
+
+
 
 
 	glShadeModel(GL_SMOOTH);
@@ -830,6 +850,7 @@ OpenGLDisplay::OpenGLDisplay( uint32_t width, uint32_t height):VideoDisplay(){
 	gfx.aratio=1;
 	gfx.wu=1;
 	gfx.hu=1;
+	gfx.tex_dim=0;
 
 	rgb=NULL;
 	needUpload=false;
@@ -843,15 +864,18 @@ OpenGLDisplay::OpenGLDisplay( uint32_t width, uint32_t height):VideoDisplay(){
 struct mgl_gfx*  OpenGLDisplay::getTexture(){
 	dataLock.lock();
 	if (gfx.texture==-1){
+		int hw_max_dim = window->getTextureMaxSize();
+		int dim = (hw_max_dim>2048) ? 2048 : hw_max_dim;
+		gfx.tex_dim=dim;
 		glGenTextures( 1, (GLuint*)&gfx.texture);
 		glBindTexture( GL_TEXTURE_2D, gfx.texture);
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		uint8_t *dummy_black=(uint8_t*)calloc(1,2048*2048*3);
+		uint8_t *dummy_black=(uint8_t*)calloc(1,dim*dim*3);
 		massert(dummy_black);
-		glTexImage2D( GL_TEXTURE_2D, 0, 3, 2048, 2048, 0, GL_RGB, GL_UNSIGNED_BYTE, dummy_black );
+		glTexImage2D( GL_TEXTURE_2D, 0, 3, dim, dim, 0, GL_RGB, GL_UNSIGNED_BYTE, dummy_black );
 		free(dummy_black);
 	}
 
@@ -860,10 +884,43 @@ struct mgl_gfx*  OpenGLDisplay::getTexture(){
 		newRgbData=false;
 		glBindTexture( GL_TEXTURE_2D, gfx.texture);
 
-		glTexSubImage2D( GL_TEXTURE_2D, 0, 0,0 , width, height, GL_RGB, GL_UNSIGNED_BYTE, rgb );
-		gfx.wu=width/2048.0F;
-		gfx.hu=height/2048.0F;
-		gfx.aratio = (float)width/(float)height;
+		if (width>gfx.tex_dim){
+			int factor=2;
+			while (width/factor > gfx.tex_dim)
+				factor++;
+			cerr << "WARNING: insufficent OpenGL hardware. Resizing image to fit in texture (factor="<<factor<<")"<<endl;
+			uint8_t* tmpbuf = new uint8_t[(width/factor)*(height/factor)*3+16];
+
+			int x,y;
+			int newwidth = width/factor;
+			int newheight = height/factor;
+			for (y=0; y<newheight; y++){
+				for (x=0; x<newwidth; x++){
+//					tmpbuf[x*3+y*newheight*3+0]=rgb[(x*3+y*newheight*3+0)*factor];
+//					tmpbuf[x*3+y*newheight*3+1]=rgb[(x*3+y*newheight*3+1)*factor];
+//					tmpbuf[x*3+y*newheight*3+2]=rgb[(x*3+y*newheight*3+2)*factor];
+					tmpbuf[x*3+y*newwidth*3+0]=rgb[(x*3+y*width*3+0)*factor];
+					tmpbuf[x*3+y*newwidth*3+1]=rgb[(x*3+y*width*3+2)*factor];
+					tmpbuf[x*3+y*newwidth*3+2]=rgb[(x*3+y*width*3+1)*factor];
+
+
+				}
+			}
+
+			glTexSubImage2D( GL_TEXTURE_2D, 0, 0,0 , newwidth, newheight, GL_RGB, GL_UNSIGNED_BYTE, tmpbuf );
+			gfx.wu=(newwidth/*/(float)factor*/)/(float)gfx.tex_dim;
+			gfx.hu=(newheight/*/(float)factor*/)/(float)gfx.tex_dim;
+			gfx.aratio = (float)width/(float)height;
+			cerr << "EEEE: new dim="<<newwidth<<"x"<<newheight<<" and gfx.hu="<<gfx.hu<<" and tex_dim="<<gfx.tex_dim<<endl;
+			delete []tmpbuf;
+			
+		}else{
+
+			glTexSubImage2D( GL_TEXTURE_2D, 0, 0,0 , width, height, GL_RGB, GL_UNSIGNED_BYTE, rgb );
+			gfx.wu=width/(float)gfx.tex_dim;
+			gfx.hu=height/(float)gfx.tex_dim;
+			gfx.aratio = (float)width/(float)height;
+		}
 	}
 	dataLock.unlock();
 	return &gfx;
@@ -901,6 +958,7 @@ void OpenGLDisplay::start(){
 	massert(window);
 	window->start();
 	window->addDisplay(this);
+
 }
 
 void OpenGLDisplay::stop(){

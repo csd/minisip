@@ -127,7 +127,13 @@ class LIBMINISIP_API VideoMediaSource : public MObject {
 		uint32_t nbytesReceived;
 		bool packetLoss;
 		bool firstSeqNo;
-		uint16_t expectedSeqNo;
+//		uint16_t expectedSeqNo;
+		uint16_t lastSeqNo;
+		uint16_t lastPlayedSeqNo;
+		std::list<MRef<RtpPacket*> > rtpReorderBuf;
+		void enqueueRtp(MRef<RtpPacket*> rtp); //ordered list of packets left to play out
+		void playSaved();
+
 
 
 		std::list<MImage *> emptyImages;

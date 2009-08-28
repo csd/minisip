@@ -53,6 +53,7 @@ struct mgl_gfx{
 	float wu;	//width usage of texture (0..1). How much of texture is rendered
 	float hu;	//height usage
 	float aratio;   // width/height
+	int tex_dim;
 	Animate* x1;
 	Animate* y1;
 	Animate* x2;
@@ -90,6 +91,7 @@ class OpenGLDisplay: public VideoDisplay{
 
 	private:
 		mgl_gfx gfx;
+		
 
 		uint8_t *rgb;
 		bool newRgbData;
