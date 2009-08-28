@@ -164,7 +164,7 @@ class OpenGLWindow : public Runnable {
 
 
 		}
-		void updateVideoPositions();
+		void updateVideoPositions(bool doAnimate);
 		void drawSurface();
 		void sdlQuit();
 		void windowResized(int w, int h);
@@ -240,11 +240,12 @@ OpenGLWindow::OpenGLWindow(int w, int h, bool fullscreen){
 
 #define REPORT_N 500
 
-void OpenGLWindow::updateVideoPositions(){
+void OpenGLWindow::updateVideoPositions(bool doAnimate){
 	cerr << "EEEE: doing updateVideoPositions()"<<endl;
 	int nvideos = displays.size();
 
 	list<OpenGLDisplay*>::iterator i;
+	float screen_aratio=(float)cur_width/(float)cur_height;
 	int video_n=0;
 	for (i=displays.begin(); i!=displays.end(); i++, video_n++){ //FIXME: this makes all videos full screen (last video is displayed on top)
 		float leftx=windowX0;
@@ -266,16 +267,26 @@ void OpenGLWindow::updateVideoPositions(){
 		}
 
 
+
 		switch (nvideos){
 			case -1:
 			case 0:
 				massert(1==0);
 				break;
 			case 1:
-				tex_x1=leftx;
-				tex_y1=topy;
-				tex_x2=rightx;
-				tex_y2=bottomy;
+				if (gfx->aratio > screen_aratio) { // fill full width
+					tex_x1=leftx;
+					tex_y1=tex_x1/gfx->aratio;
+					tex_x2=rightx;
+					tex_y2=tex_x2/gfx->aratio;
+
+
+				}else{	//fill full height
+					tex_y1=topy;
+					tex_x1=tex_y1*gfx->aratio;
+					tex_y2=bottomy;
+					tex_x2=tex_y2*gfx->aratio;
+				}
 				middle=0.0F;
 
 				break;
@@ -385,17 +396,26 @@ void OpenGLWindow::updateVideoPositions(){
 
 		cerr << "EEEE: setting position of video "<< video_n <<" to " << tex_x1<<","<<tex_y1<<" "<<tex_x2<<","<<tex_y2<<endl;
 
-		gfx->x1= new Animate(animation_ms, lastx1, tex_x1, ANIMATE_STARTSTOP);
-		gfx->y1= new Animate(animation_ms, lasty1, tex_y1 /* /gfx->aratio */ , ANIMATE_STARTSTOP);
-		gfx->x2= new Animate(animation_ms, lastx2, tex_x2, ANIMATE_STARTSTOP);
-		gfx->y2= new Animate(animation_ms, lasty2, tex_y2 /* /gfx->aratio */, ANIMATE_STARTSTOP);
-		gfx->alpha= new Animate(animation_ms, lastAlpha, 1, ANIMATE_STARTSTOP);
+		if (!doAnimate){
+			gfx->x1= new Animate(tex_x1);
+			gfx->y1= new Animate(tex_y1);
+			gfx->x2= new Animate(tex_x2);
+			gfx->y2= new Animate(tex_y2);
+			gfx->alpha= new Animate(1);
+		}else{
+			gfx->x1= new Animate(animation_ms, lastx1, tex_x1, ANIMATE_STARTSTOP);
+			gfx->y1= new Animate(animation_ms, lasty1, tex_y1, ANIMATE_STARTSTOP);
+			gfx->x2= new Animate(animation_ms, lastx2, tex_x2, ANIMATE_STARTSTOP);
+			gfx->y2= new Animate(animation_ms, lasty2, tex_y2, ANIMATE_STARTSTOP);
+			gfx->alpha= new Animate(animation_ms, lastAlpha, 1, ANIMATE_STARTSTOP);
+		}
+
 		gfx->x1->start();
 		gfx->y1->start();
 		gfx->x2->start();
 		gfx->y2->start();
 		gfx->alpha->start();
-		
+
 	}
 }
 
@@ -411,7 +431,7 @@ void OpenGLWindow::removeDisplay(OpenGLDisplay* displ){
 	displayListLock.lock();
 	displays.remove(displ);
 	displayListLock.unlock();
-	updateVideoPositions();
+	updateVideoPositions(true);
 }
 
 #define WINDOW_WIDTH -windowX0
@@ -459,7 +479,7 @@ void OpenGLWindow::drawSurface(){
 	GLdouble x=0;
 
 	if (displaysChanged){
-		updateVideoPositions();
+		updateVideoPositions(true);
 		displaysChanged=false;
 	}
 
@@ -512,10 +532,14 @@ void OpenGLWindow::sdlQuit(){
 
 
 void OpenGLWindow::toggleFullscreen(){
-        printf("Toggle fullscreent\n");
+        printf("Toggle fullscreen\n");
         sdlFlags ^= SDL_FULLSCREEN;
-        //SDL_WM_ToggleFullScreen(gDrawSurface);
+//        SDL_WM_ToggleFullScreen(gDrawSurface);
+
         initSurface();
+
+//	startFullscreen=isFullscreen();
+//        initSdl();
 
 }
 
@@ -536,7 +560,7 @@ void OpenGLWindow::windowResized(int w, int h){
 
         initSurface();
 
-	updateVideoPositions();
+	updateVideoPositions(false);
         SDL_GL_SwapBuffers();
 }
 
@@ -718,8 +742,13 @@ void OpenGLWindow::initSdl(){
 		fprintf(stderr,"Coudn't get video information!\n%s\n", SDL_GetError());
 		exit(1);
 	}
-	native_width=vidinfo->current_w;
-	native_height=vidinfo->current_h;
+	if (!native_height){ //the size of the desktop is only available the first
+			 	//time this function is called. The second time
+			 	//it is the size of the current window.
+		native_width=vidinfo->current_w;
+		native_height=vidinfo->current_h;
+	}
+	cerr << "EEEE: OpenGL: native screen dimension is "<< native_width<<"x"<<native_height<<endl;
 
 	// set opengl attributes
 	SDL_GL_SetAttribute(SDL_GL_RED_SIZE,        5);
@@ -754,6 +783,8 @@ void OpenGLWindow::initSurface(){
 
 	// get a framebuffer
 	int w,h;
+	cerr <<"EEEE: sdlFlags="<<sdlFlags<<endl;
+	cerr <<"EEEE: SDL_FULLSCREEN="<<SDL_FULLSCREEN<<endl;
 	if (sdlFlags & SDL_FULLSCREEN){
 		w=native_width;
 		h=native_height;
