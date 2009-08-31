@@ -62,6 +62,7 @@ class Dc1394Grabber : public Grabber{
 		uint32_t getWidth(){ return width; };
 
 		void setHandler( ImageHandler * handler );
+		virtual void setLocalDisplay(MRef<VideoDisplay*>);
 
 	private:
 		dc1394_cameracapture camera;

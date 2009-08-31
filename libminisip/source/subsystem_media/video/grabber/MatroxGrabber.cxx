@@ -73,6 +73,10 @@ MatroxGrabber::MatroxGrabber( string dev ){
 	initialized=false;
 }
 
+void MatroxGrabber::setLocalDisplay(MRef<VideoDisplay*> d){
+	localDisplay=d;
+}
+
 void MatroxGrabber::init(){
 
 	initialized=true;
@@ -169,6 +173,12 @@ void MatroxGrabber::setHandler( ImageHandler * handler ){
 }
 
 void MatroxGrabber::read( ImageHandler * handler ){
+	cerr <<"EEEE: doing MatroxGrabber::read()"<<endl;
+	if (localDisplay){
+		cerr <<"EEEE: MatroxGrabber: starting local dispay"<<endl;
+		localDisplay->setIsLocalVideo(true);
+		localDisplay->start();
+	}
 
 	/* Allocate and clear sequence and display images. */
 	MappControl(M_ERROR, M_PRINT_DISABLE);
@@ -247,10 +257,18 @@ void MatroxGrabber::read( ImageHandler * handler ){
 		if (!UserStruct.stopped){
 			static int i=0;
 			i++;
-			if (i%2==1) //grabber does 50fps. We send 25fps.
+			if (i%2==1){ //grabber does 50fps. We send 25fps.
+
 				handler->handle( frame );
+				if (localDisplay){
+					localDisplay->handle(frame);
+				}
+			}
 
 		}
+	}
+	if (localDisplay){
+		localDisplay->stop();
 	}
 
 	/* Wait for end of last grab. */

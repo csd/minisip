@@ -291,6 +291,11 @@ void Dc1394Grabber::close(){
 	
 }
 
+void Dc1394Grabber::setLocalDisplay(MRef<VideoDisplay*>){
+
+}
+
+
 /* Borrowed from libavcodec */
 
 static void yuv422_to_yuv420p(MData *dst, const MData *src,

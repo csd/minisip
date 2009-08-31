@@ -28,6 +28,7 @@
 #include<libminisip/libminisip_config.h>
 
 #include<libminisip/media/video/ImageHandler.h>
+#include<libminisip/media/video/display/VideoDisplay.h>
 
 #include<libmutil/MemObject.h>
 #include<libmutil/MSingleton.h>
@@ -51,6 +52,8 @@ class LIBMINISIP_API Grabber : public Runnable{
 		virtual void close()=0;
 
 		virtual void setHandler( ImageHandler * handler )=0;
+
+		virtual void setLocalDisplay(MRef<VideoDisplay*>)=0;
 
 		virtual std::string getMemObjectType() const {return "Grabber";}
 		

@@ -31,6 +31,7 @@
 #include<string>
 
 #include<libminisip/media/video/ImageHandler.h>
+#include<libminisip/media/video/display/VideoDisplay.h>
 
 #include<libmutil/MemObject.h>
 
@@ -70,6 +71,8 @@ class LIBMINISIP_API AVEncoder: public ImageHandler, public MObject{
 		VideoEncoderCallback * getCallback(){return callback;};
 		void setCallback( VideoEncoderCallback * cb ){this->callback = cb;};
 
+		void setLocalDisplay(MRef<VideoDisplay*>);
+
 		void close();
 
 	private:
@@ -83,6 +86,8 @@ class LIBMINISIP_API AVEncoder: public ImageHandler, public MObject{
 
 		VideoEncoderCallback * callback;
 	 	byte_t outBuffer[AVCODEC_MAX_VIDEO_FRAME_SIZE];
+
+		MRef<VideoDisplay*> localDisplay;
 
 		void *swsctx;
 };

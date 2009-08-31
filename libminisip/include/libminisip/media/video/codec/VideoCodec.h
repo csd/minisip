@@ -68,6 +68,8 @@ class LIBMINISIP_API MVideoCodec : public Codec{
 
 		virtual uint32_t getVersion() const;
 
+		virtual MRef<AVEncoder*> getEncoder();
+
 	private:
 
 		MRef<RealtimeMediaStreamSender *> senders;

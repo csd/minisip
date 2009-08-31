@@ -61,6 +61,13 @@ VideoMedia::VideoMedia( MRef<Codec *> codec, MRef<VideoDisplay *> display, MRef<
         sendingWidth = 176;
         sendingHeight = 144;
 
+#if 1
+	cerr <<"EEEE: VideoDisplay::VideoMedia: start creating display..."<<endl;
+	MRef<VideoDisplay *> localVideoDisplay = VideoDisplayRegistry::getInstance()->createDisplay( receivingWidth, receivingHeight, false );
+	cerr <<"EEEE: VideoDisplay::VideoMedia: start setting local display..."<<endl;
+	grabber->setLocalDisplay(localVideoDisplay);
+	cerr <<"EEEE: VideoDisplay::VideoMedia: done setting local display..."<<endl;
+#endif
 
         addSdpAttribute( "framesize:34 " + itoa( receivingWidth ) + "-" + itoa( receivingHeight ) );
 }
@@ -91,7 +98,7 @@ void VideoMedia::playData( MRef<RtpPacket *> packet ){
 
 	MRef<VideoMediaSource *> source = getSource( packet->getHeader().SSRC );
 
-	if( source ){ //FIXME: Deliberately break playing video, introduced Dec 18 2007, must be removed same day
+	if( source ){ 
 		source->playData( packet );
 	}
 
@@ -124,9 +131,14 @@ void VideoMedia::registerMediaSource( uint32_t ssrc, string callId ){
         }
 
         else{
-                MRef<VideoDisplay *> newdisplay = VideoDisplayRegistry::getInstance()->createDisplay( receivingWidth, receivingHeight );
+                MRef<VideoDisplay *> newdisplay = VideoDisplayRegistry::getInstance()->createDisplay( receivingWidth, receivingHeight, true );
                 source->getDecoder()->setHandler( *newdisplay );
                 source->display = newdisplay;
+
+		//Make the local display get the video from the grabber after the
+		//encoder has encoded and sent it.
+		codec->getEncoder()->setLocalDisplay(newdisplay);
+
                 if( newdisplay ){
                         //newdisplay->start();
                 }
@@ -328,21 +340,21 @@ int rtpSeqDiff(int prev, int now){
 	}
 
 	int ldiff=*largest - *smallest;
-	cerr <<"EEEE: ldiff="<<ldiff<<endl;
+	//cerr <<"EEEE: ldiff="<<ldiff<<endl;
 
 	if (ldiff > 0xFFFF-1000){ //undo wrapping so that later sequence numbers are larger
 		*smallest+=0x10000;
 		cerr <<"Detected wrap!"<<endl;
 	}
 
-	cerr << "now="<<now<<" prev="<<prev<<endl;
+	//cerr << "now="<<now<<" prev="<<prev<<endl;
 	int ret = now-prev;
-	cerr << "EEEE: rtpSeqDiff: returning "<< ret<<endl;
+	//cerr << "EEEE: rtpSeqDiff: returning "<< ret<<endl;
 	return ret;
 }
 
 void VideoMediaSource::enqueueRtp(MRef<RtpPacket*> rtp){
-	cerr << "EEEE: VideoMediaSource::enqueueRtp seq="<< rtp->getHeader().getSeqNo()<<endl;
+	//cerr << "EEEE: VideoMediaSource::enqueueRtp seq="<< rtp->getHeader().getSeqNo()<<endl;
 	if (rtpReorderBuf.size()==0){
 		rtpReorderBuf.push_front(rtp);
 	}else{
@@ -353,11 +365,12 @@ void VideoMediaSource::enqueueRtp(MRef<RtpPacket*> rtp){
 		rtpReorderBuf.insert(i,rtp);
 	}
 
-	cerr << "EEEE: after enqueueRtp: sequence numbers: ";
+/*	cerr << "EEEE: after enqueueRtp: sequence numbers: ";
 	list<MRef<RtpPacket*> >::iterator i;
 	for (i=i=rtpReorderBuf.begin(); i!=rtpReorderBuf.end(); i++)
 		cerr << (*i)->getHeader().getSeqNo()<<" ";
 	cerr <<endl;
+*/
 }
 
 void VideoMediaSource::playSaved(){
@@ -377,7 +390,7 @@ void VideoMediaSource::playData( MRef<RtpPacket *> packet ){
 
 	int seqNo = packet->getHeader().getSeqNo();
 
-	cerr << "EEEE: playData: lastseq="<<lastPlayedSeqNo<<", seqNo="<<seqNo<<endl;
+	//cerr << "EEEE: playData: lastseq="<<lastPlayedSeqNo<<", seqNo="<<seqNo<<endl;
 
 	if( firstSeqNo ){
 		//expectedSeqNo = seqNo;

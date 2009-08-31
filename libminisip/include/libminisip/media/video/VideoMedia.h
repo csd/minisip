@@ -31,6 +31,7 @@
 #include<libminisip/media/video/ImageHandler.h>
 #include<libminisip/media/video/display/VideoDisplay.h>
 #include<libminisip/media/video/codec/AVDecoder.h>
+#include<libminisip/media/video/codec/AVCoder.h>
 #include<libminisip/media/video/codec/VideoEncoderCallback.h>
 #include<libminisip/media/video/grabber/Grabber.h>
 
@@ -107,6 +108,7 @@ class LIBMINISIP_API VideoMediaSource : public MObject {
 		virtual void playData( MRef<RtpPacket *> packet ); 
 
 		MRef<AVDecoder *> getDecoder();
+		MRef<AVEncoder *> getEncoder();
 
 		uint32_t ssrc;
 

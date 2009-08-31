@@ -49,6 +49,8 @@ class LIBMINISIP_API VideoDisplay : public ImageHandler, public Runnable{
 
 		/* From ImageHandler */
 		virtual void handle( MImage * );
+		virtual void setIsLocalVideo( bool isLocal );
+		virtual bool getIsLocalVideo();
 		virtual MImage * provideImage();
 		virtual void releaseImage( MImage * image );
 		virtual bool providesImage();
@@ -66,6 +68,10 @@ class LIBMINISIP_API VideoDisplay : public ImageHandler, public Runnable{
 		virtual void displayImage( MImage * image )=0;
 		virtual MImage * allocateImage()=0;
 		virtual void deallocateImage( MImage * image )=0;
+
+		bool isLocalVideo; //Local video might get other treatment. For example, handle() will be called
+					// with a MImage that was not allocated using allocateImage()
+
 	private:
 		std::list<MImage *> filledImages;
 		Mutex filledImagesLock;
@@ -93,7 +99,7 @@ class LIBMINISIP_API VideoDisplayPlugin : public MPlugin{
 
 		VideoDisplayPlugin( MRef<Library *> lib );
 
-		virtual MRef<VideoDisplay *> create( uint32_t width, uint32_t height ) const = 0;
+		virtual MRef<VideoDisplay *> create( uint32_t width, uint32_t height) const = 0;
 };
 
 /**
@@ -103,7 +109,7 @@ class LIBMINISIP_API VideoDisplayRegistry: public MPluginRegistry, public MSingl
 	public:
 		virtual std::string getPluginType(){ return "VideoDisplay"; }
 
-		MRef<VideoDisplay*> createDisplay( uint32_t width, uint32_t height );
+		MRef<VideoDisplay*> createDisplay( uint32_t width, uint32_t height, bool doStart );
 		void signalDisplayDeleted();
 
 	protected:

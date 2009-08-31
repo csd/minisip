@@ -522,6 +522,10 @@ void V4LGrabber::unmapMemory(){
 }
 
 
+void V4LGrabber::setLocalDisplay(MRef<VideoDisplay*>){
+
+}
+
 
 #if 0
 	

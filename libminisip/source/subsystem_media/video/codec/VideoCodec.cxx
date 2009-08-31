@@ -45,6 +45,10 @@ void MVideoCodec::encode( MRef<MImage *> image ){
 	coder->handle( *image );
 }
 
+MRef<AVEncoder*> MVideoCodec::getEncoder(){
+	return coder;
+}
+
 void MVideoCodec::decode( byte_t * inputData, uint32_t inputSize ){
 	decoder->decodeFrame( inputData, inputSize );
 }

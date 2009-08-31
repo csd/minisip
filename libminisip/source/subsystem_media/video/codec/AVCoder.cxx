@@ -79,9 +79,13 @@ AVEncoder::AVEncoder() {
 
 }
 
+#ifdef GLOBAL_BANDWIDTH_HACK
+extern volatile int globalBitRate;
+#endif
+
 void AVEncoder::init( uint32_t width, uint32_t height ){
 	cerr << "=========================== doing AVEncoder::init============================"<<endl;
-	//cerr << "AVEncoder::init("<<width<<","<<height<<")"<<endl;
+	cerr << "AVEncoder::init("<<width<<","<<height<<endl;
 
 
 	Video *video = (Video*)this->video;
@@ -105,7 +109,17 @@ void AVEncoder::init( uint32_t width, uint32_t height ){
 	video->width=width;
 	video->height=height;
 	video->fps=15;
-	videoCodec->bitrate=256;
+
+#ifdef GLOBAL_BANDWIDTH_HACK
+	if (globalBitRate<128)
+		globalBitRate=128;
+	if (globalBitRate>15000)
+		globalBitRate=25000;
+	videoCodec->bitrate=globalBitRate;
+#else
+	videoCodec->bitrate=1500;
+#endif
+
 
 	hdviper_setup_video_encoder(videoCodec, VIDEO_CODEC_H264, video);
 
@@ -123,6 +137,10 @@ void AVEncoder::close(){
 		hdviper_destroy_video_encoder(videoCodec);
 }
 
+void AVEncoder::setLocalDisplay(MRef<VideoDisplay*> d){
+	localDisplay=d;
+}
+
 #define REPORT_N 50
 
 void AVEncoder::handle( MImage * image ){
@@ -136,6 +154,18 @@ void AVEncoder::handle( MImage * image ){
 	static int i=0;
 	static int N=0;
         i++;
+
+#ifdef GLOBAL_BANDWIDTH_HACK
+	static int lastBitRate=-1;
+	if (lastBitRate==-1)
+		lastBitRate=globalBitRate;
+
+	if (globalBitRate!=lastBitRate){
+		init(image->width, image->height);
+		lastBitRate=globalBitRate;
+
+	}
+#endif
 
 
 //	if (i%7!=0)
@@ -192,22 +222,12 @@ void AVEncoder::handle( MImage * image ){
 
 		/* We must free frame ourselves */
 		mustFreeFrame = true;
-#if 0
-		/* Convert to the desired type (plannar YUV 420 ) */
-		if( img_convert( (AVPicture*)&frame, PIX_FMT_YUV420P, 
-					(AVPicture*)image, srcFormat,
-					video->width, video->height ) < 0 ){
-			throw VideoException( "Could not convert image to encoding format" );
-		}
-#else
-		
 
 		if (!swsctx)
 			swsctx = sws_getContext(image->width, image->height, srcFormat, image->width, image->height, PIX_FMT_YUV420P,SWS_FAST_BILINEAR, NULL,NULL,NULL);
 		struct SwsContext* ctx = (struct SwsContext*)swsctx;
 
 		sws_scale( ctx, image->data, image->linesize, 0, image->height, frame.data, frame.linesize);
-#endif
 	}
 	else{
 		/* We can use the picture as is */

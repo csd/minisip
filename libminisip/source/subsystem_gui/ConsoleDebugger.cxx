@@ -99,6 +99,8 @@ void ConsoleDebugger::showHelp() {
 	
 }
 
+int globalBitRate=1024;
+
 void ConsoleDebugger::run(){
 #ifdef DEBUG_OUTPUT
 	bool tmpSet;
@@ -153,6 +155,14 @@ void ConsoleDebugger::run(){
 				break;
 
 	#ifdef DEBUG_OUTPUT
+			case '1':
+				globalBitRate-=256;
+				cerr <<"------->EEEE: bitrate="<<globalBitRate<<endl;
+				break;
+			case '2':
+				globalBitRate+=256;
+				cerr <<"------->EEEE: bitrate="<<globalBitRate<<endl;
+				break;
 			case 'P':
 			case 'p':
 				sipStack->setDebugPrintPackets(!sipStack->getDebugPrintPackets() );

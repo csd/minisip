@@ -73,6 +73,8 @@ class MatroxGrabber : public Grabber{
 
 		void setHandler( ImageHandler * handler );
 
+		virtual void setLocalDisplay(MRef<VideoDisplay*>);
+
 	private:
 		void init();
 
@@ -87,6 +89,7 @@ class MatroxGrabber : public Grabber{
 
 		Mutex grabberLock;
 		ImageHandler * handler;
+		MRef<VideoDisplay*> localDisplay;
 		
 		bool initialized;
 		MRef<Thread*> runthread;

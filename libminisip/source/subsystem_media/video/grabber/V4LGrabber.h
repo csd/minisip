@@ -69,6 +69,8 @@ class V4LGrabber : public Grabber{
 
 		virtual void setHandler( ImageHandler * handler );
 
+		virtual void setLocalDisplay(MRef<VideoDisplay*>);
+
 	private:
 		/* V4L stuff */
 		struct video_capability * v4lCapacity;
