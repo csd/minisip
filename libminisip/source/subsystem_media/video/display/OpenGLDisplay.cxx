@@ -165,6 +165,8 @@ class OpenGLWindow : public Runnable {
 
 		}
 		void updateVideoPositions(bool doAnimate);
+
+		void rectToCoord(float &x1, float&y2, float &x2, float &y2, float lx1, float ly1, float lx2, float ly2, float aratio);
 		void drawSurface();
 		void sdlQuit();
 		void windowResized(int w, int h);
@@ -198,6 +200,7 @@ class OpenGLWindow : public Runnable {
 		int native_height;
 		int cur_width;
 		int cur_height;
+		float screen_aratio;
 
 		int sdlFlags;
 		int bpp;
@@ -207,17 +210,18 @@ class OpenGLWindow : public Runnable {
 		Mutex lock;
 		MRef<Thread*> thread;
 
-		Mutex queueLock;
+//		Mutex queueLock;
 		//Semaphore queueSem;
-		std::list<MImage *> displayQueue;
+//		std::list<MImage *> displayQueue;
 
-		GLuint texture;
+//		GLuint texture;
 };
+
 
 MRef<OpenGLWindow*> OpenGLWindow::globalWindowObj=NULL;
 
 OpenGLWindow::OpenGLWindow(int w, int h, bool fullscreen){
-	texture=-1;
+	//texture=-1;
 	runCount=0;
 	doStop=false;
 	initialized=false;
@@ -226,6 +230,7 @@ OpenGLWindow::OpenGLWindow(int w, int h, bool fullscreen){
 	resized=false;
 	native_width=0;
 	native_height=0;
+	screen_aratio=1.0;
 	startFullscreen=fullscreen;
 	animation_ms=250;
 	displaysChanged=false;
@@ -240,131 +245,202 @@ OpenGLWindow::OpenGLWindow(int w, int h, bool fullscreen){
 
 #define REPORT_N 500
 
+
+void OpenGLWindow::rectToCoord(float &x1, float&y1, float &x2, float &y2, float lx1, float ly1, float lx2, float ly2, float aratio){
+	
+	float l_aratio=(lx2-lx1)/(ly2-ly1);
+
+	if (aratio > l_aratio) { // fill full width, center vertically
+		float h=(lx2-lx1)/aratio;
+		float lh=ly2-ly1;
+		x1=lx1;
+		y1=ly1+((lh-h)/2.0);
+		x2=lx2;
+		y2=y1+h;
+
+
+	}else{	//fill full height
+		y1=ly1;
+		float w=(ly2-ly1)*aratio;
+		float lw=lx2-lx1;
+		x1=lx1+(lw-w)/2.0;
+		y2=ly2;
+		x2=x1+w;
+	}
+	cerr <<"EEEE: mapped "<<lx1<<","<<ly1<<"->"<<lx2<<","<<ly2<<" to " << x1<<","<<y1<<"->"<<x2<<","<<y2<<endl;
+
+}
+
+void findVideoArea(int video_n, int ntot, float &x1, float&y1, float &x2, float &y2, float lx1, float ly1, float lx2, float ly2, bool preferHorisontal){
+	
+	int n=1;
+	int nr=1;
+	int nc=1;
+	while (nr*nc<ntot){	//find how many columns and rows to layout in
+		if (preferHorisontal){
+			if (nr<nc)
+				nr++;
+			else	
+				nc++;
+		}else{
+			if (nc<nr){
+				nc++;
+			}else{
+				nr++;
+			}
+
+		}
+	}
+
+	int nextra=nr*nc-ntot; //now all rows are full. This many are not
+	int nfull = nr - nextra;
+
+	int row=0;
+	n=video_n;
+//	cerr <<"nfull="<<nfull<<endl;
+	while(n>=nc || (n>=(nc-1)&&row>=nfull) ){		//find what row this video should be in
+		if (row>=nfull){
+			n-=(nc-1);
+		}else{
+			n-=nc;
+		}
+		row++;
+	}
+	int col_in_row=nc;	//number of videos in the row our video is in
+	if (row>=nfull){	
+		col_in_row--;	
+	}
+//	cerr <<"EEEE: row="<<row<<"/"<<nr<<endl;
+	int col=n;
+//	cerr <<"EEEE: col="<<col<<"/"<<nc<<endl;
+//	cerr <<"EEEE: columns in this row="<<col_in_row<<endl;
+
+	float rowh=(ly2-ly1)/(float)nr;
+//	cerr <<"EEEE: row height="<<rowh<<endl;
+	y1=ly1+(float)row*rowh;
+	y2=y1+rowh;
+
+	float colw = (lx2-lx1)/(float)col_in_row;
+//	cerr <<"EEEE: colw="<<colw<<endl;
+	x1=lx1+col*(float)colw;
+	x2=x1+colw;
+
+
+#if 0
+	//  1  2  3  4  5  6  7  8  9  10 
+	int nrow[]={1, 1, 2, 2, 3, 2, 3, 3, 3, 4}
+	int ncol[]={1, 2, 2, 2, 2, 3, 3, 3, 3, 3}
+	int nr;
+	int nc:
+		if (ntot<=10){
+		nr=nrow[ntot-1];
+		nc=nrow[ntot-1];
+	}else{
+		int n=4;
+		while (n*n<ntot)
+			n++;
+		nr=nc=n;
+	}
+
+	int r=video_n/nc;
+
+	int x, int y;
+
+	for (x=0; x<nc; x++){
+		
+		for (y=0; y<nr; y++){
+		
+		}
+#endif
+
+}
+
 void OpenGLWindow::updateVideoPositions(bool doAnimate){
+
 	cerr << "EEEE: doing updateVideoPositions()"<<endl;
-	int nvideos = displays.size();
+	displayListLock.lock();
+	int n_videos = displays.size();
 
 	list<OpenGLDisplay*>::iterator i;
 	float screen_aratio=(float)cur_width/(float)cur_height;
-	int video_n=0;
-	for (i=displays.begin(); i!=displays.end(); i++, video_n++){ //FIXME: this makes all videos full screen (last video is displayed on top)
-		float leftx=windowX0;
-		float middlex=0.0F;
-		float rightx=-windowX0;
-		float topy=windowY0;
-		float middley=0.0F;
-		float bottomy=-windowY0;
+
+
+
+	//Make sure local displays are in the end of 
+	//the list of displays. They are transparant, and
+	//must be displayed on top of other video displays.
+	list<OpenGLDisplay*> tmpdisplays=displays;
+	displays.clear();
+	int n_local=0;
+	for (i=tmpdisplays.begin(); i!=tmpdisplays.end(); i++){
+		if ((*i)->getIsLocalVideo())
+			n_local++;
+		else
+			displays.push_back(*i);
+	}
+
+	for (i=tmpdisplays.begin(); i!=tmpdisplays.end(); i++){
+		if ((*i)->getIsLocalVideo())
+			displays.push_back(*i);
+	}
+	tmpdisplays.clear();
+	
+	int n_remote=n_videos-n_local;
+
+	float leftx=windowX0; 
+	float middlex=0.0F;
+	float rightx=-windowX0;
+	float topy=windowY0;
+	float middley=0.0F;
+	float bottomy=-windowY0;
+
+	int remote_video_n=0;
+	int global_n=0;
+	for (i=displays.begin(); i!=displays.end(); i++, global_n++){ 
 
 		mgl_gfx* gfx = (*i)->getTexture();
+		float tex_x1, tex_y1, tex_x2, tex_y2, alpha;
 
-		float tex_x1, tex_y1, tex_x2, tex_y2;
-		float middle;
+		if ((*i)->getIsLocalVideo()){
+			float glwidth = rightx-leftx;
+			float glheight= bottomy-topy;
+			float localwidth=glwidth/5;
+			cerr <<"EEEE: glwidth="<<glwidth<<endl;
+			cerr <<"EEEE: glheight="<<glheight<<endl;
+			float localx=rightx-localwidth-glwidth/128;
+			cerr <<"EEEE: localx="<<localx<<endl;
+			tex_x1= localx;
+			tex_y1= /*bottomy-glheight/8-glheight/128*/ topy+glheight/128;
+			tex_x2=localx+localwidth;
+			tex_y2= tex_y1+localwidth/gfx->aratio /*-glheight/128*/;
+			alpha=0.7;
 
-		
-		bool firstUpdate=false;
-		if (!gfx->x1){
-			firstUpdate=true;
+
+		}else{
+			alpha=1.0;
+			bool horisontal = screen_aratio>1.25;
+
+			//Find where to layout
+			findVideoArea(remote_video_n, n_remote, tex_x1, tex_y1, tex_x2, tex_y2, leftx, topy, rightx, bottomy, horisontal);
+			
+			//Keep correct aspect ratio
+			rectToCoord(tex_x1,tex_y1,tex_x2,tex_y2, tex_x1, tex_y1, tex_x2,tex_y2, gfx->aratio);
+			middlex=tex_x1+(tex_x2-tex_x1)/2;
+			middley=tex_y1+(tex_y2-tex_y1)/2;
+			remote_video_n++;
 		}
 
-
-
-		switch (nvideos){
-			case -1:
-			case 0:
-				massert(1==0);
-				break;
-			case 1:
-				if (gfx->aratio > screen_aratio) { // fill full width
-					tex_x1=leftx;
-					tex_y1=tex_x1/gfx->aratio;
-					tex_x2=rightx;
-					tex_y2=tex_x2/gfx->aratio;
-
-
-				}else{	//fill full height
-					tex_y1=topy;
-					tex_x1=tex_y1*gfx->aratio;
-					tex_y2=bottomy;
-					tex_x2=tex_y2*gfx->aratio;
-				}
-				middle=0.0F;
-
-				break;
-			case 2:
-				if (video_n==0){
-					tex_x1=leftx;
-					tex_y1=topy /*tex_x1/gfx->aratio*/; //FIXME - should not be top
-					tex_x2=0.0F;
-					tex_y2=bottomy /*tex_x2/gfx->aratio*/; //FIXME
-					middlex=leftx/2;
-					middley=0; //FIXME
-				}else{
-					tex_x1=0.0F;
-					tex_y1=topy /*tex_x1/gfx->aratio*/; //FIXME - should not be top
-					tex_x2=rightx;
-					tex_y2=bottomy /*tex_x2/gfx->aratio*/; //FIXME
-					middlex=rightx;
-					middley=0; //FIXME
-				}
-
-				break;
-			case 3:
-				//tex_x1:
-				//
-				if (video_n==0) tex_x1=leftx;
-				if (video_n==1) tex_x1=0.0;
-				if (video_n==2) tex_x1=leftx/2;
-			
-				//tex_y1:
-				//
-				if (video_n==0) tex_y1=topy;
-				if (video_n==1) tex_y1=topy;
-				if (video_n==2) tex_y1=0.0F;
-
-			
-				//tex_x2:
-				//
-				if (video_n==0) tex_x2=0.0F;
-				if (video_n==1) tex_x2=rightx;
-				if (video_n==2) tex_x2=rightx/2;
-
-				//tex_y2:
-				//
-				if (video_n==0) tex_y2=0.0F;
-				if (video_n==1) tex_y2=0.0F;
-				if (video_n==2) tex_y2=bottomy;
-				break;
-			case 4:
-				//tex_x1
-				if (video_n==0 | video_n==2) tex_x1=leftx;
-				if (video_n==1 | video_n==3) tex_x1=0.0F;
-
-				//tex_y1
-				if (video_n==0 | video_n==1) tex_y1=topy;
-				if (video_n==2 | video_n==3) tex_y1=0.0F;
-
-				//tex_x2
-				if (video_n==0 | video_n==2) tex_x2=0.0F;
-				if (video_n==1 | video_n==3) tex_x2=rightx;
-
-				//tex_y2
-				if (video_n==0 | video_n==1) tex_y2=0.0F;
-				if (video_n==2 | video_n==3) tex_y2=bottomy;
-				break;
-
-		}
-		
 		float lastx1=tex_x1;
 		float lasty1=tex_y1;
 		float lastx2=tex_x2;
 		float lasty2=tex_y2;
-		
+
 
 		if (gfx->x1){
 			lastx1=gfx->x1->getVal();
 			delete gfx->x1;
 		}else{
-			if (nvideos>1){
+			if (n_remote>1){
 				lastx1=lastx2=middlex;	//grow from middle if it it did previously not exist
 				lasty1=lasty2=middley;
 			}else{
@@ -394,20 +470,20 @@ void OpenGLWindow::updateVideoPositions(bool doAnimate){
 		}
 
 
-		cerr << "EEEE: setting position of video "<< video_n <<" to " << tex_x1<<","<<tex_y1<<" "<<tex_x2<<","<<tex_y2<<endl;
+		cerr << "EEEE: setting position of video "<< global_n <<" to " << tex_x1<<","<<tex_y1<<" "<<tex_x2<<","<<tex_y2<<" alpha="<<alpha<<endl;
 
 		if (!doAnimate){
 			gfx->x1= new Animate(tex_x1);
 			gfx->y1= new Animate(tex_y1);
 			gfx->x2= new Animate(tex_x2);
 			gfx->y2= new Animate(tex_y2);
-			gfx->alpha= new Animate(1);
+			gfx->alpha= new Animate(alpha);
 		}else{
 			gfx->x1= new Animate(animation_ms, lastx1, tex_x1, ANIMATE_STARTSTOP);
 			gfx->y1= new Animate(animation_ms, lasty1, tex_y1, ANIMATE_STARTSTOP);
 			gfx->x2= new Animate(animation_ms, lastx2, tex_x2, ANIMATE_STARTSTOP);
 			gfx->y2= new Animate(animation_ms, lasty2, tex_y2, ANIMATE_STARTSTOP);
-			gfx->alpha= new Animate(animation_ms, lastAlpha, 1, ANIMATE_STARTSTOP);
+			gfx->alpha= new Animate(animation_ms, lastAlpha, alpha, ANIMATE_STARTSTOP);
 		}
 
 		gfx->x1->start();
@@ -417,6 +493,8 @@ void OpenGLWindow::updateVideoPositions(bool doAnimate){
 		gfx->alpha->start();
 
 	}
+
+	displayListLock.unlock();
 }
 
 void OpenGLWindow::addDisplay(OpenGLDisplay* displ){
@@ -434,34 +512,22 @@ void OpenGLWindow::removeDisplay(OpenGLDisplay* displ){
 	updateVideoPositions(true);
 }
 
-#define WINDOW_WIDTH -windowX0
-
 void OpenGLWindow::drawSurface(){
-//	cerr << "EEEE: doing OpenGLWindow::drawSurface()"<<endl;
-        static struct timeval lasttime;
-        static int i=0;
-        i++;
-        if (i%REPORT_N==1){
-                struct timeval now;
-                gettimeofday(&now, NULL);
-                int diffms = (now.tv_sec-lasttime.tv_sec)*1000+(now.tv_usec-lasttime.tv_usec)/1000;
-                float sec = (float)diffms/1000.0f;
-                printf("%d frames in %fs\n", REPORT_N, sec);
-                printf("FPS_OPENGL: %f\n", (float)REPORT_N/(float)sec );
-                lasttime=now;
-        }
+	//	cerr << "EEEE: doing OpenGLWindow::drawSurface()"<<endl;
+	static struct timeval lasttime;
+	static int i=0;
+	i++;
+	if (i%REPORT_N==1){
+		struct timeval now;
+		gettimeofday(&now, NULL);
+		int diffms = (now.tv_sec-lasttime.tv_sec)*1000+(now.tv_usec-lasttime.tv_usec)/1000;
+		float sec = (float)diffms/1000.0f;
+		printf("%d frames in %fs\n", REPORT_N, sec);
+		printf("FPS_OPENGL: %f\n", (float)REPORT_N/(float)sec );
+		lasttime=now;
+	}
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ); //EE: not use depth?
-
-///        if (!d_login->hidden())
-///                d_login->draw();
-
-//      SDL_Color green = {0,255,0};
-//        SDL_Color black= {0,0,0};
-
-//      text->draw2D(100,100,"Hello world", 10, green);
-        //text->draw2D(100,100,"Hello world", 30,green, black);
-	
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ); //EE: not use depth?
 
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
@@ -474,7 +540,7 @@ void OpenGLWindow::drawSurface(){
 
 	static int N=0;
 	N++;
-//	glRotatef(((float)N)/5.0, 0.0F, 1.0F,0.0F);
+	//	glRotatef(((float)N)/5.0, 0.0F, 1.0F,0.0F);
 
 	GLdouble x=0;
 
@@ -482,20 +548,20 @@ void OpenGLWindow::drawSurface(){
 		updateVideoPositions(true);
 		displaysChanged=false;
 	}
+	
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	displayListLock.lock();
 	list<OpenGLDisplay*>::iterator video;
 	int dummy=1;
 	int nvideos=displays.size();
 	for (video=displays.begin(); video!=displays.end(); video++){
-//		cerr << "EEEE: getting video texture for display "<< dummy++"/"<<nvideos <<endl;
+//				cerr << "EEEE: getting video texture for display "<< dummy++ <<"/"<<nvideos <<endl;
 		struct mgl_gfx* gfx = (*video)->getTexture();
 		if (gfx->texture>0){
-//			cerr <<"aratio="<<gfx->aratio<<endl;
-//			cerr << "EEEE: ++++++++++++++ drawing texture "<<video_texture<<" +++++++++++++"<<endl;
 			float alpha=gfx->alpha->getVal();
-			//cerr <<"Alpha="<<alpha<<endl;
-			glColor4f(alpha,alpha,alpha, alpha );
+			glColor4f(1.0,1.0,1.0, alpha );
 			glBindTexture( GL_TEXTURE_2D, gfx->texture);
 			glBegin( GL_QUADS );
 			glTexCoord2f( 0, gfx->hu );
@@ -522,46 +588,48 @@ void OpenGLWindow::drawSurface(){
 
 
 void OpenGLWindow::sdlQuit(){
-        cerr << "EEEE: sdlQuit called"<<endl;
-        if (isFullscreen() ){
-                toggleFullscreen();
-        }
-        SDL_Quit();
+	cerr << "EEEE: sdlQuit called"<<endl;
+	if (isFullscreen() ){
+		toggleFullscreen();
+	}
+	SDL_Quit();
 }
 
 
 
 void OpenGLWindow::toggleFullscreen(){
-        printf("Toggle fullscreen\n");
-        sdlFlags ^= SDL_FULLSCREEN;
-//        SDL_WM_ToggleFullScreen(gDrawSurface);
+	printf("Toggle fullscreen\n");
+	sdlFlags ^= SDL_FULLSCREEN;
+	//        SDL_WM_ToggleFullScreen(gDrawSurface);
 
-        initSurface();
+	initSurface();
 
-//	startFullscreen=isFullscreen();
-//        initSdl();
+	//	startFullscreen=isFullscreen();
+	//        initSdl();
 
 }
 
 
 bool OpenGLWindow::isFullscreen(){
-        if (sdlFlags&SDL_FULLSCREEN)
-                return true;
-        else
-                return false; 
+	if (sdlFlags&SDL_FULLSCREEN)
+		return true;
+	else
+		return false; 
 }
 
 
 
 void OpenGLWindow::windowResized(int w, int h){
 	cerr<<"EEEE: doing OpenGLWindow::windowResized("<<w<<","<<h<<")"<<endl;
-        windowed_width=w;
-        windowed_height=h;
+	windowed_width=w;
+	windowed_height=h;
 
-        initSurface();
+	screen_aratio=(float)w/(float)h;
+
+	initSurface();
 
 	updateVideoPositions(false);
-        SDL_GL_SwapBuffers();
+	SDL_GL_SwapBuffers();
 }
 
 
@@ -585,60 +653,60 @@ void OpenGLWindow::run(){
 			string url;
 			switch( event.type )
 			{
-			case SDL_MOUSEBUTTONDOWN:
-				printf("PRESS: %d,%d\n",event.button.x, event.button.y);
+				case SDL_MOUSEBUTTONDOWN:
+					printf("PRESS: %d,%d\n",event.button.x, event.button.y);
 #if 0
-				url=d_login->clickedUrl(event.button.x, event.button.y);
-				if (url!=""){
-					gui->doRegister(url);
-					d_login->hide();
-				}
+					url=d_login->clickedUrl(event.button.x, event.button.y);
+					if (url!=""){
+						gui->doRegister(url);
+						d_login->hide();
+					}
 #endif
 
-				break;
-			case SDL_MOUSEMOTION:
-				//printf("mouse %d,%d\n",event.motion.x, event.motion.y);
-				//			d_login->mouseMove(event.motion.x, event.motion.y);
-				break;
+					break;
+				case SDL_MOUSEMOTION:
+					//printf("mouse %d,%d\n",event.motion.x, event.motion.y);
+					//			d_login->mouseMove(event.motion.x, event.motion.y);
+					break;
 
-			case SDL_QUIT:
-				sdlQuit();
-				return;
-			case SDL_VIDEORESIZE:
-				printf("EE: RESIZE!\n");
-				windowResized(event.resize.w, event.resize.h);
-				break;
-			case SDL_KEYDOWN:
-
-				//trap quit and fullscreen events. Forward everything else
-
-				if (event.key.keysym.sym == SDLK_ESCAPE ||
-						event.key.keysym.sym == SDLK_q){
+				case SDL_QUIT:
 					sdlQuit();
 					return;
-				}
-
-/*				if (event.key.keysym.sym=='w'){
-					windowResized(rand()%800+100, rand()%800+100);
+				case SDL_VIDEORESIZE:
+					printf("EE: RESIZE!\n");
+					windowResized(event.resize.w, event.resize.h);
 					break;
-				}
-*/
+				case SDL_KEYDOWN:
 
+					//trap quit and fullscreen events. Forward everything else
 
-				if (event.key.keysym.sym == SDLK_RETURN &&
-						event.key.keysym.mod & KMOD_ALT){
-					toggleFullscreen();
-				}else{
-					char key = event.key.keysym.sym;
-					if (event.key.keysym.mod == KMOD_SHIFT){        //if shift, make upper case
-						printf("Shift detected\n");
-						key-='a'-'A';
+					if (event.key.keysym.sym == SDLK_ESCAPE ||
+							event.key.keysym.sym == SDLK_q){
+						sdlQuit();
+						return;
 					}
-					//gui->keyPressed(key);
 
-				}
+					/*				if (event.key.keysym.sym=='w'){
+									windowResized(rand()%800+100, rand()%800+100);
+									break;
+									}
+									*/
 
-				break;
+
+					if (event.key.keysym.sym == SDLK_RETURN &&
+							event.key.keysym.mod & KMOD_ALT){
+						toggleFullscreen();
+					}else{
+						char key = event.key.keysym.sym;
+						if (event.key.keysym.mod == KMOD_SHIFT){        //if shift, make upper case
+							printf("Shift detected\n");
+							key-='a'-'A';
+						}
+						//gui->keyPressed(key);
+
+					}
+
+					break;
 			}
 
 		} // -- while event in queue
@@ -714,6 +782,9 @@ void OpenGLWindow::init(){
 
 }
 
+typedef GLvoid (*glXSwapIntervalSGIFunc) (GLint);
+typedef GLvoid (*glXSwapIntervalMESAFunc) (GLint);
+
 void OpenGLWindow::initSdl(){
 	// init video system
 	if( SDL_Init(SDL_INIT_VIDEO) < 0 )
@@ -762,10 +833,41 @@ void OpenGLWindow::initSdl(){
 
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER,    1);
 
+
+	/* We want to enable synchronizing swapping buffers to
+ 	 * vsynch to avoid tearing. SDL_GL_SWAP_CONTROL does
+ 	 * not (always?) work under linux, so we try to
+ 	 * use GL extensions.
+ 	 */
+
 	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL,    1);
 
 	SDL_putenv((char*)"__GL_SYNC_TO_VBLANK=1");
 
+
+#if 1
+	cerr <<"EEEE: trying to VSYNCH using OpenGL extensiosn"<<endl;
+
+	glXSwapIntervalSGIFunc glXSwapIntervalSGI = 0;
+	glXSwapIntervalMESAFunc glXSwapIntervalMESA = 0;
+	glXSwapIntervalSGI = (glXSwapIntervalSGIFunc) glXGetProcAddress((const GLubyte*)"glXSwapIntervalSGI");
+	if (false && glXSwapIntervalSGI){
+		cerr <<"EEEE: setting VSYNCH using SGI"<<endl;
+		glXSwapIntervalSGI (2);
+	}else{
+		cerr <<"EEEE: no SGI"<<endl;
+		glXSwapIntervalMESA = (glXSwapIntervalMESAFunc) glXGetProcAddress((const GLubyte*)"glXSwapIntervalMESA");
+
+		if (glXSwapIntervalMESA){
+			cerr <<"EEEE: setting VSYNCH using MESA"<<endl;
+			glXSwapIntervalMESA (2);
+		}else{
+			cerr <<"EEEE: no MESA"<<endl;
+		}
+
+
+	}
+#endif 
 
 	sdlFlags = SDL_OPENGL | SDL_RESIZABLE;
 
@@ -875,10 +977,11 @@ OpenGLDisplay::OpenGLDisplay( uint32_t width, uint32_t height):VideoDisplay(){
 	this->height = height;
 	fullscreen = false;
 	nallocated=0;
+	//isLocalVideo=false;
 
 	memset(&gfx, 0, sizeof(gfx));
 	gfx.texture=-1;
-	gfx.aratio=1;
+	gfx.aratio=(float)width/(float)height;
 	gfx.wu=1;
 	gfx.hu=1;
 	gfx.tex_dim=0;
@@ -886,6 +989,8 @@ OpenGLDisplay::OpenGLDisplay( uint32_t width, uint32_t height):VideoDisplay(){
 	rgb=NULL;
 	needUpload=false;
 	newRgbData=false;
+	//rgb32=false;
+	colorNBytes=3;
 
 	window = * (OpenGLWindow::getWindow() );
 	window->sizeHint(width,height);
@@ -894,7 +999,9 @@ OpenGLDisplay::OpenGLDisplay( uint32_t width, uint32_t height):VideoDisplay(){
 
 struct mgl_gfx*  OpenGLDisplay::getTexture(){
 	dataLock.lock();
+//	cerr <<"EEEE: gl extensions: " << glGetString(GL_EXTENSIONS);
 	if (gfx.texture==-1){
+		massert(colorNBytes==3 || colorNBytes==4);
 		int hw_max_dim = window->getTextureMaxSize();
 		int dim = (hw_max_dim>2048) ? 2048 : hw_max_dim;
 		gfx.tex_dim=dim;
@@ -904,9 +1011,10 @@ struct mgl_gfx*  OpenGLDisplay::getTexture(){
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		uint8_t *dummy_black=(uint8_t*)calloc(1,dim*dim*3);
+		uint8_t *dummy_black=(uint8_t*)calloc(1,dim*dim*colorNBytes);
 		massert(dummy_black);
-		glTexImage2D( GL_TEXTURE_2D, 0, 3, dim, dim, 0, GL_RGB, GL_UNSIGNED_BYTE, dummy_black );
+		GLenum pixFormat = colorNBytes==3?GL_RGB:GL_BGRA;
+		glTexImage2D( GL_TEXTURE_2D, 0, 3, dim, dim, 0, /*pixFormat*/ GL_RGB, GL_UNSIGNED_BYTE, dummy_black );
 		free(dummy_black);
 	}
 
@@ -920,19 +1028,19 @@ struct mgl_gfx*  OpenGLDisplay::getTexture(){
 			while (width/factor > gfx.tex_dim)
 				factor++;
 			cerr << "WARNING: insufficent OpenGL hardware. Resizing image to fit in texture (factor="<<factor<<")"<<endl;
-			uint8_t* tmpbuf = new uint8_t[(width/factor)*(height/factor)*3+16];
+			uint8_t* tmpbuf = new uint8_t[(width/factor)*(height/factor)*colorNBytes+16];
 
 			int x,y;
 			int newwidth = width/factor;
 			int newheight = height/factor;
 			for (y=0; y<newheight; y++){
 				for (x=0; x<newwidth; x++){
-//					tmpbuf[x*3+y*newheight*3+0]=rgb[(x*3+y*newheight*3+0)*factor];
-//					tmpbuf[x*3+y*newheight*3+1]=rgb[(x*3+y*newheight*3+1)*factor];
-//					tmpbuf[x*3+y*newheight*3+2]=rgb[(x*3+y*newheight*3+2)*factor];
-					tmpbuf[x*3+y*newwidth*3+0]=rgb[(x*3+y*width*3+0)*factor];
-					tmpbuf[x*3+y*newwidth*3+1]=rgb[(x*3+y*width*3+2)*factor];
-					tmpbuf[x*3+y*newwidth*3+2]=rgb[(x*3+y*width*3+1)*factor];
+//					tmpbuf[x*colorNBytes+y*newheight*colorNBytes+0]=rgb[(x*colorNBytes+y*newheight*colorNBytes+0)*factor];
+//					tmpbuf[x*colorNBytes+y*newheight*colorNBytes+1]=rgb[(x*colorNBytes+y*newheight*colorNBytes+1)*factor];
+//					tmpbuf[x*colorNBytes+y*newheight*colorNBytes+2]=rgb[(x*colorNBytes+y*newheight*colorNBytes+2)*factor];
+					tmpbuf[x*colorNBytes+y*newwidth*colorNBytes+0]=rgb[(x*colorNBytes+y*width*colorNBytes+0)*factor];
+					tmpbuf[x*+y*newwidth*colorNBytes+1]=rgb[(x*colorNBytes+y*width*colorNBytes+2)*factor];
+					tmpbuf[x*colorNBytes+y*newwidth*colorNBytes+2]=rgb[(x*colorNBytes+y*width*colorNBytes+1)*factor];
 
 
 				}
@@ -946,8 +1054,11 @@ struct mgl_gfx*  OpenGLDisplay::getTexture(){
 			delete []tmpbuf;
 			
 		}else{
+			//cerr << "EEEE: getTexture: uploading texture of size "<<width<<"x"<<height << " for display "<<(uint64_t)this<<endl;
 
-			glTexSubImage2D( GL_TEXTURE_2D, 0, 0,0 , width, height, GL_RGB, GL_UNSIGNED_BYTE, rgb );
+			GLenum pixFormat = colorNBytes==3?GL_RGB:GL_BGRA;
+
+			glTexSubImage2D( GL_TEXTURE_2D, 0, 0,0 , width, height, pixFormat, GL_UNSIGNED_BYTE, rgb );
 			gfx.wu=width/(float)gfx.tex_dim;
 			gfx.hu=height/(float)gfx.tex_dim;
 			gfx.aratio = (float)width/(float)height;
@@ -957,8 +1068,14 @@ struct mgl_gfx*  OpenGLDisplay::getTexture(){
 	return &gfx;
 }
 
-void OpenGLDisplay::handle( MImage * mimage ){
-//	cerr <<"EEEE: doing OpenGLDisplay::handle on display "<<(uint64_t)this<<endl;
+void OpenGLDisplay::handle( MImage * mimage){
+//	cerr <<"EEEE: doing OpenGLDisplay::handle on display "<<(uint64_t)this<<" image size="<<mimage->width<<"x"<<mimage->height<<endl;
+//	cerr <<"EEEE: linesize0="<< mimage->linesize[0]<<endl;
+	massert(mimage->linesize[1]==0);
+	
+	colorNBytes=mimage->linesize[0]/mimage->width;
+//	cerr <<"EEEE: colorNBytes="<<colorNBytes<<endl;
+
 	dataLock.lock();
 	if (!rgb || width!=mimage->width || height!=mimage->height){
 		cerr << "EEEE: allocating RGB of size "<<mimage->width<<"x"<<mimage->height<<endl;
@@ -966,15 +1083,18 @@ void OpenGLDisplay::handle( MImage * mimage ){
 			delete rgb;
 		width=mimage->width;
 		height=mimage->height;
-		rgb = new uint8_t[width*height*3+16]; // +16 to avoid mesa bug
+		gfx.aratio=(float)width/(float)height;
+		rgb = new uint8_t[width*height*colorNBytes+16]; // +16 to avoid mesa bug
 	
 	}
 
 	massert(rgb);
-	memcpy(rgb, &mimage->data[0][0], width*height*3); //TODO: don't copy since it is in correct format.
+//	cerr <<"EEEE:handle: copying data to rgb buf, n="<<width<<"x"<<height<<endl;
+	memcpy(rgb, &mimage->data[0][0], width*height*colorNBytes); //TODO: don't copy since it is in correct format.
 	newRgbData=true;
 //	cerr << "EEEE: OpenGLDisplay::handle: done copying new data"<<endl;
-	emptyImages.push_back(mimage);
+	if (!isLocalVideo)
+		emptyImages.push_back(mimage);
 	dataLock.unlock();
 
 
@@ -1017,6 +1137,7 @@ void OpenGLDisplay::resize(int w, int h){
 	cerr << "EEEE: doing OpenGLDisplay::resize("<<w<<","<<h<<") old size="<<width<<"x"<<height<<endl;
 	this->width=w;
 	this->height=h;
+	gfx.aratio=(float)w/(float)h;
 	window->sizeHint(w,h);
 }
 
@@ -1081,6 +1202,10 @@ void OpenGLDisplay::displayImage( MImage * mimage ){
 
 void OpenGLDisplay::handleEvents(){
 	cerr <<"EEEE: doing OpenGLDisplay::handleEvents"<<endl;
+}
+
+void OpenGLDisplay::setIsLocalVideo(bool isLocal){
+	isLocalVideo=isLocal;
 }
 
 OpenGLPlugin::OpenGLPlugin( MRef<Library *> lib ): VideoDisplayPlugin( lib ){

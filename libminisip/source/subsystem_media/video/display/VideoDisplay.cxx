@@ -36,7 +36,7 @@ using namespace std;
 VideoDisplayRegistry::VideoDisplayRegistry(): displayCounter( 0 ){
 }
 
-MRef<VideoDisplay *> VideoDisplayRegistry::createDisplay( uint32_t width, uint32_t height ){
+MRef<VideoDisplay *> VideoDisplayRegistry::createDisplay( uint32_t width, uint32_t height, bool doStart ){
         MRef<VideoDisplay *> display = NULL;
 	const char *names[] = { "opengl", "sdl", "xv", "x11", NULL };
         
@@ -77,7 +77,8 @@ MRef<VideoDisplay *> VideoDisplayRegistry::createDisplay( uint32_t width, uint32
 				continue;
 			}
 			
-			display->start();
+			if (doStart)
+				display->start();
 			displayCounter ++;
 			break;
 		}
@@ -100,6 +101,7 @@ void VideoDisplayRegistry::signalDisplayDeleted(){
 
 
 VideoDisplay::VideoDisplay(){
+	isLocalVideo=false;
 	show = false;
 //	emptyImagesLock.lock();
         show = true;
@@ -274,6 +276,19 @@ bool VideoDisplay::providesImage(){
 }
 
 void VideoDisplay::releaseImage( MImage * mimage ){
+}
+
+bool VideoDisplay::getIsLocalVideo(){
+	return isLocalVideo;
+}
+
+void VideoDisplay::setIsLocalVideo(bool isLocal){
+	massert(1==0); // FIXME: don't let grabber send local video to this type of display.
+			// Details: The images sent to handle() by the grabber are not allocated/managed
+			// by this class, and there will most likely be problems until we have looked
+			// into this.
+			// This method is overloaded in the OpenGL display that handles this case.
+	isLocalVideo=isLocal;
 }
 
 VideoDisplayPlugin::VideoDisplayPlugin( MRef<Library *> lib ): MPlugin( lib ){

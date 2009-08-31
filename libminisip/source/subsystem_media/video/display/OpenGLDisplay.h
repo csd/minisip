@@ -35,7 +35,7 @@
 #include <GL/glext.h>
 #include <GL/glx.h>
 #include <GL/glxext.h>
-#define glXGetProcAddress(x) (*glXGetProcAddressARB)((const GLubyte*)x)
+//#define glXGetProcAddress(x) (*glXGetProcAddressARB)((const GLubyte*)x)
 #include<unistd.h>
 #include<sys/time.h>
 
@@ -75,6 +75,7 @@ class OpenGLDisplay: public VideoDisplay{
 		virtual MImage * provideImage();
 
 		virtual void handle( MImage * mimage );
+//		virtual void handleLocal( MImage * mimage );
 
 		virtual void resize(int w, int h);
 
@@ -89,7 +90,11 @@ class OpenGLDisplay: public VideoDisplay{
 		 */
 		struct mgl_gfx* getTexture();
 
+		virtual void setIsLocalVideo(bool);	
+		
+
 	private:
+		int colorNBytes;
 		mgl_gfx gfx;
 		
 
