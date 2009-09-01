@@ -405,15 +405,15 @@ void OpenGLWindow::updateVideoPositions(bool doAnimate){
 			float glwidth = rightx-leftx;
 			float glheight= bottomy-topy;
 			float localwidth=glwidth/5;
-			cerr <<"EEEE: glwidth="<<glwidth<<endl;
-			cerr <<"EEEE: glheight="<<glheight<<endl;
+//			cerr <<"EEEE: glwidth="<<glwidth<<endl;
+//			cerr <<"EEEE: glheight="<<glheight<<endl;
 			float localx=rightx-localwidth-glwidth/128;
-			cerr <<"EEEE: localx="<<localx<<endl;
+//			cerr <<"EEEE: localx="<<localx<<endl;
 			tex_x1= localx;
 			tex_y1= /*bottomy-glheight/8-glheight/128*/ topy+glheight/128;
 			tex_x2=localx+localwidth;
 			tex_y2= tex_y1+localwidth/gfx->aratio /*-glheight/128*/;
-			alpha=0.7;
+			alpha=0.6;
 
 
 		}else{
@@ -563,6 +563,7 @@ void OpenGLWindow::drawSurface(){
 			float alpha=gfx->alpha->getVal();
 			glColor4f(1.0,1.0,1.0, alpha );
 			glBindTexture( GL_TEXTURE_2D, gfx->texture);
+//			cerr<<"EEEE: drawing texture "<<gfx->texture<<" with alpha "<<alpha<<endl;
 			glBegin( GL_QUADS );
 			glTexCoord2f( 0, gfx->hu );
 			glVertex3f(  gfx->x1->getVal(), gfx->y1->getVal(), 0.0f );
@@ -1019,6 +1020,7 @@ struct mgl_gfx*  OpenGLDisplay::getTexture(){
 	}
 
 	if (newRgbData){
+		//cerr <<"EEEE: uploading new texture"<<endl;
 		massert(gfx.texture>0);
 		newRgbData=false;
 		glBindTexture( GL_TEXTURE_2D, gfx.texture);
@@ -1049,9 +1051,9 @@ struct mgl_gfx*  OpenGLDisplay::getTexture(){
 			delete []tmpbuf;
 			
 		}else{
-			//cerr << "EEEE: getTexture: uploading texture of size "<<width<<"x"<<height << " for display "<<(uint64_t)this<<endl;
+			//cerr << "EEEE: getTexture: uploading texture of size "<<width<<"x"<<height << " for display "<<(uint64_t)this<< "colorNBytes="<<colorNBytes<< " texdim="<<gfx.tex_dim<<endl;
 
-			GLenum pixFormat = colorNBytes==3?GL_RGB:GL_BGRA;
+			GLenum pixFormat = (colorNBytes==3)?GL_RGB:GL_BGRA;
 
 			glTexSubImage2D( GL_TEXTURE_2D, 0, 0,0 , width, height, pixFormat, GL_UNSIGNED_BYTE, rgb );
 			gfx.wu=width/(float)gfx.tex_dim;
@@ -1064,7 +1066,7 @@ struct mgl_gfx*  OpenGLDisplay::getTexture(){
 }
 
 void OpenGLDisplay::handle( MImage * mimage){
-//	cerr <<"EEEE: doing OpenGLDisplay::handle on display "<<(uint64_t)this<<" image size="<<mimage->width<<"x"<<mimage->height<<endl;
+	//cerr <<"EEEE: doing OpenGLDisplay::handle on display "<<(uint64_t)this<<" image size="<<mimage->width<<"x"<<mimage->height<<" local="<<isLocalVideo<<endl;
 //	cerr <<"EEEE: linesize0="<< mimage->linesize[0]<<endl;
 	massert(mimage->linesize[1]==0);
 	
@@ -1111,6 +1113,7 @@ void OpenGLDisplay::stop(){
 	cerr <<"EEEE: doing OpenGLDisplay::stop"<<endl;
 	window->removeDisplay(this);
 	window->stop();
+	gfx.texture=-1;
 }
 
 void OpenGLDisplay::openDisplay(){
