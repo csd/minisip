@@ -1035,14 +1035,9 @@ struct mgl_gfx*  OpenGLDisplay::getTexture(){
 			int newheight = height/factor;
 			for (y=0; y<newheight; y++){
 				for (x=0; x<newwidth; x++){
-//					tmpbuf[x*colorNBytes+y*newheight*colorNBytes+0]=rgb[(x*colorNBytes+y*newheight*colorNBytes+0)*factor];
-//					tmpbuf[x*colorNBytes+y*newheight*colorNBytes+1]=rgb[(x*colorNBytes+y*newheight*colorNBytes+1)*factor];
-//					tmpbuf[x*colorNBytes+y*newheight*colorNBytes+2]=rgb[(x*colorNBytes+y*newheight*colorNBytes+2)*factor];
 					tmpbuf[x*colorNBytes+y*newwidth*colorNBytes+0]=rgb[(x*colorNBytes+y*width*colorNBytes+0)*factor];
-					tmpbuf[x*+y*newwidth*colorNBytes+1]=rgb[(x*colorNBytes+y*width*colorNBytes+2)*factor];
+					tmpbuf[x*colorNBytes+y*newwidth*colorNBytes+1]=rgb[(x*colorNBytes+y*width*colorNBytes+2)*factor];
 					tmpbuf[x*colorNBytes+y*newwidth*colorNBytes+2]=rgb[(x*colorNBytes+y*width*colorNBytes+1)*factor];
-
-
 				}
 			}
 
@@ -1050,7 +1045,7 @@ struct mgl_gfx*  OpenGLDisplay::getTexture(){
 			gfx.wu=(newwidth/*/(float)factor*/)/(float)gfx.tex_dim;
 			gfx.hu=(newheight/*/(float)factor*/)/(float)gfx.tex_dim;
 			gfx.aratio = (float)width/(float)height;
-			cerr << "EEEE: new dim="<<newwidth<<"x"<<newheight<<" and gfx.hu="<<gfx.hu<<" and tex_dim="<<gfx.tex_dim<<endl;
+			//cerr << "EEEE: new dim="<<newwidth<<"x"<<newheight<<" and gfx.hu="<<gfx.hu<<" and tex_dim="<<gfx.tex_dim<<endl;
 			delete []tmpbuf;
 			
 		}else{
