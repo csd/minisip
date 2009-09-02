@@ -1,5 +1,5 @@
 SUBDIRS = 
-DIST_SUBDIRS = textui gtkgui qtgui confgui 
+DIST_SUBDIRS = textui gtkgui qtgui openglgui confgui 
 
 
 if TEXT_UI
@@ -8,6 +8,10 @@ endif
 
 if GTK_GUI
         SUBDIRS += gtkgui
+endif
+
+if OPENGL_GUI
+        SUBDIRS += openglgui
 endif
 
 if QT_GUI

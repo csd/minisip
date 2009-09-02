@@ -105,6 +105,20 @@ dnl	  enable_gtk="no"
       fi ])
 AM_CONDITIONAL(TEXT_UI, [test "${enable_textui}" = "yes"])
 
+
+dnl OpenGL GUI
+AC_ARG_ENABLE(opengl,
+    AS_HELP_STRING([--enable-opengl],
+        [enables the OpenGL based full-screen user interface (default disabled)]),
+    [ if test "${enable_opengl}" = "yes"
+      then
+	  AC_DEFINE(OPENGL_GUI, [], [Use the OpenGL full screen user interface])
+	  LDFLAGS="${LDFLAGS} -lminisip_video"
+      fi ])
+AM_CONDITIONAL(OPENGL_GUI, [test "${enable_opengl}" = "yes"])
+
+
+
 dnl Qt GUI
 AC_ARG_ENABLE(qtui,
     AS_HELP_STRING([--enable-qtui],
@@ -316,6 +330,7 @@ AC_CONFIG_FILES([minisip/Makefile
 			minisip/gui/qtgui/Makefile
 			minisip/gui/gtkgui/Makefile
 			minisip/gui/textui/Makefile
+			minisip/gui/openglgui/Makefile
 			minisip/gui/confgui/Makefile
 			minisip/win32/Makefile
 			minisip/win32/minisip-res.rc
