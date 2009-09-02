@@ -47,22 +47,30 @@
 #include<stdlib.h>
 #include<string.h>
 
-using namespace std;
+#include<sys/types.h>
+#include<linux/unistd.h>
 
+using namespace std;
 
 
 #ifdef DEBUG_OUTPUT
 
+pid_t gettid(void ){
+	return syscall(__NR_gettid);
+}
+
 class tinfo{
 	public:
 		uint64_t id;
+		pid_t tid;
 		string name;
 };
 list<tinfo> threadNames;
-void addThread(uint64_t id, std::string name=""){
+void addThread(uint64_t id, pid_t tid, std::string name=""){
 	printf("THREAD: adding thread %lld\n", id);
 	tinfo inf;
 	inf.id=id;
+	inf.tid=tid;
 	inf.name=name;
 	threadNames.push_back(inf);
 }
@@ -72,6 +80,7 @@ void delThread(uint64_t id){
 	list<tinfo>::iterator i;
 	for (i=threadNames.begin(); i!=threadNames.end(); i++){
 		if ((*i).id==id){
+			printf("THREAD: removing id=%lld tid=%d name=%s\n", (*i).id, (*i).tid, (*i).name.c_str());
 			threadNames.erase(i);
 			return;
 		}
@@ -91,15 +100,15 @@ void printThreads(){
 #ifdef DEBUG_OUTPUT
 	list<tinfo>::iterator i;
 	for (i=threadNames.begin(); i!=threadNames.end(); i++){
-		cerr << "THREAD: "<< (*i).id <<"\t"<<(*i).name<<endl;
+		cerr << "THREAD: "<< (*i).id <<"\t"<<(*i).name<<"\ttid="<<(*i).tid<<endl;
 	}
 #endif	
 }
 
-void setThreadName(string descr, uint64_t tid){
+void setThreadName(string descr, uint64_t id){
 #ifdef DEBUG_OUTPUT
-	if (tid==0)
-		tid=(uint64_t)pthread_self();
+	if (id==0)
+		id=(uint64_t)pthread_self();
 	list<tinfo>::iterator i;
 	for (i=threadNames.begin(); i!=threadNames.end(); i++){
 		if ((*i).id==(uint64_t)pthread_self()){
@@ -107,7 +116,7 @@ void setThreadName(string descr, uint64_t tid){
 			return;
 		}
 	}
-	addThread(tid);
+	addThread(id, gettid() );
 	setThreadName(descr);
 #endif
 }
@@ -121,7 +130,7 @@ void startFunction( void* (*f)() ){
 
 #ifdef DEBUG_OUTPUT
 	uint64_t id = pthread_self();
-	addThread( id );
+	addThread( id, gettid() );
 	pthread_cleanup_push( (cleanupFunc) ,(void*)id );
 #endif
 	int i;
@@ -148,7 +157,7 @@ void *startFunctionArg( void* (*f)(void*), void* arg){
 
 #ifdef DEBUG_OUTPUT
 	uint64_t id = pthread_self();
-	addThread( (uint64_t)pthread_self());
+	addThread( (uint64_t)pthread_self(), gettid());
 	pthread_cleanup_push( (cleanupFunc) ,(void*)id );
 #endif
 	try{
@@ -176,7 +185,7 @@ void *startFunctionArg( void* (*f)(void*), void* arg){
 void startRunnable(MRef<Runnable*> r){
 #ifdef DEBUG_OUTPUT
 	uint64_t id = pthread_self();
-	addThread( (uint64_t)pthread_self());
+	addThread( (uint64_t)pthread_self(), gettid() );
 	pthread_cleanup_push( (cleanupFunc) ,(void*)id );
 #endif
 
