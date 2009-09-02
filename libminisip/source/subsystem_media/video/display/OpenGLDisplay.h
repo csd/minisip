@@ -28,38 +28,13 @@
 
 #include<libminisip/media/video/display/VideoDisplay.h>
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_opengl.h>
-
-#include <GL/glu.h>
-#include <GL/glext.h>
-#include <GL/glx.h>
-#include <GL/glxext.h>
-//#define glXGetProcAddress(x) (*glXGetProcAddressARB)((const GLubyte*)x)
-#include<unistd.h>
-#include<sys/time.h>
-
-
 #include<libmutil/Thread.h>
 #include<libmutil/Mutex.h>
 #include<libmutil/CondVar.h>
 #include<list>
-#include"Animate.h"
 
 class OpenGLWindow;
 
-struct mgl_gfx{
-	GLuint texture;
-	float wu;	//width usage of texture (0..1). How much of texture is rendered
-	float hu;	//height usage
-	float aratio;   // width/height
-	int tex_dim;
-	Animate* x1;
-	Animate* y1;
-	Animate* x2;
-	Animate* y2;
-	Animate* alpha;
-};
 
 /**
  * A OpenGLDisplay represents one stream of images being displayed in
@@ -68,14 +43,13 @@ struct mgl_gfx{
  */
 class OpenGLDisplay: public VideoDisplay{
 	public: 
-		OpenGLDisplay( uint32_t width, uint32_t height );
+		OpenGLDisplay( uint32_t width, uint32_t height, bool fullscreen );
 		virtual void init( uint32_t height,  uint32_t width );
 		virtual bool handlesChroma( uint32_t chroma );
 
 		virtual MImage * provideImage();
 
 		virtual void handle( MImage * mimage );
-//		virtual void handleLocal( MImage * mimage );
 
 		virtual void resize(int w, int h);
 
@@ -92,10 +66,18 @@ class OpenGLDisplay: public VideoDisplay{
 
 		virtual void setIsLocalVideo(bool);	
 		
+		bool getIsSelected();//{return gfx->isSelected;}
+		void setIsSelected(bool is);//{gfx.isSelected=is;}
+		
+		virtual bool handleCommand(CommandString cmd);
+
+		void sendCmd(CommandString cmd);
+		
+		virtual void setCallback(MRef<CommandReceiver*> cb);
 
 	private:
 		int colorNBytes;
-		mgl_gfx gfx;
+		mgl_gfx *gfx;
 		
 
 		uint8_t *rgb;
@@ -137,8 +119,8 @@ class OpenGLPlugin: public VideoDisplayPlugin{
 
 		virtual std::string getDescription() const { return "OpenGL display"; }
 
-		virtual MRef<VideoDisplay *> create( uint32_t width, uint32_t height ) const{
-			return new OpenGLDisplay( width, height );
+		virtual MRef<VideoDisplay *> create( uint32_t width, uint32_t height, bool fullscreen ) const{
+			return new OpenGLDisplay( width, height, fullscreen );
 		}
 };
 

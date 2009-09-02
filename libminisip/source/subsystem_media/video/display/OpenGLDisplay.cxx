@@ -28,6 +28,22 @@
 #include<sys/time.h>
 #include<SDL/SDL_syswm.h>
 
+#include"Animate.h"
+
+#include <SDL/SDL.h>
+#include <SDL/SDL_opengl.h>
+
+#include <GL/glu.h>
+#include <GL/glext.h>
+#include <GL/glx.h>
+#include <GL/glxext.h>
+//#define glXGetProcAddress(x) (*glXGetProcAddressARB)((const GLubyte*)x)
+#include<unistd.h>
+#include<sys/time.h>
+#include<fstream>
+
+
+
 #include<libmutil/mtime.h>
 
 #include<iostream>
@@ -65,6 +81,111 @@ MPlugin * mopengl_LTX_getPlugin( MRef<Library*> lib ){
 
 #define DRAW_Z -20.0F
 
+
+
+struct mgl_gfx{
+	GLuint texture;
+	float wu;	//width usage of texture (0..1). How much of texture is rendered
+	float hu;	//height usage
+	float aratio;   // width/height
+	int tex_dim;
+	Animate* x1;
+	Animate* y1;
+	Animate* x2;
+	Animate* y2;
+	Animate* alpha;
+	bool isSelected;
+	char*name;
+};
+
+class Menu{
+public:
+	Menu(struct mgl_gfx* _icon, bool _visible=true){
+		visible=_visible;
+		icon=_icon;
+		selected=false;
+	}
+	int nVisible(){
+		int ret=0;
+		list<Menu*>::iterator i;
+		for (i=mitems.begin();i!=mitems.end();i++){
+			if ((*i)->visible)
+				ret++;
+		}
+		return ret;
+	}
+	int getSelectedIndex(){
+		int n=0;
+		list<Menu*>::iterator i;
+		for (i=mitems.begin();i!=mitems.end();i++, n++){
+			if ((*i)->selected)
+				return n;
+		}
+		return 0;
+	}
+
+	///Returns currently selected menu
+	Menu* selectRight(){
+		Menu* ret=NULL;
+		cerr <<"EEEE: doing selectLeft"<<endl;
+		int s=getSelectedIndex();
+		list<Menu*>::iterator item=mitems.begin();
+		for (int i=0; i<s; i++)
+			item++;
+		(*item)->selected=false;	// clear old selection
+		item++;
+
+		while (item!=mitems.end() && (*item)->visible==false)
+			item++;
+
+		if (item==mitems.end()){       //if wrap
+			(*mitems.begin())->selected=true;
+			ret=*mitems.begin();
+		}else{
+			(*item)->selected=true;
+			ret=*item;
+		}
+		massert(ret!=NULL);
+		return ret;
+	}
+	
+	///Returns currently selected menu
+	Menu* selectLeft(){
+		cerr <<"EEEE: doing selectRight"<<endl;
+		int s=getSelectedIndex();
+
+		Menu*last=*mitems.begin();
+		list<Menu*>::iterator item=mitems.begin();
+		do{
+			if ((*item)->visible)
+				last=*item;
+			item++;
+		}while(item!=mitems.end());
+
+		
+		Menu*prev=last;
+
+
+		item=mitems.begin();
+		for (int i=0; i<s; i++){
+			prev=*item;
+			item++;
+		}
+		(*item)->selected=false;
+		massert(prev!=NULL);
+		prev->selected=true;
+		return prev;
+	}
+
+
+	bool visible;
+	bool selected;
+	list<Menu*> mitems;
+	Menu* selectedItem;
+	struct mgl_gfx* icon;
+	CommandString command;
+};
+
 class OpenGLWindow : public Runnable {
 	public:
 		OpenGLWindow(int width, int height, bool fullscreen);
@@ -82,7 +203,7 @@ class OpenGLWindow : public Runnable {
 		
 		string getMemObjectType(){return "OpenGLWindow";}
 
-		static MRef<OpenGLWindow*> getWindow();
+		static MRef<OpenGLWindow*> getWindow(bool fullscreen);
 
 		/*
 		 * OpenGL implementations limits the size of a texture
@@ -102,68 +223,50 @@ class OpenGLWindow : public Runnable {
 //					windowed_height = h;
 //					windowResized(w,h);
 //				}
-//				if (!initialized){
+				if (!initialized && !startFullscreen){
 					windowed_width  = w;
 					windowed_height = h;
-//				}
+				}
 			resized=true;
 			}
 	
 		} 
+
+		void setTexturePath(string path);
+		void enableMenu();
+		void keyPressed(string key, bool isRepeat);
+
+		void setCallback(OpenGLDisplay* cb){
+			if (!callback)
+				callback=cb;
+		}
+
+		///send command to callback
+		void send(CommandString cmd);
+		void incomingCall(string callid, string uri, bool unprotected);
 	private:
+		bool loadTexture(string name);
+		void hideAcceptCallMenu(bool hideAllMenus);
+		struct mgl_gfx* getIcon(string name);
+		void setupMenu();
+		bool texturesLoaded;
+		bool showMenu;
+		Menu* menuRoot;
+		Menu* menuCur;
+		Menu* menuItemCur;
+
+		Menu* menuActions;
+		Menu* menuAcceptCall;
+		Mutex menuLock;
+		string texturePath;
+
+		bool inCall;
 		int animation_ms;
 		GLdouble windowX0;
 		GLdouble windowY0;
 		bool resized;
-		void findScreenCoords(){
-			GLdouble x=0;
-			GLdouble y=0;
-			GLdouble z=0;
+		void findScreenCoords();
 
-			GLdouble model[16];
-			GLdouble proj[16];
-			GLint view[4];
-			glGetDoublev(GL_PROJECTION_MATRIX, &proj[0]);
-			glGetDoublev(GL_MODELVIEW_MATRIX, &model[0]);
-			glGetIntegerv(GL_VIEWPORT, &view[0]);
-	
-
-			GLdouble winx;
-			GLdouble winy;
-			GLdouble winz;
-			GLdouble delta=40;
-			int i;
-			for (i=0; i<64; i++){
-
-				int ret = gluProject(x,y,z, model,proj,view, &winx, &winy, &winz);
-
-				if (winx<0)
-					x=x+delta;
-				else
-					x=x-delta;
-				delta=delta/2;
-			}
-			windowX0=x;
-
-			x=0;
-			delta=20;
-
-			for (i=0; i<64; i++){
-
-				int ret = gluProject(x,y,z, model,proj,view, &winx, &winy, &winz);
-
-				if (winy<0)
-					y=y+delta;
-				else
-					y=y-delta;
-				delta=delta/2;
-			}
-			windowY0=y;
-
-			cerr << "EEEE: findScreenCoords: window 0,0 is at coord "<<windowX0 << ","<< windowY0 <<",-20"<<endl;
-
-
-		}
 		void updateVideoPositions(bool doAnimate);
 
 		void rectToCoord(float &x1, float&y2, float &x2, float &y2, float lx1, float ly1, float lx2, float ly2, float aratio);
@@ -175,9 +278,12 @@ class OpenGLWindow : public Runnable {
 
 		Mutex displayListLock;
 		list<OpenGLDisplay*> displays;
+		list<struct mgl_gfx*> icons;
 		bool displaysChanged;
 
 		int t_max_size;
+
+		OpenGLDisplay* callback;
 		
 
 		//Counts how many times displays have called "start()"
@@ -221,8 +327,18 @@ class OpenGLWindow : public Runnable {
 MRef<OpenGLWindow*> OpenGLWindow::globalWindowObj=NULL;
 
 OpenGLWindow::OpenGLWindow(int w, int h, bool fullscreen){
+	cerr<<"EEEE: ------------------------ CREATING OPENGL WINDOW---------------"<<endl;
+	cerr <<"EEEE: fullscreen="<<fullscreen<<endl;
 	//texture=-1;
 	runCount=0;
+	inCall=false;
+	showMenu=false;
+	menuRoot=NULL;
+	menuCur=NULL;
+	menuItemCur=NULL;
+	menuActions=NULL;
+	menuAcceptCall=NULL;
+	texturesLoaded=false;
 	doStop=false;
 	initialized=false;
 	windowed_width=w;
@@ -237,17 +353,244 @@ OpenGLWindow::OpenGLWindow(int w, int h, bool fullscreen){
 
 	gDrawSurface=NULL;
 
+	callback=NULL;
+
 	t_max_size=0;
 
 	bpp=0;
 
 }
 
+void OpenGLWindow::send(CommandString cmd){
+	if (callback)
+		callback->sendCmd(cmd);
+
+}
+
+void OpenGLWindow::hideAcceptCallMenu(bool hideAll){
+	menuLock.lock();
+	menuCur->selected=false;
+	menuRoot=menuActions;
+	menuCur=menuActions;
+	menuItemCur=*menuActions->mitems.begin();
+	showMenu=!hideAll;
+	menuLock.unlock();
+}
+
+void OpenGLWindow::incomingCall(string callid, string uri, bool unprotected){
+	cerr <<"OpenGLWindow::incomingCall: trying to display accept call menu"<<endl;
+	menuLock.lock();
+	list<Menu*>::iterator i=menuAcceptCall->mitems.begin();
+	(*i)->command=CommandString(callid, "accept_invite");	//command for yes button
+	i++;
+	(*i)->command=CommandString(callid, "reject_invite");	//command for no button
+	menuRoot=menuAcceptCall;
+	menuCur=menuAcceptCall;
+	menuItemCur=*menuAcceptCall->mitems.begin();
+	menuLock.unlock();
+
+}
+
+void OpenGLWindow::keyPressed(string key, bool isRepeat){
+	cerr <<"EEEE: OpenGLWindow::keyPressed: "<<key<<endl;
+	if (key=="KEY_MENU" && !isRepeat){
+		showMenu=!showMenu;
+		
+		cerr <<"EEEE: MENU DETECTED"<<endl;	
+		return;
+	}
+
+	if (showMenu && !isRepeat){
+		if (key=="BTN_LEFT"){
+			menuLock.lock();
+			menuItemCur = menuCur->selectLeft();
+			menuLock.unlock();
+		}
+		if (key=="BTN_RIGHT"){
+			menuLock.lock();
+			menuItemCur = menuCur->selectRight();
+			menuLock.unlock();
+			
+		}
+		if (key=="KEY_PLAY"){
+			menuLock.lock();
+			string cmd = menuItemCur->command.getOp();
+			cerr <<"EEEE: MENU SELECTED: "<< cmd<<endl;
+			
+			if (cmd!=""){
+				CommandString cmd = menuItemCur->command;
+				menuLock.unlock();
+				send( menuItemCur->command );
+			}else{
+				menuLock.unlock();
+			}
+
+			if (menuRoot==menuAcceptCall)
+				hideAcceptCallMenu(cmd=="accept_invite");
+			
+		}
+
+
+
+	}
+
+}
+
+void OpenGLWindow::setTexturePath(string p){
+	texturePath=p;
+}
+
+struct mgl_gfx* OpenGLWindow::getIcon(string name){
+	list<struct mgl_gfx*>::iterator i;
+	for (i=icons.begin(); i!=icons.end(); i++)
+		if (name==(*i)->name)
+			return *i;
+	return NULL;
+
+} 
+
+#define ICON_DIM 256
+bool OpenGLWindow::loadTexture(string fname){
+	texturesLoaded=true;
+	cerr <<"EEEE: OpenGLWindow::loadTexture: trying to load "<<fname<<endl;
+
+	string path = "/home/erik/share/minisip/"+fname+".raw";
+	int len=ICON_DIM*ICON_DIM*4;
+	byte_t *tmp = new byte_t[len+16];
+	cerr <<"EEEE: opening file <"<<path<<">"<<endl;
+	ifstream inf;
+	inf.open(path.c_str(), ios::binary);
+	cerr <<"EEEE: reading file..."<<endl;
+	inf.read((char*)tmp,len);
+
+	struct mgl_gfx* t = new struct mgl_gfx;
+	memset(t,0,sizeof(struct mgl_gfx));
+	t->isSelected=true;
+	t->hu=1.0;
+	t->wu=1.0;
+	t->tex_dim=256;
+
+	glGenTextures( 1, (GLuint*)&(t->texture));
+	cerr <<"EEEE: generated texture id "<< t->texture<<endl;
+	massert(t->texture > 0);
+	glBindTexture( GL_TEXTURE_2D, t->texture);
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	cerr <<"EEEE: uploading to GL..."<<endl;
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, ICON_DIM, ICON_DIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, tmp);
+
+	t->name=strdup(fname.c_str());
+
+	icons.push_back(t);
+
+	delete[] tmp;
+	cerr <<"EEEE: done loading texture"<<endl;
+}
+
+void OpenGLWindow::setupMenu(){
+
+	menuActions=new Menu(NULL);
+	menuCur=menuRoot=menuActions;
+	
+	Menu* m;
+
+	const char* names[]={"invite","hangup","settings","exit" ,0};
+
+	int i=0;
+	while (names[i++]){
+		struct mgl_gfx* icon = getIcon(names[i-1]);
+		massert(icon);
+		m = new Menu(icon);
+		m->command=CommandString("",names[i-1]);
+		menuActions->mitems.push_back(m);
+	}
+	(*(menuActions->mitems.begin()))->selected=true;
+	menuItemCur = *(menuActions->mitems.begin());
+	
+	
+	menuAcceptCall=new Menu(NULL);
+	
+	struct mgl_gfx* icon = getIcon("yes");
+	massert(icon);
+	m = new Menu(icon);
+	menuAcceptCall->mitems.push_back(m);
+
+	icon = getIcon("no");
+	massert(icon);
+	m = new Menu(icon);
+	menuAcceptCall->mitems.push_back(m);
+	(*(menuAcceptCall->mitems.begin()))->selected=true;
+
+
+
+}
+
+void OpenGLWindow::enableMenu(){
+	cerr<<"EEEE: called enableMenu()"<<endl;
+	massert(texturePath.size()>0);
+	showMenu=true;
+}
+
 #define REPORT_N 500
 
 
+
+
+void OpenGLWindow::findScreenCoords() {
+	GLdouble x=0;
+	GLdouble y=0;
+	GLdouble z=0;
+
+	GLdouble model[16];
+	GLdouble proj[16];
+	GLint view[4];
+	glGetDoublev(GL_PROJECTION_MATRIX, &proj[0]);
+	glGetDoublev(GL_MODELVIEW_MATRIX, &model[0]);
+	glGetIntegerv(GL_VIEWPORT, &view[0]);
+
+
+	GLdouble winx;
+	GLdouble winy;
+	GLdouble winz;
+	GLdouble delta=40;
+	int i;
+	for (i=0; i<64; i++){
+
+		int ret = gluProject(x,y,z, model,proj,view, &winx, &winy, &winz);
+
+		if (winx<0)
+			x=x+delta;
+		else
+			x=x-delta;
+		delta=delta/2;
+	}
+	windowX0=x;
+
+	x=0;
+	delta=20;
+
+	for (i=0; i<64; i++){
+
+		int ret = gluProject(x,y,z, model,proj,view, &winx, &winy, &winz);
+
+		if (winy<0)
+			y=y+delta;
+		else
+			y=y-delta;
+		delta=delta/2;
+	}
+	windowY0=y;
+
+	cerr << "EEEE: findScreenCoords: window 0,0 is at coord "<<windowX0 << ","<< windowY0 <<",-20"<<endl;
+
+
+}
+
+
 void OpenGLWindow::rectToCoord(float &x1, float&y1, float &x2, float &y2, float lx1, float ly1, float lx2, float ly2, float aratio){
-	
+
 	float l_aratio=(lx2-lx1)/(ly2-ly1);
 
 	if (aratio > l_aratio) { // fill full width, center vertically
@@ -267,12 +610,12 @@ void OpenGLWindow::rectToCoord(float &x1, float&y1, float &x2, float &y2, float 
 		y2=ly2;
 		x2=x1+w;
 	}
-	cerr <<"EEEE: mapped "<<lx1<<","<<ly1<<"->"<<lx2<<","<<ly2<<" to " << x1<<","<<y1<<"->"<<x2<<","<<y2<<endl;
+//	cerr <<"EEEE: mapped "<<lx1<<","<<ly1<<"->"<<lx2<<","<<ly2<<" to " << x1<<","<<y1<<"->"<<x2<<","<<y2<<endl;
 
 }
 
 void findVideoArea(int video_n, int ntot, float &x1, float&y1, float &x2, float &y2, float lx1, float ly1, float lx2, float ly2, bool preferHorisontal){
-	
+
 	int n=1;
 	int nr=1;
 	int nc=1;
@@ -325,34 +668,6 @@ void findVideoArea(int video_n, int ntot, float &x1, float&y1, float &x2, float 
 	x1=lx1+col*(float)colw;
 	x2=x1+colw;
 
-
-#if 0
-	//  1  2  3  4  5  6  7  8  9  10 
-	int nrow[]={1, 1, 2, 2, 3, 2, 3, 3, 3, 4}
-	int ncol[]={1, 2, 2, 2, 2, 3, 3, 3, 3, 3}
-	int nr;
-	int nc:
-		if (ntot<=10){
-		nr=nrow[ntot-1];
-		nc=nrow[ntot-1];
-	}else{
-		int n=4;
-		while (n*n<ntot)
-			n++;
-		nr=nc=n;
-	}
-
-	int r=video_n/nc;
-
-	int x, int y;
-
-	for (x=0; x<nc; x++){
-		
-		for (y=0; y<nr; y++){
-		
-		}
-#endif
-
 }
 
 void OpenGLWindow::updateVideoPositions(bool doAnimate){
@@ -363,7 +678,6 @@ void OpenGLWindow::updateVideoPositions(bool doAnimate){
 
 	list<OpenGLDisplay*>::iterator i;
 	float screen_aratio=(float)cur_width/(float)cur_height;
-
 
 
 	//Make sure local displays are in the end of 
@@ -498,18 +812,24 @@ void OpenGLWindow::updateVideoPositions(bool doAnimate){
 }
 
 void OpenGLWindow::addDisplay(OpenGLDisplay* displ){
+	inCall=true;
 	cerr << "EEEE: doing addDisplay()"<<endl;
 	displayListLock.lock();
 	displays.push_back(displ);
 	displaysChanged=true;
+	cerr<<"EEEE: --------------------------------- after add ndisplays="<< displays.size()<<endl;
 	displayListLock.unlock();
 }
 
 void OpenGLWindow::removeDisplay(OpenGLDisplay* displ){
 	displayListLock.lock();
 	displays.remove(displ);
+	inCall=displays.size()>0;
+	displaysChanged=true;
+	cerr<<"EEEE: --------------------------------- after remove ndisplays="<< displays.size()<<endl;
 	displayListLock.unlock();
 	updateVideoPositions(true);
+
 }
 
 void OpenGLWindow::drawSurface(){
@@ -527,12 +847,27 @@ void OpenGLWindow::drawSurface(){
 		lasttime=now;
 	}
 
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ); //EE: not use depth?
 
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
 
 	glEnable( GL_TEXTURE_2D );
+
+
+	if (showMenu&&!texturesLoaded){
+		cerr <<"EEEE: drawSurface: SHOW MENU: loading icons"<<endl;
+		loadTexture("invite");
+		loadTexture("hangup");
+		loadTexture("settings");
+		loadTexture("exit");
+		loadTexture("yes");
+		loadTexture("no");
+		setupMenu();
+		cerr <<"EEEE: drawSurface: done loading textures"<<endl;
+	}
+
 
 	glPushMatrix();
 
@@ -564,22 +899,125 @@ void OpenGLWindow::drawSurface(){
 			glColor4f(1.0,1.0,1.0, alpha );
 			glBindTexture( GL_TEXTURE_2D, gfx->texture);
 //			cerr<<"EEEE: drawing texture "<<gfx->texture<<" with alpha "<<alpha<<endl;
+			float x1= gfx->x1->getVal();
+			float y1= gfx->y1->getVal();
+			float x2= gfx->x2->getVal();
+			float y2= gfx->y2->getVal();
+
 			glBegin( GL_QUADS );
 			glTexCoord2f( 0, gfx->hu );
-			glVertex3f(  gfx->x1->getVal(), gfx->y1->getVal(), 0.0f );
+			glVertex3f(  x1, y1, 0.0f );
 
 			glTexCoord2f( gfx->wu, gfx->hu );
-			glVertex3f( gfx->x2->getVal(), gfx->y1->getVal(), 0.0f );
+			glVertex3f( x2, y1, 0.0f );
 
 			glTexCoord2f( gfx->wu, 0 );
-			glVertex3f( gfx->x2->getVal(), gfx->y2->getVal(), 0.0f );
+			glVertex3f( x2, y2, 0.0f );
 
 			glTexCoord2f( 0, 0 );
-			glVertex3f( gfx->x1->getVal(), gfx->y2->getVal(), 0.0f );
+			glVertex3f( x1, y2, 0.0f );
 			glEnd();
+
+			if (gfx->isSelected){
+				float bwidth=(y2-y1)/20.0;
+				glColor4f(0.0, 0.0, 0.7, 0.5); 
+				glRectf( x1, y1, x2, y1+bwidth );
+				glRectf( x1, y2, x2, y2-bwidth );
+				glRectf( x1, y1+bwidth, x1+bwidth, y2-bwidth);
+				glRectf( x2, y1+bwidth, x2-bwidth, y2-bwidth);
+			}
+
 		}
 	}
 	displayListLock.unlock();
+
+	if (showMenu){
+		menuLock.lock();
+		massert(menuRoot);
+		
+		int nicons=menuRoot->nVisible();
+		float x1= windowX0  ;
+		float y1= windowY0/5   ;
+		float x2= -windowX0  ;
+		float y2= -windowY0/5  ;
+		rectToCoord(x1,y1,x2,y2,x1,y1,x2,y2,1.0);
+
+		float iconWidth=x2-x1;
+		float totWidth=iconWidth*nicons;
+		float startx=-totWidth/2;
+
+		int iconi=0;
+		list<Menu*>::iterator i;
+
+		for (i=menuRoot->mitems.begin(); i!=menuRoot->mitems.end(); i++, iconi++){
+			if ((*i)->visible){
+				x1=startx+iconi*iconWidth;
+				x2=x1+iconWidth;
+
+				//Bug workaround - draw off-screen texture. If not,
+				//the glRectf in the next block will not result in
+				//anything on screen.
+				if (iconi==0){
+					glColor4f(1.0,1.0,1.0, 1.0);
+					glBindTexture( GL_TEXTURE_2D, (*i)->icon->texture);
+
+					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+					glBegin( GL_QUADS );
+					glTexCoord2f( 0, 1.0 );
+					glVertex3f(  100, 100, 0.0f );
+
+					glTexCoord2f( 1.0, 1.0 );
+					glVertex3f( 100, 100, 0.0f );
+
+					glTexCoord2f( 1.0, 0 );
+					glVertex3f( 100, 100, 0.0f );
+
+					glTexCoord2f( 0, 0 );
+					glVertex3f( 100, 100, 0.0f );
+					glEnd();
+				}
+
+				if ((*i)->selected){
+					glBlendFunc(GL_ONE, GL_ONE);
+			//		cerr <<"EEEE: drawing rectangle"<<endl;
+					float bwidth=(y2-y1)/10.0;
+			//		cerr <<"EEEE: bwidth="<<bwidth<<endl;
+					//glColor4f(0.5, 0.5, 0.6, 1.0); 
+					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+					glColor4f(1.0, 1.0, 1.0, 1.0); 
+
+					glRectf( x1, y1, x2, y1+bwidth );
+					glRectf( x1, y2, x2, y2-bwidth );
+					glRectf( x1, y1+bwidth, x1+bwidth, y2-bwidth);
+					glRectf( x2, y1+bwidth, x2-bwidth, y2-bwidth);
+				}
+
+
+				glColor4f(1.0,1.0,1.0, 1.0);
+				glBindTexture( GL_TEXTURE_2D, (*i)->icon->texture);
+
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				glBegin( GL_QUADS );
+				glTexCoord2f( 0, 1.0 );
+				glVertex3f(  x1, y1, 0.0f );
+
+				glTexCoord2f( 1.0, 1.0 );
+				glVertex3f( x2, y1, 0.0f );
+
+				glTexCoord2f( 1.0, 0 );
+				glVertex3f( x2, y2, 0.0f );
+
+				glTexCoord2f( 0, 0 );
+				glVertex3f( x1, y2, 0.0f );
+				glEnd();
+
+
+			}
+
+
+		}
+		menuLock.unlock();
+	}
 
 	glPopMatrix();
 
@@ -607,16 +1045,17 @@ void OpenGLWindow::toggleFullscreen(){
 
 	//	startFullscreen=isFullscreen();
 	//        initSdl();
+	updateVideoPositions(false);
 
 }
 
 
-bool OpenGLWindow::isFullscreen(){
-	if (sdlFlags&SDL_FULLSCREEN)
-		return true;
-	else
-		return false; 
-}
+	bool OpenGLWindow::isFullscreen(){
+		if (sdlFlags&SDL_FULLSCREEN)
+			return true;
+		else
+			return false; 
+	}
 
 
 
@@ -768,9 +1207,9 @@ void OpenGLWindow::stop(){
 	cerr << "EEEE: after OpenGLWindow::stop() runCount="<<runCount<<endl;
 }
 
-MRef<OpenGLWindow*> OpenGLWindow::getWindow(){
+MRef<OpenGLWindow*> OpenGLWindow::getWindow(bool fullscreen){
 	if (!globalWindowObj)
-		globalWindowObj = new OpenGLWindow(800,  600, false);
+		globalWindowObj = new OpenGLWindow(800,  600, fullscreen);
 	return globalWindowObj;
 
 }
@@ -972,20 +1411,23 @@ void OpenGLWindow::initSurface(){
 
 
 
-OpenGLDisplay::OpenGLDisplay( uint32_t width, uint32_t height):VideoDisplay(){
-	cerr << "EEEE: OpenGLDisplay::OpenGLDisplay("<< width<<","<<height<<") running"<<endl;
+OpenGLDisplay::OpenGLDisplay( uint32_t width, uint32_t height, bool _fullscreen):VideoDisplay(){
+	cerr << "EEEE: OpenGLDisplay::OpenGLDisplay("<< width<<","<<height<<","<<fullscreen<<") running"<<endl;
 	this->width = width;
 	this->height = height;
-	fullscreen = false;
+	fullscreen = _fullscreen;
 	nallocated=0;
 	//isLocalVideo=false;
+	
+	gfx= new struct mgl_gfx;
 
-	memset(&gfx, 0, sizeof(gfx));
-	gfx.texture=-1;
-	gfx.aratio=(float)width/(float)height;
-	gfx.wu=1;
-	gfx.hu=1;
-	gfx.tex_dim=0;
+	memset(gfx, 0, sizeof(struct mgl_gfx));
+	gfx->texture=-1;
+	gfx->aratio=(float)width/(float)height;
+	gfx->wu=1;
+	gfx->hu=1;
+	gfx->tex_dim=0;
+	gfx->isSelected=false;
 
 	rgb=NULL;
 	needUpload=false;
@@ -993,21 +1435,32 @@ OpenGLDisplay::OpenGLDisplay( uint32_t width, uint32_t height):VideoDisplay(){
 	//rgb32=false;
 	colorNBytes=3;
 
-	window = * (OpenGLWindow::getWindow() );
+	window = * (OpenGLWindow::getWindow(fullscreen) );
 	window->sizeHint(width,height);
 	massert(window);
+	window->setCallback(this);
+}
+
+
+//TODO: remove this method - it does the same thing as in the base class
+void OpenGLDisplay::setCallback(MRef<CommandReceiver*> cb){
+	callback=cb;
+}
+
+void OpenGLDisplay::sendCmd(CommandString cmd){
+	if (callback)
+		callback->handleCommand("gui",cmd);
 }
 
 struct mgl_gfx*  OpenGLDisplay::getTexture(){
 	dataLock.lock();
-//	cerr <<"EEEE: gl extensions: " << glGetString(GL_EXTENSIONS);
-	if (gfx.texture==-1){
+	if (gfx->texture==-1){
 		massert(colorNBytes==3 || colorNBytes==4);
 		int hw_max_dim = window->getTextureMaxSize();
 		int dim = (hw_max_dim>2048) ? 2048 : hw_max_dim;
-		gfx.tex_dim=dim;
-		glGenTextures( 1, (GLuint*)&gfx.texture);
-		glBindTexture( GL_TEXTURE_2D, gfx.texture);
+		gfx->tex_dim=dim;
+		glGenTextures( 1, (GLuint*)&(gfx->texture));
+		glBindTexture( GL_TEXTURE_2D, gfx->texture);
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -1021,13 +1474,13 @@ struct mgl_gfx*  OpenGLDisplay::getTexture(){
 
 	if (newRgbData){
 		//cerr <<"EEEE: uploading new texture"<<endl;
-		massert(gfx.texture>0);
+		massert(gfx->texture>0);
 		newRgbData=false;
-		glBindTexture( GL_TEXTURE_2D, gfx.texture);
+		glBindTexture( GL_TEXTURE_2D, gfx->texture);
 
-		if (width>gfx.tex_dim){
+		if (width>gfx->tex_dim){
 			int factor=2;
-			while (width/factor > gfx.tex_dim)
+			while (width/factor > gfx->tex_dim)
 				factor++;
 			cerr << "WARNING: insufficent OpenGL hardware. Resizing image to fit in texture (factor="<<factor<<")"<<endl;
 			uint8_t* tmpbuf = new uint8_t[(width/factor)*(height/factor)*colorNBytes+16];
@@ -1044,35 +1497,31 @@ struct mgl_gfx*  OpenGLDisplay::getTexture(){
 			}
 
 			glTexSubImage2D( GL_TEXTURE_2D, 0, 0,0 , newwidth, newheight, GL_RGB, GL_UNSIGNED_BYTE, tmpbuf );
-			gfx.wu=(newwidth/*/(float)factor*/)/(float)gfx.tex_dim;
-			gfx.hu=(newheight/*/(float)factor*/)/(float)gfx.tex_dim;
-			gfx.aratio = (float)width/(float)height;
-			//cerr << "EEEE: new dim="<<newwidth<<"x"<<newheight<<" and gfx.hu="<<gfx.hu<<" and tex_dim="<<gfx.tex_dim<<endl;
+			gfx->wu=(newwidth/*/(float)factor*/)/(float)gfx->tex_dim;
+			gfx->hu=(newheight/*/(float)factor*/)/(float)gfx->tex_dim;
+			gfx->aratio = (float)width/(float)height;
+			//cerr << "EEEE: new dim="<<newwidth<<"x"<<newheight<<" and gfx->hu="<<gfx->hu<<" and tex_dim="<<gfx->tex_dim<<endl;
 			delete []tmpbuf;
 			
 		}else{
-			//cerr << "EEEE: getTexture: uploading texture of size "<<width<<"x"<<height << " for display "<<(uint64_t)this<< "colorNBytes="<<colorNBytes<< " texdim="<<gfx.tex_dim<<endl;
+			//cerr << "EEEE: getTexture: uploading texture of size "<<width<<"x"<<height << " for display "<<(uint64_t)this<< "colorNBytes="<<colorNBytes<< " texdim="<<gfx->tex_dim<<endl;
 
 			GLenum pixFormat = (colorNBytes==3)?GL_RGB:GL_BGRA;
 
 			glTexSubImage2D( GL_TEXTURE_2D, 0, 0,0 , width, height, pixFormat, GL_UNSIGNED_BYTE, rgb );
-			gfx.wu=width/(float)gfx.tex_dim;
-			gfx.hu=height/(float)gfx.tex_dim;
-			gfx.aratio = (float)width/(float)height;
+			gfx->wu=width/(float)gfx->tex_dim;
+			gfx->hu=height/(float)gfx->tex_dim;
+			gfx->aratio = (float)width/(float)height;
 		}
 	}
 	dataLock.unlock();
-	return &gfx;
+	return gfx;
 }
 
 void OpenGLDisplay::handle( MImage * mimage){
 	//cerr <<"EEEE: doing OpenGLDisplay::handle on display "<<(uint64_t)this<<" image size="<<mimage->width<<"x"<<mimage->height<<" local="<<isLocalVideo<<endl;
-//	cerr <<"EEEE: linesize0="<< mimage->linesize[0]<<endl;
 	massert(mimage->linesize[1]==0);
-	
 	colorNBytes=mimage->linesize[0]/mimage->width;
-//	cerr <<"EEEE: colorNBytes="<<colorNBytes<<endl;
-
 	dataLock.lock();
 	if (!rgb || width!=mimage->width || height!=mimage->height){
 		cerr << "EEEE: allocating RGB of size "<<mimage->width<<"x"<<mimage->height<<endl;
@@ -1080,23 +1529,17 @@ void OpenGLDisplay::handle( MImage * mimage){
 			delete rgb;
 		width=mimage->width;
 		height=mimage->height;
-		gfx.aratio=(float)width/(float)height;
+		gfx->aratio=(float)width/(float)height;
 		rgb = new uint8_t[width*height*colorNBytes+16]; // +16 to avoid mesa bug
 	
 	}
 
 	massert(rgb);
-//	cerr <<"EEEE:handle: copying data to rgb buf, n="<<width<<"x"<<height<<endl;
 	memcpy(rgb, &mimage->data[0][0], width*height*colorNBytes); //TODO: don't copy since it is in correct format.
 	newRgbData=true;
-//	cerr << "EEEE: OpenGLDisplay::handle: done copying new data"<<endl;
 	if (!isLocalVideo)
 		emptyImages.push_back(mimage);
 	dataLock.unlock();
-
-
-
-//	window->display(mimage, (uint64_t)this);
 }
 
 
@@ -1113,9 +1556,16 @@ void OpenGLDisplay::stop(){
 	cerr <<"EEEE: doing OpenGLDisplay::stop"<<endl;
 	window->removeDisplay(this);
 	window->stop();
-	gfx.texture=-1;
+	gfx->texture=-1;
 }
 
+bool OpenGLDisplay::getIsSelected(){
+	return gfx->isSelected;
+}
+
+void OpenGLDisplay::setIsSelected(bool is){
+	gfx->isSelected=is;
+}
 void OpenGLDisplay::openDisplay(){
 	cerr <<"EEEE: doing OpenGLDisplay::openDisplay"<<endl;
 
@@ -1135,7 +1585,7 @@ void OpenGLDisplay::resize(int w, int h){
 	cerr << "EEEE: doing OpenGLDisplay::resize("<<w<<","<<h<<") old size="<<width<<"x"<<height<<endl;
 	this->width=w;
 	this->height=h;
-	gfx.aratio=(float)w/(float)h;
+	gfx->aratio=(float)w/(float)h;
 	window->sizeHint(w,h);
 }
 
@@ -1204,6 +1654,43 @@ void OpenGLDisplay::handleEvents(){
 
 void OpenGLDisplay::setIsLocalVideo(bool isLocal){
 	isLocalVideo=isLocal;
+}
+
+bool OpenGLDisplay::handleCommand(CommandString cmd){
+	bool handled=false;
+	if (cmd.getOp()=="make_proxy"){	//if we will not display any video
+		window->removeDisplay(this);
+		
+
+	}
+
+	if (cmd.getOp()=="set_texture_path"){
+		window->setTexturePath(cmd.getParam());
+		handled=true;
+	}
+
+	if (cmd.getOp()=="key"){
+			window->keyPressed(cmd.getParam(), cmd.getParam2()=="REPEAT");
+			handled=true;
+	}
+
+	if (cmd.getOp()=="incoming_available"){
+		string fromuri = cmd.getParam();
+		string callid  = cmd.getDestinationId();
+		bool unprotected = cmd.getParam2()=="unprotected";
+		window->incomingCall(callid, fromuri, unprotected);
+	}
+
+	if (cmd.getOp()=="enable_menu"){
+		window->enableMenu();
+		handled=true;
+	}
+	if (!handled){
+		cerr <<"EEEE: warning: OpenGLDisplay did not handle command "<< cmd.getOp()<<endl;
+
+	}
+	return handled;
+	
 }
 
 OpenGLPlugin::OpenGLPlugin( MRef<Library *> lib ): VideoDisplayPlugin( lib ){

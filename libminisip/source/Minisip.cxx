@@ -125,6 +125,8 @@ static void signal_handler( int signal ){
 # define PATH_SEPARATOR ":"
 #endif
 
+bool Minisip::pluginsLoaded=false;
+
 static string buildPluginPath( const string &argv0 ){
 	string pluginPath;
 	size_t pos = argv0.find_last_of(DIR_SEPARATOR);
@@ -176,14 +178,9 @@ static void loadPlugins(const string &argv0){
 	pluginManager->loadFromDirectory( pluginPath );
 }
 
-/**
- *
- * -p <plugin path>
- * -c <configuration file>
-*/
-Minisip::Minisip( MRef<Gui *> g, int /*argc*/, char **argv ) : gui(g){
+void Minisip::doLoadPlugins(char **argv){
+	pluginsLoaded=true;
 
-	massert(g);
 	string pluginPath = argv ? argv[0] : "";
 	int i=0;
 	char *a=NULL;
@@ -202,11 +199,7 @@ Minisip::Minisip( MRef<Gui *> g, int /*argc*/, char **argv ) : gui(g){
 					break;
 
 				case 'c':
-					path = argv[i++];
-					if (path)
-						confPath = path;
-					else
-						throw MinisipBadArgument("bad argument for -c");
+					i++;
 					break;
 				default:
 					throw MinisipBadArgument((string("bad argument: ") + a[1]).c_str());
@@ -222,18 +215,61 @@ Minisip::Minisip( MRef<Gui *> g, int /*argc*/, char **argv ) : gui(g){
 
 	srand((unsigned int)time(0));
 
-	#ifndef WIN32
-		#ifdef DEBUG_OUTPUT
-		signal( SIGUSR1, signal_handler );
-	#endif
-	#endif
-	
 
 	#ifdef DEBUG_OUTPUT
 	mdbg("init") << "Loading plugins"<<endl;
 	#endif
 
 	loadPlugins( pluginPath );
+}
+
+/**
+ *
+ * -p <plugin path>
+ * -c <configuration file>
+*/
+Minisip::Minisip( MRef<Gui *> g, int /*argc*/, char **argv ) : gui(g){
+
+	if (!pluginsLoaded)
+		doLoadPlugins(argv);
+
+	massert(g);
+
+	int i=0;
+	char *a=NULL;
+	do{	
+		char *path;
+		if (argv)
+			a = argv[i++];
+		if (a && a[0]=='-'){
+			switch (a[1]){
+				case 'p': //handled by loadPlugins
+					i++;
+					break;
+
+				case 'c':
+					path = argv[i++];
+					if (path)
+						confPath = path;
+					else
+						throw MinisipBadArgument("bad argument for -c");
+					break;
+				default:
+					throw MinisipBadArgument((string("bad argument: ") + a[1]).c_str());
+					break;
+			}
+		
+		}
+
+	}while(a);
+
+
+	#ifndef WIN32
+		#ifdef DEBUG_OUTPUT
+		signal( SIGUSR1, signal_handler );
+	#endif
+	#endif
+
 
 	#ifdef DEBUG_OUTPUT
 	mout << "Initializing NetUtil"<<endl;

@@ -93,7 +93,7 @@ class X11Plugin: public VideoDisplayPlugin{
 
 		virtual std::string getDescription() const { return "X11 display"; }
 
-		virtual MRef<VideoDisplay *> create( uint32_t width, uint32_t height ) const{
+		virtual MRef<VideoDisplay *> create( uint32_t width, uint32_t height, bool fullscreen ) const {
 			return new X11Display( width, height );
 		}
 

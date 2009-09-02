@@ -63,7 +63,7 @@ VideoMedia::VideoMedia( MRef<Codec *> codec, MRef<VideoDisplay *> display, MRef<
 
 #if 1
 	cerr <<"EEEE: VideoDisplay::VideoMedia: start creating display..."<<endl;
-	MRef<VideoDisplay *> localVideoDisplay = VideoDisplayRegistry::getInstance()->createDisplay( receivingWidth, receivingHeight, false );
+	MRef<VideoDisplay *> localVideoDisplay = VideoDisplayRegistry::getInstance()->createDisplay( receivingWidth, receivingHeight, false, false );
 	cerr <<"EEEE: VideoDisplay::VideoMedia: start setting local display..."<<endl;
 	grabber->setLocalDisplay(localVideoDisplay);
 	cerr <<"EEEE: VideoDisplay::VideoMedia: done setting local display..."<<endl;
@@ -131,7 +131,7 @@ void VideoMedia::registerMediaSource( uint32_t ssrc, string callId ){
         }
 
         else{
-                MRef<VideoDisplay *> newdisplay = VideoDisplayRegistry::getInstance()->createDisplay( receivingWidth, receivingHeight, true );
+                MRef<VideoDisplay *> newdisplay = VideoDisplayRegistry::getInstance()->createDisplay( receivingWidth, receivingHeight, true, false );
                 source->getDecoder()->setHandler( *newdisplay );
                 source->display = newdisplay;
 

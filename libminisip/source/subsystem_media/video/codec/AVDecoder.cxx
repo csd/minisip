@@ -206,6 +206,25 @@ void AVDecoder::decodeFrame( uint8_t * data, uint32_t length ){
 		}
 
 	}
+
+	if (i%200==0){
+		static struct timespec last_wallt;
+		static struct timespec last_cput;
+
+		struct timespec now_cpu;
+		struct timespec now_wall;
+		clock_gettime(CLOCK_THREAD_CPUTIME_ID, &now_cpu);
+		clock_gettime(CLOCK_REALTIME, &now_wall);
+		cerr <<"=======> AVDecoder:: CPU USAGE: "<< now_cpu.tv_sec<<"."<<now_cpu.tv_nsec<<endl;
+		uint64_t delta_cpu = (now_cpu.tv_sec-last_cput.tv_sec)*1000000000LL+(now_cpu.tv_nsec-last_cput.tv_nsec);
+		cerr << "Last 200 frames took "<< delta_cpu/1000 <<"us"<<endl;
+		uint64_t delta_wall = (now_wall.tv_sec-last_wallt.tv_sec)*1000000000LL+(now_wall.tv_nsec-last_wallt.tv_nsec);
+
+		last_cput  = now_cpu;
+		last_wallt = now_wall;
+		cerr <<"========> AVDecoder CPU usage: "<< ((float)delta_cpu/(float)delta_wall)*100.0<<"%"<<endl;
+	}
+
 }	
 
 void AVDecoder::setSsrc( uint32_t ssrc ){

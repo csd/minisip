@@ -89,7 +89,7 @@ class SdlPlugin: public VideoDisplayPlugin{
 
 		virtual std::string getDescription() const { return "SDL display"; }
 
-		virtual MRef<VideoDisplay *> create( uint32_t width, uint32_t height ) const{
+		virtual MRef<VideoDisplay *> create( uint32_t width, uint32_t height, bool fullscreen ) const{
 			return new SdlDisplay( width, height );
 		}
 };

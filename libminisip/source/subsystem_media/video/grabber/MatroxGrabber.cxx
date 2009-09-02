@@ -33,6 +33,7 @@
 #include<libmutil/mtime.h>
 #include<libmutil/stringutils.h>
 #include<libmutil/merror.h>
+#include<time.h>
 
 using namespace std;
 
@@ -263,6 +264,26 @@ void MatroxGrabber::read( ImageHandler * handler ){
 				if (localDisplay){
 					localDisplay->handle(frame);
 				}
+			}
+
+			if (i%200==0){
+				static struct timespec last_wallt;
+				static struct timespec last_cput;
+
+				struct timespec now_cpu;
+				struct timespec now_wall;
+				clock_gettime(CLOCK_THREAD_CPUTIME_ID, &now_cpu);
+				clock_gettime(CLOCK_REALTIME, &now_wall);
+				cerr <<"cpusec="<<now_cpu.tv_sec<<" lastsec="<<last_cput.tv_sec<<endl;
+				uint64_t delta_cpu = (now_cpu.tv_sec-last_cput.tv_sec)*1000000000LL+(now_cpu.tv_nsec-last_cput.tv_nsec);
+				uint64_t delta_wall = (now_wall.tv_sec-last_wallt.tv_sec)*1000000000LL+(now_wall.tv_nsec-last_wallt.tv_nsec);
+
+				cerr <<"MatroxGrabber:: CPU USAGE: "<< now_cpu.tv_sec<<"."<<now_cpu.tv_nsec<<endl;
+				cerr <<"delta_cpu="<<delta_cpu/1000<<" delta_wall="<<delta_wall/1000<<endl;
+				cerr <<"========> MatroxGrabber: CPU usage: "<< ((float)delta_cpu/(float)delta_wall)*100.0<<"%"<<endl;
+				last_cput=now_cpu;
+				last_wallt=now_wall;
+
 			}
 
 		}

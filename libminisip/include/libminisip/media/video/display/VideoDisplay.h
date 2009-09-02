@@ -35,6 +35,8 @@
 #include<libmutil/Semaphore.h>
 #include<libmutil/MPlugin.h>
 #include<libmutil/MSingleton.h>
+#include<libmutil/CommandString.h>
+#include<libmutil/MessageRouter.h>
 
 #include<libminisip/media/video/ImageHandler.h>
 
@@ -54,6 +56,10 @@ class LIBMINISIP_API VideoDisplay : public ImageHandler, public Runnable{
 		virtual MImage * provideImage();
 		virtual void releaseImage( MImage * image );
 		virtual bool providesImage();
+
+		virtual bool handleCommand(CommandString cmd);
+
+		virtual void setCallback(MRef<CommandReceiver*> cb);
 		
 	protected:
 		VideoDisplay();
@@ -71,6 +77,8 @@ class LIBMINISIP_API VideoDisplay : public ImageHandler, public Runnable{
 
 		bool isLocalVideo; //Local video might get other treatment. For example, handle() will be called
 					// with a MImage that was not allocated using allocateImage()
+
+		MRef<CommandReceiver*> callback;
 
 	private:
 		std::list<MImage *> filledImages;
@@ -99,7 +107,7 @@ class LIBMINISIP_API VideoDisplayPlugin : public MPlugin{
 
 		VideoDisplayPlugin( MRef<Library *> lib );
 
-		virtual MRef<VideoDisplay *> create( uint32_t width, uint32_t height) const = 0;
+		virtual MRef<VideoDisplay *> create( uint32_t width, uint32_t height, bool fullscreen) const = 0;
 };
 
 /**
@@ -109,7 +117,7 @@ class LIBMINISIP_API VideoDisplayRegistry: public MPluginRegistry, public MSingl
 	public:
 		virtual std::string getPluginType(){ return "VideoDisplay"; }
 
-		MRef<VideoDisplay*> createDisplay( uint32_t width, uint32_t height, bool doStart );
+		MRef<VideoDisplay*> createDisplay( uint32_t width, uint32_t height, bool doStart, bool fullscreen );
 		void signalDisplayDeleted();
 
 	protected:

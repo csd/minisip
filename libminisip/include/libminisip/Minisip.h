@@ -57,7 +57,10 @@ class LIBMINISIP_API Minisip : public MObject{
 		void startDebugger();
 		void stopDebugger();
 
+		static void doLoadPlugins(char **argv);
+
 	private:
+		static bool pluginsLoaded;
 		
 		int initParseConfig();
 

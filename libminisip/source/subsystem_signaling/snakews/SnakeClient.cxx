@@ -85,34 +85,6 @@ void PresenceService::registerContacts(){
 
 	adb_setContactListResponse_t* resp = adb_setContactListResponse1_get_setContactListResponse(resp_c, env);
 
-
-
-
-
-
-#if 0
-	adb_getStatus2_t* req_c = adb_getStatus2_create(env);
-
-	adb_getStatus_t* req = adb_getStatus_create(env);
-	adb_getStatus_set_sessionId(req, env, id.c_str() );
-	adb_getStatus_set_userAddress(req, env, "erik@hdviper.org");
-
-	adb_getStatus2_set_getStatus(req_c, env, req);
-
-	adb_getStatusResponse3_t* resp_c = axis2_stub_op_PresenceAgentUserStubService_getStatus(stub, env, req_c );
-	adb_getStatusResponse_t* resp = adb_getStatusResponse3_get_getStatusResponse( resp_c, env );
-
-	adb_userStatus_t* status = adb_getStatusResponse_get_userStatus(resp, env);
-
-	string descr = adb_userStatus_get_description( status, env);
-	string sipaddr = adb_userStatus_get_sipAddress(status, env);
-	adb_statusType_t* type = adb_userStatus_get_type( status, env);
-	string t = adb_statusType_get_statusType(type,env);
-
-
-	cerr << "EEEE: PRESENCE: descr="<<descr<<" sipaddr="<<sipaddr<<" type="<<t<<endl;
-#endif
-
 }
 
 void PresenceService::statusUpdated(){
@@ -282,8 +254,10 @@ void CallbackService::run(){
 				}
 
 			}
-			if (!nevents && !doStop)
+			if (!nevents && !doStop){
+				cerr <<"EEEE: sleeping for two senconds until next WS call"<<endl;
 				Thread::msleep(2000);
+			}
 		}
 
 
@@ -355,6 +329,8 @@ void SnakeClient::handleCommand(std::string subsystem, const CommandString& comm
 			axis2_char_t* saddr = adb_service_get_address(s, env);
 			axis2_char_t* sname = adb_service_get_name(s, env);
 
+			cerr << "EEEE: service "<< i+1<<": name <"<<sname<<"> addr <"<< saddr<<">"<<endl;
+
 			if (string("callback-service")==sname){
 				callbackService = new CallbackService(callback, id, saddr);
 				callbackService->start();
@@ -364,20 +340,10 @@ void SnakeClient::handleCommand(std::string subsystem, const CommandString& comm
 				presenceService->registerContacts();
 				presenceService->statusUpdated();
 			}
-
-
-
-		
-			cerr << "EEEE: service "<< i+1<<": name <"<<sname<<"> addr <"<< saddr<<">"<<endl;
-		
 		}
 
 
 	}
-
-
-
-
 
 }
 

@@ -36,7 +36,8 @@ using namespace std;
 VideoDisplayRegistry::VideoDisplayRegistry(): displayCounter( 0 ){
 }
 
-MRef<VideoDisplay *> VideoDisplayRegistry::createDisplay( uint32_t width, uint32_t height, bool doStart ){
+MRef<VideoDisplay *> VideoDisplayRegistry::createDisplay( uint32_t width, uint32_t height, bool doStart, bool fullscreen ){
+	cerr <<"EEEE: running VideoDisplayRegistry::createDisplay fullscreen="<<fullscreen<<endl;
         MRef<VideoDisplay *> display = NULL;
 	const char *names[] = { "opengl", "sdl", "xv", "x11", NULL };
         
@@ -46,6 +47,7 @@ MRef<VideoDisplay *> VideoDisplayRegistry::createDisplay( uint32_t width, uint32
 		if( !names[i] ){
 			break;
 		}
+		cerr <<"EEEE: trying display type "<<names[i]<<endl;
 
 		string name = names[i];
 
@@ -59,6 +61,7 @@ MRef<VideoDisplay *> VideoDisplayRegistry::createDisplay( uint32_t width, uint32
 			plugin = findPlugin( name );
 			if( !plugin ){
 				mdbg << "VideoDisplayRegistry: Can't find " << name << endl;
+				cerr << "EEEE: VideoDisplayRegistry: Can't find " << name << endl;
 				continue;
 			}
 			
@@ -70,10 +73,11 @@ MRef<VideoDisplay *> VideoDisplayRegistry::createDisplay( uint32_t width, uint32
 				continue;
 			}
 			
-			display = videoPlugin->create( width, height );
+			display = videoPlugin->create( width, height, fullscreen );
 			
 			if( !display ){
 				merr << "VideoDisplayPlugin: Couldn't create display " << name << endl;
+				cerr << "EEEE: VideoDisplayPlugin: Couldn't create display " << name << endl;
 				continue;
 			}
 			
@@ -110,6 +114,14 @@ VideoDisplay::VideoDisplay(){
 VideoDisplay::~VideoDisplay(){
 //        thread->join();
 	VideoDisplayRegistry::getInstance()->signalDisplayDeleted();
+}
+
+void VideoDisplay::setCallback(MRef<CommandReceiver*> cb){
+	callback=cb;
+}
+
+bool VideoDisplay::handleCommand(CommandString cmd){
+	return false;
 }
 
 void VideoDisplay::start(){
