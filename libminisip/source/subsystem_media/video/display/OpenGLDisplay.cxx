@@ -29,6 +29,7 @@
 #include<SDL/SDL_syswm.h>
 
 #include"Animate.h"
+#include"Text.h"
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_opengl.h>
@@ -248,6 +249,8 @@ class OpenGLWindow : public Runnable {
 		bool loadTexture(string name);
 		void hideAcceptCallMenu(bool hideAllMenus);
 		struct mgl_gfx* getIcon(string name);
+
+		void findVideoArea(int video_n, int ntot, float &x1, float&y1, float &x2, float &y2, float lx1, float ly1, float lx2, float ly2, bool preferHorisontal, bool* selectedptr);
 		void setupMenu();
 		bool texturesLoaded;
 		bool showMenu;
@@ -308,6 +311,11 @@ class OpenGLWindow : public Runnable {
 		int cur_height;
 		float screen_aratio;
 
+		int video_select_row;
+		int video_select_col;
+		int video_nrows;
+		int video_ncols;
+
 		int sdlFlags;
 		int bpp;
 
@@ -321,6 +329,8 @@ class OpenGLWindow : public Runnable {
 //		std::list<MImage *> displayQueue;
 
 //		GLuint texture;
+//
+		Text *text;
 };
 
 
@@ -350,6 +360,10 @@ OpenGLWindow::OpenGLWindow(int w, int h, bool fullscreen){
 	startFullscreen=fullscreen;
 	animation_ms=250;
 	displaysChanged=false;
+	video_select_row=0;
+	video_select_col=0;
+	video_nrows=0;
+	video_ncols=0;
 
 	gDrawSurface=NULL;
 
@@ -359,6 +373,16 @@ OpenGLWindow::OpenGLWindow(int w, int h, bool fullscreen){
 
 	bpp=0;
 
+#if 0
+	if (TTF_Init()){
+		cerr <<"Failed to initialize SDL_TTF!\n"<<endl;
+		exit(1);
+	}
+
+	text=new Text("/home/erik/FreeSans.ttf");
+#else
+	text=NULL;
+#endif
 }
 
 void OpenGLWindow::send(CommandString cmd){
@@ -400,7 +424,53 @@ void OpenGLWindow::keyPressed(string key, bool isRepeat){
 		return;
 	}
 
+	if (!showMenu){
+		if (key=="KEY_CHANNELUP"){
+			cerr <<"EEEE: selecting row up"<<endl;
+			cerr <<"EEEE: video_nrows="<<video_nrows<<endl;
+			cerr <<"EEEE: video_ncols="<<video_ncols<<endl;
+			menuLock.lock();
+			video_select_row++;
+			if (video_select_row>=video_nrows)
+				video_select_row--;
+			menuLock.unlock();
+			updateVideoPositions(false);
+		}
+		if (key=="KEY_CHANNELDOWN"){
+			cerr <<"EEEE: selecting row down"<<endl;
+			menuLock.lock();
+			video_select_row--;
+			if (video_select_row<0)
+				video_select_row=0;
+			menuLock.unlock();
+			updateVideoPositions(false);
+		}
+		if (key=="BTN_RIGHT"){
+			cerr <<"EEEE: selecting row up"<<endl;
+			cerr <<"EEEE: video_nrows="<<video_nrows<<endl;
+			cerr <<"EEEE: video_ncols="<<video_ncols<<endl;
+			menuLock.lock();
+			video_select_col++;
+			if (video_select_col>=video_ncols)
+				video_select_col--;
+			menuLock.unlock();
+			updateVideoPositions(false);
+		}
+		if (key=="BTN_LEFT"){
+			cerr <<"EEEE: selecting row down"<<endl;
+			menuLock.lock();
+			video_select_col--;
+			if (video_select_col<0)
+				video_select_col=0;
+			menuLock.unlock();
+			updateVideoPositions(false);
+		}
+
+	}
+
 	if (showMenu && !isRepeat){
+
+
 		if (key=="BTN_LEFT"){
 			menuLock.lock();
 			menuItemCur = menuCur->selectLeft();
@@ -614,7 +684,7 @@ void OpenGLWindow::rectToCoord(float &x1, float&y1, float &x2, float &y2, float 
 
 }
 
-void findVideoArea(int video_n, int ntot, float &x1, float&y1, float &x2, float &y2, float lx1, float ly1, float lx2, float ly2, bool preferHorisontal){
+void OpenGLWindow::findVideoArea(int video_n, int ntot, float &x1, float&y1, float &x2, float &y2, float lx1, float ly1, float lx2, float ly2, bool preferHorisontal, bool* selectedptr){
 
 	int n=1;
 	int nr=1;
@@ -634,6 +704,9 @@ void findVideoArea(int video_n, int ntot, float &x1, float&y1, float &x2, float 
 
 		}
 	}
+
+	video_nrows=nr;
+	video_ncols=nc;
 
 	int nextra=nr*nc-ntot; //now all rows are full. This many are not
 	int nfull = nr - nextra;
@@ -667,6 +740,18 @@ void findVideoArea(int video_n, int ntot, float &x1, float&y1, float &x2, float 
 //	cerr <<"EEEE: colw="<<colw<<endl;
 	x1=lx1+col*(float)colw;
 	x2=x1+colw;
+
+	if (selectedptr){
+		if (row==video_select_row && (col==video_select_col)){
+			cerr <<"EEEE: Video SELECTEd: row="<<row<<" col="<<col<<" video_select_row="<<video_select_row<<" video_select_col="<<video_select_col<<endl;
+			*selectedptr=true;
+		}else{
+			cerr <<"EEEE: Video not selected: row="<<row<<" col="<<col<<" video_select_row="<<video_select_row<<" video_select_col="<<video_select_col<<endl;
+			*selectedptr=false;	
+		}
+	}
+
+
 
 }
 
@@ -735,7 +820,7 @@ void OpenGLWindow::updateVideoPositions(bool doAnimate){
 			bool horisontal = screen_aratio>1.25;
 
 			//Find where to layout
-			findVideoArea(remote_video_n, n_remote, tex_x1, tex_y1, tex_x2, tex_y2, leftx, topy, rightx, bottomy, horisontal);
+			findVideoArea(remote_video_n, n_remote, tex_x1, tex_y1, tex_x2, tex_y2, leftx, topy, rightx, bottomy, horisontal, &gfx->isSelected);
 			
 			//Keep correct aspect ratio
 			rectToCoord(tex_x1,tex_y1,tex_x2,tex_y2, tex_x1, tex_y1, tex_x2,tex_y2, gfx->aratio);
@@ -931,16 +1016,38 @@ void OpenGLWindow::drawSurface(){
 	}
 	displayListLock.unlock();
 
+	if (text){
+		SDL_Color white={255,255,255};
+		SDL_Color black={0,0,0};
+		cerr <<"EEEE: drawing text"<<endl;
+
+		int width = text->getTextWidth("Hello world", 28, black, white);
+		text->draw3D(0,0,0, 1.0/30.0,"Hello world",48, white, black);
+		text->draw2D(10,10,"Hello world",28, white, black);
+		text->draw3D(0,0,0,10,10,10,"Hello world",28, white, black);
+	}
+
 	if (showMenu){
 		menuLock.lock();
 		massert(menuRoot);
 		
 		int nicons=menuRoot->nVisible();
-		float x1= windowX0  ;
-		float y1= windowY0/5   ;
-		float x2= -windowX0  ;
-		float y2= -windowY0/5  ;
-		rectToCoord(x1,y1,x2,y2,x1,y1,x2,y2,1.0);
+		float x1= windowX0;
+		float y1= windowY0;
+		float x2= -windowX0;
+		float y2= -windowY0;
+		
+		cerr <<"EEEE: nvideos="<<nvideos<<endl;
+		if (nvideos==0){ 	//limit to middle 40% of height
+			cerr <<"EEEE: layout middle"<<endl;
+			y1= y1/5;
+			y2= y2/5;
+			rectToCoord(x1,y1, x2,y2,  x1,y1, x2,y2,  1.0); //draw menu on bottom 1/8 of screen
+		}else{
+			cerr <<"EEEE: layout bottom"<<endl;
+			y2= y1+(y2-y1)/8   ;
+			rectToCoord(x1,y1,x2,y2,x1,y1,x2,y2,1.0);
+		}
 
 		float iconWidth=x2-x1;
 		float totWidth=iconWidth*nicons;
@@ -949,6 +1056,7 @@ void OpenGLWindow::drawSurface(){
 		int iconi=0;
 		list<Menu*>::iterator i;
 
+		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		for (i=menuRoot->mitems.begin(); i!=menuRoot->mitems.end(); i++, iconi++){
 			if ((*i)->visible){
 				x1=startx+iconi*iconWidth;
@@ -979,12 +1087,13 @@ void OpenGLWindow::drawSurface(){
 
 				if ((*i)->selected){
 					glBlendFunc(GL_ONE, GL_ONE);
+					//glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_DST_COLOR);
 			//		cerr <<"EEEE: drawing rectangle"<<endl;
 					float bwidth=(y2-y1)/10.0;
 			//		cerr <<"EEEE: bwidth="<<bwidth<<endl;
-					//glColor4f(0.5, 0.5, 0.6, 1.0); 
+					//glColor4f(0.5, 0.5, 0.6, 0.6); 
 					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-					glColor4f(1.0, 1.0, 1.0, 1.0); 
+					glColor4f(1.0, 1.0, 1.0, 0.6); 
 
 					glRectf( x1, y1, x2, y1+bwidth );
 					glRectf( x1, y2, x2, y2-bwidth );
@@ -1095,13 +1204,6 @@ void OpenGLWindow::run(){
 			{
 				case SDL_MOUSEBUTTONDOWN:
 					printf("PRESS: %d,%d\n",event.button.x, event.button.y);
-#if 0
-					url=d_login->clickedUrl(event.button.x, event.button.y);
-					if (url!=""){
-						gui->doRegister(url);
-						d_login->hide();
-					}
-#endif
 
 					break;
 				case SDL_MOUSEMOTION:
@@ -1156,7 +1258,7 @@ void OpenGLWindow::run(){
 			resized=false;
 		}
 		drawSurface();
-//		Thread::msleep(500);
+		Thread::msleep(500);
 	}
 
 	cerr <<"----------------EEEE: OpenGl thread quitting"<<endl;
@@ -1239,7 +1341,7 @@ void OpenGLWindow::initSdl(){
 		exit(1);
 	}
 
-	text = new Text("share/FreeSans.ttf");
+	text = new Text("/home/erik/FreeSans.ttf");
 #endif
 
 
@@ -1373,8 +1475,8 @@ void OpenGLWindow::initSurface(){
 	///	massert(d_login);
 	///	d_login->initGl(text);
 
-	///	if (text)
-	///		text->restartGl();
+	if (text)
+		text->restartGl();
 
 
 	SDL_GL_SetAttribute(SDL_GL_RED_SIZE,        5);
@@ -1624,6 +1726,7 @@ MImage * OpenGLDisplay::allocateImage(){
 	mimage->linesize[2] = 0;
 	mimage->width=width;
 	mimage->height=height;
+	mimage->chroma= M_CHROMA_RV24;
 
 	mimage->privateData = NULL;
 

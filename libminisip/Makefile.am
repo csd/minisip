@@ -400,6 +400,8 @@ plugins_LTLIBRARIES += mopengl.la
 mopengl_la_LDFLAGS = $(plugins_LDFLAGS)
 mopengl_la_SOURCES = source/subsystem_media/video/display/OpenGLDisplay.cxx \
 			source/subsystem_media/video/display/OpenGLDisplay.h \
+			source/subsystem_media/video/display/Text.cxx \
+			source/subsystem_media/video/display/Text.h \
 			source/subsystem_media/video/display/Animate.cxx \
 			source/subsystem_media/video/display/Animate.h
 mopengl_la_LIBADD = libminisip_video.la libminisip.la $(MUTIL_LIBS) $(XV_LIBS) $(OPENGL_LIBS) $(X_LIBS) $(X_EXTRA_LIBS)

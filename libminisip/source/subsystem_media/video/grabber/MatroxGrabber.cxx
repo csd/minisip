@@ -72,6 +72,7 @@ MIL_INT MFTYPE GrabEnd(MIL_INT HookType, MIL_ID EventId, void MPTYPE *UserStruct
 MatroxGrabber::MatroxGrabber( string dev ){
 	device=dev;
 	initialized=false;
+	memset(&UserStruct,0,sizeof(UserStruct));
 }
 
 void MatroxGrabber::setLocalDisplay(MRef<VideoDisplay*> d){
