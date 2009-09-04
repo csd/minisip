@@ -44,7 +44,7 @@ TextTexture::TextTexture(TTF_Font* font, std::string t, int size, SDL_Color fgco
 	initial = TTF_RenderText_Blended(font, text.c_str(), fgcolor);
 	textwidth = initial->w;
 	textheight = initial->h;
-	cerr << "EEEE: TextureText: width="<<textwidth<<endl;
+//	cerr << "EEEE: TextureText: width="<<textwidth<<endl;
 	int w = nextpoweroftwo(initial->w);
 	int h = nextpoweroftwo(initial->h);
 	texturewidth=w;
@@ -305,6 +305,46 @@ void Text::draw3D( float x, float y, float z, float scale, std::string text, int
 
 }
 
+
+
+
+static void rectToCoord(float &x1, float&y1, float &x2, float &y2, float lx1, float ly1, float lx2, float ly2, float aratio)
+{
+
+        float l_aratio=(lx2-lx1)/(ly2-ly1);
+
+	cerr <<"l_aratio="<<l_aratio<<endl;
+	cerr <<"aratio="<<aratio<<endl;
+
+        if (aratio > l_aratio) { // fill full width, center vertically
+		cerr <<"fill width"<<endl;
+                float h=(lx2-lx1)/aratio;
+                float lh=ly2-ly1;
+                x1=lx1;
+                y1=ly1+((lh-h)/2.0);
+                x2=lx2;
+                y2=y1+h;
+
+
+        }else{  //fill full height
+		cerr <<"fill height"<<endl;
+
+                y1=ly1;
+                float w=(ly2-ly1)*aratio;
+		cerr <<"w="<<w<<endl;
+                float lw=lx2-lx1;
+		cerr <<"lw="<<lw<<endl;
+
+                x1=lx1+(lw-w)/2.0;
+		cerr <<"x1="<<x1<<endl;
+                y2=ly2;
+                x2=x1+w;
+		cerr <<"x2="<<x2<<endl;
+        }
+	cerr <<"EEEE: mapped "<<lx1<<","<<ly1<<"->"<<lx2<<","<<ly2<<" to " << x1<<","<<y1<<"->"<<x2<<","<<y2<<endl;
+}
+
+
 void Text::draw3D( float x1, float y1, float z1, float x2, float y2, float z2, std::string text, int size, SDL_Color fgc, SDL_Color bgc ){
 	MRef<TextTexture*> t =  getTextureObject(text, size, fgc, bgc);
 
@@ -325,19 +365,24 @@ void Text::draw3D( float x1, float y1, float z1, float x2, float y2, float z2, s
 	glBindTexture(GL_TEXTURE_2D, tex );
 	//glColor3f(c.r/255.0, c.g/255.0, c.b/255.0);
 
+
+//	cerr <<"EEEE: textwidth="<<(float)t->textwidth<<endl;
+//	cerr <<"EEEE: textheight="<<(float)t->textheight<<endl;
+	rectToCoord(x1,y1,x2,y2,x1,y1,x2,y2, (float)t->textwidth/(float)t->textheight);
+
 	glBindTexture(GL_TEXTURE_2D, tex );
 	glBegin(GL_QUADS);
 
-	glTexCoord2f(0.0f, 1.0f);
+	glTexCoord2f(0.0f, /*1.0f*/ (float)t->textheight/(float)t->textureheight);
 	glVertex3f(x1 ,y1, z1);
 
 
-	glTexCoord2f(1.0f, 1.0f);
+	glTexCoord2f(/*1.0f*/ (float)t->textwidth/(float)t->texturewidth , /*1.0f*/ (float)t->textheight/(float)t->textureheight);
 	//glTexCoord2f(0.0f, 1.0f);
 	glVertex3f(x2, y1, z1);
 
 
-	glTexCoord2f(1.0f, 0.0f);
+	glTexCoord2f(/*1.0f*/ (float)t->textwidth/(float)t->texturewidth, 0.0f);
 	//glTexCoord2f(1.0f, 1.0f);
 	glVertex3f(x2, y2,z1 );
 

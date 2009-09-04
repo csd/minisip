@@ -37,6 +37,7 @@
 #include<libmutil/MSingleton.h>
 #include<libmutil/CommandString.h>
 #include<libmutil/MessageRouter.h>
+#include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
 
 #include<libminisip/media/video/ImageHandler.h>
 
@@ -60,6 +61,12 @@ class LIBMINISIP_API VideoDisplay : public ImageHandler, public Runnable{
 		virtual bool handleCommand(CommandString cmd);
 
 		virtual void setCallback(MRef<CommandReceiver*> cb);
+
+//		virtual void setTitle(std::string t);
+		virtual void setCallId(std::string id);
+//		virtual void setRemoteUri(std::string u);
+			
+		virtual void setPhoneConfig(MRef<SipSoftPhoneConfiguration*> conf);
 		
 	protected:
 		VideoDisplay();

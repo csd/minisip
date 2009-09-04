@@ -116,6 +116,15 @@ VideoDisplay::~VideoDisplay(){
 	VideoDisplayRegistry::getInstance()->signalDisplayDeleted();
 }
 
+void VideoDisplay::setCallId(string id){
+
+}
+
+void VideoDisplay::setPhoneConfig(MRef<SipSoftPhoneConfiguration*> conf){
+
+}
+
+
 void VideoDisplay::setCallback(MRef<CommandReceiver*> cb){
 	callback=cb;
 }

@@ -75,6 +75,11 @@ class OpenGLDisplay: public VideoDisplay{
 		
 		virtual void setCallback(MRef<CommandReceiver*> cb);
 
+		virtual void setCallId(std::string id);
+
+		void setPhoneConfig(MRef<SipSoftPhoneConfiguration*> conf);
+
+
 	private:
 		int colorNBytes;
 		mgl_gfx *gfx;

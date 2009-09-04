@@ -389,6 +389,7 @@ bool SipDialogVoipServer::a3005_ringing_termwait_reject( const SipSMCommand &com
 				SipSMCommand::dialog_layer)){
 
 
+		cerr <<"EEEE: detected reject"<<endl;
 		sendReject();
 
 		getMediaSession()->stop();

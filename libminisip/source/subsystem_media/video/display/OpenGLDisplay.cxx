@@ -96,15 +96,19 @@ struct mgl_gfx{
 	Animate* y2;
 	Animate* alpha;
 	bool isSelected;
-	char*name;
+	char* name;
+	char* callId;
 };
 
 class Menu{
 public:
-	Menu(struct mgl_gfx* _icon, bool _visible=true){
+	Menu(string _name, struct mgl_gfx* _icon, string _text, bool _visible=true){
+		name=_name;
 		visible=_visible;
 		icon=_icon;
 		selected=false;
+		text = _text;
+		toppicture=NULL;
 	}
 	int nVisible(){
 		int ret=0;
@@ -177,15 +181,39 @@ public:
 		prev->selected=true;
 		return prev;
 	}
+	
+	Menu* getMenuItem(string name){
+		int n=0;
+		list<Menu*>::iterator i;
+		for (i=mitems.begin();i!=mitems.end();i++, n++){
+			cerr <<"EEEE: comparing with <"<<(*i)->name<<">"<<endl;
+			if ((*i)->name==name)
+				return *i;
+		}
+		cerr <<"EEEE: could not find menu item <"<<name <<">"<<endl;
+		return NULL;
+	}
 
-
+	string name;
 	bool visible;
 	bool selected;
 	list<Menu*> mitems;
 	Menu* selectedItem;
 	struct mgl_gfx* icon;
 	CommandString command;
+	string text;
+	struct mgl_gfx* toppicture;
 };
+
+#define MENU_HIDDEN      1
+#define MENU_MAIN        2
+#define MENU_ASKACCEPT   3
+#define MENU_SETTINGS    4
+#define MENU_ADDRESSBOOK 5
+
+#define VIDEO_EQUAL      1
+#define VIDEO_PREFERENCE 2
+#define VIDEO_TALKER     3
 
 class OpenGLWindow : public Runnable {
 	public:
@@ -196,8 +224,6 @@ class OpenGLWindow : public Runnable {
 		void start();
 		void stop();
 		virtual void run();
-
-//		void display(MImage* image, uint64_t source);
 
 		void addDisplay(OpenGLDisplay* displ);
 		void removeDisplay(OpenGLDisplay* displ);
@@ -237,6 +263,7 @@ class OpenGLWindow : public Runnable {
 		void enableMenu();
 		void keyPressed(string key, bool isRepeat);
 
+		void setPhoneConfig(MRef<SipSoftPhoneConfiguration*> conf);
 		void setCallback(OpenGLDisplay* cb){
 			if (!callback)
 				callback=cb;
@@ -246,14 +273,22 @@ class OpenGLWindow : public Runnable {
 		void send(CommandString cmd);
 		void incomingCall(string callid, string uri, bool unprotected);
 	private:
-		bool loadTexture(string name);
-		void hideAcceptCallMenu(bool hideAllMenus);
+
+		 bool loadTexture(string name);
+
+
 		struct mgl_gfx* getIcon(string name);
 
 		void findVideoArea(int video_n, int ntot, float &x1, float&y1, float &x2, float &y2, float lx1, float ly1, float lx2, float ly2, bool preferHorisontal, bool* selectedptr);
 		void setupMenu();
+		void hideAcceptCallMenu(bool hideAllMenus);
+		void menuDrawAskAccept();
+		void menuDraw();
+		void menuDrawSettings();
+		void menuDrawAddressBook();
+
 		bool texturesLoaded;
-		bool showMenu;
+		//		bool showMenu;
 		Menu* menuRoot;
 		Menu* menuCur;
 		Menu* menuItemCur;
@@ -262,6 +297,8 @@ class OpenGLWindow : public Runnable {
 		Menu* menuAcceptCall;
 		Mutex menuLock;
 		string texturePath;
+
+		MRef<SipSoftPhoneConfiguration*> pconf;
 
 		bool inCall;
 		int animation_ms;
@@ -328,9 +365,11 @@ class OpenGLWindow : public Runnable {
 		//Semaphore queueSem;
 //		std::list<MImage *> displayQueue;
 
-//		GLuint texture;
-//
+		GLuint textureGray;
+
 		Text *text;
+		
+		int menuMode;
 };
 
 
@@ -340,9 +379,10 @@ OpenGLWindow::OpenGLWindow(int w, int h, bool fullscreen){
 	cerr<<"EEEE: ------------------------ CREATING OPENGL WINDOW---------------"<<endl;
 	cerr <<"EEEE: fullscreen="<<fullscreen<<endl;
 	//texture=-1;
+	menuMode=MENU_HIDDEN;
 	runCount=0;
 	inCall=false;
-	showMenu=false;
+//	showMenu=false;
 	menuRoot=NULL;
 	menuCur=NULL;
 	menuItemCur=NULL;
@@ -364,6 +404,7 @@ OpenGLWindow::OpenGLWindow(int w, int h, bool fullscreen){
 	video_select_col=0;
 	video_nrows=0;
 	video_ncols=0;
+	textureGray=0;
 
 	gDrawSurface=NULL;
 
@@ -373,16 +414,16 @@ OpenGLWindow::OpenGLWindow(int w, int h, bool fullscreen){
 
 	bpp=0;
 
-#if 0
 	if (TTF_Init()){
 		cerr <<"Failed to initialize SDL_TTF!\n"<<endl;
 		exit(1);
 	}
 
 	text=new Text("/home/erik/FreeSans.ttf");
-#else
-	text=NULL;
-#endif
+}
+
+void OpenGLWindow::setPhoneConfig(MRef<SipSoftPhoneConfiguration*> conf){
+	pconf=conf;
 }
 
 void OpenGLWindow::send(CommandString cmd){
@@ -397,7 +438,11 @@ void OpenGLWindow::hideAcceptCallMenu(bool hideAll){
 	menuRoot=menuActions;
 	menuCur=menuActions;
 	menuItemCur=*menuActions->mitems.begin();
-	showMenu=!hideAll;
+//	showMenu=!hideAll;
+	if (hideAll)
+		menuMode=MENU_HIDDEN;
+	else
+		menuMode=MENU_MAIN;
 	menuLock.unlock();
 }
 
@@ -410,6 +455,11 @@ void OpenGLWindow::incomingCall(string callid, string uri, bool unprotected){
 	(*i)->command=CommandString(callid, "reject_invite");	//command for no button
 	menuRoot=menuAcceptCall;
 	menuCur=menuAcceptCall;
+	Menu* hangup = menuActions->getMenuItem("hangup");
+	massert(hangup);
+	hangup->command=CommandString(callid, "hang_up");
+//	showMenu=true;
+	menuMode=MENU_ASKACCEPT;
 	menuItemCur=*menuAcceptCall->mitems.begin();
 	menuLock.unlock();
 
@@ -418,13 +468,17 @@ void OpenGLWindow::incomingCall(string callid, string uri, bool unprotected){
 void OpenGLWindow::keyPressed(string key, bool isRepeat){
 	cerr <<"EEEE: OpenGLWindow::keyPressed: "<<key<<endl;
 	if (key=="KEY_MENU" && !isRepeat){
-		showMenu=!showMenu;
-		
+		//showMenu=!showMenu;
+		if (menuMode==MENU_HIDDEN){
+			menuMode=MENU_MAIN;
+		}else{
+			menuMode=MENU_HIDDEN;
+		}
 		cerr <<"EEEE: MENU DETECTED"<<endl;	
 		return;
 	}
 
-	if (!showMenu){
+	if (/*!showMenu*/ menuMode==MENU_HIDDEN){
 		if (key=="KEY_CHANNELUP"){
 			cerr <<"EEEE: selecting row up"<<endl;
 			cerr <<"EEEE: video_nrows="<<video_nrows<<endl;
@@ -468,7 +522,7 @@ void OpenGLWindow::keyPressed(string key, bool isRepeat){
 
 	}
 
-	if (showMenu && !isRepeat){
+	if (/*showMenu*/ menuMode!=MENU_HIDDEN && !isRepeat){
 
 
 		if (key=="BTN_LEFT"){
@@ -488,16 +542,22 @@ void OpenGLWindow::keyPressed(string key, bool isRepeat){
 			cerr <<"EEEE: MENU SELECTED: "<< cmd<<endl;
 			
 			if (cmd!=""){
-				CommandString cmd = menuItemCur->command;
-				menuLock.unlock();
-				send( menuItemCur->command );
+				if (cmd=="invite"){
+					cerr<<"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"<<endl;
+					menuMode=MENU_ADDRESSBOOK;
+					menuLock.unlock();
+				}else{
+					CommandString cmd = menuItemCur->command;
+					menuLock.unlock();
+					send( menuItemCur->command );
+				}
 			}else{
 				menuLock.unlock();
 			}
 
 			if (menuRoot==menuAcceptCall)
 				hideAcceptCallMenu(cmd=="accept_invite");
-			
+
 		}
 
 
@@ -557,22 +617,41 @@ bool OpenGLWindow::loadTexture(string fname){
 
 	delete[] tmp;
 	cerr <<"EEEE: done loading texture"<<endl;
+
+	if (textureGray==0){
+		byte_t* gray=(byte_t*)malloc(8*3*8*3+16);
+		memset(gray,0xFF,8*3*8*3);
+
+		glGenTextures( 1, &textureGray);
+		massert(textureGray > 0);
+		glBindTexture( GL_TEXTURE_2D, textureGray);
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		cerr <<"EEEE: uploading to GL..."<<endl;
+		glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, 8, 8, 0, GL_RGB, GL_UNSIGNED_BYTE, gray);
+
+	}
 }
 
 void OpenGLWindow::setupMenu(){
 
-	menuActions=new Menu(NULL);
+	menuActions=new Menu("",NULL,"");
 	menuCur=menuRoot=menuActions;
 	
 	Menu* m;
 
-	const char* names[]={"invite","hangup","settings","exit" ,0};
+	const char* names[]={"invite","settings","hangup","exit" ,0};
+	const char* names_text[]={"Make call","Settings","Hang up","Exit application" , 0};
 
 	int i=0;
 	while (names[i++]){
 		struct mgl_gfx* icon = getIcon(names[i-1]);
 		massert(icon);
-		m = new Menu(icon);
+		m = new Menu( names[i-1], icon, names_text[i-1]);
+		if (strcmp(names[i-1],"exit")==0 )
+			m->visible=false;
 		m->command=CommandString("",names[i-1]);
 		menuActions->mitems.push_back(m);
 	}
@@ -580,16 +659,18 @@ void OpenGLWindow::setupMenu(){
 	menuItemCur = *(menuActions->mitems.begin());
 	
 	
-	menuAcceptCall=new Menu(NULL);
+	menuAcceptCall=new Menu( "", NULL, "");
+
+	menuAcceptCall->toppicture =getIcon("person");
 	
 	struct mgl_gfx* icon = getIcon("yes");
 	massert(icon);
-	m = new Menu(icon);
+	m = new Menu("yes",icon, "Accept");
 	menuAcceptCall->mitems.push_back(m);
 
 	icon = getIcon("no");
 	massert(icon);
-	m = new Menu(icon);
+	m = new Menu("no",icon, "Reject");
 	menuAcceptCall->mitems.push_back(m);
 	(*(menuAcceptCall->mitems.begin()))->selected=true;
 
@@ -600,7 +681,8 @@ void OpenGLWindow::setupMenu(){
 void OpenGLWindow::enableMenu(){
 	cerr<<"EEEE: called enableMenu()"<<endl;
 	massert(texturePath.size()>0);
-	showMenu=true;
+	/*showMenu=true;*/
+	menuMode=MENU_MAIN;
 }
 
 #define REPORT_N 500
@@ -662,8 +744,11 @@ void OpenGLWindow::findScreenCoords() {
 void OpenGLWindow::rectToCoord(float &x1, float&y1, float &x2, float &y2, float lx1, float ly1, float lx2, float ly2, float aratio){
 
 	float l_aratio=(lx2-lx1)/(ly2-ly1);
+//	cerr <<"l_aratio="<<l_aratio<<endl;
+//	cerr <<"aratio="<<aratio<<endl;
 
 	if (aratio > l_aratio) { // fill full width, center vertically
+//		cerr <<"fill width"<<endl;
 		float h=(lx2-lx1)/aratio;
 		float lh=ly2-ly1;
 		x1=lx1;
@@ -673,9 +758,14 @@ void OpenGLWindow::rectToCoord(float &x1, float&y1, float &x2, float &y2, float 
 
 
 	}else{	//fill full height
+//		cerr <<"fill height"<<endl;
 		y1=ly1;
 		float w=(ly2-ly1)*aratio;
+
+//		cerr <<"w="<<w<<endl;
+
 		float lw=lx2-lx1;
+//		cerr <<"lw="<<lw<<endl;
 		x1=lx1+(lw-w)/2.0;
 		y2=ly2;
 		x2=x1+w;
@@ -917,6 +1007,230 @@ void OpenGLWindow::removeDisplay(OpenGLDisplay* displ){
 
 }
 
+void OpenGLWindow::menuDrawAskAccept(){
+
+}
+
+void OpenGLWindow::menuDrawSettings(){
+
+}
+
+void OpenGLWindow::menuDrawAddressBook(){
+	massert(pconf);
+	cerr <<"EEEEEEEEEEEE: OpenGLWindow::menuDrawAddressBook"<<endl;
+
+
+	list<string> contacts;
+
+	int nonline=0;
+	std::list<MRef<PhoneBook *> >::iterator i;
+	cerr <<"EEEE: nphonebooks="<<pconf->phonebooks.size()<<endl;
+	for (i=pconf->phonebooks.begin(); i!=pconf->phonebooks.end() ; i++){
+		list< MRef<PhoneBookPerson *> > persons = (*i)->getPersons();
+		list< MRef<PhoneBookPerson *> >::iterator j;
+		cerr <<"EEEE: persons in book="<<persons.size()<<endl;
+		for (j=persons.begin(); j!=persons.end(); j++){
+			list< MRef<ContactEntry *> > entries = (*j)->getEntries();
+			list< MRef<ContactEntry *> >::iterator ent;
+			cerr <<"EEEE: contacts per person: "<<entries.size()<<endl;;
+			for (ent=entries.begin(); ent!=entries.end(); ent++){
+				contacts.push_back( (*ent)->getUri() );
+				if ((*ent)->isOnline())
+					nonline++;
+			}
+
+		}
+	}
+	cerr <<"EEEE: nonline="<<nonline<<endl;
+
+
+}
+
+
+
+void OpenGLWindow::menuDraw(){
+	menuLock.lock();
+	massert(menuRoot);
+	bool drawBackground=true;
+
+
+	if (menuMode==MENU_ADDRESSBOOK){
+		menuDrawAddressBook();
+		menuLock.unlock();
+		return;
+	}
+
+	int nicons=menuRoot->nVisible();
+	float x1= windowX0;
+	float y1= windowY0;
+	float x2= -windowX0;
+	float y2= -windowY0;
+
+	int nvideos=displays.size();
+	cerr <<"EEEE: nvideos="<<nvideos<<endl;
+	if (nvideos==0){ 	//limit to middle 40% of height
+		//			cerr <<"EEEE: layout middle"<<endl;
+		y1= y1/5;  //fifth of screen, below center
+		y2= y2/5;
+		rectToCoord(x1,y1, x2,y2,  x1,y1, x2,y2,  1.0); //draw menu on bottom 1/8 of screen
+		if (menuRoot->toppicture){
+			float height=y2-y1;
+			y1=y1-height;
+			y2=y2-height;
+		}
+		drawBackground=false;
+	}else{
+		cerr <<"EEEE: layout bottom"<<endl;
+		y2= y1+(y2-y1)/8   ;
+		rectToCoord(x1,y1,x2,y2,x1,y1,x2,y2,1.0);
+	}
+	float bottomOffset = (y2-y1)/4;	//Note: The icons are drawn outside of their bounds by this amount
+
+	float iconWidth=x2-x1;
+	float totWidth=iconWidth*nicons;
+	float startx=-totWidth/2;
+
+	int iconi=0;
+	list<Menu*>::iterator i;
+
+	if (menuRoot->toppicture){
+		float px1=-100;	//don't limit on width
+		float px2=100;
+		float py1=y2;
+		float py2=y2+iconWidth;
+		rectToCoord(px1,py1, px2,py2, px1,py1, px2,py2, 1.0);
+
+		cerr <<"EEEE: toppicture: getting texture"<<endl;
+		glColor4f(1.0,1.0,1.0, 1.0);
+		glBindTexture( GL_TEXTURE_2D, menuRoot->toppicture->texture);
+		cerr <<"EEEE: toppicture: drawing"<<endl;
+
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glBegin( GL_QUADS );
+		glTexCoord2f( 0, 1.0 );
+		glVertex3f(  px1, bottomOffset*2 + py1, 0.0f );
+
+		glTexCoord2f( 1.0, 1.0 );
+		glVertex3f( px2, bottomOffset*2 + py1, 0.0f );
+
+		glTexCoord2f( 1.0, 0 );
+		glVertex3f( px2, bottomOffset*2 + py2, 0.0f );
+
+		glTexCoord2f( 0, 0 );
+		glVertex3f( px1, bottomOffset*2 + py2, 0.0f );
+		glEnd();
+		cerr <<"EEEE: toppicture: toppicture done"<<endl;
+
+	}
+	if (drawBackground){
+
+		glColor4f(1.0,1.0,1.0, 0.3);
+		glBindTexture( GL_TEXTURE_2D, textureGray);
+		cerr <<"EEEE: toppicture: drawing background"<<endl;
+
+		float bgx1=-totWidth/2-iconWidth/4;
+		float bgx2=totWidth/2+iconWidth/4;
+		float bgy1=y1;
+		float bgy2=y2+iconWidth/2;
+
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glBegin( GL_QUADS );
+		glTexCoord2f( 0, 1.0 );
+		glVertex3f( bgx1 , bgy1, 0.0f );
+
+		glTexCoord2f( 1.0, 1.0 );
+		glVertex3f( bgx2, bgy1, 0.0f );
+
+		glTexCoord2f( 1.0, 0 );
+		glVertex3f( bgx2, bgy2, 0.0f );
+
+		glTexCoord2f( 0, 0 );
+		glVertex3f( bgx1, bgy2, 0.0f );
+		glEnd();
+	}
+
+
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	for (i=menuRoot->mitems.begin(); i!=menuRoot->mitems.end(); i++, iconi++){
+		if ((*i)->visible){
+			x1=startx+iconi*iconWidth;
+			x2=x1+iconWidth;
+
+			//Bug workaround - draw off-screen texture. If not,
+			//the glRectf in the next block will not result in
+			//anything on screen.
+			if (iconi==0){
+				glColor4f(1.0,1.0,1.0, 1.0);
+				glBindTexture( GL_TEXTURE_2D, (*i)->icon->texture);
+
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				glBegin( GL_QUADS );
+				glTexCoord2f( 0, 1.0 );
+				glVertex3f(  100, 100, 0.0f );
+
+				glTexCoord2f( 1.0, 1.0 );
+				glVertex3f( 100, 100, 0.0f );
+
+				glTexCoord2f( 1.0, 0 );
+				glVertex3f( 100, 100, 0.0f );
+
+				glTexCoord2f( 0, 0 );
+				glVertex3f( 100, 100, 0.0f );
+				glEnd();
+			}
+
+
+			if ((*i)->selected){
+				glBlendFunc(GL_ONE, GL_ONE);
+				float bwidth=(y2-y1)/10.0;
+				//glColor4f(0.5, 0.5, 0.6, 0.6); 
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				glColor4f(1.0, 1.0, 1.0, 0.6); 
+				float bottomOffset = (y2-y1)/4;
+				cerr <<"EEEE: bottomOffset="<<bottomOffset<<endl;
+
+				glRectf( x1, bottomOffset + y1,        x2,        bottomOffset + y1+bwidth);
+				glRectf( x1, bottomOffset + y2,        x2,        bottomOffset + y2-bwidth);
+				glRectf( x1, bottomOffset + y1+bwidth, x1+bwidth, bottomOffset + y2-bwidth);
+				glRectf( x2, bottomOffset + y1+bwidth, x2-bwidth, bottomOffset + y2-bwidth);
+				if ((*i)->selected){
+
+					SDL_Color white={255,255,255};
+					SDL_Color black={0,0,0};
+
+					text->draw3D(x1-200,y1,0, x2+200,y1+bottomOffset,0, (*i)->text ,36, white, black);
+
+				}
+			}
+
+
+			glColor4f(1.0,1.0,1.0, 1.0);
+			glBindTexture( GL_TEXTURE_2D, (*i)->icon->texture);
+
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glBegin( GL_QUADS );
+			glTexCoord2f( 0, 1.0 );
+			glVertex3f(  x1, bottomOffset + y1, 0.0f );
+
+			glTexCoord2f( 1.0, 1.0 );
+			glVertex3f( x2, bottomOffset + y1, 0.0f );
+
+			glTexCoord2f( 1.0, 0 );
+			glVertex3f( x2, bottomOffset + y2, 0.0f );
+
+			glTexCoord2f( 0, 0 );
+			glVertex3f( x1, bottomOffset + y2, 0.0f );
+			glEnd();
+
+
+		}
+
+
+	}
+	menuLock.unlock();
+
+}
+
 void OpenGLWindow::drawSurface(){
 	//	cerr << "EEEE: doing OpenGLWindow::drawSurface()"<<endl;
 	static struct timeval lasttime;
@@ -941,8 +1255,9 @@ void OpenGLWindow::drawSurface(){
 	glEnable( GL_TEXTURE_2D );
 
 
-	if (showMenu&&!texturesLoaded){
+	if (/*showMenu*/ menuMode!=MENU_HIDDEN && !texturesLoaded){
 		cerr <<"EEEE: drawSurface: SHOW MENU: loading icons"<<endl;
+		loadTexture("person");
 		loadTexture("invite");
 		loadTexture("hangup");
 		loadTexture("settings");
@@ -968,7 +1283,7 @@ void OpenGLWindow::drawSurface(){
 		updateVideoPositions(true);
 		displaysChanged=false;
 	}
-	
+
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -977,13 +1292,13 @@ void OpenGLWindow::drawSurface(){
 	int dummy=1;
 	int nvideos=displays.size();
 	for (video=displays.begin(); video!=displays.end(); video++){
-//				cerr << "EEEE: getting video texture for display "<< dummy++ <<"/"<<nvideos <<endl;
+		//				cerr << "EEEE: getting video texture for display "<< dummy++ <<"/"<<nvideos <<endl;
 		struct mgl_gfx* gfx = (*video)->getTexture();
 		if (gfx->texture>0){
 			float alpha=gfx->alpha->getVal();
 			glColor4f(1.0,1.0,1.0, alpha );
 			glBindTexture( GL_TEXTURE_2D, gfx->texture);
-//			cerr<<"EEEE: drawing texture "<<gfx->texture<<" with alpha "<<alpha<<endl;
+			//			cerr<<"EEEE: drawing texture "<<gfx->texture<<" with alpha "<<alpha<<endl;
 			float x1= gfx->x1->getVal();
 			float y1= gfx->y1->getVal();
 			float x2= gfx->x2->getVal();
@@ -1016,117 +1331,24 @@ void OpenGLWindow::drawSurface(){
 	}
 	displayListLock.unlock();
 
+#if 0
 	if (text){
 		SDL_Color white={255,255,255};
 		SDL_Color black={0,0,0};
 		cerr <<"EEEE: drawing text"<<endl;
-
-		int width = text->getTextWidth("Hello world", 28, black, white);
-		text->draw3D(0,0,0, 1.0/30.0,"Hello world",48, white, black);
-		text->draw2D(10,10,"Hello world",28, white, black);
-		text->draw3D(0,0,0,10,10,10,"Hello world",28, white, black);
+		text->draw3D(windowX0,windowY0,0,-windowX0,-windowY0,0,"Hello world",16, white, black);
 	}
+#endif
 
-	if (showMenu){
-		menuLock.lock();
-		massert(menuRoot);
-		
-		int nicons=menuRoot->nVisible();
-		float x1= windowX0;
-		float y1= windowY0;
-		float x2= -windowX0;
-		float y2= -windowY0;
-		
-		cerr <<"EEEE: nvideos="<<nvideos<<endl;
-		if (nvideos==0){ 	//limit to middle 40% of height
-			cerr <<"EEEE: layout middle"<<endl;
-			y1= y1/5;
-			y2= y2/5;
-			rectToCoord(x1,y1, x2,y2,  x1,y1, x2,y2,  1.0); //draw menu on bottom 1/8 of screen
-		}else{
-			cerr <<"EEEE: layout bottom"<<endl;
-			y2= y1+(y2-y1)/8   ;
-			rectToCoord(x1,y1,x2,y2,x1,y1,x2,y2,1.0);
-		}
+	switch(menuMode){
+		case MENU_HIDDEN:
+			break;
+		default:
+			menuDraw();
 
-		float iconWidth=x2-x1;
-		float totWidth=iconWidth*nicons;
-		float startx=-totWidth/2;
-
-		int iconi=0;
-		list<Menu*>::iterator i;
-
-		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		for (i=menuRoot->mitems.begin(); i!=menuRoot->mitems.end(); i++, iconi++){
-			if ((*i)->visible){
-				x1=startx+iconi*iconWidth;
-				x2=x1+iconWidth;
-
-				//Bug workaround - draw off-screen texture. If not,
-				//the glRectf in the next block will not result in
-				//anything on screen.
-				if (iconi==0){
-					glColor4f(1.0,1.0,1.0, 1.0);
-					glBindTexture( GL_TEXTURE_2D, (*i)->icon->texture);
-
-					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-					glBegin( GL_QUADS );
-					glTexCoord2f( 0, 1.0 );
-					glVertex3f(  100, 100, 0.0f );
-
-					glTexCoord2f( 1.0, 1.0 );
-					glVertex3f( 100, 100, 0.0f );
-
-					glTexCoord2f( 1.0, 0 );
-					glVertex3f( 100, 100, 0.0f );
-
-					glTexCoord2f( 0, 0 );
-					glVertex3f( 100, 100, 0.0f );
-					glEnd();
-				}
-
-				if ((*i)->selected){
-					glBlendFunc(GL_ONE, GL_ONE);
-					//glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_DST_COLOR);
-			//		cerr <<"EEEE: drawing rectangle"<<endl;
-					float bwidth=(y2-y1)/10.0;
-			//		cerr <<"EEEE: bwidth="<<bwidth<<endl;
-					//glColor4f(0.5, 0.5, 0.6, 0.6); 
-					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-					glColor4f(1.0, 1.0, 1.0, 0.6); 
-
-					glRectf( x1, y1, x2, y1+bwidth );
-					glRectf( x1, y2, x2, y2-bwidth );
-					glRectf( x1, y1+bwidth, x1+bwidth, y2-bwidth);
-					glRectf( x2, y1+bwidth, x2-bwidth, y2-bwidth);
-				}
+	};
 
 
-				glColor4f(1.0,1.0,1.0, 1.0);
-				glBindTexture( GL_TEXTURE_2D, (*i)->icon->texture);
-
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-				glBegin( GL_QUADS );
-				glTexCoord2f( 0, 1.0 );
-				glVertex3f(  x1, y1, 0.0f );
-
-				glTexCoord2f( 1.0, 1.0 );
-				glVertex3f( x2, y1, 0.0f );
-
-				glTexCoord2f( 1.0, 0 );
-				glVertex3f( x2, y2, 0.0f );
-
-				glTexCoord2f( 0, 0 );
-				glVertex3f( x1, y2, 0.0f );
-				glEnd();
-
-
-			}
-
-
-		}
-		menuLock.unlock();
-	}
 
 	glPopMatrix();
 
@@ -1544,6 +1766,11 @@ OpenGLDisplay::OpenGLDisplay( uint32_t width, uint32_t height, bool _fullscreen)
 }
 
 
+void OpenGLDisplay::setPhoneConfig(MRef<SipSoftPhoneConfiguration*> conf){
+	window->setPhoneConfig(conf);
+}
+
+
 //TODO: remove this method - it does the same thing as in the base class
 void OpenGLDisplay::setCallback(MRef<CommandReceiver*> cb){
 	callback=cb;
@@ -1794,6 +2021,11 @@ bool OpenGLDisplay::handleCommand(CommandString cmd){
 	}
 	return handled;
 	
+}
+
+void OpenGLDisplay::setCallId(string id){
+	massert(gfx);
+	gfx->callId=strdup(id.c_str());
 }
 
 OpenGLPlugin::OpenGLPlugin( MRef<Library *> lib ): VideoDisplayPlugin( lib ){

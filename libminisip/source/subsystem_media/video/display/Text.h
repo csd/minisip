@@ -43,6 +43,13 @@ class TextTexture : public MObject {
 		SDL_Color getFgColor(){return fgColor;}
 		SDL_Color getBgColor(){return bgColor;}
 
+		int textwidth;
+		int textheight;
+
+		int texturewidth;
+		int textureheight;
+
+
 	private:
 		std::string text;
 		int fontsize;
@@ -50,11 +57,6 @@ class TextTexture : public MObject {
 		SDL_Color fgColor;
 		int texture_handle;
 
-		int textwidth;
-		int textheight;
-
-		int texturewidth;
-		int textureheight;
 };
 
 class MFont : public MObject{
