@@ -44,7 +44,7 @@ AC_ARG_ENABLE(sctp,
     AS_HELP_STRING([--enable-sctp],
         [Enable SCTP]),,[enable_sctp=no])
 
-if test "${enable_ldap}" = "yes"; then
+if test "${enable_sctp}" = "yes"; then
    AC_DEFINE(ENABLE_SCTP, [], [Define to 1 if you have SCTP support])
    have_sctp=yes
 fi  
