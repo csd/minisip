@@ -162,11 +162,13 @@ void PresenceService::statusUpdated(){
 					if ((*ent)->getUri()== uri){
 
 						if (t=="ONLINE" && !(*ent)->isOnline() ){
+							(*ent)->setOnlineStatus(CONTACT_STATUS_ONLINE);
 							cerr << "----->STATUS CHANGE: "<< uri<<" is "<<t<<endl;
 							CommandString cmd("",SipCommandString::remote_presence_update,uri,"online");
 							callback->handleCommand("gui", cmd);
 						}
 						if (t=="OFFLINE" && (*ent)->isOnline() ){
+							(*ent)->setOnlineStatus(CONTACT_STATUS_OFFLINE);
 							cerr << "----->STATUS CHANGE: "<< uri<<" is "<<t<<endl;
 							CommandString cmd("",SipCommandString::remote_presence_update,uri,"offline");
 							callback->handleCommand("gui", cmd);
