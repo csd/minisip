@@ -27,8 +27,8 @@
 #include<iostream>
 #include<string>
 
-#include"cb_src/axis2_stub_CallbackServiceUserStubService.h"
-#include"sm_src/axis2_stub_ServicesManagerUserStubService.h"
+#include"cb/axis2_stub_CallbackServiceUserStubService.h"
+#include"sm/axis2_stub_ServicesManagerUserStubService.h"
 #include"pa/axis2_stub_PresenceAgentUserStubService.h"
 #include<libmsip/SipCommandString.h>
 
