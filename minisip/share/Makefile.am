@@ -7,7 +7,14 @@ dist_pkgdata_DATA = \
 	play.png \
 	record.png \
 	secure.png \
-	tray_icon.png
+	tray_icon.png \
+	exit.raw \
+	hangup.raw \
+        invite.raw \
+	no.raw \
+	person.raw \
+	settings.raw \
+	yes.raw
 
 EXTRA_DIST = \
 	minisip.png \

@@ -38,11 +38,12 @@
  */
 class OpenGlGui : public Gui {
 	public:
-		OpenGlGui();
+		OpenGlGui(bool fullscreen);
 	
 		std::string getMemObjectType() const {return "OpenGlGui";}
 		
 		virtual void handleCommand(const CommandString&);
+		virtual CommandString handleCommandResp(std::string subsystem, const CommandString&);
 		virtual void setSipSoftPhoneConfiguration(MRef<SipSoftPhoneConfiguration *>sipphoneconfig);
 		virtual void setContactDb(MRef<ContactDb *>){};
 		virtual bool configDialog( MRef<SipSoftPhoneConfiguration *> conf );
@@ -62,18 +63,21 @@ class OpenGlGui : public Gui {
 //		virtual void keyPressed(int key);
 //		virtual void guiExecute(std::string cmd);
 //		virtual void guiExecute(const MRef<QuestionDialog*> &d);
+//
+		void join();
 	
 	private:
+		bool startFullscreen;
 		
 //		void showMem();
 		
 //		std::string currentconfname;
 		std::string currentcaller;
-		std::string input;
-		std::string callId;
-		std::string state;
+//		std::string input;
+//		std::string callId;
+//		std::string state;
 		MRef<SipSoftPhoneConfiguration *> config;
-		bool autoanswer;
+//		bool autoanswer;
 		MRef<Semaphore *> semSipReady;
 		Thread *thread;
 		MRef<Semaphore *> quitSem;
@@ -81,7 +85,7 @@ class OpenGlGui : public Gui {
 		
 		
 		///indicates that the user is in a call and cannot answer any other incoming calls
-		bool inCall;
+//		bool inCall;
 
 		///indicates that the TextUI is in the P2T Mode
 //		bool p2tmode;

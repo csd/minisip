@@ -38,6 +38,16 @@ int main( int argc, char *argv[] )
 	merr.setPrintStreamName(true);
 	mout.setPrintStreamName(true);
 	mdbg.setPrintStreamName(true);
+	bool fullscreen=false;
+
+	if (argv && argv[1] && argv[1][0]=='-' && argv[1][1]=='f'){
+		fullscreen=true;
+		int i=1;
+		do{
+			argv[i]=argv[i+1];
+			i++;
+		}while(argv[i]);
+	}
 
 	cerr << endl << "Starting MiniSIP TextUI ... welcome!" << endl << endl;
 	setupDefaultSignalHandling(); //Signal handlers are created for all 
@@ -47,21 +57,25 @@ int main( int argc, char *argv[] )
 	
 	cerr << "Creating OpenGlGui"<< endl;
 	Minisip::doLoadPlugins(argv);
-	MRef<OpenGlGui*> gui = new OpenGlGui();
-	gui->start();
-
-	Thread::msleep(3000);
+	MRef<OpenGlGui*> gui = new OpenGlGui(fullscreen);
 
 	Minisip minisip( *gui, argc, argv );
+	gui->start();
+	cerr <<"EEEE: :::::::::::::::: running minisip.startSip"<<endl;
 	if( minisip.startSip() > 0 ) {
-//		gui->displayMessage("");
-//		gui->displayMessage("To auto-complete, press <tab>. For a list of commands, press <tab>.", MinisipTextUI::bold);
-//		gui->displayMessage("");
-
-		minisip.join();
+		cerr <<"EEEE: :::::::::::::::: running minisip.startDebugger"<<endl;
+		
+		minisip.startDebugger();
+		cerr <<"EEEE: :::::::::::::::: running minisip.join"<<endl;
+		//minisip.join();
+		
+		gui->join();
+//		Thread::msleep(5000);
 	} else {
 		cerr << endl << "ERROR while starting SIP!" << endl << endl;
 	}
+
+	cerr <<"EEEE: ,,,,,,,,,,,,,,,,,,,,,,,, running minisip.exit"<<endl;
 	minisip.exit();
 	return 0;
 }

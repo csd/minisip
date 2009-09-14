@@ -170,9 +170,10 @@ void IrInput::run(){
 }
 
 
-OpenGlGui::OpenGlGui() {
+OpenGlGui::OpenGlGui(bool fullscreen) {
+	startFullscreen=fullscreen;
 	thread=NULL;
-	inCall=false;
+//	inCall=false;
 	quitSem = new Semaphore();
 	IrInput* ir = new IrInput(this);
 	ir->start();
@@ -182,23 +183,30 @@ void OpenGlGui::start(){
 	thread = new Thread(this);
 }
 
+void OpenGlGui::join(){
+	display->handleCommand( CommandString("", "wait_quit")  );
+}
+
 void OpenGlGui::run(){
 	cerr <<"EEEE: OpenGlGui::run started"<<endl;
 	VideoDisplayRegistry::getInstance();
 
-	display = VideoDisplayRegistry::getInstance()->createDisplay( 512, 512, true, true);
+	display = VideoDisplayRegistry::getInstance()->createDisplay( 960, 640, true, startFullscreen);
 	massert(display);
 	display->setCallback(this);
 	display->handleCommand(CommandString("","set_texture_path","/tmp/") );
 	display->handleCommand(CommandString("","make_proxy") );
 	display->handleCommand(CommandString("","enable_menu") );
 //	display->start();
-	Thread::msleep(50000);
+//	Thread::msleep(50000);
+
 
 
 
 	//Un-block any thread waiting for us to quit
 	quitSem->inc();
+
+	cerr <<"EEEE: ......................... run quitting"<<endl;
 
 }
 
@@ -210,6 +218,12 @@ void OpenGlGui::displayErrorMessage(string msg){
 //	displayMessage(msg, red);
 }
 
+CommandString OpenGlGui::handleCommandResp(string subsystem, const CommandString&cmd){
+	if (cmd.getOp()=="invite"){
+		return sendCommandResp("sip", cmd);
+	}
+	massert(false);
+}
 
 void OpenGlGui::handleCommand(const CommandString &cmd){
 	cerr << "OpenGlGui::handleCommand: Got "<<cmd.getString() << endl;
@@ -218,17 +232,43 @@ void OpenGlGui::handleCommand(const CommandString &cmd){
 		display->handleCommand(cmd);
 	}
 
-	if (cmd.getOp()=="incoming_available"){
+	if (cmd.getOp()=="remote_presence_update"){
 		display->handleCommand(cmd);
 	}
 
+	if (cmd.getOp()=="incoming_available"){
+		sendCommand( "media",CommandString("","start_ringing") );
+		display->handleCommand(cmd);
+	}
+	
+	if (cmd.getOp()=="invite"){
+		CommandString resp=sendCommandResp("sip", cmd);
+	}
+
+	if (cmd.getOp()=="invite_ok"){
+		CommandString cmdstr( cmd.getDestinationId(),
+				MediaCommandString::set_session_sound_settings,
+				"senders", "ON");
+		sendCommand("media", cmdstr);
+	}
+
+
 	if (cmd.getOp()=="accept_invite" || cmd.getOp()=="reject_invite"){
+		sendCommand( "media",CommandString("","stop_ringing") );
 		sendCommand("sip", cmd);
+		
+               CommandString cmdstr( cmd.getDestinationId(),
+                                MediaCommandString::set_session_sound_settings,
+                                "senders", "ON");
+                sendCommand("media",cmdstr);
+
+
 	}
 		
 
-	if (cmd.getOp()=="hangup"){
-		cerr <<"EEEE: should be shutting down..."<<endl;
+	if (cmd.getOp()=="hang_up"){
+		cerr <<"EEEE: got hangup from opengl for callid "<< cmd.getDestinationId()<<endl;
+		sendCommand("sip", cmd);
 	}
 
 #if 0
@@ -471,6 +511,7 @@ bool OpenGlGui::configDialog( MRef<SipSoftPhoneConfiguration *> /*conf*/ ){
 
 void OpenGlGui::setSipSoftPhoneConfiguration(MRef<SipSoftPhoneConfiguration *>sipphoneconfig){
 	config = sipphoneconfig;       
+	display->setPhoneConfig(config);
 }
 
 void OpenGlGui::setCallback(MRef<CommandReceiver*> callback){
