@@ -171,7 +171,59 @@ libsnake_src = source/subsystem_signaling/snakews/SnakeClient.cxx \
 	       source/subsystem_signaling/snakews/sm/adb_ServiceUnavailableException4.c \
 	       source/subsystem_signaling/snakews/sm/adb_SnakeException3.c \
 	       source/subsystem_signaling/snakews/sm/adb_UserNotRegisteredException2.c \
-	       source/subsystem_signaling/snakews/sm/stub_ServicesManagerUserStubService.c
+	       source/subsystem_signaling/snakews/sm/stub_ServicesManagerUserStubService.c \
+	       source/subsystem_signaling/snakews/cb/adb_getEvents3.h \
+	       source/subsystem_signaling/snakews/cb/adb_getEvents.h \
+	       source/subsystem_signaling/snakews/cb/adb_getEventsResponse0.h \
+	       source/subsystem_signaling/snakews/cb/adb_getEventsResponse.h \
+	       source/subsystem_signaling/snakews/cb/adb_snakeEvent.h \
+	       source/subsystem_signaling/snakews/cb/adb_SnakeException2.h \
+	       source/subsystem_signaling/snakews/cb/adb_SnakeException.h \
+	       source/subsystem_signaling/snakews/cb/adb_UserNotRegisteredException1.h \
+	       source/subsystem_signaling/snakews/cb/adb_UserNotRegisteredException.h \
+	       source/subsystem_signaling/snakews/cb/stub_CallbackServiceUserStubService.h \
+	       source/subsystem_signaling/snakews/pa/adb_getStatus2.h \
+	       source/subsystem_signaling/snakews/pa/adb_getStatuses10.h \
+	       source/subsystem_signaling/snakews/pa/adb_getStatuses.h \
+	       source/subsystem_signaling/snakews/pa/adb_getStatusesResponse0.h \
+	       source/subsystem_signaling/snakews/pa/adb_getStatusesResponse.h \
+	       source/subsystem_signaling/snakews/pa/adb_getStatus.h \
+	       source/subsystem_signaling/snakews/pa/adb_getStatusResponse3.h \
+	       source/subsystem_signaling/snakews/pa/adb_getStatusResponse.h \
+	       source/subsystem_signaling/snakews/pa/adb_IncorrectStatusTypeException9.h \
+	       source/subsystem_signaling/snakews/pa/adb_IncorrectStatusTypeException.h \
+	       source/subsystem_signaling/snakews/pa/adb_ServiceUnavailableException11.h \
+	       source/subsystem_signaling/snakews/pa/adb_ServiceUnavailableException.h \
+	       source/subsystem_signaling/snakews/pa/adb_setContactList8.h \
+	       source/subsystem_signaling/snakews/pa/adb_setContactList.h \
+	       source/subsystem_signaling/snakews/pa/adb_setContactListResponse1.h \
+	       source/subsystem_signaling/snakews/pa/adb_setContactListResponse.h \
+	       source/subsystem_signaling/snakews/pa/adb_setStatus7.h \
+	       source/subsystem_signaling/snakews/pa/adb_setStatus.h \
+	       source/subsystem_signaling/snakews/pa/adb_setStatusResponse6.h \
+	       source/subsystem_signaling/snakews/pa/adb_setStatusResponse.h \
+	       source/subsystem_signaling/snakews/pa/adb_SnakeException5.h \
+	       source/subsystem_signaling/snakews/pa/adb_SnakeException.h \
+	       source/subsystem_signaling/snakews/pa/adb_statusType.h \
+	       source/subsystem_signaling/snakews/pa/adb_UnknownUserException4.h \
+	       source/subsystem_signaling/snakews/pa/adb_UnknownUserException.h \
+	       source/subsystem_signaling/snakews/pa/adb_UserNotRegisteredException12.h \
+	       source/subsystem_signaling/snakews/pa/adb_UserNotRegisteredException.h \
+	       source/subsystem_signaling/snakews/pa/adb_userStatus.h \
+	       source/subsystem_signaling/snakews/pa/stub_PresenceAgentUserStubService.h \
+	       source/subsystem_signaling/snakews/sm/adb_getServices0.h \
+	       source/subsystem_signaling/snakews/sm/adb_getServices.h \
+	       source/subsystem_signaling/snakews/sm/adb_getServicesResponse1.h \
+	       source/subsystem_signaling/snakews/sm/adb_getServicesResponse.h \
+	       source/subsystem_signaling/snakews/sm/adb_service.h \
+	       source/subsystem_signaling/snakews/sm/adb_ServiceUnavailableException4.h \
+	       source/subsystem_signaling/snakews/sm/adb_ServiceUnavailableException.h \
+	       source/subsystem_signaling/snakews/sm/adb_SnakeException3.h \
+	       source/subsystem_signaling/snakews/sm/adb_SnakeException.h \
+	       source/subsystem_signaling/snakews/sm/adb_UserNotRegisteredException2.h \
+	       source/subsystem_signaling/snakews/sm/adb_UserNotRegisteredException.h \
+	       source/subsystem_signaling/snakews/sm/stub_ServicesManagerUserStubService.h
+
 
 
 
@@ -529,7 +581,8 @@ if LDAPCONTACTS_SUPPORT
 plugins_LTLIBRARIES += ldappb.la
 ldappb_la_CPPFLAGS = $(AM_CPPFLAGS)
 ldappb_la_LDFLAGS = $(plugins_LDFLAGS)
-ldappb_la_SOURCES = source/subsystem_contacts/LdapPhoneBookIo.cxx
+ldappb_la_SOURCES = source/subsystem_contacts/LdapPhoneBookIo.cxx \
+		    source/subsystem_contacts/LdapPhoneBookIo.h
 ldappb_la_LIBADD = libminisip.la $(MUTIL_LIBS) $(MNETUTIL_LIBS)
 endif LDAPCONTACTS_SUPPORT
 

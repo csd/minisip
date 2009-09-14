@@ -7,7 +7,7 @@
        * by the Apache Axis2/Java version: 1.4.1  Built on : Aug 13, 2008 (05:03:35 LKT)
        */
 
-      #include "axis2_stub_PresenceAgentUserStubService.h"
+      #include "stub_PresenceAgentUserStubService.h"
       #include <axis2_msg.h>
 
       /**
