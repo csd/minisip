@@ -29,7 +29,7 @@
 
 #include"cb_src/axis2_stub_CallbackServiceUserStubService.h"
 #include"sm_src/axis2_stub_ServicesManagerUserStubService.h"
-#include"pa_src/axis2_stub_PresenceAgentUserStubService.h"
+#include"pa/axis2_stub_PresenceAgentUserStubService.h"
 #include<libmsip/SipCommandString.h>
 
 using namespace std;
