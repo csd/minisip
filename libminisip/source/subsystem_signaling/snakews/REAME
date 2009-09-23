@@ -8,4 +8,5 @@ URL of files:
  http://esb.hdviper.org:8080/hdviper-presenceagent-us/PresenceAgentUserStub?wsdl
  http://esb.hdviper.org:8080/hdviper-callbackservice-us/CallbackServiceUserStub?wsdl
  http://esb.hdviper.org:8080/hdviper-servicesmanager-us/ServicesManagerUserStub?wsdl
+ http://esb.hdviper.org:8080/hdviper-bod-us/BoDServiceStub?wsdl
 
