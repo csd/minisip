@@ -1,5 +1,6 @@
 dist_pkgdata_DATA = \
 	insecure.png \
+	FreeSans.ttf \
 	minisip.glade \
 	minisip.png \
 	noplay.png \
