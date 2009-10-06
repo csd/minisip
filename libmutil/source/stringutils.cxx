@@ -36,6 +36,7 @@
 #include<libmutil/mtypes.h>
 #include<string>
 #include<iostream>
+#include<stdio.h>
 
 #ifdef _MSC_VER
 static int nocaseequal(char c1, char c2){
