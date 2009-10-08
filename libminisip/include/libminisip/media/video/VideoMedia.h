@@ -116,7 +116,11 @@ class LIBMINISIP_API VideoMediaSource : public MObject {
 
 		friend class VideoMedia;
 	private:
-		void addPacketToFrame( MRef<RtpPacket *> packet );
+		/**
+		 * @param flush Packet loss was detected, and previous
+		 *              data should be flushed to the decoder.
+		 */
+		void addPacketToFrame( MRef<RtpPacket *> packet, bool flush );
 
 		MRef<AVDecoder *> decoder;
 		MRef<VideoDisplay *> display;

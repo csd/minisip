@@ -107,6 +107,7 @@ class LIBMINISIP_API FileSoundSource : public SoundSource{
         virtual void pushSound(short *samples,
                                 int32_t nSamples,
                                 int32_t index,
+				int sampleRate,
                                 bool isStereo=false);
         
         /**

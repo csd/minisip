@@ -76,7 +76,7 @@ class LIBMINISIP_API RealtimeMedia : public Media {
 		 * @param marker whether or not the marker should be set
 		 * in the RTP header
 		 */
-		virtual void sendData( byte_t * data, uint32_t length, uint32_t ts, bool marker=false );
+		virtual void sendData( byte_t * data, uint32_t length, int samplerate, uint32_t ts, bool marker/*=false*/ );
 
 		/**
 		 * Used by the media sessions to register a RealtimeMediaStreamSender.
@@ -144,7 +144,7 @@ class LIBMINISIP_API RealtimeMedia : public Media {
 	protected:
 		RealtimeMedia( MRef<Codec *> defaultCodec );
 
-		RealtimeMedia( std::list<MRef<Codec *> > codecList );
+		RealtimeMedia( const std::list<MRef<Codec *> > & codecList );
 
 		std::list< MRef<Codec *> > codecList;
 		Mutex codecListLock;

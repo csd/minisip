@@ -111,7 +111,8 @@ class LIBMINISIP_API SoundSource : public MObject{
 		virtual void pushSound(short *samples,
 				int32_t nSamples,
 				int32_t index,
-				bool isStereo = false)=0;
+				int freq,
+				bool isStereo /* = false*/)=0;
 
 		/**
 		Read Samples from the SoundSource
@@ -244,6 +245,7 @@ class LIBMINISIP_API BasicSoundSource: public SoundSource{
 		void pushSound(short *samples,
 				int32_t nSamples,
 				int32_t index,
+				int samplerate,
 				bool isStereo = false);
 
 
@@ -285,6 +287,10 @@ class LIBMINISIP_API BasicSoundSource: public SoundSource{
 			if rtp packets come in burst  ... 
 		*/
 		CircularBuffer * cbuff;
+
+		int oFreq;
+
+		uint16_t plc_lastdata[4096];
 		
 		/**
 		Auxiliary buffer .. used both in pushSound() and getSound().

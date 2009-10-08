@@ -47,7 +47,7 @@ class LIBMINISIP_API SoundRecorderCallback{
 		* @param length length of samplearr
 		* @see SoundCard
 		*/
-		virtual void srcb_handleSound(void *samplearr, int length)=0;
+		virtual void srcb_handleSound(void *samplearr, int length, int sample_freq)=0;
 		#ifdef AEC_SUPPORT
 		virtual void srcb_handleSound(void *samplearr, int length, void *samplearrR)=0;		//hanning
 		#endif

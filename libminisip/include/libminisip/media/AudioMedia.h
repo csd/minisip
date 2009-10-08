@@ -60,7 +60,7 @@ class LIBMINISIP_API AudioMedia : public RealtimeMedia, public SoundRecorderCall
 		* objects, representing the CODEC chosen by the user
 		* and sorted according to her preference
 		*/
-		AudioMedia( MRef<SoundIO *> soundIo, std::list<MRef<Codec *> > codecList );
+		AudioMedia( MRef<SoundIO *> soundIo, const std::list<MRef<Codec *> > & codecList );
 		
 		virtual std::string getMemObjectType() const {return "AudioMedia";}
 
@@ -120,7 +120,7 @@ class LIBMINISIP_API AudioMedia : public RealtimeMedia, public SoundRecorderCall
 		* @param samplearr pointer to the audio samples
 		* @param length length of samplearr
 		*/
-		virtual void srcb_handleSound( void *samplearr, int length );
+		virtual void srcb_handleSound( void *samplearr, int length, int samplerate );
 		#ifdef AEC_SUPPORT 
 		virtual void srcb_handleSound( void *samplearr, int length, void *samplearrR);	//hanning
 		#endif
@@ -136,7 +136,7 @@ class LIBMINISIP_API AudioMedia : public RealtimeMedia, public SoundRecorderCall
 		* @param marker whether or not the marker should be set
 		* in the RTP header
 		*/
-		virtual void sendData( byte_t * data, uint32_t length, uint32_t ts, bool marker );
+		virtual void sendData( byte_t * data, uint32_t nsamples, int samplerate, uint32_t ts, bool marker );
 
 		/**
 		* Used to start the playout of a ringtone, contained
@@ -168,7 +168,7 @@ class LIBMINISIP_API AudioMedia : public RealtimeMedia, public SoundRecorderCall
 		MRef<SoundIO *> soundIo;                 
 		uint32_t seqNo;
 		byte_t encoded[1600];                 
-		short resampledData[160];
+		short resampledData[1600];
 		#ifdef AEC_SUPPORT
 		short resampledDataR[160];		//hanning
 		static AEC aec;				//hanning
