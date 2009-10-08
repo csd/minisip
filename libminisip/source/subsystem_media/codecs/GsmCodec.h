@@ -55,7 +55,7 @@ class GsmCodecState: public CodecState{
 		GsmCodecState();
 		~GsmCodecState();
 
-		uint32_t encode( void *inBuf, int32_t inSize, void *outBuf );
+		uint32_t encode( void *inBuf, int32_t inSize, int samplerate, void *outBuf );
 		uint32_t decode( void *inBuf, int32_t inSize, void *outBuf );
 
 		std::string getMemObjectType() const {return "GsmCodecState";};

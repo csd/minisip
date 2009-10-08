@@ -70,7 +70,7 @@ G711Codec::~G711Codec(){
 G711CodecState::G711CodecState( G711Version v): version( v ){
 }
 
-uint32_t G711CodecState::encode(void *in_buf, int32_t in_buf_size, void *out_buf){
+uint32_t G711CodecState::encode(void *in_buf, int32_t in_buf_size, int samplerate, void *out_buf){
 	massert(in_buf_size==2*160);
 	
 	short *in_data = (short*)in_buf;

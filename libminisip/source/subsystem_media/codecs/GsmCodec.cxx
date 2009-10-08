@@ -95,7 +95,7 @@ GsmCodecState::~GsmCodecState(){
 	gsm_destroy( gsmState );
 }
 
-uint32_t GsmCodecState::encode( void *inBuf, int32_t inSize, void *outBuf ){
+uint32_t GsmCodecState::encode( void *inBuf, int32_t inSize, int samplerate, void *outBuf ){
 	if( inSize != GSM_EXEPECTED_INPUT * sizeof( short ) ){
 		return 0;
 	}

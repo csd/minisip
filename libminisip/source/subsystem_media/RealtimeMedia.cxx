@@ -13,7 +13,7 @@ RealtimeMedia::RealtimeMedia(MRef<Codec *> codec ){
 }
 
 // pn430 Function added for multicodec
-RealtimeMedia::RealtimeMedia( std::list<MRef<Codec *> > codecListing ){
+RealtimeMedia::RealtimeMedia( const std::list<MRef<Codec *> >& codecListing ){
 	codecList = codecListing;
 	//selectedCodec = defaultCodec;
 }
@@ -57,7 +57,7 @@ void RealtimeMedia::unregisterRealtimeMediaSender( MRef<RealtimeMediaStreamSende
 	sendersLock.unlock();
 }
 
-void RealtimeMedia::sendData( byte_t * data, uint32_t length, uint32_t ts, bool marker ){
+void RealtimeMedia::sendData( byte_t * data, uint32_t length, int sampleRate, uint32_t ts, bool marker ){
 	list< MRef<RealtimeMediaStreamSender *> >::iterator i;
 	sendersLock.lock();
 	for( i = senders.begin(); i != senders.end(); i++ ){

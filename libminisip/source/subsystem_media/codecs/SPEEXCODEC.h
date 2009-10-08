@@ -41,7 +41,7 @@ class SpeexCodecState : public CodecState{
 		/**
 		 * @returns Number of bytes in output buffer
 		 */
-		virtual uint32_t encode(void *in_buf, int32_t in_buf_size, void *out_buf);
+		virtual uint32_t encode(void *in_buf, int32_t in_buf_size, int samplerate, void *out_buf);
 
 		/**
 		 * 
@@ -53,11 +53,11 @@ class SpeexCodecState : public CodecState{
 		void         *enc_state; 
 		void         *dec_state; 
 		SpeexBits    bits;   	 
-		float 	     input_frame[160]; 
+//		float 	     input_frame[320]; 
 		int	     nbBytes;		
 		char         bytes_ptr[MAX_NB_BYTES];  
 		char        *input_bytes;    
-		float       *output_frame;  
+//		float       *output_frame;  
 		int          frame_size;
 };
 

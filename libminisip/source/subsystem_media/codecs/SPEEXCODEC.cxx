@@ -59,21 +59,36 @@ SpeexCodecState::SpeexCodecState(){
 	
 	
 	// As a start, just use the narrow-band mode is implemented
-	enc_state = speex_encoder_init(&speex_nb_mode); 
+	enc_state = speex_encoder_init(&speex_wb_mode); 
 	
 	// This will hand in the frame size used by the encoder
-	speex_encoder_ctl(enc_state,SPEEX_GET_FRAME_SIZE,&frame_size);
 
+
+	int ok;
+
+	int sample_rate=16000;
+	ok = speex_decoder_ctl(enc_state, SPEEX_SET_SAMPLING_RATE, &sample_rate);
+	massert(ok>=0);
+
+	ok = speex_encoder_ctl(enc_state,SPEEX_GET_FRAME_SIZE,&frame_size);
+	massert(ok>=0);
+	cerr <<"EEEE: SPEEX encoder frame_size="<<frame_size<<endl;
 	
+
+
 	// Decoder Initialization
 	
 	// As a start, just use the narrow-band mode is implemented
-	dec_state = speex_decoder_init(&speex_nb_mode); 
+	dec_state = speex_decoder_init(&speex_wb_mode); 
+
+	ok = speex_decoder_ctl(dec_state, SPEEX_SET_SAMPLING_RATE, &sample_rate);
+	massert(ok>=0);
 	
 	// This will hand in the frame size used by the decoder  
-	speex_decoder_ctl(dec_state, SPEEX_GET_FRAME_SIZE, &frame_size);
+	ok=speex_decoder_ctl(dec_state, SPEEX_GET_FRAME_SIZE, &frame_size);
+	cerr <<"EEEE: SPEEX decoder frame_size="<<frame_size<<endl;
 	
-	output_frame = new float[160];
+//	output_frame = new float[320];
 	
 }
 
@@ -82,21 +97,21 @@ SpeexCodecState::~SpeexCodecState(){
 	speex_bits_destroy(&bits);
 	speex_encoder_destroy(enc_state);
 	speex_decoder_destroy(dec_state);
-	delete [] output_frame;
+	//delete [] output_frame;
 }
 
 
-uint32_t SpeexCodecState::encode(void *in_buf, int32_t in_buf_size, void *out_buf){
+uint32_t SpeexCodecState::encode(void *in_buf, int32_t in_buf_size, int samplerate, void *out_buf){
 
 
-	for (int i=0; i< in_buf_size; i++){
-		input_frame[i]= (float) ((short*)in_buf)[i];
-	}
+//	for (int i=0; i< in_buf_size; i++){
+//		input_frame[i]= (float) ((short*)in_buf)[i];
+//	}
 	
 	
 	//  now for every input frame:
 	speex_bits_reset(&bits);
-	speex_encode(enc_state, input_frame, &bits);
+	speex_encode_int(enc_state, (short*)in_buf, &bits);
 	// returns the number of bytes that need to be written
 	//int bNum = speex_bits_nbytes(&bits); 
 	nbBytes = speex_bits_write(&bits, (char*)out_buf, MAX_NB_BYTES);
@@ -117,15 +132,10 @@ uint32_t SpeexCodecState::decode(void *in_buf, int32_t in_buf_size, void *out_bu
 
 	// for every input frame:
 	speex_bits_read_from(&bits, input_bytes, in_buf_size);
-	speex_decode(dec_state, &bits, output_frame);
+	//speex_decode(dec_state, &bits, output_frame);
+	speex_decode_int(dec_state, &bits, (short*)out_buf);
 	
-	for (int i=0; i< 160; i++){
-		((short *)out_buf)[i]= (short)output_frame[i];
-	}
-
-	return 160;
-
-
+	return 320;
 }
 
 SpeexCodec::SpeexCodec( MRef<Library *> lib ): AudioCodec( lib ){
@@ -136,7 +146,7 @@ int32_t SpeexCodec::getSamplingSizeMs(){
 }
 
 int32_t SpeexCodec::getSamplingFreq(){
-	return 8000;
+	return 16000;
 }
 
 
@@ -148,7 +158,7 @@ int32_t SpeexCodec::getEncodedNrBytes(){
 
 
 int32_t SpeexCodec::getInputNrSamples(){
-	return 160;
+	return 320;
 }
 
 string SpeexCodec::getCodecName(){
@@ -156,7 +166,7 @@ string SpeexCodec::getCodecName(){
 }
 
 string SpeexCodec::getCodecDescription(){
-	return "SPEEX 8kHz, Speex";
+	return "SPEEX 16kHz, Speex";
 	// for now we are only using narrow-band (8kHz)
 
 }
@@ -169,7 +179,7 @@ uint8_t SpeexCodec::getSdpMediaType(){
 }
 
 string SpeexCodec::getSdpMediaAttributes(){
-	return "speex/8000/1";
+	return "speex/16000/1";
 	//     <encoding_name>/<clock_rate>/<number_of_channels(for audio streams)>
 	//     Here we use the narrow-band (8000) using only one channel (non-sterio)
 }

@@ -73,10 +73,11 @@ using namespace std;
 //                Media(codec),
 //                soundIo(soundIo){
 AudioMedia::AudioMedia( MRef<SoundIO *> soundIo_, 
-			std::list<MRef<Codec *> > codecList_):
-							RealtimeMedia(codecList_),
-							soundIo(soundIo_){
+			const std::list<MRef<Codec *> > & codecList_):
+							RealtimeMedia(codecList_)//,
+							/*soundIo(soundIo_)*/{
 						
+	soundIo = soundIo_;
 	// for audio media, we assume that we can both send and receive
 	receive = true;
 	send = true;
@@ -162,9 +163,11 @@ void AudioMedia::playData( MRef<RtpPacket *> packet ){
 
 //this function is called from SoundIO::recorderLoop
 //the void *data is originally a short *
-void AudioMedia::srcb_handleSound( void * data, int length){
-	resampler->resample( (short *)data, resampledData );
-	sendData( (byte_t*) &resampledData, 160*sizeof(short), 0, false );
+void AudioMedia::srcb_handleSound( void * data, int nsamples, int samplerate){
+//	resampler->resample( (short *)data, resampledData );
+//	sendData( (byte_t*) &resampledData, 160*sizeof(short), 0, false );
+
+	sendData( (byte_t*) data, nsamples, samplerate, 0, false );
 	seqNo ++;
 }
 
@@ -181,12 +184,12 @@ void AudioMedia::srcb_handleSound( void * data, int length, void * dataR){				//
 }
 #endif
 
-void AudioMedia::sendData( byte_t * data, uint32_t length, uint32_t ts, bool marker ){
+void AudioMedia::sendData( byte_t * data, uint32_t nsamples, int samplerate, uint32_t ts, bool marker ){
 
 	//all these zerodata vars are used to send silence to muted senders
 	//we need a silence data vector, as we cannot simply erase the data vector, 
 	//as it is shared by all media stream senders ... 
-	static byte_t zeroData[160*sizeof(short)]; //this needs to be of _length_ length
+	static byte_t zeroData[160*sizeof(short)*10]; //this needs to be of _length_ length
 	static bool zeroDataInit = false;
 	bool encodeZeroData;
 	
@@ -194,7 +197,7 @@ void AudioMedia::sendData( byte_t * data, uint32_t length, uint32_t ts, bool mar
 	
 	if( ! zeroDataInit ) {
 		zeroDataInit = true;
-		for( uint32_t i = 0; i<length; i++ ) zeroData[i] = 0; 
+		for( uint32_t i = 0; i<nsamples*sizeof(short); i++ ) zeroData[i] = 0; 
 	}
 	
 	list< MRef<RealtimeMediaStreamSender *> >::iterator i;
@@ -221,7 +224,10 @@ void AudioMedia::sendData( byte_t * data, uint32_t length, uint32_t ts, bool mar
 
 		//if we must send silence (zeroData), encode it ... 
 		if( encodeZeroData ) {
-			encodedLength = selectedCodec->encode( &zeroData, length, encoded );
+
+			int sfreq = ((AudioCodec*)(*selectedCodec->getCodec()))->getSamplingFreq();
+			
+			encodedLength = selectedCodec->encode( &zeroData, sfreq==8000?160*sizeof(short):320*sizeof(short), sfreq, encoded);
 		} else {
 
 
@@ -238,16 +244,27 @@ void AudioMedia::sendData( byte_t * data, uint32_t length, uint32_t ts, bool mar
 				for( iSource = sources.begin(); iSource != sources.end(); iSource ++ ){
 					if ( (*iSource)->getCallId()!= (*i)->getCallId() ){
 						short *stream = (*iSource)->getCodecOutputBuffer();
-						for (uint32_t ii=0; ii< length/2; ii++)
+						for (uint32_t ii=0; ii< nsamples; ii++)
 							((short*)data)[ii] += stream[ii];
 						
 
 					}
 				}
 			}
-			encodedLength = selectedCodec->encode( data, length, encoded );
+			int sfreq = ((AudioCodec*)(*selectedCodec->getCodec()))->getSamplingFreq();
+			if (sfreq==8000 && SOUND_CARD_FREQ!=8000){
+				resampler->resample( (short *)data, resampledData );
+				encodedLength = selectedCodec->encode( resampledData, nsamples/2*sizeof(short), 8000, encoded);
+			}else{ 
+				if (sfreq==SOUND_CARD_FREQ){
+					cerr <<"EEEE: NOT resampling sending native"<<endl;
+					encodedLength = selectedCodec->encode(data, nsamples*sizeof(short), SOUND_CARD_FREQ, encoded);
+				}else{
+					massert(1==0);
+				}
+			}
 		}
-	
+
 		(*i)->send( encoded, encodedLength, &givenTs, marker );
 	}
 	
@@ -312,9 +329,9 @@ void AudioMediaSource::playData( MRef<RtpPacket *> rtpPacket ){
 
 	if( codec ){
 		uint32_t outputSize = codec->decode( rtpPacket->getContent(), rtpPacket->getContentLength(), codecOutput );
+		int sfreq = ((AudioCodec*)(*codec->getCodec()))->getSamplingFreq();
 
-		pushSound( codecOutput,
-			outputSize, hdr.getSeqNo() );
+		pushSound( codecOutput, outputSize, sfreq, hdr.getSeqNo(), false);
 		
         }
 

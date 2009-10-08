@@ -41,7 +41,7 @@ class G711CodecState : public CodecState{
 		/**
 		* @returns Number of bytes in output buffer
 		*/
-		virtual uint32_t encode(void *in_buf, int32_t in_buf_size, void *out_buf);
+		virtual uint32_t encode(void *in_buf, int32_t in_buf_size, int samplerate, void *out_buf);
 
 		/**
 		*
