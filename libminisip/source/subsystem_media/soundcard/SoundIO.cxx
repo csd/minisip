@@ -225,6 +225,7 @@ void *SoundIO::recorderLoop(void *sc_arg){
 	for (i=0; i<2; i++){
 		//buffers[i] = (short *)malloc(soundcard->recorder_buffer_size*sizeof(short)*2);
 		buffers[i] = (short *)malloc(4096);
+		memset(buffers[i],0,4096);
 	}
 		
 	short * tempBuffer=NULL;
@@ -264,6 +265,8 @@ void *SoundIO::recorderLoop(void *sc_arg){
 				nread = soundcard->soundDevIn->read( 
 						(byte_t *)buffers[i%2], 
 						soundcard->recorder_buffer_size );
+				//cerr <<"EEEE: SoundIO: read n="<<nread<<endl;
+				//cerr <<"EEEE: SoundIO: data is"<<binToHex((unsigned char*)buffers[i%2], soundcard->recorder_buffer_size*2)<<endl;
 		}
 				
 		soundcard->soundDevIn->unlockRead();
@@ -314,9 +317,12 @@ void *SoundIO::recorderLoop(void *sc_arg){
 							soundcard->recorder_buffer_size,
 							tempBufferR); //hanning
 					#else
+					//cerr <<"EEEE: SoundIO: data is"<<binToHex((unsigned char*)tempBuffer, soundcard->recorder_buffer_size*2)<<endl;
 					(*cb)->getCallback()->srcb_handleSound(
 							tempBuffer, 
-							soundcard->recorder_buffer_size);
+							soundcard->recorder_buffer_size,
+							soundcard->samplingRate
+							);
 					#endif
 					
 					

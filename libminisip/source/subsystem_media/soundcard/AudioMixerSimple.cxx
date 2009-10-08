@@ -133,6 +133,7 @@ bool AudioMixerSimple::normalizeStereo( int32_t length ) {
 	short * outbuff = outputBuffer;
 	int32_t * inbuff = mixBuffer;
 	int32_t * sample = new int32_t[2];
+
 	
 	//indicates the end ...
 	short * end = outbuff + length;
@@ -144,7 +145,7 @@ bool AudioMixerSimple::normalizeStereo( int32_t length ) {
 		sample[0] = (*inbuff * normalizeFactor) >> 6;
 		inbuff++;
 		sample[1] = (*inbuff * normalizeFactor) >> 6;
-		
+
 		if( abs(sample[0]) > NORMALIZE_MAX_RANGE) {
 			normalizeFactor = abs( (NORMALIZE_MAX_RANGE<<6) / (*inbuff) );
 			if( sample[0] < 0 )

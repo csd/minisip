@@ -52,10 +52,10 @@ FileSoundSource::FileSoundSource(string callId, string filename,
 	m = file.tellg();
 	
 	nSamples = (m-l)/(sizeof(short)*inputNChannels);
-	cerr << "nSample: " << nSamples << endl;
+	cerr << "FileSoundSource: nSample: " << nSamples << endl;
 
 	nOutputFrames = ( outputDurationMs * inputFreq ) / 1000;
-	cerr << "nOutputFrames: " << nOutputFrames << endl;
+	cerr << "FileSoundSource: nOutputFrames: " << nOutputFrames << endl;
 	
 	input = new short[nSamples*inputNChannels];
 	
@@ -139,6 +139,7 @@ void FileSoundSource::disable(){
 void FileSoundSource::pushSound(short *,
 				int32_t ,
 				int32_t ,
+				int ,
 				bool )
 {
 #ifdef DEBUG_OUTPUT

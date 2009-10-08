@@ -76,15 +76,18 @@ BasicSoundSource::BasicSoundSource(int32_t id,
 		SoundSource(id, callId),
 		plcProvider(plc)   {
 	this->oNChannels = oNChannels;
+	this->oFreq = oFreq;
         
 	this->position=position;
 
 	oFrames = ( oDurationMs * oFreq ) / 1000;
-	iFrames = ( oDurationMs * 8000 ) / 1000;
+//	iFrames = ( oDurationMs * 8000 ) / 1000;
+	iFrames = oFrames;
 	
 	resampler = ResamplerRegistry::getInstance()->create( 8000, oFreq, oDurationMs, oNChannels );
 
 	temp = new short[iFrames * oNChannels];
+	memset(temp,0,iFrames * oNChannels*sizeof(short));
 	
 	//FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME
 	//With this implementation, we keep losing audio ... 
@@ -129,8 +132,10 @@ int nget=1;
 void BasicSoundSource::pushSound(short * samples,
 				int32_t nMonoSamples,
 				int32_t index,
+				int sampleRate,
 				bool isStereo)
 {
+
 #ifdef DEBUG_OUTPUT
 	npush++;
 	if (npush%1000 == 0) {
@@ -164,7 +169,10 @@ void BasicSoundSource::pushSound(short * samples,
 	//Otherwise, transform them from mono to stereo (copy them twice ... ).
 	int writeRet=false;
 	if( isStereo ) {
-		writeRet = cbuff->write( samples, nMonoSamples * 2, true );
+
+		//TODO: FIXME: handle case where sampleRate is > 8kHz
+		resampler->resample( samples, temp);
+		writeRet = cbuff->write( temp, nMonoSamples * 2, true );
 	} else {
 		int tempVal;
 
@@ -180,11 +188,22 @@ void BasicSoundSource::pushSound(short * samples,
 				tempVal ++;
 				temp[ tempVal ] = samples[i];
 			}
-			writeRet = cbuff->write( temp, cur * 2, true );
-			samples += cur;
-			nSamples -= cur;
+
+			if (sampleRate==oFreq){
+				writeRet = cbuff->write( temp, cur * 2, true );
+				samples += cur;
+				nSamples -= cur;
+			}else{
+				short temp2[2048];
+				resampler->resample( temp, temp2);
+				writeRet = cbuff->write( temp2, cur * 2*2, true );
+				samples += cur;
+				nSamples -= cur;
+			}
 		}
 	}
+
+
 	bufferLock.unlock();
 #ifdef DEBUG_OUTPUT
 	if( writeRet == false ) {
@@ -256,7 +275,9 @@ void BasicSoundSource::getSound(short *dest,
 		cerr << "BasicSoundSource::pushSound - Buffer read error"<<endl;
 	}
 #endif
-	resampler->resample( temp, dest );
+//	resampler->resample( temp, dest );
+	memcpy(dest,temp,iFrames * oNChannels * sizeof( short ) );
+
 // 	memset( dest, 0, oFrames * oNChannels * sizeof( short ) ); 
 	bufferLock.unlock();
 	

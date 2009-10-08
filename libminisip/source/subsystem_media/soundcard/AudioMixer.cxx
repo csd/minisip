@@ -63,17 +63,21 @@ bool AudioMixer::init( uint32_t numChannels_ ) {
 	
 	this->numChannels = numChannels_;
 	this->frameSize = (SOUND_CARD_FREQ * 20) / 1000;	
-	
+
 	//we may need to re-new the buffers if 
 	//either of these change ... 
 	if( !outputBuffer || hasChanged ) {
+		massert(this->numChannels * this->frameSize);
 		outputBuffer = new short[this->numChannels * this->frameSize];
+		memset(outputBuffer,0,this->numChannels * this->frameSize*sizeof(short));
 	}
 	if( !inputBuffer || hasChanged ) {
 		inputBuffer = new short[this->numChannels * this->frameSize];
+		memset(inputBuffer, 0, this->numChannels * this->frameSize*sizeof(short));
 	}
 	if( !mixBuffer || hasChanged ) {
 		mixBuffer = new int32_t[this->numChannels * this->frameSize];
+		memset(mixBuffer,0,this->numChannels * this->frameSize*sizeof(int32_t));
 	}
 #ifdef DEBUG_OUTPUT	
 	cerr << "AudioMixer::init() ... initializing audio mixer" << endl;
