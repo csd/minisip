@@ -257,8 +257,11 @@ void AudioMedia::sendData( byte_t * data, uint32_t nsamples, int samplerate, uin
 				encodedLength = selectedCodec->encode( resampledData, nsamples/2*sizeof(short), 8000, encoded);
 			}else{ 
 				if (sfreq==SOUND_CARD_FREQ){
-					cerr <<"EEEE: NOT resampling sending native"<<endl;
+					//cerr <<"EEEE: NOT resampling sending native"<<endl;
+
+
 					encodedLength = selectedCodec->encode(data, nsamples*sizeof(short), SOUND_CARD_FREQ, encoded);
+					//cerr <<"EEEE: ENCODE DONE, length="<<encodedLength<<endl;
 				}else{
 					massert(1==0);
 				}
@@ -330,8 +333,10 @@ void AudioMediaSource::playData( MRef<RtpPacket *> rtpPacket ){
 	if( codec ){
 		uint32_t outputSize = codec->decode( rtpPacket->getContent(), rtpPacket->getContentLength(), codecOutput );
 		int sfreq = ((AudioCodec*)(*codec->getCodec()))->getSamplingFreq();
+		//cerr <<"EEEE: -------------------------> decode len="<<outputSize<<" sfreq="<<sfreq<<endl;
+		//cerr <<"EEEE: decoded data="<<binToHex((unsigned char*)codecOutput,outputSize*2)<<endl;
 
-		pushSound( codecOutput, outputSize, sfreq, hdr.getSeqNo(), false);
+		pushSound( codecOutput, outputSize, hdr.getSeqNo(), sfreq, false);
 		
         }
 
