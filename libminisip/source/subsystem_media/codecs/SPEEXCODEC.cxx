@@ -57,15 +57,19 @@ SpeexCodecState::SpeexCodecState(){
 	
 	//  Encoder Initialization
 	
-	
+
+	const SpeexMode *speex_mode;
+	speex_mode = speex_lib_get_mode(SPEEX_MODEID_WB);
 	// As a start, just use the narrow-band mode is implemented
-	enc_state = speex_encoder_init(&speex_wb_mode); 
+	enc_state = speex_encoder_init(speex_mode); 
+
+	massert(enc_state);
 	
 	// This will hand in the frame size used by the encoder
 
 
 	int ok;
-
+#if 0
 	int sample_rate=16000;
 	ok = speex_decoder_ctl(enc_state, SPEEX_SET_SAMPLING_RATE, &sample_rate);
 	massert(ok>=0);
@@ -73,21 +77,30 @@ SpeexCodecState::SpeexCodecState(){
 	ok = speex_encoder_ctl(enc_state,SPEEX_GET_FRAME_SIZE,&frame_size);
 	massert(ok>=0);
 	cerr <<"EEEE: SPEEX encoder frame_size="<<frame_size<<endl;
-	
+
+	int bitrate;
+	speex_encoder_ctl(enc_state, SPEEX_GET_BITRATE, &bitrate);
+	cerr <<"EEEE: SPEEX: bitrate="<<bitrate<<endl;
+
+#endif	
 
 
 	// Decoder Initialization
 	
 	// As a start, just use the narrow-band mode is implemented
-	dec_state = speex_decoder_init(&speex_wb_mode); 
+	dec_state = speex_decoder_init(speex_mode); 
+	massert(dec_state);
 
+#if 0
 	ok = speex_decoder_ctl(dec_state, SPEEX_SET_SAMPLING_RATE, &sample_rate);
 	massert(ok>=0);
 	
 	// This will hand in the frame size used by the decoder  
 	ok=speex_decoder_ctl(dec_state, SPEEX_GET_FRAME_SIZE, &frame_size);
+	massert(ok>=0);
 	cerr <<"EEEE: SPEEX decoder frame_size="<<frame_size<<endl;
-	
+#endif
+
 //	output_frame = new float[320];
 	
 }
@@ -109,23 +122,23 @@ uint32_t SpeexCodecState::encode(void *in_buf, int32_t in_buf_size, int samplera
 //	}
 	
 	
+	cerr <<"EEEE: Speex: in_buf_size="<<in_buf_size<<endl;
 	//  now for every input frame:
 	speex_bits_reset(&bits);
+	cerr <<"EEEE: doing speex_encode_int"<<endl;
 	speex_encode_int(enc_state, (short*)in_buf, &bits);
+	cerr <<"EEEE: done doing speex_encode_int"<<endl;
 	// returns the number of bytes that need to be written
 	//int bNum = speex_bits_nbytes(&bits); 
-	nbBytes = speex_bits_write(&bits, (char*)out_buf, MAX_NB_BYTES);
+	nbBytes = speex_bits_write(&bits, (char*)out_buf,/* MAX_NB_BYTES*/ 640);
 	
-	//out_buf = (void *) bytes_ptr;  // not sure
-	//cerr << print_hex((unsigned char*)(out_buf), nbBytes)<<endl; 
-
 	return nbBytes;
-
 }
 
 uint32_t SpeexCodecState::decode(void *in_buf, int32_t in_buf_size, void *out_buf){
 
 
+	cerr <<"EEEE: SPEEX decode running;"<<endl;
 	input_bytes = (char *) in_buf;  // should in_buf also be changed to short (as in encode function)?  If so, then then you should have a for loop here
 	//nbBytes = (int) in_buf_size;
 
