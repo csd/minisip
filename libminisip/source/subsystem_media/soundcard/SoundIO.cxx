@@ -41,6 +41,7 @@
 #include<iostream>
 #include<stdio.h>
 #include<stdlib.h>
+#include<string.h>
 
 #include<libminisip/media/soundcard/SoundIO.h>
 #include<libminisip/media/soundcard/SoundSource.h>
