@@ -62,11 +62,11 @@ VideoMedia::VideoMedia( MRef<Codec *> codec, MRef<VideoDisplay *> display, MRef<
         sendingHeight = 144;
 
 #if 1
-	cerr <<"EEEE: VideoDisplay::VideoMedia: start creating display..."<<endl;
+	//cerr <<"EEEE: VideoDisplay::VideoMedia: start creating display..."<<endl;
 	MRef<VideoDisplay *> localVideoDisplay = VideoDisplayRegistry::getInstance()->createDisplay( receivingWidth, receivingHeight, false, false );
-	cerr <<"EEEE: VideoDisplay::VideoMedia: start setting local display..."<<endl;
+	//cerr <<"EEEE: VideoDisplay::VideoMedia: start setting local display..."<<endl;
 	grabber->setLocalDisplay(localVideoDisplay);
-	cerr <<"EEEE: VideoDisplay::VideoMedia: done setting local display..."<<endl;
+	//cerr <<"EEEE: VideoDisplay::VideoMedia: done setting local display..."<<endl;
 #endif
 
         addSdpAttribute( "framesize:34 " + itoa( receivingWidth ) + "-" + itoa( receivingHeight ) );
@@ -118,7 +118,7 @@ void VideoMedia::playData( MRef<RtpPacket *> packet ){
 
 
 void VideoMedia::sendVideoData( byte_t * data, uint32_t length, uint32_t ts, bool marker ){
-        sendData( data, length, ts, marker );
+        sendData( data, length, 90000, ts, marker );
 }
 
 void VideoMedia::registerMediaSource( uint32_t ssrc, string callId ){
@@ -345,7 +345,7 @@ int rtpSeqDiff(int prev, int now){
 
 	if (ldiff > 0xFFFF-1000){ //undo wrapping so that later sequence numbers are larger
 		*smallest+=0x10000;
-		cerr <<"Detected wrap!"<<endl;
+		//cerr <<"Detected wrap!"<<endl;
 	}
 
 	//cerr << "now="<<now<<" prev="<<prev<<endl;
@@ -366,20 +366,21 @@ void VideoMediaSource::enqueueRtp(MRef<RtpPacket*> rtp){
 		rtpReorderBuf.insert(i,rtp);
 	}
 
-/*	cerr << "EEEE: after enqueueRtp: sequence numbers: ";
+#if 0
+	//cerr << "EEEE: after enqueueRtp: sequence numbers: ";
 	list<MRef<RtpPacket*> >::iterator i;
 	for (i=i=rtpReorderBuf.begin(); i!=rtpReorderBuf.end(); i++)
 		cerr << (*i)->getHeader().getSeqNo()<<" ";
 	cerr <<endl;
-*/
+#endif
 }
 
 void VideoMediaSource::playSaved(){
 	while (rtpReorderBuf.size()>0 && rtpSeqDiff(lastPlayedSeqNo, (*rtpReorderBuf.begin())->getHeader().getSeqNo()  )==1){
-		cerr << "EEEE: playing another queued packet"<<endl;
 		MRef<RtpPacket*> packet=*rtpReorderBuf.begin();
 		int seqNo = packet->getHeader().getSeqNo();
-		addPacketToFrame( packet );
+		//cerr << "EEEE: playing another queued packet with seq="<<seqNo<<endl;
+		addPacketToFrame( packet, false );
 		rtpReorderBuf.pop_front();
 		lastSeqNo=seqNo;
 		lastPlayedSeqNo=seqNo;
@@ -389,6 +390,7 @@ void VideoMediaSource::playSaved(){
 
 void VideoMediaSource::playData( MRef<RtpPacket *> packet ){
 
+	int marker= packet->getHeader().marker;
 	int seqNo = packet->getHeader().getSeqNo();
 
 	//cerr << "EEEE: playData: lastseq="<<lastPlayedSeqNo<<", seqNo="<<seqNo<<endl;
@@ -402,9 +404,11 @@ void VideoMediaSource::playData( MRef<RtpPacket *> packet ){
 	}
 
 	int rtpDiff= rtpSeqDiff(lastPlayedSeqNo,seqNo);
+	//cerr <<"EEEE: rtpDiff=" << rtpDiff<<endl;
 
 	if (rtpDiff==1){ // no packet loss
-		addPacketToFrame(packet);
+		//cerr <<"EEEE: no packet loss - adding to frame"<<endl;
+		addPacketToFrame(packet, false);
 		lastSeqNo = seqNo;
 		lastPlayedSeqNo=lastSeqNo;
 		playSaved();
@@ -412,7 +416,7 @@ void VideoMediaSource::playData( MRef<RtpPacket *> packet ){
 	}
 
 	if (rtpDiff<0){
-		cerr << "EEEE: seq no "<< seqNo <<" too late - dropping"<<endl;
+		//cerr << "EEEE: seq no "<< seqNo <<" too late - dropping"<<endl;
 		return;
 	}
 
@@ -423,7 +427,7 @@ void VideoMediaSource::playData( MRef<RtpPacket *> packet ){
 
 
 	if (rtpDiff>4){
-		cerr << "EEEE: packet loss detected - plaaying quueued packeet"<<endl;
+		//cerr << "EEEE: packet loss detected - plaaying quueued packeet"<<endl;
 		lastPlayedSeqNo=(*(rtpReorderBuf.begin()))->getHeader().getSeqNo();
 		lastPlayedSeqNo--; 	//fake that it's time for the first in queue to play
 		lastSeqNo=lastPlayedSeqNo;
@@ -482,12 +486,20 @@ void VideoMediaSource::playData( MRef<RtpPacket *> packet ){
 #endif
 }
 
-void VideoMediaSource::addPacketToFrame( MRef<RtpPacket *> packet){
+void VideoMediaSource::addPacketToFrame( MRef<RtpPacket *> packet, bool flush){
+
+	if (flush){
+		//cerr <<"EEEE: addPacketToFrame: flushing"<<endl;
+		decoder->decodeFrame( frame, index);
+		index=0;
+	}
+
+
 	unsigned char *content = packet->getContent();
 	uint32_t clen = packet->getContentLength();
 	bool marker= packet->getHeader().marker;
 
-//	cerr << "EEEE: VideoMediaSource::addPacketToFrame: ssrc=" << ssrc << " len="<<clen<< " seq="<<packet->getHeader().getSeqNo() << " timestamp="<<packet->getHeader().getTimestamp()<<" marker="<<marker<<endl;
+	//cerr << "EEEE: VideoMediaSource::addPacketToFrame: ssrc=" << ssrc << " len="<<clen<< " seq="<<packet->getHeader().getSeqNo() << " timestamp="<<packet->getHeader().getTimestamp()<<" marker="<<marker<<endl;
 
 	if (!content || !clen)
 		return;
