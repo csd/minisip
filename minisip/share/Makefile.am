@@ -14,6 +14,7 @@ dist_pkgdata_DATA = \
         invite.raw \
 	no.raw \
 	person.raw \
+	rightarrow.raw \
 	settings.raw \
 	yes.raw
 
