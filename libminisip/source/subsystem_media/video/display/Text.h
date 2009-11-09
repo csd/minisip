@@ -24,13 +24,16 @@
         #endif
 #endif
 
+#define TEXT_ALIGN_LEFT 1
+#define TEXT_ALIGN_CENTER 2
+#define TEXT_ALIGN_RIGHT 3
 
 class TextTexture : public MObject {
 	public:
 		TextTexture(TTF_Font* font, std::string t, int size, SDL_Color fgc, SDL_Color bgc);
 		~TextTexture();
 
-		int getTexture(){return texture_handle;}
+		GLuint getTexture();//{return texture_handle;}
 		std::string getText(){return text;}
 		int getSize(){return fontsize;}
 
@@ -55,7 +58,7 @@ class TextTexture : public MObject {
 		int fontsize;
 		SDL_Color bgColor;
 		SDL_Color fgColor;
-		int texture_handle;
+		GLuint texture_handle;
 
 };
 
@@ -90,7 +93,7 @@ class Text : public MObject{
 
 		void draw2D(int x, int y, std::string text, int size, SDL_Color fgc, SDL_Color bgc);
 		void draw3D(float x, float y, float z, float scale, std::string text, int size, SDL_Color fgc, SDL_Color bgc, ScreenLocation *where=NULL);
-		void draw3D(float x1, float y1, float z1, float x2, float y2, float z2, std::string text, int size, SDL_Color fgc, SDL_Color bgc);
+		void draw3D(float x1, float y1, float z1, float x2, float y2, float z2, std::string text, int size, SDL_Color fgc, SDL_Color bgc, int align);
 		int getTextureWidth(std::string text, int size, SDL_Color fgc, SDL_Color bgc);
 		int getTextureHeight(std::string text, int size,  SDL_Color fgc, SDL_Color bgc);
 
