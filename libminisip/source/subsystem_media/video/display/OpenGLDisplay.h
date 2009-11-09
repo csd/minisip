@@ -72,6 +72,7 @@ class OpenGLDisplay: public VideoDisplay{
 		virtual bool handleCommand(CommandString cmd);
 
 		void sendCmd(CommandString cmd);
+		CommandString sendCmdResp(CommandString cmd);
 		
 		virtual void setCallback(MRef<CommandReceiver*> cb);
 
@@ -79,8 +80,21 @@ class OpenGLDisplay: public VideoDisplay{
 
 		void setPhoneConfig(MRef<SipSoftPhoneConfiguration*> conf);
 
+		bool isHidden(){
+			return hidden;
+		}
+	
+		void setHidden(bool h){
+			hidden=h;
+		}
+		
+		
+		uint64_t timeLastReceive;
 
+
+		Mutex dataLock;
 	private:
+		bool hidden;
 		int colorNBytes;
 		mgl_gfx *gfx;
 		
@@ -88,7 +102,6 @@ class OpenGLDisplay: public VideoDisplay{
 		uint8_t *rgb;
 		bool newRgbData;
 		bool needUpload;
-		Mutex dataLock;
 
 		uint32_t height;
 		uint32_t width;
@@ -98,6 +111,7 @@ class OpenGLDisplay: public VideoDisplay{
 
 		int nallocated;
 		std::list<MImage*> emptyImages;
+
 
 		void openDisplay();
 		virtual void createWindow();

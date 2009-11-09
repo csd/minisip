@@ -42,7 +42,9 @@
 #include<unistd.h>
 #include<sys/time.h>
 #include<fstream>
+#include<map>
 
+#include<libmutil/Timestamp.h>
 
 
 #include<libmutil/mtime.h>
@@ -95,10 +97,65 @@ struct mgl_gfx{
 	Animate* x2;
 	Animate* y2;
 	Animate* alpha;
+	Animate* rotate;
 	bool isSelected;
 	char* name;
 	char* callId;
 };
+
+class Notification{
+	public:
+		Notification(string message, Text* _text, int _textureGray){
+			gfx = new struct mgl_gfx;
+			memset(gfx,0, sizeof(struct mgl_gfx) );
+			gfx->name = strdup(message.c_str());
+			text=_text;
+			textureGray=_textureGray;
+		}
+		~Notification(){
+			delete gfx;
+			gfx=NULL;
+		}
+		
+		void draw(float lx1, float ly1,  float lx2, float ly2);
+
+		struct mgl_gfx* gfx;
+		Text* text;
+		int textureGray;
+};
+
+
+void Notification::draw(float x1, float y1, float x2, float y2){
+
+	static const SDL_Color white={255,255,255};
+	static const SDL_Color black={0,0,0};
+
+	glColor4f(1.0,1.0,1.0, 0.3);
+	glBindTexture( GL_TEXTURE_2D, textureGray);
+	massert(glGetError()==GL_NO_ERROR);
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	massert(glGetError()==GL_NO_ERROR);
+	glBegin( GL_QUADS );
+	glTexCoord2f( 0, 1.0 );
+	glVertex3f( x1 , y1, 0.0f );
+
+	glTexCoord2f( 1.0, 1.0 );
+	glVertex3f( x2, y1, 0.0f );
+
+	glTexCoord2f( 1.0, 0 );
+	glVertex3f( x2, y2, 0.0f );
+
+	glTexCoord2f( 0, 0 );
+	glVertex3f( x1, y2, 0.0f );
+	glEnd();
+	massert(glGetError()==GL_NO_ERROR);
+
+	cerr <<"EEEE: doing text->draw3d x1="<<x1<< " x2="<<x2<<" y1="<<y1<<" y2="<<y2<<endl;
+	text->draw3D( x1,0,0,  x2,y2,0, gfx->name, 16, white, black, TEXT_ALIGN_LEFT);
+}
+
+
 
 class Menu{
 public:
@@ -109,6 +166,17 @@ public:
 		selected=false;
 		text = _text;
 		toppicture=NULL;
+	}
+	Menu* select(int si){
+		list<Menu*>::iterator i;
+		int j=0;
+		Menu* ret=NULL;
+		for (i=mitems.begin();i!=mitems.end();i++,j++){
+			(*i)->selected = si==j;
+			if((*i)->selected)
+				ret=*i;
+		}
+		return ret;
 	}
 	int nVisible(){
 		int ret=0;
@@ -132,7 +200,7 @@ public:
 	///Returns currently selected menu
 	Menu* selectRight(){
 		Menu* ret=NULL;
-		cerr <<"EEEE: doing selectLeft"<<endl;
+		//cerr <<"EEEE: doing selectLeft"<<endl;
 		int s=getSelectedIndex();
 		list<Menu*>::iterator item=mitems.begin();
 		for (int i=0; i<s; i++)
@@ -156,7 +224,7 @@ public:
 	
 	///Returns currently selected menu
 	Menu* selectLeft(){
-		cerr <<"EEEE: doing selectRight"<<endl;
+		//cerr <<"EEEE: doing selectRight"<<endl;
 		int s=getSelectedIndex();
 
 		Menu*last=*mitems.begin();
@@ -173,7 +241,8 @@ public:
 
 		item=mitems.begin();
 		for (int i=0; i<s; i++){
-			prev=*item;
+			if ( (*item)->visible)
+				prev=*item;
 			item++;
 		}
 		(*item)->selected=false;
@@ -186,7 +255,7 @@ public:
 		int n=0;
 		list<Menu*>::iterator i;
 		for (i=mitems.begin();i!=mitems.end();i++, n++){
-			cerr <<"EEEE: comparing with <"<<(*i)->name<<">"<<endl;
+//			cerr <<"EEEE: comparing with <"<<(*i)->name<<">"<<endl;
 			if ((*i)->name==name)
 				return *i;
 		}
@@ -203,7 +272,219 @@ public:
 	CommandString command;
 	string text;
 	struct mgl_gfx* toppicture;
+	string toptext;
 };
+
+class AddressItem : public MObject {
+	public:
+		AddressItem(string _name, string _sipuri){
+			name=strdup(_name.c_str());
+			sipuri=strdup(_sipuri.c_str());
+			texture=0;
+			wu=wu=0;
+			aratio=0;
+			tex_dim=0;
+			x1=x2=y1=y2=NULL;
+			isSelected=false;
+		}
+		virtual ~AddressItem(){
+			if (name)
+				free(name);
+			if (sipuri)
+				free(sipuri);
+		}
+
+		GLuint texture;
+		float wu;	//width usage of texture (0..1). How much of texture is rendered
+		float hu;	//height usage
+		float aratio;   // width/height
+		int tex_dim;
+		Animate* x1;
+		Animate* y1;
+		Animate* x2;
+		Animate* y2;
+		Animate* alpha;
+		bool isSelected;
+		char* name;
+		char* sipuri;
+
+};
+
+
+
+class AddressItemList : public MObject{
+	public:
+		AddressItemList(string name){
+			listName=name;
+			lastSelect=0;
+		}
+		string listName;
+		list<MRef<AddressItem*> > addresses;
+		float headerx1,headery1,headerx2,headery2;
+		int lastSelect;
+
+		bool contains(string sipuri){
+			list<MRef<AddressItem*> >::iterator i;
+			for (i=addresses.begin(); i!=addresses.end(); i++){
+				if (sipuri==(*i)->sipuri)
+					return true;
+			}
+			return false;
+		}
+
+		void remove(string sipuri){
+			list<MRef<AddressItem*> >::iterator i;
+			for (i=addresses.begin(); i!=addresses.end(); i++){
+				if (sipuri==(*i)->sipuri){
+					addresses.erase(i);
+					return;
+				}
+			}
+		}
+
+		string getUri(int i){
+			list<MRef<AddressItem*> >::iterator li;
+			int j=0;
+			for (li=addresses.begin(); j<i; j++)
+				li++;
+			return (*li)->sipuri;
+		}
+
+
+
+		void selectnone(){
+			list<MRef<AddressItem*> >::iterator li;
+			int j=0;
+			for (li=addresses.begin(); li!=addresses.end(); li++)
+				(*li)->isSelected=false;
+		}
+
+
+		int select(int i){
+			selectnone();
+			if (i<0)
+				i=addresses.size()-1;
+			if (i>=addresses.size())
+				i=0;
+			list<MRef<AddressItem*> >::iterator li;
+			int j=0;
+			for (li=addresses.begin(); j<i; j++)
+				li++;
+			(*li)->isSelected=true;
+			return i;
+		}
+
+		int keyDown(int i){
+			if (i>=addresses.size())
+				i=0;
+			select(i);
+			return i;
+		}
+		int keyUp(int i){
+			if (i<0)
+				i=addresses.size()-1;
+			select(i);
+			return i;
+		}
+
+};
+
+
+class AddressBookMenu {
+	public:
+		AddressBookMenu(){
+			selectList=0;
+			selectItem=0;
+		}
+		MRef<AddressItemList*> getList(string name){
+			list< MRef<AddressItemList*> >::iterator i;
+			for (i=menuLists.begin(); i!=menuLists.end(); i++){
+				if ( (*i)->listName == name)
+					return *i;
+			}
+			return NULL;
+		}
+
+		string getSelectedUri(){
+			MRef<AddressItemList*> list = getAt(selectList);
+			return list->getUri(selectItem);
+		}
+
+		MRef<AddressItemList*> getAt(int i){
+			list<MRef<AddressItemList*> >::iterator li;
+			int j=0;
+			for (li=menuLists.begin(); j<i; j++)
+				li++;
+			return *li;
+		}
+
+		void keyDown(){
+			MRef<AddressItemList*> list = getAt(selectList);
+			selectItem++;
+			selectItem=list->keyDown(selectItem);
+			//cerr <<"EEEE: AddressBookMenu: selectList="<<selectList<<" selectItem="<<selectItem<<endl;
+			
+		}
+		void keyUp(){
+			MRef<AddressItemList*> list = getAt(selectList);
+			selectItem--;
+			selectItem=list->keyUp(selectItem);
+			//cerr <<"EEEE: AddressBookMenu: selectList="<<selectList<<" selectItem="<<selectItem<<endl;
+			
+		}
+		void keyLeft(){
+			MRef<AddressItemList*> oldlist = getAt(selectList);
+			oldlist->selectnone();
+			selectList--;
+			if (selectList<0)
+				selectList=menuLists.size()-1;
+			MRef<AddressItemList*> list = getAt(selectList);
+			if (list->addresses.size()==0)	//don't select empty list
+				list=oldlist;
+			selectItem=list->select(selectItem);
+			//cerr <<"EEEE: AddressBookMenu: selectList="<<selectList<<" selectItem="<<selectItem<<endl;
+		}
+		void keyRight(){
+
+			MRef<AddressItemList*> oldlist = getAt(selectList);
+			oldlist->selectnone();
+			selectList++;
+			if (selectList>=menuLists.size())
+				selectList=0;
+			MRef<AddressItemList*> list = getAt(selectList);
+			if (list->addresses.size()==0) //prevent going to empty list
+				list=oldlist;
+			selectItem=list->select(selectItem);
+			//cerr <<"EEEE: AddressBookMenu: selectList="<<selectList<<" selectItem="<<selectItem<<endl;
+		}
+		void updateSelected(){
+			//cerr <<"EEEE: getting list "<< selectList<<endl;
+			MRef<AddressItemList*> l = getAt(selectList);
+			massert(l);
+			if (l->addresses.size()==0){ //If list is empty, select next. This should only
+							//happen when noone is online
+				selectList++;
+				selectItem=0;
+				//cerr <<"EEEE: getting _next_ list "<< selectList<<endl;
+				l=getAt(selectList);
+			}
+			//cerr <<"EEEE: doing select"<<endl;
+			selectItem=l->select(selectItem);
+			//cerr <<"EEEE: done doing select"<<endl;
+		}
+
+
+
+
+
+
+		int selectList;
+		int selectItem;
+		list< MRef<AddressItemList*> > menuLists;
+};
+
+
+
 
 #define MENU_HIDDEN      1
 #define MENU_MAIN        2
@@ -214,6 +495,9 @@ public:
 #define VIDEO_EQUAL      1
 #define VIDEO_PREFERENCE 2
 #define VIDEO_TALKER     3
+
+#define LOCAL_VIDEO_OFF 1
+#define LOCAL_VIDEO_TRANSPARENT 2
 
 class OpenGLWindow : public Runnable {
 	public:
@@ -271,21 +555,50 @@ class OpenGLWindow : public Runnable {
 
 		///send command to callback
 		void send(CommandString cmd);
+		CommandString sendResp(CommandString cmd);
 		void incomingCall(string callid, string uri, bool unprotected);
+
+		void presenceUpdated(){addressBookUpdated=true;}
+		void join(){
+			thread->join();
+
+		}
+
+		void registerUri(string callid, string remoteuri){
+			id_uri[callid]=remoteuri;
+
+		}
+
+		void updateVideoLayout(){
+			displaysChanged=true;
+		}
+	
+		void showNotification(string message);
+
+		void notificationsDraw();
+
+		int nVisibleDisplays();
+
 	private:
+		std::map<string, string> id_uri;
 
 		 bool loadTexture(string name);
 
 
 		struct mgl_gfx* getIcon(string name);
 
+		void videoSelect(string key);
 		void findVideoArea(int video_n, int ntot, float &x1, float&y1, float &x2, float &y2, float lx1, float ly1, float lx2, float ly2, bool preferHorisontal, bool* selectedptr);
 		void setupMenu();
+		void updateMenu(bool animate);
 		void hideAcceptCallMenu(bool hideAllMenus);
 		void menuDrawAskAccept();
 		void menuDraw();
+		void menuLayout(bool animate);
 		void menuDrawSettings();
 		void menuDrawAddressBook();
+
+		void deadVideoProcessing();
 
 		bool texturesLoaded;
 		//		bool showMenu;
@@ -309,7 +622,7 @@ class OpenGLWindow : public Runnable {
 
 		void updateVideoPositions(bool doAnimate);
 
-		void rectToCoord(float &x1, float&y2, float &x2, float &y2, float lx1, float ly1, float lx2, float ly2, float aratio);
+		void rectToCoord(float &x1, float& y1, float &x2, float &y2, float lx1, float ly1, float lx2, float ly2, float aratio);
 		void drawSurface();
 		void sdlQuit();
 		void windowResized(int w, int h);
@@ -320,6 +633,8 @@ class OpenGLWindow : public Runnable {
 		list<OpenGLDisplay*> displays;
 		list<struct mgl_gfx*> icons;
 		bool displaysChanged;
+
+		OpenGLDisplay* getSelectedDisplay();
 
 		int t_max_size;
 
@@ -363,23 +678,59 @@ class OpenGLWindow : public Runnable {
 
 //		Mutex queueLock;
 		//Semaphore queueSem;
-//		std::list<MImage *> displayQueue;
 
 		GLuint textureGray;
 
 		Text *text;
 		
+		bool useGui;
 		int menuMode;
+		int videoMode;
+		int localVideoMode;
+		bool localVideoSelected;
+
+
+		//list< string > addressBookNames;
+		//list< list<  MRef<ContactEntry *>  > > addressBook;
+
+		//list<MRef<ContactEntry*> > getAddressBook(){
+		
+		//}
+		
+		AddressBookMenu addressBookMenu;
+
+
+		void layoutAddressBook(bool doAnimate);
+		bool addressBookUpdated;
+		bool addressBookAnimate;
+
+		Mutex notificationLock;
+		list<Notification*> notifications;
 };
+
+
+void OpenGLWindow::showNotification(string message){
+
+	Notification* n = new Notification(message, text, textureGray);
+
+	notificationLock.lock();
+	notifications.push_back( n );
+	notificationLock.unlock();
+
+	
+}
+
 
 
 MRef<OpenGLWindow*> OpenGLWindow::globalWindowObj=NULL;
 
 OpenGLWindow::OpenGLWindow(int w, int h, bool fullscreen){
 	cerr<<"EEEE: ------------------------ CREATING OPENGL WINDOW---------------"<<endl;
-	cerr <<"EEEE: fullscreen="<<fullscreen<<endl;
-	//texture=-1;
 	menuMode=MENU_HIDDEN;
+	videoMode=VIDEO_EQUAL;
+	localVideoMode=LOCAL_VIDEO_TRANSPARENT;
+
+	useGui=false;
 	runCount=0;
 	inCall=false;
 //	showMenu=false;
@@ -398,10 +749,11 @@ OpenGLWindow::OpenGLWindow(int w, int h, bool fullscreen){
 	native_height=0;
 	screen_aratio=1.0;
 	startFullscreen=fullscreen;
-	animation_ms=250;
+	animation_ms=400;
 	displaysChanged=false;
 	video_select_row=0;
 	video_select_col=0;
+	localVideoSelected=false;
 	video_nrows=0;
 	video_ncols=0;
 	textureGray=0;
@@ -411,19 +763,22 @@ OpenGLWindow::OpenGLWindow(int w, int h, bool fullscreen){
 	callback=NULL;
 
 	t_max_size=0;
+	addressBookUpdated=true;
+	addressBookAnimate=false;
 
 	bpp=0;
 
-	if (TTF_Init()){
-		cerr <<"Failed to initialize SDL_TTF!\n"<<endl;
-		exit(1);
-	}
-
-	text=new Text("/home/erik/FreeSans.ttf");
 }
 
 void OpenGLWindow::setPhoneConfig(MRef<SipSoftPhoneConfiguration*> conf){
 	pconf=conf;
+}
+
+CommandString OpenGLWindow::sendResp(CommandString cmd){
+	CommandString ret;
+	if (callback)
+		ret=callback->sendCmdResp(cmd);
+	return ret;
 }
 
 void OpenGLWindow::send(CommandString cmd){
@@ -441,8 +796,11 @@ void OpenGLWindow::hideAcceptCallMenu(bool hideAll){
 //	showMenu=!hideAll;
 	if (hideAll)
 		menuMode=MENU_HIDDEN;
-	else
+	else{
+		menuItemCur=menuRoot->select(0);
+		
 		menuMode=MENU_MAIN;
+	}
 	menuLock.unlock();
 }
 
@@ -453,6 +811,9 @@ void OpenGLWindow::incomingCall(string callid, string uri, bool unprotected){
 	(*i)->command=CommandString(callid, "accept_invite");	//command for yes button
 	i++;
 	(*i)->command=CommandString(callid, "reject_invite");	//command for no button
+	
+	menuAcceptCall->toptext="Call from <"+uri+">"; //remove - this should be set at each incoming call
+
 	menuRoot=menuAcceptCall;
 	menuCur=menuAcceptCall;
 	Menu* hangup = menuActions->getMenuItem("hangup");
@@ -465,74 +826,183 @@ void OpenGLWindow::incomingCall(string callid, string uri, bool unprotected){
 
 }
 
+OpenGLDisplay* OpenGLWindow::getSelectedDisplay(){
+	displayListLock.lock();
+	list<OpenGLDisplay*>::iterator video;
+	for (video=displays.begin(); video!=displays.end(); video++){
+		if ((*video)->getTexture()->isSelected || (*video)->getIsLocalVideo() &&localVideoSelected){
+			OpenGLDisplay* ret = (*video);
+			displayListLock.unlock();
+			return ret;
+		}
+	}
+	displayListLock.unlock();
+	return NULL;
+}
+
+void OpenGLWindow::videoSelect(string key){
+	cerr <<"EEEE: videoSelect("<<key<<")"<<endl;
+
+	if (key=="KEY_PLAY"){
+		OpenGLDisplay* selected = getSelectedDisplay();
+		if (selected){
+			float lastrot=0;
+			if (selected->getTexture()->rotate){
+				lastrot=selected->getTexture()->rotate->getVal();
+				delete selected->getTexture()->rotate;
+			}
+			selected->getTexture()->rotate = new Animate(1000,lastrot, lastrot>1?0.0F:180.0F ,ANIMATE_STARTSTOP);
+			selected->getTexture()->rotate->start();
+		}
+	}
+
+	if (key=="KEY_CHANNELUP"){
+		cerr <<"EEEE: selecting row up"<<endl;
+		cerr <<"EEEE: video_nrows="<<video_nrows<<endl;
+		cerr <<"EEEE: video_ncols="<<video_ncols<<endl;
+		menuLock.lock();
+		localVideoSelected=false;
+
+		if (video_select_col>=video_ncols) //if local video selected, decrease column
+			video_select_col--;
+
+		video_select_row++;
+		if (video_select_row>=video_nrows)
+			video_select_row--;
+		menuLock.unlock();
+		updateVideoPositions(false);
+	}
+	if (key=="KEY_CHANNELDOWN"){
+		cerr <<"EEEE: selecting row down"<<endl;
+		menuLock.lock();
+		localVideoSelected=false;
+
+		if (video_select_col>=video_ncols) //if local video selected, decrease column
+			video_select_col--;
+
+		video_select_row--;
+		if (video_select_row<0)
+			video_select_row=0;
+		menuLock.unlock();
+		updateVideoPositions(false);
+	}
+	if (key=="BTN_RIGHT"){
+		cerr <<"EEEE: selecting row right"<<endl;
+		cerr <<"EEEE: video_nrows="<<video_nrows<<endl;
+		cerr <<"EEEE: video_ncols="<<video_ncols<<endl;
+		menuLock.lock();
+		if (video_select_col==video_ncols-1 && video_select_row==0){
+			localVideoSelected=true;
+		}else{
+			localVideoSelected=false;
+			video_select_col++;
+			if (video_select_col>=video_ncols){
+				//if not selecting local video
+//				if ( !(video_select_row==0 && video_select_col==video_ncols) 
+//						&& localVideoMode==LOCAL_VIDEO_TRANSPARENT)
+					video_select_col--;
+			}
+		}
+
+		menuLock.unlock();
+		updateVideoPositions(false);
+	}
+	if (key=="BTN_LEFT"){
+		cerr <<"EEEE: selecting row down"<<endl;
+		menuLock.lock();
+		localVideoSelected=false;
+		video_select_col--;
+		if (video_select_col<0)
+			video_select_col=0;
+		menuLock.unlock();
+		updateVideoPositions(false);
+	}
+
+
+
+
+}
+
 void OpenGLWindow::keyPressed(string key, bool isRepeat){
-	cerr <<"EEEE: OpenGLWindow::keyPressed: "<<key<<endl;
-	if (key=="KEY_MENU" && !isRepeat){
-		//showMenu=!showMenu;
-		if (menuMode==MENU_HIDDEN){
+//	cerr <<"EEEE: OpenGLWindow::keyPressed: "<<key<<endl;
+
+	if (isRepeat)
+		return;
+
+	if (key=="KEY_MENU"){
+		if (menuMode==MENU_ADDRESSBOOK){
+			menuItemCur=menuActions->select(0);
 			menuMode=MENU_MAIN;
 		}else{
-			menuMode=MENU_HIDDEN;
+			if (menuMode==MENU_HIDDEN){
+				menuItemCur=menuActions->select(0);
+				menuMode=MENU_MAIN;
+			}else{
+				menuMode=MENU_HIDDEN;
+			}
 		}
-		cerr <<"EEEE: MENU DETECTED"<<endl;	
 		return;
 	}
 
-	if (/*!showMenu*/ menuMode==MENU_HIDDEN){
-		if (key=="KEY_CHANNELUP"){
-			cerr <<"EEEE: selecting row up"<<endl;
-			cerr <<"EEEE: video_nrows="<<video_nrows<<endl;
-			cerr <<"EEEE: video_ncols="<<video_ncols<<endl;
-			menuLock.lock();
-			video_select_row++;
-			if (video_select_row>=video_nrows)
-				video_select_row--;
-			menuLock.unlock();
-			updateVideoPositions(false);
-		}
-		if (key=="KEY_CHANNELDOWN"){
-			cerr <<"EEEE: selecting row down"<<endl;
-			menuLock.lock();
-			video_select_row--;
-			if (video_select_row<0)
-				video_select_row=0;
-			menuLock.unlock();
-			updateVideoPositions(false);
-		}
-		if (key=="BTN_RIGHT"){
-			cerr <<"EEEE: selecting row up"<<endl;
-			cerr <<"EEEE: video_nrows="<<video_nrows<<endl;
-			cerr <<"EEEE: video_ncols="<<video_ncols<<endl;
-			menuLock.lock();
-			video_select_col++;
-			if (video_select_col>=video_ncols)
-				video_select_col--;
-			menuLock.unlock();
-			updateVideoPositions(false);
-		}
-		if (key=="BTN_LEFT"){
-			cerr <<"EEEE: selecting row down"<<endl;
-			menuLock.lock();
-			video_select_col--;
-			if (video_select_col<0)
-				video_select_col=0;
-			menuLock.unlock();
-			updateVideoPositions(false);
-		}
-
+	if (menuMode==MENU_HIDDEN){
+		videoSelect(key);
 	}
 
-	if (/*showMenu*/ menuMode!=MENU_HIDDEN && !isRepeat){
+	if (menuMode==MENU_ADDRESSBOOK){
+
+		if (key=="KEY_PLAY"){
+			string uri = addressBookMenu.getSelectedUri();
+
+
+			CommandString resp=sendResp( CommandString("","invite",uri));
+			registerUri(resp.getDestinationId(), uri);
+			Menu* hangup = menuActions->getMenuItem("hangup");
+			massert(hangup);
+			hangup->command=CommandString( resp.getDestinationId(), "hang_up" );
+
+			menuMode=MENU_HIDDEN;
+		}
+
+
+		if (key=="BTN_LEFT"){
+			addressBookMenu.keyLeft();
+			addressBookAnimate=false;
+			addressBookUpdated=true;
+		}
+		if (key=="BTN_RIGHT"){
+			addressBookMenu.keyRight();
+			addressBookAnimate=false;
+			addressBookUpdated=true;
+		}
+		if (key=="KEY_CHANNELUP"){
+			addressBookMenu.keyUp();
+			addressBookAnimate=false;
+			addressBookUpdated=true;
+		}
+		if (key=="KEY_CHANNELDOWN"){
+			addressBookMenu.keyDown();
+			addressBookAnimate=false;
+			addressBookUpdated=true;
+		}
+
+
+
+		
+	}
+
+	if (menuMode!=MENU_HIDDEN){
 
 
 		if (key=="BTN_LEFT"){
 			menuLock.lock();
 			menuItemCur = menuCur->selectLeft();
+			updateMenu(true);
 			menuLock.unlock();
 		}
 		if (key=="BTN_RIGHT"){
 			menuLock.lock();
 			menuItemCur = menuCur->selectRight();
+			updateMenu(true);
 			menuLock.unlock();
 			
 		}
@@ -542,10 +1012,17 @@ void OpenGLWindow::keyPressed(string key, bool isRepeat){
 			cerr <<"EEEE: MENU SELECTED: "<< cmd<<endl;
 			
 			if (cmd!=""){
+				if (cmd=="exit"){
+					doStop=true;
+				}
 				if (cmd=="invite"){
-					cerr<<"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"<<endl;
+					addressBookUpdated=true;
 					menuMode=MENU_ADDRESSBOOK;
+					//addressBookMenu.selectList=0;
+					//addressBookMenu.selectItem=0;
 					menuLock.unlock();
+					//addressBookMenu.keyUp();
+					//addressBookMenu.keyDown();
 				}else{
 					CommandString cmd = menuItemCur->command;
 					menuLock.unlock();
@@ -601,6 +1078,7 @@ bool OpenGLWindow::loadTexture(string fname){
 	t->tex_dim=256;
 
 	glGenTextures( 1, (GLuint*)&(t->texture));
+	massert(glGetError()==GL_NO_ERROR);
 	cerr <<"EEEE: generated texture id "<< t->texture<<endl;
 	massert(t->texture > 0);
 	glBindTexture( GL_TEXTURE_2D, t->texture);
@@ -610,6 +1088,7 @@ bool OpenGLWindow::loadTexture(string fname){
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	cerr <<"EEEE: uploading to GL..."<<endl;
 	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, ICON_DIM, ICON_DIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, tmp);
+	massert(glGetError()==GL_NO_ERROR);
 
 	t->name=strdup(fname.c_str());
 
@@ -633,10 +1112,24 @@ bool OpenGLWindow::loadTexture(string fname){
 		glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, 8, 8, 0, GL_RGB, GL_UNSIGNED_BYTE, gray);
 
 	}
+	massert(glGetError()==GL_NO_ERROR);
+}
+
+void OpenGLWindow::updateMenu(bool animate){
+	if (menuActions){
+		massert(menuActions);
+		massert(menuActions->getMenuItem("hangup"));
+		massert(menuActions->getMenuItem("exit"));
+		menuActions->getMenuItem("hangup")->visible=inCall;
+		menuActions->getMenuItem("exit")->visible=!inCall;
+	}
+	if (menuRoot)
+		menuLayout(animate);
 }
 
 void OpenGLWindow::setupMenu(){
 
+	menuLock.lock();
 	menuActions=new Menu("",NULL,"");
 	menuCur=menuRoot=menuActions;
 	
@@ -662,6 +1155,7 @@ void OpenGLWindow::setupMenu(){
 	menuAcceptCall=new Menu( "", NULL, "");
 
 	menuAcceptCall->toppicture =getIcon("person");
+	menuAcceptCall->toptext="Incoming call"; //remove - this should be set at each incoming call
 	
 	struct mgl_gfx* icon = getIcon("yes");
 	massert(icon);
@@ -675,6 +1169,9 @@ void OpenGLWindow::setupMenu(){
 	(*(menuAcceptCall->mitems.begin()))->selected=true;
 
 
+	updateMenu(false);
+
+	menuLock.unlock();
 
 }
 
@@ -682,12 +1179,14 @@ void OpenGLWindow::enableMenu(){
 	cerr<<"EEEE: called enableMenu()"<<endl;
 	massert(texturePath.size()>0);
 	/*showMenu=true;*/
+
+	if (menuActions)
+		menuItemCur=menuActions->select(0);
 	menuMode=MENU_MAIN;
+	useGui=true;
 }
 
 #define REPORT_N 500
-
-
 
 
 void OpenGLWindow::findScreenCoords() {
@@ -706,7 +1205,7 @@ void OpenGLWindow::findScreenCoords() {
 	GLdouble winx;
 	GLdouble winy;
 	GLdouble winz;
-	GLdouble delta=40;
+	GLdouble delta=-DRAW_Z;
 	int i;
 	for (i=0; i<64; i++){
 
@@ -721,7 +1220,7 @@ void OpenGLWindow::findScreenCoords() {
 	windowX0=x;
 
 	x=0;
-	delta=20;
+	delta=-DRAW_Z;
 
 	for (i=0; i<64; i++){
 
@@ -734,6 +1233,7 @@ void OpenGLWindow::findScreenCoords() {
 		delta=delta/2;
 	}
 	windowY0=y;
+	massert(glGetError()==GL_NO_ERROR);
 
 	cerr << "EEEE: findScreenCoords: window 0,0 is at coord "<<windowX0 << ","<< windowY0 <<",-20"<<endl;
 
@@ -832,8 +1332,8 @@ void OpenGLWindow::findVideoArea(int video_n, int ntot, float &x1, float&y1, flo
 	x2=x1+colw;
 
 	if (selectedptr){
-		if (row==video_select_row && (col==video_select_col)){
-			cerr <<"EEEE: Video SELECTEd: row="<<row<<" col="<<col<<" video_select_row="<<video_select_row<<" video_select_col="<<video_select_col<<endl;
+		if (row==video_select_row && (col==video_select_col) && !localVideoSelected){
+			cerr <<"EEEE: Video SELECTED: row="<<row<<" col="<<col<<" video_select_row="<<video_select_row<<" video_select_col="<<video_select_col<<endl;
 			*selectedptr=true;
 		}else{
 			cerr <<"EEEE: Video not selected: row="<<row<<" col="<<col<<" video_select_row="<<video_select_row<<" video_select_col="<<video_select_col<<endl;
@@ -845,11 +1345,78 @@ void OpenGLWindow::findVideoArea(int video_n, int ntot, float &x1, float&y1, flo
 
 }
 
+void OpenGLWindow::deadVideoProcessing(){
+	
+//	cerr <<"EEEE: deadVideoProcessing() start"<<endl;
+	bool doUpdate=false;;
+	displayListLock.lock();
+	list<OpenGLDisplay*>::iterator i;
+	uint64_t now10k=mtime()+10000;
+	int I=0;
+	for (i=displays.begin(); i!=displays.end(); i++){ 
+		//cerr <<"EEEE: video I="<<I++<<endl;
+		if ((*i)->isHidden())
+			continue;
+		mgl_gfx* gfx = (*i)->getTexture();
+		//(*i)->dataLock.lock();
+		uint64_t trecv= (*i)->timeLastReceive;
+		//(*i)->dataLock.unlock();
+		uint64_t udiff=now10k;
+		udiff-=trecv;
+		int diff=(int) udiff;
+		diff-=10000;
+		if (diff<0 )
+			diff=1;
+		//cerr <<"EEEE: trecv="<<trecv<<endl;
+		//cerr <<"EEEE: now="<<now<<endl;
+		//cerr <<"EEEE: time since last frame="<< diff<< endl;
+		if ( (*i)->timeLastReceive!=0 && diff>1000){
+			float alpha=1.0;
+			if (  gfx->alpha ){
+				alpha = gfx->alpha->getVal();
+			}
+			if ( alpha>=0.999999){
+				
+				cerr <<"EEEE: dead video: creating alpha animation"<<endl;
+				if (gfx->alpha)
+					delete gfx->alpha;
+				gfx->alpha=new Animate(500,1.0,0.0,ANIMATE_LINEAR);
+				gfx->alpha->start();
+			}
+			if (alpha<0.01){
+				cerr <<"EEEE: alpha is zero - disabling video"<<endl;
+				//displayListLock.unlock();
+				//removeDisplay(*i);
+				//displayListLock.lock();
+				(*i)->setHidden(true);
+				doUpdate=true;
+				break;
+			}
+		}
+		
+	}
+
+	displayListLock.unlock();
+	if (doUpdate)
+		updateVideoPositions(true);
+//	cerr <<"EEEE: deadVideoProcessing() end"<<endl;
+}
+
+int OpenGLWindow::nVisibleDisplays(){
+	int ret=0;
+	list<OpenGLDisplay*>::iterator i;
+	for (i=displays.begin(); i!=displays.end(); i++){
+		if (!(*i)->isHidden())
+			ret++;
+	}
+	return ret;
+}
+
 void OpenGLWindow::updateVideoPositions(bool doAnimate){
 
 	cerr << "EEEE: doing updateVideoPositions()"<<endl;
 	displayListLock.lock();
-	int n_videos = displays.size();
+	int n_videos = /*displays.size()*/ nVisibleDisplays();
 
 	list<OpenGLDisplay*>::iterator i;
 	float screen_aratio=(float)cur_width/(float)cur_height;
@@ -858,6 +1425,7 @@ void OpenGLWindow::updateVideoPositions(bool doAnimate){
 	//Make sure local displays are in the end of 
 	//the list of displays. They are transparant, and
 	//must be displayed on top of other video displays.
+	
 	list<OpenGLDisplay*> tmpdisplays=displays;
 	displays.clear();
 	int n_local=0;
@@ -886,6 +1454,10 @@ void OpenGLWindow::updateVideoPositions(bool doAnimate){
 	int remote_video_n=0;
 	int global_n=0;
 	for (i=displays.begin(); i!=displays.end(); i++, global_n++){ 
+		if ((*i)->isHidden()){
+			global_n--;
+			continue;
+		}
 
 		mgl_gfx* gfx = (*i)->getTexture();
 		float tex_x1, tex_y1, tex_x2, tex_y2, alpha;
@@ -954,12 +1526,14 @@ void OpenGLWindow::updateVideoPositions(bool doAnimate){
 
 		float lastAlpha=0.0;
 		if (gfx->alpha){
+			massert(gfx->alpha);
 			lastAlpha=gfx->alpha->getVal();
 			delete gfx->alpha;
 		}
 
 
 		cerr << "EEEE: setting position of video "<< global_n <<" to " << tex_x1<<","<<tex_y1<<" "<<tex_x2<<","<<tex_y2<<" alpha="<<alpha<<endl;
+		cerr<<"EEEE: !!!!!!! laying out video with aratio="<<gfx->aratio<<endl;
 
 		if (!doAnimate){
 			gfx->x1= new Animate(tex_x1);
@@ -994,15 +1568,35 @@ void OpenGLWindow::addDisplay(OpenGLDisplay* displ){
 	displaysChanged=true;
 	cerr<<"EEEE: --------------------------------- after add ndisplays="<< displays.size()<<endl;
 	displayListLock.unlock();
+
+	menuLock.lock();
+	updateMenu(false);
+	menuLock.unlock();
+
+	updateVideoPositions(true);
 }
 
 void OpenGLWindow::removeDisplay(OpenGLDisplay* displ){
+	cerr <<"EEEE: removeDisplay() running"<<endl;
 	displayListLock.lock();
 	displays.remove(displ);
 	inCall=displays.size()>0;
 	displaysChanged=true;
+	if ( !inCall && useGui ){
+		menuLock.lock();
+		if (menuActions)
+			menuItemCur=menuActions->select(0);
+		menuMode=MENU_MAIN;
+		menuLock.unlock();
+	}
+
 	cerr<<"EEEE: --------------------------------- after remove ndisplays="<< displays.size()<<endl;
 	displayListLock.unlock();
+	if (useGui){
+		menuLock.lock();
+		updateMenu(false);
+		menuLock.unlock();
+	}
 	updateVideoPositions(true);
 
 }
@@ -1015,38 +1609,361 @@ void OpenGLWindow::menuDrawSettings(){
 
 }
 
-void OpenGLWindow::menuDrawAddressBook(){
-	massert(pconf);
-	cerr <<"EEEEEEEEEEEE: OpenGLWindow::menuDrawAddressBook"<<endl;
+bool lessthan_addritem(MRef<AddressItem*> a, MRef<AddressItem*> b){
+	massert(a);
+	massert(b);
+	massert(a->sipuri);
+	massert(b->sipuri);
+	if (strcmp(a->sipuri, b->sipuri)<0)
+		return true;
+	else
+		return false;
+}
 
+/*
+ * Phonebook= an AddressItemList
+ * PhoneBookPerson does not have a representation
+ * ContactEntry=AddressItem
+ */
 
-	list<string> contacts;
+void OpenGLWindow::layoutAddressBook(bool doAnimate){
 
+	cerr <<"EEEE: started layoutAddressBook"<<endl;
 	int nonline=0;
 	std::list<MRef<PhoneBook *> >::iterator i;
+
 	cerr <<"EEEE: nphonebooks="<<pconf->phonebooks.size()<<endl;
+
+	MRef<AddressItemList*> onlinelist= addressBookMenu.getList( "Online" );
+
+	if (!onlinelist){
+		cerr <<"EEEE: adding online list"<<endl;
+		onlinelist=new AddressItemList("Online");
+		addressBookMenu.menuLists.push_front(onlinelist);
+	}else{
+		//onlinelist->addresses.clear();
+	}
+
 	for (i=pconf->phonebooks.begin(); i!=pconf->phonebooks.end() ; i++){
 		list< MRef<PhoneBookPerson *> > persons = (*i)->getPersons();
 		list< MRef<PhoneBookPerson *> >::iterator j;
-		cerr <<"EEEE: persons in book="<<persons.size()<<endl;
+		MRef<AddressItemList*> alist = addressBookMenu.getList( (*i)->getName() );
+		if (!alist){
+			cerr <<"EEEE: adding list"<< (*i)->getName() <<endl;
+			alist=new AddressItemList((*i)->getName() );
+			addressBookMenu.menuLists.push_back(alist);
+		}
+ 		cerr <<"EEEE: persons in book="<<persons.size()<<endl;
+
 		for (j=persons.begin(); j!=persons.end(); j++){
 			list< MRef<ContactEntry *> > entries = (*j)->getEntries();
 			list< MRef<ContactEntry *> >::iterator ent;
 			cerr <<"EEEE: contacts per person: "<<entries.size()<<endl;;
 			for (ent=entries.begin(); ent!=entries.end(); ent++){
-				contacts.push_back( (*ent)->getUri() );
-				if ((*ent)->isOnline())
-					nonline++;
-			}
+				if (!alist->contains( (*ent)->getUri() ) ){ // do uri comparison and not string
+					cerr <<"EEEE: adding user "<< (*ent)->getUri() <<" to list"<<endl;
+					alist->addresses.push_back(new AddressItem( (*ent)->getName(), (*ent)->getUri() ));
+					
+				}
+				if ((*ent)->isOnline()){
+					if (!onlinelist->contains((*ent)->getUri() )){
+						//TODO: push sorted, and not at end
+						cerr <<"EEEE: online user "<< (*ent)->getUri() <<" to list"<<endl;
+						onlinelist->addresses.push_front(new AddressItem( (*ent)->getName(), (*ent)->getUri() ));
+						onlinelist->addresses.sort(lessthan_addritem);
+					}
 
+				}
+				if (!(*ent)->isOnline() && onlinelist->contains((*ent)->getUri())){
+					onlinelist->remove( (*ent)->getUri() );
+				}
+			}
 		}
 	}
-	cerr <<"EEEE: nonline="<<nonline<<endl;
 
+	cerr << "EEEE: address lists:"<<endl;
+	list<MRef<AddressItemList*> >::iterator k;
+
+	int nlists = addressBookMenu.menuLists.size();
+	//for all AddressItemList in menuList
+	int n=0;
+	for (k=addressBookMenu.menuLists.begin(); k!=addressBookMenu.menuLists.end(); k++,n++){
+//		cerr <<"EEEE: Address book <"<<(*k)->listName<<">"<<endl;
+		float listlx1=windowX0;
+		float listlx2=-windowX0;
+		float listly1=windowY0;
+		float listly2=-windowY0;
+		float listwidth=(listlx2-listlx1)/nlists;
+		float headerheight=(listly2-listly1)/5;
+		
+	
+		float listx1=listlx1+n*listwidth;
+		float listx2=listlx1+(n+1)*listwidth;
+
+		//layout list name
+		//
+		(*k)->headerx1=listx1;
+		(*k)->headerx2=listx2;
+		(*k)->headery1=listly2-headerheight;
+		(*k)->headery2=listly2-headerheight/2;
+
+		//layout menu items
+		
+		MRef<AddressItemList*> list = (*k); 
+		float listheight=(listly2-listly1-headerheight)/20;
+		std::list< MRef<AddressItem*> >::iterator j;
+		int m=0;
+		//for all AddressItems in addresses
+		//
+		for (j= (*k)->addresses.begin(); j!=(*k)->addresses.end(); j++,m++){
+			bool hasLastPosition=false;
+
+			float listy1=listly2-(m+1)*listheight - headerheight;	
+			float listy2=listly2-m*listheight-headerheight;	
+
+			float lastx1;
+			float lastx2;
+			float lasty1;
+			float lasty2;
+			float lastalpha;
+
+			if ( (*j)->x1 ){
+				lastx1=(*j)->x1->getVal();
+				lastx2=(*j)->x2->getVal();
+				lasty1=(*j)->y1->getVal();
+				lasty2=(*j)->y2->getVal();
+				lastalpha=(*j)->alpha->getVal();
+				delete (*j)->x1;
+				delete (*j)->x2;
+				delete (*j)->y1;
+				delete (*j)->y2;
+				delete (*j)->alpha;
+			}else{
+				lastx1=listx1;
+				lastx2=listx2;
+				lasty1=listy1;
+				lasty2=listy2;
+				lastalpha=0;
+			}
+			if (!doAnimate){
+				lastx1=listx1;
+				lastx2=listx2;
+				lasty1=listy1;
+				lasty2=listy2;
+				lastalpha=1;
+			}
+			(*j)->x2=new Animate(animation_ms,lastx2, listx2, ANIMATE_STARTSTOP );
+			(*j)->y1=new Animate(animation_ms,lasty1, listy1, ANIMATE_STARTSTOP );
+			(*j)->y2=new Animate(animation_ms,lasty2, listy2, ANIMATE_STARTSTOP );
+			(*j)->alpha=new Animate(animation_ms,lastalpha, 1.0, ANIMATE_STARTSTOP );
+			(*j)->x2->start();
+			(*j)->y1->start();
+			(*j)->y2->start();
+			(*j)->alpha->start();
+			(*j)->x1=new Animate(animation_ms,lastx1, listx1, ANIMATE_STARTSTOP );
+			(*j)->x1->start();
+			
+		} 
+	}
+	
 
 }
 
+void OpenGLWindow::menuDrawAddressBook(){
 
+	static const SDL_Color white={255,255,255};
+	static const SDL_Color black={0,0,0};
+	massert(pconf);
+	if (addressBookUpdated){
+		layoutAddressBook(addressBookAnimate);
+		addressBookMenu.updateSelected();
+		addressBookAnimate=true;
+		addressBookUpdated=false;
+	}
+
+	massert(glGetError()==GL_NO_ERROR);
+	glColor4f(1.0,1.0,1.0, 0.3);
+	glBindTexture( GL_TEXTURE_2D, textureGray);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBegin( GL_QUADS );
+	glTexCoord2f( 0, 1.0 );
+	float borderOffset=-windowX0/25;
+	glVertex3f(  windowX0+borderOffset, windowY0+borderOffset, 0.0f );
+
+	glTexCoord2f( 1.0, 1.0 );
+	glVertex3f( -windowX0-borderOffset, windowY0+borderOffset, 0.0f );
+
+	glTexCoord2f( 1.0, 0 );
+	glVertex3f( -windowX0-borderOffset, -windowY0-borderOffset, 0.0f );
+
+	glTexCoord2f( 0, 0 );
+	glVertex3f( windowX0+borderOffset, -windowY0-borderOffset, 0.0f );
+	glEnd();
+	massert(glGetError()==GL_NO_ERROR);
+
+
+	list<MRef<AddressItemList*> >::iterator k;
+
+	int nlists = addressBookMenu.menuLists.size();
+	//for all AddressItemList in menuList
+	int n=0;
+	for (k=addressBookMenu.menuLists.begin(); k!=addressBookMenu.menuLists.end(); k++,n++){
+//		cerr <<"EEEE: Address book <"<<(*k)->listName<<"> of size "<< (*k)->addresses.size() <<endl;
+
+		glColor4f( 1.0, 1.0, 1.0, 1.0 ); 
+		text->draw3D((*k)->headerx1,(*k)->headery1,0, (*k)->headerx2,(*k)->headery2,0, (*k)->listName, 36, white, black, TEXT_ALIGN_CENTER);
+
+
+		MRef<AddressItemList*> list = (*k); 
+		std::list< MRef<AddressItem*> >::iterator j;
+		int m=0;
+		//for all AddressItems in addresses
+		//
+		for (j= (*k)->addresses.begin(); j!=(*k)->addresses.end(); j++,m++){
+
+
+			float x1= (*j)->x1->getVal();
+			float y1= (*j)->y1->getVal();
+			float x2= (*j)->x2->getVal();
+			float y2= (*j)->y2->getVal();
+			float alpha= (*j)->alpha->getVal();
+//			cerr <<"EEEE: using alpha="<<alpha<<endl;
+
+
+			if ((*j)->isSelected){
+
+				glColor4f(1.0,1.0,1.0, 0.3);
+				glBindTexture( GL_TEXTURE_2D, textureGray);
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				glBegin( GL_QUADS );
+				glTexCoord2f( 0, 1.0 );
+				glVertex3f( x1 , y1, 0.0f );
+
+				glTexCoord2f( 1.0, 1.0 );
+				glVertex3f( x2, y1, 0.0f );
+
+				glTexCoord2f( 1.0, 0 );
+				glVertex3f( x2, y2, 0.0f );
+
+				glTexCoord2f( 0, 0 );
+				glVertex3f( x1, y2, 0.0f );
+				glEnd();
+			}
+
+
+			glColor4f(1.0, 1.0, 1.0, alpha); 
+	massert(glGetError()==GL_NO_ERROR);
+			text->draw3D( x1,y1,0, x2,y2,0, /*(*j)->sipuri*/ (*j)->name, 24, white, black, TEXT_ALIGN_CENTER);
+	massert(glGetError()==GL_NO_ERROR);
+		}
+
+
+	} 
+}
+
+
+void OpenGLWindow::menuLayout(bool animate){
+	cerr <<"EEEE: menuLayout called"<<endl;
+	int nicons=menuRoot->nVisible();
+	float x1= windowX0;
+	float y1= windowY0;
+	float x2= -windowX0;
+	float y2= -windowY0;
+
+
+	int nvideos=displays.size();
+//	cerr <<"EEEE: nvideos="<<nvideos<<endl;
+	if (nvideos==0){ 	//limit to middle 40% of height
+		//			cerr <<"EEEE: layout middle"<<endl;
+		y1= y1/5;  //fifth of screen, below center
+		y2= y2/5;
+		rectToCoord(x1,y1, x2,y2,  x1,y1, x2,y2,  1.0); //draw menu on bottom 1/8 of screen
+		if (menuRoot->toppicture){
+			float height=y2-y1;
+			y1=y1-height;
+			y2=y2-height;
+		}
+	}else{
+//		cerr <<"EEEE: layout bottom"<<endl;
+		y2= y1+(y2-y1)/8   ;
+		rectToCoord(x1,y1,x2,y2,x1,y1,x2,y2,1.0);
+	}
+
+	float iconWidth=x2-x1;
+	float totWidth=iconWidth*nicons;
+	float startx=-totWidth/2;
+
+	float bottomOffset = (y2-y1)/4;	//Note: The icons are drawn outside of their bounds by this amount
+
+
+	int iconi=0;
+	list<Menu*>::iterator i;
+	for (i=menuRoot->mitems.begin(); i!=menuRoot->mitems.end(); i++, iconi++){
+		if ((*i)->visible){
+			x1=startx+iconi*iconWidth;
+			x2=x1+iconWidth;
+			float stretch = /*x1/10*/ 0.0F;
+
+			float lastx1=x1;
+			float lastx2=x2;
+			float lasty1=y1+bottomOffset;
+			float lasty2=y2+bottomOffset;
+
+			if ((*i)->icon->x1!=NULL){
+				if (animate){
+					lastx1= (*i)->icon->x1->getVal();
+					lastx2= (*i)->icon->x2->getVal();
+					lasty1= (*i)->icon->y1->getVal();
+					lasty2= (*i)->icon->y2->getVal();
+				}
+
+				delete (*i)->icon->x1;
+				delete (*i)->icon->x2;
+				delete (*i)->icon->y1;
+				delete (*i)->icon->y2;
+
+				(*i)->icon->x1=NULL;
+				(*i)->icon->x2=NULL;
+				(*i)->icon->y1=NULL;
+				(*i)->icon->y2=NULL;
+			}
+
+			if ( (*i)->selected){
+				stretch = (y2-y1)/15.0;
+
+				if (stretch<0)
+					stretch=-stretch;
+
+				(*i)->icon->x1 = new Animate(2000, x1, x1-stretch, ANIMATE_SINUS);
+				(*i)->icon->x1->start();
+				long long stime = (*i)->icon->x1->getStartTime();
+
+				(*i)->icon->x2 = new Animate(2000, x2, x2+stretch, ANIMATE_SINUS);
+				(*i)->icon->x2->start( stime );
+
+				(*i)->icon->y1 = new Animate(2000, y1+bottomOffset, y1+bottomOffset-stretch, ANIMATE_SINUS );
+				(*i)->icon->y1->start(stime);
+
+				(*i)->icon->y2 = new Animate(2000, y2+bottomOffset, y2+bottomOffset+stretch, ANIMATE_SINUS);
+				(*i)->icon->y2->start(stime);
+			}else{
+				(*i)->icon->x1 = new Animate(300, lastx1, x1, ANIMATE_LINEAR);
+				(*i)->icon->x2 = new Animate(300, lastx2, x2, ANIMATE_LINEAR);
+				(*i)->icon->y1 = new Animate(300, lasty1, y1+bottomOffset, ANIMATE_LINEAR);
+				(*i)->icon->y2 = new Animate(300, lasty2, y2+bottomOffset, ANIMATE_LINEAR);
+				(*i)->icon->x1->start();
+				long long stime=(*i)->icon->x1->getStartTime();
+				(*i)->icon->x2->start(stime);
+				(*i)->icon->y1->start(stime);
+				(*i)->icon->y2->start(stime);
+			}
+
+		}else{
+			iconi--; //don't count invisible icons
+		}
+	}
+
+}
 
 void OpenGLWindow::menuDraw(){
 	menuLock.lock();
@@ -1067,7 +1984,7 @@ void OpenGLWindow::menuDraw(){
 	float y2= -windowY0;
 
 	int nvideos=displays.size();
-	cerr <<"EEEE: nvideos="<<nvideos<<endl;
+//	cerr <<"EEEE: nvideos="<<nvideos<<endl;
 	if (nvideos==0){ 	//limit to middle 40% of height
 		//			cerr <<"EEEE: layout middle"<<endl;
 		y1= y1/5;  //fifth of screen, below center
@@ -1080,7 +1997,7 @@ void OpenGLWindow::menuDraw(){
 		}
 		drawBackground=false;
 	}else{
-		cerr <<"EEEE: layout bottom"<<endl;
+//		cerr <<"EEEE: layout bottom"<<endl;
 		y2= y1+(y2-y1)/8   ;
 		rectToCoord(x1,y1,x2,y2,x1,y1,x2,y2,1.0);
 	}
@@ -1093,6 +2010,10 @@ void OpenGLWindow::menuDraw(){
 	int iconi=0;
 	list<Menu*>::iterator i;
 
+	static const SDL_Color white={255,255,255};
+	static const SDL_Color black={0,0,0};
+
+	massert(glGetError()==GL_NO_ERROR);
 	if (menuRoot->toppicture){
 		float px1=-100;	//don't limit on width
 		float px2=100;
@@ -1100,10 +2021,10 @@ void OpenGLWindow::menuDraw(){
 		float py2=y2+iconWidth;
 		rectToCoord(px1,py1, px2,py2, px1,py1, px2,py2, 1.0);
 
-		cerr <<"EEEE: toppicture: getting texture"<<endl;
+		//		cerr <<"EEEE: toppicture: getting texture"<<endl;
 		glColor4f(1.0,1.0,1.0, 1.0);
 		glBindTexture( GL_TEXTURE_2D, menuRoot->toppicture->texture);
-		cerr <<"EEEE: toppicture: drawing"<<endl;
+//		cerr <<"EEEE: toppicture: drawing"<<endl;
 
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glBegin( GL_QUADS );
@@ -1119,14 +2040,16 @@ void OpenGLWindow::menuDraw(){
 		glTexCoord2f( 0, 0 );
 		glVertex3f( px1, bottomOffset*2 + py2, 0.0f );
 		glEnd();
-		cerr <<"EEEE: toppicture: toppicture done"<<endl;
+	massert(glGetError()==GL_NO_ERROR);
+		text->draw3D(  px1+iconWidth, bottomOffset*2+py1, 0,   px1+iconWidth*4, bottomOffset*2+py2,0, menuRoot->toptext, 32, white, black, TEXT_ALIGN_CENTER);
+	massert(glGetError()==GL_NO_ERROR);
 
 	}
 	if (drawBackground){
 
 		glColor4f(1.0,1.0,1.0, 0.3);
 		glBindTexture( GL_TEXTURE_2D, textureGray);
-		cerr <<"EEEE: toppicture: drawing background"<<endl;
+//		cerr <<"EEEE: toppicture: drawing background"<<endl;
 
 		float bgx1=-totWidth/2-iconWidth/4;
 		float bgx2=totWidth/2+iconWidth/4;
@@ -1147,6 +2070,7 @@ void OpenGLWindow::menuDraw(){
 		glTexCoord2f( 0, 0 );
 		glVertex3f( bgx1, bgy2, 0.0f );
 		glEnd();
+	massert(glGetError()==GL_NO_ERROR);
 	}
 
 
@@ -1160,6 +2084,7 @@ void OpenGLWindow::menuDraw(){
 			//the glRectf in the next block will not result in
 			//anything on screen.
 			if (iconi==0){
+	massert(glGetError()==GL_NO_ERROR);
 				glColor4f(1.0,1.0,1.0, 1.0);
 				glBindTexture( GL_TEXTURE_2D, (*i)->icon->texture);
 
@@ -1177,32 +2102,42 @@ void OpenGLWindow::menuDraw(){
 				glTexCoord2f( 0, 0 );
 				glVertex3f( 100, 100, 0.0f );
 				glEnd();
+	massert(glGetError()==GL_NO_ERROR);
 			}
 
 
 			if ((*i)->selected){
+	massert(glGetError()==GL_NO_ERROR);
 				glBlendFunc(GL_ONE, GL_ONE);
 				float bwidth=(y2-y1)/10.0;
 				//glColor4f(0.5, 0.5, 0.6, 0.6); 
 				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 				glColor4f(1.0, 1.0, 1.0, 0.6); 
 				float bottomOffset = (y2-y1)/4;
-				cerr <<"EEEE: bottomOffset="<<bottomOffset<<endl;
+//				cerr <<"EEEE: bottomOffset="<<bottomOffset<<endl;
 
 				glRectf( x1, bottomOffset + y1,        x2,        bottomOffset + y1+bwidth);
-				glRectf( x1, bottomOffset + y2,        x2,        bottomOffset + y2-bwidth);
+				glRectf( x1, bottomOffset + y2-bwidth,        x2,        bottomOffset + y2);
 				glRectf( x1, bottomOffset + y1+bwidth, x1+bwidth, bottomOffset + y2-bwidth);
-				glRectf( x2, bottomOffset + y1+bwidth, x2-bwidth, bottomOffset + y2-bwidth);
+				glRectf( x2-bwidth, bottomOffset + y1+bwidth, x2, bottomOffset + y2-bwidth);
+	massert(glGetError()==GL_NO_ERROR);
 				if ((*i)->selected){
 
 					SDL_Color white={255,255,255};
 					SDL_Color black={0,0,0};
 
-					text->draw3D(x1-200,y1,0, x2+200,y1+bottomOffset,0, (*i)->text ,36, white, black);
+					text->draw3D(x1-200,y1,0, x2+200,y1+bottomOffset,0, (*i)->text ,36, white, black, TEXT_ALIGN_CENTER);
+	massert(glGetError()==GL_NO_ERROR);
 
 				}
 			}
-
+			if ((*i)->icon->x1==NULL){
+				updateMenu(false);
+			}
+			massert((*i)->icon->x1);
+			massert((*i)->icon->x2);
+			massert((*i)->icon->y1);
+			massert((*i)->icon->y2);
 
 			glColor4f(1.0,1.0,1.0, 1.0);
 			glBindTexture( GL_TEXTURE_2D, (*i)->icon->texture);
@@ -1210,24 +2145,54 @@ void OpenGLWindow::menuDraw(){
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glBegin( GL_QUADS );
 			glTexCoord2f( 0, 1.0 );
-			glVertex3f(  x1, bottomOffset + y1, 0.0f );
+			//glVertex3f(  x1, bottomOffset + y1, 0.0f );
+			glVertex3f(  (*i)->icon->x1->getVal(), (*i)->icon->y1->getVal(), 0.0f );
 
 			glTexCoord2f( 1.0, 1.0 );
-			glVertex3f( x2, bottomOffset + y1, 0.0f );
+			glVertex3f( (*i)->icon->x2->getVal(), (*i)->icon->y1->getVal(), 0.0f );
 
 			glTexCoord2f( 1.0, 0 );
-			glVertex3f( x2, bottomOffset + y2, 0.0f );
+			//glVertex3f( x2, bottomOffset + y2, 0.0f );
+			glVertex3f( (*i)->icon->x2->getVal(), (*i)->icon->y2->getVal(), 0.0f );
 
 			glTexCoord2f( 0, 0 );
-			glVertex3f( x1, bottomOffset + y2, 0.0f );
+			//glVertex3f( x1, bottomOffset + y2, 0.0f );
+			glVertex3f( (*i)->icon->x1->getVal(), (*i)->icon->y2->getVal(), 0.0f );
 			glEnd();
+	massert(glGetError()==GL_NO_ERROR);
 
 
+		}else{
+			iconi--; //don't count invisible icons
 		}
 
 
 	}
 	menuLock.unlock();
+
+}
+
+void OpenGLWindow::notificationsDraw(){
+	list<Notification*>::iterator i;
+
+	static const SDL_Color white={255,255,255};
+	static const SDL_Color black={0,0,0};
+	notificationLock.lock();
+
+	for (i=notifications.begin(); i!=notifications.end(); i++){
+		cerr <<"EEEE: Notification draw: " << (*i)->gfx->name << endl;
+		float x1= windowX0;
+		float y1= windowY0;
+		float x2= -windowX0;
+		float y2= -windowY0;
+
+		(*i)->draw( x1,0, x2,y2/20 );
+
+
+
+	}
+
+	notificationLock.unlock();
 
 }
 
@@ -1247,12 +2212,14 @@ void OpenGLWindow::drawSurface(){
 	}
 
 
+	massert(glGetError()==GL_NO_ERROR);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ); //EE: not use depth?
 
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
 
 	glEnable( GL_TEXTURE_2D );
+	massert(glGetError()==GL_NO_ERROR);
 
 
 	if (/*showMenu*/ menuMode!=MENU_HIDDEN && !texturesLoaded){
@@ -1266,6 +2233,7 @@ void OpenGLWindow::drawSurface(){
 		loadTexture("no");
 		setupMenu();
 		cerr <<"EEEE: drawSurface: done loading textures"<<endl;
+	massert(glGetError()==GL_NO_ERROR);
 	}
 
 
@@ -1289,20 +2257,36 @@ void OpenGLWindow::drawSurface(){
 
 	displayListLock.lock();
 	list<OpenGLDisplay*>::iterator video;
+//	glCullFace(GL_BACK);
+//	glEnable(GL_CULL_FACE);
 	int dummy=1;
 	int nvideos=displays.size();
 	for (video=displays.begin(); video!=displays.end(); video++){
 		//				cerr << "EEEE: getting video texture for display "<< dummy++ <<"/"<<nvideos <<endl;
 		struct mgl_gfx* gfx = (*video)->getTexture();
-		if (gfx->texture>0){
+		if (!(*video)->isHidden() && gfx->texture>0){
+			massert(gfx->alpha);
 			float alpha=gfx->alpha->getVal();
-			glColor4f(1.0,1.0,1.0, alpha );
-			glBindTexture( GL_TEXTURE_2D, gfx->texture);
-			//			cerr<<"EEEE: drawing texture "<<gfx->texture<<" with alpha "<<alpha<<endl;
+			float rot=0;
+			if (gfx->rotate)
+				rot=gfx->rotate->getVal();
+
 			float x1= gfx->x1->getVal();
 			float y1= gfx->y1->getVal();
 			float x2= gfx->x2->getVal();
 			float y2= gfx->y2->getVal();
+
+			massert(glGetError()==GL_NO_ERROR);
+			glPushMatrix();
+			float xtransl = x1+(x2-x1)/2;
+//			cerr <<"EEEE: X translation="<<xtransl<<endl;
+			glTranslatef(xtransl,0,0);
+			glRotatef(rot,0,1,0);
+			x1=x1-xtransl;
+			x2=x2-xtransl;
+			glColor4f(1.0,1.0,1.0, alpha );
+			glBindTexture( GL_TEXTURE_2D, gfx->texture);
+			//			cerr<<"EEEE: drawing texture "<<gfx->texture<<" with alpha "<<alpha<<endl;
 
 			glBegin( GL_QUADS );
 			glTexCoord2f( 0, gfx->hu );
@@ -1318,27 +2302,34 @@ void OpenGLWindow::drawSurface(){
 			glVertex3f( x1, y2, 0.0f );
 			glEnd();
 
-			if (gfx->isSelected){
+			if (gfx->isSelected || (*video)->getIsLocalVideo() &&localVideoSelected){
 				float bwidth=(y2-y1)/20.0;
 				glColor4f(0.0, 0.0, 0.7, 0.5); 
-				glRectf( x1, y1, x2, y1+bwidth );
-				glRectf( x1, y2, x2, y2-bwidth );
-				glRectf( x1, y1+bwidth, x1+bwidth, y2-bwidth);
-				glRectf( x2, y1+bwidth, x2-bwidth, y2-bwidth);
+				glRectf( x1, y1, x2, y1+bwidth );             // _
+				glRectf( x1, y2-bwidth, x2, y2 );             // - X
+				glRectf( x1, y1+bwidth, x1+bwidth, y2-bwidth);//|
+				glRectf( x2-bwidth, y1+bwidth, x2, y2-bwidth);//  |X
 			}
+			if (gfx->callId){
+				//cerr <<"EEEE: drawing callid <"<<gfx->callId<<">"<<endl;
+				
+				if (id_uri.count(gfx->callId) > 0){
+					string uri=id_uri[gfx->callId];
+					//cerr<<"EEEE: uri=<"<<uri<<">"<<endl;
+					static const SDL_Color white={255,255,255};
+					static const SDL_Color black={0,0,0};
+					text->draw3D( x1,y2-(y2-y1)/20,0,  x2,y2,0, uri, 16, white, black, TEXT_ALIGN_LEFT);
+				}
+			}else{
+				//cerr <<"EEEE: NOT drawing callid"<<endl;
+			}
+
+			glPopMatrix();
+	massert(glGetError()==GL_NO_ERROR);
 
 		}
 	}
 	displayListLock.unlock();
-
-#if 0
-	if (text){
-		SDL_Color white={255,255,255};
-		SDL_Color black={0,0,0};
-		cerr <<"EEEE: drawing text"<<endl;
-		text->draw3D(windowX0,windowY0,0,-windowX0,-windowY0,0,"Hello world",16, white, black);
-	}
-#endif
 
 	switch(menuMode){
 		case MENU_HIDDEN:
@@ -1348,12 +2339,19 @@ void OpenGLWindow::drawSurface(){
 
 	};
 
+	notificationsDraw();
 
 
 	glPopMatrix();
 
+	massert(glGetError()==GL_NO_ERROR);
 	glFlush();
+	massert(glGetError()==GL_NO_ERROR);
 	SDL_GL_SwapBuffers();
+	massert(glGetError()==GL_NO_ERROR);
+
+	if (i%50==0)	//looking for dead videos is a bit heavy to do every round
+		deadVideoProcessing();
 }
 
 
@@ -1362,7 +2360,10 @@ void OpenGLWindow::sdlQuit(){
 	if (isFullscreen() ){
 		toggleFullscreen();
 	}
+
+	cerr <<"----------------------------->EEEE: SDL_Quit int sdlQuit running by thread "<<hex<<Thread::getCurrent().asLongInt()<<dec<<endl;
 	SDL_Quit();
+	cerr <<"EEEE: done doing SDL_Quit"<<endl;
 }
 
 
@@ -1377,6 +2378,9 @@ void OpenGLWindow::toggleFullscreen(){
 	//	startFullscreen=isFullscreen();
 	//        initSdl();
 	updateVideoPositions(false);
+	menuLock.lock();
+	updateMenu(false);
+	menuLock.unlock();
 
 }
 
@@ -1400,6 +2404,9 @@ void OpenGLWindow::windowResized(int w, int h){
 	initSurface();
 
 	updateVideoPositions(false);
+	menuLock.lock();
+	updateMenu(false);
+	menuLock.unlock();
 	SDL_GL_SwapBuffers();
 }
 
@@ -1442,6 +2449,12 @@ void OpenGLWindow::run(){
 					break;
 				case SDL_KEYDOWN:
 
+					if (event.key.keysym.sym == SDLK_n){
+						cerr <<"EEEE: showing notification"<<endl;
+						showNotification("hello");
+						cerr <<"EEEE: done show notification"<<endl;
+					}
+
 					//trap quit and fullscreen events. Forward everything else
 
 					if (event.key.keysym.sym == SDLK_ESCAPE ||
@@ -1466,6 +2479,24 @@ void OpenGLWindow::run(){
 							printf("Shift detected\n");
 							key-='a'-'A';
 						}
+						if (event.key.keysym.sym== SDLK_LEFT)
+							keyPressed("BTN_LEFT",false);
+
+						if (event.key.keysym.sym== SDLK_RIGHT)
+							keyPressed("BTN_RIGHT",false);
+
+						if (event.key.keysym.sym== SDLK_UP)
+							keyPressed("KEY_CHANNELUP",false);
+
+						if (event.key.keysym.sym== SDLK_DOWN)
+							keyPressed("KEY_CHANNELDOWN",false);
+
+						if (event.key.keysym.sym== SDLK_RETURN)
+							keyPressed("KEY_PLAY",false);
+
+						if (event.key.keysym.sym== SDLK_BACKSPACE)
+							keyPressed("KEY_MENU",false);
+
 						//gui->keyPressed(key);
 
 					}
@@ -1480,11 +2511,18 @@ void OpenGLWindow::run(){
 			resized=false;
 		}
 		drawSurface();
-		Thread::msleep(500);
+//		Thread::msleep(500);
 	}
 
 	cerr <<"----------------EEEE: OpenGl thread quitting"<<endl;
-	SDL_Quit();
+	
+	cerr <<"EEEE: TTF_Quit running by thread "<<hex<<Thread::getCurrent().asLongInt()<<dec<<endl;
+
+	TTF_Quit();
+	if (menuMode==MENU_HIDDEN){
+		cerr <<"----------------------------->EEEE: SDL_Quit running by thread "<<hex<<Thread::getCurrent().asLongInt()<<dec<<endl;
+		SDL_Quit();
+	}
 } 
 
 
@@ -1539,10 +2577,12 @@ MRef<OpenGLWindow*> OpenGLWindow::getWindow(bool fullscreen){
 }
 
 void OpenGLWindow::init(){
+
 	if (!initialized){
 		initialized=true;
 		initSdl();
 	}
+
 
 }
 
@@ -1550,6 +2590,7 @@ typedef GLvoid (*glXSwapIntervalSGIFunc) (GLint);
 typedef GLvoid (*glXSwapIntervalMESAFunc) (GLint);
 
 void OpenGLWindow::initSdl(){
+	cerr <<"---------------------> EEEE: initSdl running by thread "<<hex<<Thread::getCurrent().asLongInt()<<dec<<endl;
 	// init video system
 	if( SDL_Init(SDL_INIT_VIDEO) < 0 )
 	{
@@ -1557,7 +2598,7 @@ void OpenGLWindow::initSdl(){
 		exit(1);
 	}
 
-#if 0
+#if 1
 	if(TTF_Init()){
 		fprintf(stderr,"Failed to initialize SDL_TTF!\n");
 		exit(1);
@@ -1568,7 +2609,7 @@ void OpenGLWindow::initSdl(){
 
 
 	// tell system which funciton to process when exit() call is made
-	atexit(SDL_Quit);
+//	atexit(SDL_Quit);
 
 	// get optimal video settings
 	const SDL_VideoInfo* vidinfo = SDL_GetVideoInfo();
@@ -1585,7 +2626,11 @@ void OpenGLWindow::initSdl(){
 	}
 	cerr << "EEEE: OpenGL: native screen dimension is "<< native_width<<"x"<<native_height<<endl;
 
+	cerr  <<"EEEE: doing glGetError"<<endl;
+
+//	massert(glGetError()==GL_NO_ERROR);
 	// set opengl attributes
+	cerr<<"EEEE: setting attributes..."<<endl;
 	SDL_GL_SetAttribute(SDL_GL_RED_SIZE,        5);
 	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE,      5);
 	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE,       5);
@@ -1604,12 +2649,14 @@ void OpenGLWindow::initSdl(){
  	 * use GL extensions.
  	 */
 
+	cerr<<"EEEE: get swap attributes..."<<endl;
 	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL,    1);
 
+	cerr<<"EEEE: setting environment..."<<endl;
 	SDL_putenv((char*)"__GL_SYNC_TO_VBLANK=1");
 
 
-#if 1
+#if 0
 	cerr <<"EEEE: trying to VSYNCH using OpenGL extensiosn"<<endl;
 
 	glXSwapIntervalSGIFunc glXSwapIntervalSGI = 0;
@@ -1640,12 +2687,13 @@ void OpenGLWindow::initSdl(){
 
 	bpp = vidinfo->vfmt->BitsPerPixel; //attribute used by initSurface
 
+	cerr<<"EEEE: will run initsurface"<<endl;
 	initSurface( );
 }
 
 void OpenGLWindow::initSurface(){
-
 	printf("initSurface running\n");
+//	massert(glGetError()==GL_NO_ERROR);
 
 	// get a framebuffer
 	int w,h;
@@ -1672,6 +2720,7 @@ void OpenGLWindow::initSurface(){
 		exit(1);
 	}
 
+	massert(glGetError()==GL_NO_ERROR);
 	GLint texSize;
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &texSize);
 	printf("INFO: max texture size: %dx%d\n",texSize,texSize);
@@ -1680,6 +2729,7 @@ void OpenGLWindow::initSurface(){
 
 
 
+	massert(glGetError()==GL_NO_ERROR);
 	glShadeModel(GL_SMOOTH);
 	//glClearColor(0x04/255.0F,0x01/255.0F,0x16/255.0F,0);
 	glClearColor(0.0F,0.0F,0.0F,0);
@@ -1687,7 +2737,8 @@ void OpenGLWindow::initSurface(){
 	glViewport(0,0,cur_width,cur_height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(45.0, (GLfloat) cur_width/(GLfloat) cur_height, 1.0, 200.0);
+	gluPerspective(45.0, (GLfloat) cur_width/(GLfloat) cur_height, 1.0, 500.0);
+	massert(glGetError()==GL_NO_ERROR);
 
 	//glMatrixMode(GL_MODELVIEW);
 	//glLoadIdentity();
@@ -1714,6 +2765,7 @@ void OpenGLWindow::initSurface(){
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER,    1);
 
 
+	massert(glGetError()==GL_NO_ERROR);
 
 	glDisable(GL_DEPTH_TEST);
 
@@ -1727,6 +2779,7 @@ void OpenGLWindow::initSurface(){
 	findScreenCoords();
 	glPopMatrix();
 
+	massert(glGetError()==GL_NO_ERROR);
 }
 
 
@@ -1737,11 +2790,13 @@ void OpenGLWindow::initSurface(){
 
 OpenGLDisplay::OpenGLDisplay( uint32_t width, uint32_t height, bool _fullscreen):VideoDisplay(){
 	cerr << "EEEE: OpenGLDisplay::OpenGLDisplay("<< width<<","<<height<<","<<_fullscreen<<") running"<<endl;
+	hidden=false;
 	this->width = width;
 	this->height = height;
 	fullscreen = _fullscreen;
 	nallocated=0;
 	//isLocalVideo=false;
+	timeLastReceive=0;
 	
 	gfx= new struct mgl_gfx;
 
@@ -1776,6 +2831,13 @@ void OpenGLDisplay::setCallback(MRef<CommandReceiver*> cb){
 	callback=cb;
 }
 
+CommandString OpenGLDisplay::sendCmdResp(CommandString cmd){
+	CommandString ret;
+	if (callback)
+		ret=callback->handleCommandResp("gui",cmd);
+	return ret;
+}
+
 void OpenGLDisplay::sendCmd(CommandString cmd){
 	if (callback)
 		callback->handleCommand("gui",cmd);
@@ -1784,6 +2846,7 @@ void OpenGLDisplay::sendCmd(CommandString cmd){
 struct mgl_gfx*  OpenGLDisplay::getTexture(){
 	dataLock.lock();
 	if (gfx->texture==-1){
+	massert(glGetError()==GL_NO_ERROR);
 		massert(colorNBytes==3 || colorNBytes==4);
 		int hw_max_dim = window->getTextureMaxSize();
 		int dim = (hw_max_dim>2048) ? 2048 : hw_max_dim;
@@ -1799,6 +2862,7 @@ struct mgl_gfx*  OpenGLDisplay::getTexture(){
 		GLenum pixFormat = colorNBytes==3?GL_RGB:GL_BGRA;
 		glTexImage2D( GL_TEXTURE_2D, 0, 3, dim, dim, 0, /*pixFormat*/ GL_RGB, GL_UNSIGNED_BYTE, dummy_black );
 		free(dummy_black);
+	massert(glGetError()==GL_NO_ERROR);
 	}
 
 	if (newRgbData){
@@ -1835,9 +2899,11 @@ struct mgl_gfx*  OpenGLDisplay::getTexture(){
 		}else{
 			//cerr << "EEEE: getTexture: uploading texture of size "<<width<<"x"<<height << " for display "<<(uint64_t)this<< "colorNBytes="<<colorNBytes<< " texdim="<<gfx->tex_dim<<endl;
 
+			massert(glGetError()==GL_NO_ERROR);
 			GLenum pixFormat = (colorNBytes==3)?GL_RGB:GL_BGRA;
 
 			glTexSubImage2D( GL_TEXTURE_2D, 0, 0,0 , width, height, pixFormat, GL_UNSIGNED_BYTE, rgb );
+			massert(glGetError()==GL_NO_ERROR);
 			gfx->wu=width/(float)gfx->tex_dim;
 			gfx->hu=height/(float)gfx->tex_dim;
 			gfx->aratio = (float)width/(float)height;
@@ -1848,7 +2914,7 @@ struct mgl_gfx*  OpenGLDisplay::getTexture(){
 }
 
 void OpenGLDisplay::handle( MImage * mimage){
-	//cerr <<"EEEE: doing OpenGLDisplay::handle on display "<<(uint64_t)this<<" image size="<<mimage->width<<"x"<<mimage->height<<" local="<<isLocalVideo<<endl;
+//	cerr <<"EEEE: doing OpenGLDisplay::handle on display "<<(uint64_t)this<<" image size="<<mimage->width<<"x"<<mimage->height<<" local="<<isLocalVideo<<endl;
 	massert(mimage->linesize[1]==0);
 	colorNBytes=mimage->linesize[0]/mimage->width;
 //	cerr <<"EEEE: colorNBytes="<<colorNBytes<<endl;
@@ -1860,16 +2926,35 @@ void OpenGLDisplay::handle( MImage * mimage){
 		width=mimage->width;
 		height=mimage->height;
 		gfx->aratio=(float)width/(float)height;
+		cerr <<"EEEE: aratio for new size: "<< gfx->aratio<<endl;
 		rgb = new uint8_t[width*height*colorNBytes+16]; // +16 to avoid mesa bug
+		window->updateVideoLayout();
 	
 	}
 
 	massert(rgb);
+
+	saveTime(&times_rcv.displaycopystart);
+
 	memcpy(rgb, &mimage->data[0][0], width*height*colorNBytes); //TODO: don't copy since it is in correct format.
+
+	saveTime(&times_rcv.displaycopyend);
+
 	newRgbData=true;
 	if (!isLocalVideo)
 		emptyImages.push_back(mimage);
+	timeLastReceive=mtime();
+
+	if (gfx->alpha && gfx->alpha->getType()!=ANIMATE_CONSTANT && isHidden()){
+		gfx->alpha=new Animate(1.0);
+		gfx->alpha->start();
+		setHidden(false);
+		window->updateVideoLayout();
+	}
 	dataLock.unlock();
+
+	//printRcv();
+
 }
 
 
@@ -1919,8 +3004,12 @@ void OpenGLDisplay::resize(int w, int h){
 	delete [] rgb;
 	rgb=NULL;
 	gfx->aratio=(float)w/(float)h;
+	cerr <<"EEEE: new aratio="<< gfx->aratio<<endl;
 	window->sizeHint(w,h);
+	delete [] rgb;
+	rgb=NULL;
 
+	window->updateVideoLayout();
 }
 
 void OpenGLDisplay::destroyWindow(){
@@ -1930,6 +3019,7 @@ void OpenGLDisplay::destroyWindow(){
 MImage * OpenGLDisplay::provideImage(){
 	dataLock.lock();
 	if (emptyImages.size()==0){
+		cerr <<"EEEE: WARNING: allocating image"<<endl;
 		emptyImages.push_back( allocateImage() );
 	}
 	MImage* ret = *emptyImages.begin();
@@ -1937,6 +3027,7 @@ MImage * OpenGLDisplay::provideImage(){
 	dataLock.unlock();
 	if (ret->width!=width||ret->height!=height){	//If there has been a resize, and the 
 							//MImage is allocated with the old size, re-allocate
+		cerr <<"EEEE: provideImage: resize from "<<ret->width<<"x"<<ret->height<<" to "<<width<<"x"<<height<<endl;
 		deallocateImage(ret);
 		ret=allocateImage();
 	}
@@ -1962,6 +3053,7 @@ MImage * OpenGLDisplay::allocateImage(){
 
 	mimage->privateData = NULL;
 
+	cerr << "EEEE: done doing OpenGLDisplay::allocateImage of size "<< width<<"x"<<height<<endl;
 	return mimage;
 }
 
@@ -1989,14 +3081,28 @@ void OpenGLDisplay::handleEvents(){
 
 void OpenGLDisplay::setIsLocalVideo(bool isLocal){
 	isLocalVideo=isLocal;
+	if (isLocal){
+//		gfx->callId=strdup("local");
+
+	}
 }
 
 bool OpenGLDisplay::handleCommand(CommandString cmd){
 	bool handled=false;
+
 	if (cmd.getOp()=="make_proxy"){	//if we will not display any video
 		window->removeDisplay(this);
 		
 
+	}
+
+	if (cmd.getOp()=="wait_quit"){
+		cerr <<"EEEE: ?????????????????????????????????waiting for window quit"<<endl;
+		window->join();
+	}
+
+	if (cmd.getOp()=="remote_presence_update"){
+		window->presenceUpdated();
 	}
 
 	if (cmd.getOp()=="set_texture_path"){
@@ -2014,6 +3120,7 @@ bool OpenGLDisplay::handleCommand(CommandString cmd){
 		string callid  = cmd.getDestinationId();
 		bool unprotected = cmd.getParam2()=="unprotected";
 		window->incomingCall(callid, fromuri, unprotected);
+		window->registerUri(callid, fromuri);
 	}
 
 	if (cmd.getOp()=="enable_menu"){
