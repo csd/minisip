@@ -18,7 +18,10 @@ Animate::Animate(int _duration, float _startval, float _endval, const int _type)
 	startval=_startval;
 	endval=_endval;
 	type=_type;
-	continuous=false;
+	if (type==ANIMATE_SINUS)
+		continuous=true;
+	else
+		continuous=false;
 	delta=0.0F;
 
 }
@@ -50,18 +53,26 @@ Animate::Animate(float _startval, float _increase_per_s){
 
 }
 
+long long Animate::getStartTime(){
+	return start_time;
+}
 
-
-void Animate::start(){
-	start_time=timeMs();
+void Animate::start(long long time){
+	if (time==-1)
+		start_time=timeMs();
+	else 
+		start_time=time;
 	if (!continuous)
 		end_time=start_time+duration;
 }
 
 #define PI 3.1415926535
 float Animate::getVal(){
+	massert(start_time!=-1);
 	long long now = timeMs();
-	int ms = now-start_time;
+	long long ms = now-start_time;
+//	cerr << "EEEE: now="<<now <<" ms="<<ms<<" start_time="<<start_time<<endl;
+	
 
 //	cerr <<"Animate::getVal: ms="<<ms<<endl;
 //	cerr << "Continuous="<<continuous<<endl;
@@ -82,6 +93,7 @@ float Animate::getVal(){
 			break;
 		case ANIMATE_STARTSTOP:
 			{
+//				cerr <<"XXXXXXXXXXXXXXXXXXXXXXXx ms="<<ms<< " and duration="<<duration<<endl;
 				if (ms>=duration)
 					return endval;
 				p = (float)ms/(float)duration;
@@ -96,6 +108,14 @@ float Animate::getVal(){
 				p = (float)ms/(float)duration;
 				return startval + p*p*(endval-startval);
 			}
+		case ANIMATE_SINUS:
+			{
+				ms = ms % duration;
+				p = (float)ms/(float)duration;
+				float ret= startval + ((-cos(p*2.0*PI)+1.0)/2)*(endval-startval);
+				return ret ;
+			}
+
 
 		default:
 			merror("Unimplemented animation type");

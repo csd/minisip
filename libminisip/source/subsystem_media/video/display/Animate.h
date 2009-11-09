@@ -33,6 +33,7 @@
 //   +----------------
 #define ANIMATE_STARTSTOP 4
 
+#define ANIMATE_SINUS 5
 
 
 class Animate : public MObject{
@@ -40,14 +41,21 @@ class Animate : public MObject{
 		Animate(float fixedVal);
 		Animate(int duration_ms, float startval, float endval, const int type);
 		Animate(float startval, float increase_per_s);
+	
+		/**
+ 		 * Sets starting time to now if no argument is given, or sets it
+ 		 */
+		void start(long long time=-1);
 
-		void start();
+		long long getStartTime();
 
 		float getVal();
 
 		bool ended();
 
 		int getDuration(){return duration;}
+
+		int getType(){return type;}
 
 	private:
 		long long timeMs();
