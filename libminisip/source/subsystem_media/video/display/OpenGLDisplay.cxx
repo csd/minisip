@@ -1736,7 +1736,7 @@ void OpenGLWindow::initSurface(){
 
 
 OpenGLDisplay::OpenGLDisplay( uint32_t width, uint32_t height, bool _fullscreen):VideoDisplay(){
-	cerr << "EEEE: OpenGLDisplay::OpenGLDisplay("<< width<<","<<height<<","<<fullscreen<<") running"<<endl;
+	cerr << "EEEE: OpenGLDisplay::OpenGLDisplay("<< width<<","<<height<<","<<_fullscreen<<") running"<<endl;
 	this->width = width;
 	this->height = height;
 	fullscreen = _fullscreen;
@@ -1851,11 +1851,12 @@ void OpenGLDisplay::handle( MImage * mimage){
 	//cerr <<"EEEE: doing OpenGLDisplay::handle on display "<<(uint64_t)this<<" image size="<<mimage->width<<"x"<<mimage->height<<" local="<<isLocalVideo<<endl;
 	massert(mimage->linesize[1]==0);
 	colorNBytes=mimage->linesize[0]/mimage->width;
+//	cerr <<"EEEE: colorNBytes="<<colorNBytes<<endl;
 	dataLock.lock();
 	if (!rgb || width!=mimage->width || height!=mimage->height){
 		cerr << "EEEE: allocating RGB of size "<<mimage->width<<"x"<<mimage->height<<endl;
 		if (rgb)
-			delete rgb;
+			delete [] rgb;
 		width=mimage->width;
 		height=mimage->height;
 		gfx->aratio=(float)width/(float)height;
@@ -1914,8 +1915,12 @@ void OpenGLDisplay::resize(int w, int h){
 	cerr << "EEEE: doing OpenGLDisplay::resize("<<w<<","<<h<<") old size="<<width<<"x"<<height<<endl;
 	this->width=w;
 	this->height=h;
+	newRgbData=false;
+	delete [] rgb;
+	rgb=NULL;
 	gfx->aratio=(float)w/(float)h;
 	window->sizeHint(w,h);
+
 }
 
 void OpenGLDisplay::destroyWindow(){
