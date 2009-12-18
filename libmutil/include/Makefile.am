@@ -8,7 +8,6 @@ pkginclude_HEADERS = \
 			libmutil/IString.h \
 			libmutil/dbg.h \
 			libmutil/merror.h \
-			libmutil/dbg.h \
 			libmutil/Thread.h \
 			libmutil/TextUI.h \
 			libmutil/Timestamp.h \
