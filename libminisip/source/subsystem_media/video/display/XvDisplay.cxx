@@ -27,6 +27,7 @@
 #include<sys/time.h>
 #include<libminisip/media/video/VideoException.h>
 #include<stdlib.h>
+#include<stdio.h>
 
 using namespace std;
 

@@ -38,6 +38,7 @@
 #include<libmutil/stringutils.h>
 #include<libmutil/massert.h>
 #include<string.h>
+#include<stdio.h>
 
 #define SOURCE_QUEUE_SIZE 7
 
