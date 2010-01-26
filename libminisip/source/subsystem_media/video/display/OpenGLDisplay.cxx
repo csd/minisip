@@ -2791,6 +2791,7 @@ void OpenGLWindow::initSurface(){
 OpenGLDisplay::OpenGLDisplay( uint32_t width, uint32_t height, bool _fullscreen):VideoDisplay(){
 	cerr << "EEEE: OpenGLDisplay::OpenGLDisplay("<< width<<","<<height<<","<<_fullscreen<<") running"<<endl;
 	hidden=false;
+	hidden=false;
 	this->width = width;
 	this->height = height;
 	fullscreen = _fullscreen;

@@ -259,13 +259,13 @@ void MatroxGrabber::read( ImageHandler * handler ){
 		if (!UserStruct.stopped){
 			static int i=0;
 			i++;
-			if (i%2==1){ //grabber does 50fps. We send 25fps.
+//			if (i%50==1){ //grabber does 50fps. We send 25fps.
 
 				handler->handle( frame );
 				if (localDisplay){
 					localDisplay->handle(frame);
 				}
-			}
+//			}
 
 			if (i%200==0){
 				static struct timespec last_wallt;

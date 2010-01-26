@@ -95,7 +95,7 @@ void VideoMedia::handleMHeader( MRef< SdpHeaderM * > m ){
         }
 }
 
-void VideoMedia::playData( MRef<RtpPacket *> packet ){
+void VideoMedia::playData( const MRef<RtpPacket *> & packet ){
 
 	MRef<VideoMediaSource *> source = getSource( packet->getHeader().SSRC );
 
@@ -355,8 +355,8 @@ int rtpSeqDiff(int prev, int now){
 	return ret;
 }
 
-void VideoMediaSource::enqueueRtp(MRef<RtpPacket*> rtp){
-	//cerr << "EEEE: VideoMediaSource::enqueueRtp seq="<< rtp->getHeader().getSeqNo()<<endl;
+void VideoMediaSource::enqueueRtp( const MRef<RtpPacket*> & rtp){
+	cerr << "EEEE: VideoMediaSource::enqueueRtp seq="<< rtp->getHeader().getSeqNo()<<endl;
 	if (rtpReorderBuf.size()==0){
 		rtpReorderBuf.push_front(rtp);
 	}else{
@@ -380,7 +380,6 @@ void VideoMediaSource::playSaved(){
 	while (rtpReorderBuf.size()>0 && rtpSeqDiff(lastPlayedSeqNo, (*rtpReorderBuf.begin())->getHeader().getSeqNo()  )==1){
 		MRef<RtpPacket*> packet=*rtpReorderBuf.begin();
 		int seqNo = packet->getHeader().getSeqNo();
-		//cerr << "EEEE: playing another queued packet with seq="<<seqNo<<endl;
 		addPacketToFrame( packet, false );
 		rtpReorderBuf.pop_front();
 		lastSeqNo=seqNo;
@@ -389,7 +388,7 @@ void VideoMediaSource::playSaved(){
 
 }
 
-void VideoMediaSource::playData( MRef<RtpPacket *> packet ){
+void VideoMediaSource::playData( const MRef<RtpPacket *> & packet ){
 
 	int marker= packet->getHeader().marker;
 	int seqNo = packet->getHeader().getSeqNo();
@@ -487,7 +486,7 @@ void VideoMediaSource::playData( MRef<RtpPacket *> packet ){
 #endif
 }
 
-void VideoMediaSource::addPacketToFrame( MRef<RtpPacket *> packet, bool flush){
+void VideoMediaSource::addPacketToFrame( const MRef<RtpPacket *> & packet, bool flush){
 
 	if (flush){
 		//cerr <<"EEEE: addPacketToFrame: flushing"<<endl;

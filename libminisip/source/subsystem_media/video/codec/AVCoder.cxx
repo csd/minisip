@@ -25,6 +25,7 @@
 #include<libminisip/media/video/codec/AVCoder.h>
 #include<sys/time.h>
 #include<libmutil/mtime.h>
+#include<libmutil/Timestamp.h>
 #include<libminisip/media/video/codec/VideoEncoderCallback.h>
 #include<libminisip/media/video/VideoException.h>
 //#include<libminisip/media/rtp/RtpPacket.h>
@@ -75,6 +76,7 @@ AVEncoder::AVEncoder() {
 	video=NULL;
 	videoCodec=NULL;
 	swsctx=NULL;
+	N=0;
 
 
 }
@@ -108,7 +110,7 @@ void AVEncoder::init( uint32_t width, uint32_t height ){
 
 	video->width=width;
 	video->height=height;
-	video->fps=15;
+	video->fps=30;
 
 #ifdef GLOBAL_BANDWIDTH_HACK
 	if (globalBitRate<128)
@@ -117,7 +119,7 @@ void AVEncoder::init( uint32_t width, uint32_t height ){
 		globalBitRate=25000;
 	videoCodec->bitrate=globalBitRate;
 #else
-	videoCodec->bitrate=1500;
+	videoCodec->bitrate=6000;
 #endif
 
 
@@ -142,6 +144,10 @@ void AVEncoder::setLocalDisplay(MRef<VideoDisplay*> d){
 }
 
 #define REPORT_N 50
+#if 0
+
+#endif
+
 
 void AVEncoder::handle( MImage * image ){
 
@@ -152,8 +158,8 @@ void AVEncoder::handle( MImage * image ){
 	static struct timeval lasttime;
 
 	static int i=0;
-	static int N=0;
-        i++;
+	//	static int N=0;
+	i++;
 
 #ifdef GLOBAL_BANDWIDTH_HACK
 	static int lastBitRate=-1;
@@ -161,12 +167,14 @@ void AVEncoder::handle( MImage * image ){
 		lastBitRate=globalBitRate;
 
 	if (globalBitRate!=lastBitRate){
+		cerr <<"EEEE: bitrate changed. ============================="<<endl;
 		init(image->width, image->height);
 		lastBitRate=globalBitRate;
 
 	}
 #endif
 
+	Video *video = (Video*)this->video;
 
 //	if (i%7!=0)
 //		return;
@@ -178,13 +186,12 @@ void AVEncoder::handle( MImage * image ){
                 int diffms = (now.tv_sec-lasttime.tv_sec)*1000+(now.tv_usec-lasttime.tv_usec)/1000;
                 float sec = (float)diffms/1000.0f;
                 printf("%d frames in %fs\n", REPORT_N, sec);
-                printf("FPS_ENCODE: %f\n", (float)REPORT_N/(float)sec );
+                printf("FPS_ENCODE: %f for video of size %dx%d\n", (float)REPORT_N/(float)sec, video->width, video->height );
                 lasttime=now;
         }
 #endif
 
 
-	Video *video = (Video*)this->video;
 	VideoCodec *videoCodec = (VideoCodec*)this->videoCodec;
 
 	if (!video || image->width!=video->width || image->height!=video->height){
@@ -228,6 +235,7 @@ void AVEncoder::handle( MImage * image ){
 		struct SwsContext* ctx = (struct SwsContext*)swsctx;
 
 		sws_scale( ctx, image->data, image->linesize, 0, image->height, frame.data, frame.linesize);
+//		yuv2rgb(image->data[0], image->data[1], image->data[2], image->width, image->height, frame.data[0]);
 	}
 	else{
 		/* We can use the picture as is */
@@ -265,6 +273,8 @@ void AVEncoder::handle( MImage * image ){
 	if (mustFreeFrame){
 		avpicture_free( (AVPicture*)&frame );
 	}
+
+	//printSnd();
 }
 
 int h264_start_code(unsigned char* p){

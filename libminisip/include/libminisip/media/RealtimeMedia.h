@@ -64,7 +64,7 @@ class LIBMINISIP_API RealtimeMedia : public Media {
 		 * decoding if relevant.
 		 * @param rtpPacket the RTP packet to play
 		 */
-		virtual void playData( MRef<RtpPacket *> rtpPacket )=0;
+		virtual void playData( const MRef<RtpPacket *> & rtpPacket )=0;
 		
 		/**
 		 * Send the data to all the registered RealtimeMediaStreamSender.
