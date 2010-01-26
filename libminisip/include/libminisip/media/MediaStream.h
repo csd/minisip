@@ -297,7 +297,7 @@ class LIBMINISIP_API RealtimeMediaStreamReceiver : public RealtimeMediaStream{
 		 * playback.
 		 * @param packet the (S)RTP packet to handle
 		 */
-		virtual void handleRtpPacket( MRef<SRtpPacket *> packet, std::string callId, MRef<IPAddress *> from );
+		virtual void handleRtpPacket( const MRef<SRtpPacket *> & packet, std::string callId, MRef<IPAddress *> from );
 
 		/**
 		 * Returns a unique identifier for this Receiver. Used
@@ -468,7 +468,7 @@ class LIBMINISIP_API RealtimeMediaStreamSender : public RealtimeMediaStream{
 		uint16_t getSeqNo() { return seqNo; };
 #endif
 
-		void sendRtpPacket(MRef<RtpPacket*> rtp);
+		void sendRtpPacket(const MRef<RtpPacket*> & rtp);
 
 		/**
 		 * Used by the Session to specify the IP address

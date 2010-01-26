@@ -76,7 +76,7 @@ class LIBMINISIP_API AudioMedia : public RealtimeMedia, public SoundRecorderCall
 		* decoding if relevant.
 		* @param rtpPacket the RTP packet to play
 		*/
-		virtual void playData( MRef<RtpPacket *> rtpPacket );
+		virtual void playData( const MRef<RtpPacket *> & rtpPacket );
 
 		/**
 		* Used by the media sessions to register a MediaStreamSender.
@@ -181,7 +181,7 @@ class LIBMINISIP_API AudioMediaSource : public BasicSoundSource{
 	public:
 		AudioMediaSource( uint32_t ssrc, std::string callId, MRef<Media *> media );
 
-		void playData( MRef<RtpPacket *> rtpPacket );
+		void playData( const MRef<RtpPacket *> & rtpPacket );
 		uint32_t getSsrc();
 		
 		MRef<Media *> getMedia() { return media; };

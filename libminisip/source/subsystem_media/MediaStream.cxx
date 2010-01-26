@@ -383,7 +383,7 @@ void RealtimeMediaStreamReceiver::handleRtpPacketExt(MRef<SRtpPacket *> packet) 
 }
 #endif
 
-void RealtimeMediaStreamReceiver::handleRtpPacket( MRef<SRtpPacket *> packet, string callId, MRef<IPAddress *> from ){
+void RealtimeMediaStreamReceiver::handleRtpPacket( const MRef<SRtpPacket *> & packet, string callId, MRef<IPAddress *> from ){
 	uint32_t packetSsrc;
 	uint16_t seq_no;
 
@@ -626,7 +626,7 @@ void RealtimeMediaStreamSender::send( byte_t * data, uint32_t length, uint32_t *
 
 }
 
-void RealtimeMediaStreamSender::sendRtpPacket(MRef<RtpPacket*> rtp){
+void RealtimeMediaStreamSender::sendRtpPacket(const MRef<RtpPacket*> & rtp){
 	if( remoteAddress->getAddressFamily() == AF_INET && senderSock )
 		rtp->sendTo( **senderSock, **remoteAddress, remotePort );
 	else if( remoteAddress->getAddressFamily() == AF_INET6 && sender6Sock )

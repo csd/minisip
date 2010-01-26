@@ -37,7 +37,7 @@
 #include<libmutil/CircularBuffer.h>
 
 //jitter buffer size in units of 20ms
-#define CIRCULAR_BUFFER_SIZE 5
+#define CIRCULAR_BUFFER_SIZE 7
 
 using namespace std;
 
@@ -76,6 +76,8 @@ BasicSoundSource::BasicSoundSource(int32_t id,
 		SoundSource(id, callId),
 		plcProvider(plc)   {
 	this->oNChannels = oNChannels;
+
+	memset(plcCache, 0, 2048*sizeof(short));
 	this->oFreq = oFreq;
         
 	this->position=position;
@@ -253,9 +255,14 @@ void BasicSoundSource::getSound(short *dest,
 			short *b = plcProvider->get_plc_sound(oFrames);
 			memcpy(dest, b, oFrames);
 		}else{
+		//	for (uint32_t i=0; i < oFrames * oNChannels; i++){
+		//		dest[i]=0;
+		//	}
 			for (uint32_t i=0; i < oFrames * oNChannels; i++){
-				dest[i]=0;
+				dest[i]=plcCache[i];
+				plcCache[i]/=2;
 			}
+
 		}
 		bufferLock.unlock();
                 return;
@@ -277,6 +284,9 @@ void BasicSoundSource::getSound(short *dest,
 #endif
 //	resampler->resample( temp, dest );
 	memcpy(dest,temp,iFrames * oNChannels * sizeof( short ) );
+
+
+	memcpy((void*)&plcCache[0], dest, oFrames*oNChannels );
 
 // 	memset( dest, 0, oFrames * oNChannels * sizeof( short ) ); 
 	bufferLock.unlock();

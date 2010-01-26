@@ -246,49 +246,107 @@ void RtpReceiver::run(){
 		MRef<IPAddress *> from = NULL;
 		try{
 		    packet = SRtpPacket::readPacket( **socket, from);
-		}
-
-		catch (NetworkException &  ){
+		} catch (NetworkException &  ){
 			continue;
 		}
+
+		list<MRef<SRtpPacket*> > nextpackets;
+		struct timeval nowait={0,0};
+		{
+			FD_ZERO( &rfds );
+#ifdef WIN32
+			FD_SET( (uint32_t) socket->getFd(), &rfds );
+#else
+			FD_SET( socket->getFd(), &rfds );
+
+#endif
+			while( select( socket->getFd()+1, &rfds, NULL, NULL, &nowait ) > 0 ){
+				MRef<SRtpPacket *> nextpacket;
+				try{
+					nextpacket = SRtpPacket::readPacket( **socket, from);
+				} catch (NetworkException &  ){
+					continue;
+				}
+				nextpackets.push_back(nextpacket);
+
+			}
+			int nmark=0;
+			list<MRef<SRtpPacket*> >::iterator i;
+			for (i=nextpackets.begin(); i!=nextpackets.end(); i++){
+				if ((*i)->getHeader().marker)
+					nmark++;
+			}
+			
+
+//			cerr <<"EEEE: RtpPacket::run: number of extra packets: "<< nextpackets.size() <<" nmark" <<nmark<<endl;
+			int ndrop=0;
+			if (nmark>2 && nextpackets.size()>150){
+				while ( nmark>2 ){
+					if ( (*nextpackets.begin())->getHeader().marker )
+						nmark--;
+					nextpackets.pop_front();
+					ndrop++;
+				}
+
+				cerr <<"EEEE: dropped packets n="<<ndrop<<endl;
+			}
+
+
+		}
+
+
+
+
 
 		if( !packet ){
 			continue;
 		}
-
+		
 		realtimeMediaStreamsLock.lock();
-		for ( i = realtimeMediaStreams.begin(); i != realtimeMediaStreams.end(); i++ ) {
-                    std::list<MRef<Codec *> > codecs = (*i)->getAvailableCodecs();
-                    std::list<MRef<Codec *> >::iterator iC;
-                    int found = 0;
-			//printf( "|" );
-                    for( iC = codecs.begin(); iC != codecs.end(); iC ++ ){
-                        if ( (*iC)->getSdpMediaType() == packet->getHeader().getPayloadType() ) {
-                            (*i)->handleRtpPacket( packet, callId, from );
-                            found = 1;
-                            //printf( "~" );
-                            break;
-                        }
-                    }
+		do{
+
+			for ( i = realtimeMediaStreams.begin(); i != realtimeMediaStreams.end(); i++ ) {
+				std::list<MRef<Codec *> > codecs = (*i)->getAvailableCodecs();
+				std::list<MRef<Codec *> >::iterator iC;
+				int found = 0;
+				//printf( "|" );
+				for( iC = codecs.begin(); iC != codecs.end(); iC ++ ){
+					if ( (*iC)->getSdpMediaType() == packet->getHeader().getPayloadType() ) {
+						(*i)->handleRtpPacket( packet, callId, from );
+						found = 1;
+						//printf( "~" );
+						break;
+					}
+				}
 #ifdef ZRTP_SUPPORT
-                    /*
-                     * If we come to this point:
-                     * no codec was found for this packet.
-                     */
-                    MRef<ZrtpHostBridgeMinisip *>zhb = (*i)->getZrtpHostBridge();
+				/*
+				 * If we come to this point:
+				 * no codec was found for this packet.
+				 */
+				MRef<ZrtpHostBridgeMinisip *>zhb = (*i)->getZrtpHostBridge();
 
-                    /*
-                     * If the packet was not processed above and it contains an
-                     * extension header then check for ZRTP packet.
-                    */
-                    if (!found && zhb && packet->getHeader().getExtension()) {
-                        (*i)->handleRtpPacketExt(packet);
-                    }
+				/*
+				 * If the packet was not processed above and it contains an
+				 * extension header then check for ZRTP packet.
+				 */
+				if (!found && zhb && packet->getHeader().getExtension()) {
+					(*i)->handleRtpPacketExt(packet);
+				}
 #endif // ZRTP_SUPPORT
-                }
-                realtimeMediaStreamsLock.unlock();
+			}
 
-                packet = NULL;
+			packet = NULL;
+
+			if (nextpackets.size()>0){
+				packet= *nextpackets.begin();
+				nextpackets.pop_front();
+			}
+
+		}while(packet);
+
+		realtimeMediaStreamsLock.unlock();
+
 	}
 	socket=NULL;
 }
+

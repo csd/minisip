@@ -143,4 +143,7 @@ static inline uint64_t U64_AT( void const * _p )
 #endif
 
 
+#define GLOBAL_BANDWIDTH_HACK 1
+
+
 #endif

@@ -61,7 +61,7 @@ class LIBMINISIP_API VideoMedia : public RealtimeMedia,
 
 		virtual std::string getSdpMediaType();
 
-		virtual void playData( MRef<RtpPacket *> rtpPacket );
+		virtual void playData( const MRef<RtpPacket *> & rtpPacket );
 
 		virtual void sendVideoData( byte_t * data, uint32_t length, uint32_t ts, bool marker=false );
 
@@ -105,7 +105,7 @@ class LIBMINISIP_API VideoMediaSource : public MObject {
 		void addEmptyImage( MImage * image );
 		void addFilledImage( MImage * image );
 		
-		virtual void playData( MRef<RtpPacket *> packet ); 
+		virtual void playData( const MRef<RtpPacket *> & packet ); 
 
 		MRef<AVDecoder *> getDecoder();
 		MRef<AVEncoder *> getEncoder();
@@ -120,7 +120,7 @@ class LIBMINISIP_API VideoMediaSource : public MObject {
 		 * @param flush Packet loss was detected, and previous
 		 *              data should be flushed to the decoder.
 		 */
-		void addPacketToFrame( MRef<RtpPacket *> packet, bool flush );
+		void addPacketToFrame( const MRef<RtpPacket *> & packet, bool flush );
 
 		MRef<AVDecoder *> decoder;
 		MRef<VideoDisplay *> display;
@@ -137,7 +137,7 @@ class LIBMINISIP_API VideoMediaSource : public MObject {
 		uint16_t lastSeqNo;
 		uint16_t lastPlayedSeqNo;
 		std::list<MRef<RtpPacket*> > rtpReorderBuf;
-		void enqueueRtp(MRef<RtpPacket*> rtp); //ordered list of packets left to play out
+		void enqueueRtp(const MRef<RtpPacket*> & rtp); //ordered list of packets left to play out
 		void playSaved();
 
 

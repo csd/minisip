@@ -151,7 +151,7 @@ void AudioMedia::unregisterMediaSource( uint32_t ssrc ){
 	}
 }
 
-void AudioMedia::playData( MRef<RtpPacket *> packet ){
+void AudioMedia::playData(const MRef<RtpPacket *> & packet ){
 	MRef<AudioMediaSource *> source = getSource( packet->getHeader().SSRC );
 
 	if( source ){
@@ -326,7 +326,7 @@ AudioMediaSource::AudioMediaSource( uint32_t ssrc_, string callId, MRef<Media *>
 		codecOutput[i]=0;
 }
 
-void AudioMediaSource::playData( MRef<RtpPacket *> rtpPacket ){
+void AudioMediaSource::playData( const MRef<RtpPacket *> & rtpPacket ){
         RtpHeader hdr = rtpPacket->getHeader();
 	MRef<CodecState *> codec = findCodec( hdr.getPayloadType() );
 

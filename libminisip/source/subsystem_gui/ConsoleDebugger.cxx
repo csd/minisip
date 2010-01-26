@@ -99,7 +99,7 @@ void ConsoleDebugger::showHelp() {
 	
 }
 
-int globalBitRate=1024;
+int globalBitRate=6024;
 
 void ConsoleDebugger::run(){
 #ifdef DEBUG_OUTPUT

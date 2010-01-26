@@ -288,10 +288,10 @@ class LIBMINISIP_API BasicSoundSource: public SoundSource{
 		*/
 		CircularBuffer * cbuff;
 
+		short plcCache[2048];
+
 		int oFreq;
 
-		uint16_t plc_lastdata[4096];
-		
 		/**
 		Auxiliary buffer .. used both in pushSound() and getSound().
 		We need the mutex

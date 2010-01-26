@@ -73,6 +73,7 @@ class LIBMINISIP_API AVDecoder : public MObject{
 		bool needsConvert;
 
 		void* swsctx;
+		int N;
 
 };
 

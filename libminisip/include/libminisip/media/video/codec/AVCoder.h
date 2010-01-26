@@ -90,6 +90,7 @@ class LIBMINISIP_API AVEncoder: public ImageHandler, public MObject{
 		MRef<VideoDisplay*> localDisplay;
 
 		void *swsctx;
+		int N;
 };
 
 
