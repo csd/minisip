@@ -53,6 +53,8 @@
 #include<libmsip/SipHeaderReferTo.h>
 #include<libmsip/SipHeaderSupported.h>
 
+#include<stdio.h>
+
 using namespace std;
 
 MRef<SipRequest*> SipRequest::createSipMessageAck( MRef<SipRequest*> origReq,

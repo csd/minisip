@@ -29,6 +29,7 @@
 #include<libmikey/MikeyMessage.h>
 #include<string.h>
 #include<stdlib.h>
+#include<stdio.h>
 #include<libmcrypto/hmac.h>
 #include<libmcrypto/rand.h>
 
