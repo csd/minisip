@@ -125,7 +125,7 @@ class Notification{
 };
 
 
-void Notification::draw(float x1, float y1, float x2, float y2){
+void Notification::draw(float x1, float y1, float x2, float y2){ //NOTE: must be called by internal thread
 
 	static const SDL_Color white={255,255,255};
 	static const SDL_Color black={0,0,0};
@@ -167,7 +167,7 @@ public:
 		text = _text;
 		toppicture=NULL;
 	}
-	Menu* select(int si){
+	Menu* select(int si){ //NOTE: this method is indirectly used from external thread
 		list<Menu*>::iterator i;
 		int j=0;
 		Menu* ret=NULL;
@@ -178,7 +178,7 @@ public:
 		}
 		return ret;
 	}
-	int nVisible(){
+	int nVisible(){ //NOTE: this method is indirectly(2) used from external thread
 		int ret=0;
 		list<Menu*>::iterator i;
 		for (i=mitems.begin();i!=mitems.end();i++){
@@ -251,7 +251,7 @@ public:
 		return prev;
 	}
 	
-	Menu* getMenuItem(string name){
+	Menu* getMenuItem(string name){ //NOTE: this method is indirectly(2) used from external thread
 		int n=0;
 		list<Menu*>::iterator i;
 		for (i=mitems.begin();i!=mitems.end();i++, n++){
@@ -526,7 +526,7 @@ class OpenGLWindow : public Runnable {
 		/**
 		 * Suggest good dimension of window. If there are multiple videos, then this will be ignored
 		 */
-		void sizeHint(int w, int h){
+		void sizeHint(int w, int h){ //NOTE: this method is used from external thread
 			cerr <<"EEEE: doing sizeHint("<<w<<","<<h<<")"<<endl;
 			if (displays.size()<=1){
 //				if (initialized && ! isFullscreen() ){
@@ -548,7 +548,7 @@ class OpenGLWindow : public Runnable {
 		void keyPressed(string key, bool isRepeat);
 
 		void setPhoneConfig(MRef<SipSoftPhoneConfiguration*> conf);
-		void setCallback(OpenGLDisplay* cb){
+		void setCallback(OpenGLDisplay* cb){ //NOTE: this method is used from external thread
 			if (!callback)
 				callback=cb;
 		}
@@ -564,12 +564,12 @@ class OpenGLWindow : public Runnable {
 
 		}
 
-		void registerUri(string callid, string remoteuri){
+		void registerUri(string callid, string remoteuri){ //NOTE: this method is used from external thread
 			id_uri[callid]=remoteuri;
 
 		}
 
-		void updateVideoLayout(){
+		void updateVideoLayout(){ //NOTE: this method is used from external thread
 			displaysChanged=true;
 		}
 	
@@ -770,7 +770,7 @@ OpenGLWindow::OpenGLWindow(int w, int h, bool fullscreen){
 
 }
 
-void OpenGLWindow::setPhoneConfig(MRef<SipSoftPhoneConfiguration*> conf){
+void OpenGLWindow::setPhoneConfig(MRef<SipSoftPhoneConfiguration*> conf){ //NOTE: this method is used from external thread
 	pconf=conf;
 }
 
@@ -804,7 +804,7 @@ void OpenGLWindow::hideAcceptCallMenu(bool hideAll){
 	menuLock.unlock();
 }
 
-void OpenGLWindow::incomingCall(string callid, string uri, bool unprotected){
+void OpenGLWindow::incomingCall(string callid, string uri, bool unprotected){ //NOTE: this method is used from external thread
 	cerr <<"OpenGLWindow::incomingCall: trying to display accept call menu"<<endl;
 	menuLock.lock();
 	list<Menu*>::iterator i=menuAcceptCall->mitems.begin();
@@ -840,7 +840,7 @@ OpenGLDisplay* OpenGLWindow::getSelectedDisplay(){
 	return NULL;
 }
 
-void OpenGLWindow::videoSelect(string key){
+void OpenGLWindow::videoSelect(string key){ //NOTE: this method is indirectly used from external thread
 	cerr <<"EEEE: videoSelect("<<key<<")"<<endl;
 
 	if (key=="KEY_PLAY"){
@@ -923,7 +923,7 @@ void OpenGLWindow::videoSelect(string key){
 
 }
 
-void OpenGLWindow::keyPressed(string key, bool isRepeat){
+void OpenGLWindow::keyPressed(string key, bool isRepeat){ //NOTE: this method is used from external thread
 //	cerr <<"EEEE: OpenGLWindow::keyPressed: "<<key<<endl;
 
 	if (isRepeat)
@@ -1043,7 +1043,7 @@ void OpenGLWindow::keyPressed(string key, bool isRepeat){
 
 }
 
-void OpenGLWindow::setTexturePath(string p){
+void OpenGLWindow::setTexturePath(string p){ //NOTE: this method is used from external thread
 	texturePath=p;
 }
 
@@ -1057,7 +1057,7 @@ struct mgl_gfx* OpenGLWindow::getIcon(string name){
 } 
 
 #define ICON_DIM 256
-bool OpenGLWindow::loadTexture(string fname){
+bool OpenGLWindow::loadTexture(string fname){ //NOTE: must be called by internal thread
 	texturesLoaded=true;
 	cerr <<"EEEE: OpenGLWindow::loadTexture: trying to load "<<fname<<endl;
 
@@ -1115,7 +1115,7 @@ bool OpenGLWindow::loadTexture(string fname){
 	massert(glGetError()==GL_NO_ERROR);
 }
 
-void OpenGLWindow::updateMenu(bool animate){
+void OpenGLWindow::updateMenu(bool animate){ //NOTE: this method is indirectly used from external thread
 	if (menuActions){
 		massert(menuActions);
 		massert(menuActions->getMenuItem("hangup"));
@@ -1175,7 +1175,7 @@ void OpenGLWindow::setupMenu(){
 
 }
 
-void OpenGLWindow::enableMenu(){
+void OpenGLWindow::enableMenu(){ //NOTE: this method is used from external thread
 	cerr<<"EEEE: called enableMenu()"<<endl;
 	massert(texturePath.size()>0);
 	/*showMenu=true;*/
@@ -1189,7 +1189,7 @@ void OpenGLWindow::enableMenu(){
 #define REPORT_N 500
 
 
-void OpenGLWindow::findScreenCoords() {
+void OpenGLWindow::findScreenCoords() { //NOTE: must be called by internal thread
 	GLdouble x=0;
 	GLdouble y=0;
 	GLdouble z=0;
@@ -1241,7 +1241,7 @@ void OpenGLWindow::findScreenCoords() {
 }
 
 
-void OpenGLWindow::rectToCoord(float &x1, float&y1, float &x2, float &y2, float lx1, float ly1, float lx2, float ly2, float aratio){
+void OpenGLWindow::rectToCoord(float &x1, float&y1, float &x2, float &y2, float lx1, float ly1, float lx2, float ly2, float aratio){ //NOTE: this method is indirectly (2) used from external thread
 
 	float l_aratio=(lx2-lx1)/(ly2-ly1);
 //	cerr <<"l_aratio="<<l_aratio<<endl;
@@ -1412,7 +1412,7 @@ int OpenGLWindow::nVisibleDisplays(){
 	return ret;
 }
 
-void OpenGLWindow::updateVideoPositions(bool doAnimate){
+void OpenGLWindow::updateVideoPositions(bool doAnimate){ //NOTE: this method is indirectly used from external thread
 
 	cerr << "EEEE: doing updateVideoPositions()"<<endl;
 	displayListLock.lock();
@@ -1560,7 +1560,7 @@ void OpenGLWindow::updateVideoPositions(bool doAnimate){
 	displayListLock.unlock();
 }
 
-void OpenGLWindow::addDisplay(OpenGLDisplay* displ){
+void OpenGLWindow::addDisplay(OpenGLDisplay* displ){ //NOTE: this method is used from external thread
 	inCall=true;
 	cerr << "EEEE: doing addDisplay()"<<endl;
 	displayListLock.lock();
@@ -1576,7 +1576,7 @@ void OpenGLWindow::addDisplay(OpenGLDisplay* displ){
 	updateVideoPositions(true);
 }
 
-void OpenGLWindow::removeDisplay(OpenGLDisplay* displ){
+void OpenGLWindow::removeDisplay(OpenGLDisplay* displ){ //NOTE: this method is used from external thread
 	cerr <<"EEEE: removeDisplay() running"<<endl;
 	displayListLock.lock();
 	displays.remove(displ);
@@ -1769,7 +1769,7 @@ void OpenGLWindow::layoutAddressBook(bool doAnimate){
 
 }
 
-void OpenGLWindow::menuDrawAddressBook(){
+void OpenGLWindow::menuDrawAddressBook(){ //NOTE: must be called by internal thread
 
 	static const SDL_Color white={255,255,255};
 	static const SDL_Color black={0,0,0};
@@ -1862,7 +1862,7 @@ void OpenGLWindow::menuDrawAddressBook(){
 }
 
 
-void OpenGLWindow::menuLayout(bool animate){
+void OpenGLWindow::menuLayout(bool animate){ //NOTE: this method is indirectly used from external thread
 	cerr <<"EEEE: menuLayout called"<<endl;
 	int nicons=menuRoot->nVisible();
 	float x1= windowX0;
@@ -1965,7 +1965,7 @@ void OpenGLWindow::menuLayout(bool animate){
 
 }
 
-void OpenGLWindow::menuDraw(){
+void OpenGLWindow::menuDraw(){ //NOTE: must be called by internal thread
 	menuLock.lock();
 	massert(menuRoot);
 	bool drawBackground=true;
@@ -2172,7 +2172,7 @@ void OpenGLWindow::menuDraw(){
 
 }
 
-void OpenGLWindow::notificationsDraw(){
+void OpenGLWindow::notificationsDraw(){ //NOTE: must be called by internal(2) thread
 	list<Notification*>::iterator i;
 
 	static const SDL_Color white={255,255,255};
@@ -2196,7 +2196,8 @@ void OpenGLWindow::notificationsDraw(){
 
 }
 
-void OpenGLWindow::drawSurface(){
+void OpenGLWindow::drawSurface(){ //NOTE: must be called by internal thread
+
 	//	cerr << "EEEE: doing OpenGLWindow::drawSurface()"<<endl;
 	static struct timeval lasttime;
 	static int i=0;
@@ -2263,7 +2264,7 @@ void OpenGLWindow::drawSurface(){
 	int nvideos=displays.size();
 	for (video=displays.begin(); video!=displays.end(); video++){
 		//				cerr << "EEEE: getting video texture for display "<< dummy++ <<"/"<<nvideos <<endl;
-		struct mgl_gfx* gfx = (*video)->getTexture();
+		struct mgl_gfx* gfx = (*video)->getTexture(true);
 		if (!(*video)->isHidden() && gfx->texture>0){
 			massert(gfx->alpha);
 			float alpha=gfx->alpha->getVal();
@@ -2355,20 +2356,17 @@ void OpenGLWindow::drawSurface(){
 }
 
 
-void OpenGLWindow::sdlQuit(){
-	cerr << "EEEE: sdlQuit called"<<endl;
+void OpenGLWindow::sdlQuit(){ //NOTE: must be called by internal thread
 	if (isFullscreen() ){
 		toggleFullscreen();
 	}
 
-	cerr <<"----------------------------->EEEE: SDL_Quit int sdlQuit running by thread "<<hex<<Thread::getCurrent().asLongInt()<<dec<<endl;
 	SDL_Quit();
-	cerr <<"EEEE: done doing SDL_Quit"<<endl;
 }
 
 
 
-void OpenGLWindow::toggleFullscreen(){
+void OpenGLWindow::toggleFullscreen(){ //NOTE: must be called by internal thread
 	printf("Toggle fullscreen\n");
 	sdlFlags ^= SDL_FULLSCREEN;
 	//        SDL_WM_ToggleFullScreen(gDrawSurface);
@@ -2394,7 +2392,7 @@ void OpenGLWindow::toggleFullscreen(){
 
 
 
-void OpenGLWindow::windowResized(int w, int h){
+void OpenGLWindow::windowResized(int w, int h){ //NOTE: must be called by internal thread
 	cerr<<"EEEE: doing OpenGLWindow::windowResized("<<w<<","<<h<<")"<<endl;
 	windowed_width=w;
 	windowed_height=h;
@@ -2411,7 +2409,7 @@ void OpenGLWindow::windowResized(int w, int h){
 }
 
 
-void OpenGLWindow::run(){
+void OpenGLWindow::run(){ //NOTE: must be called by internal thread
 	cerr << "EEEE: OpenGLWindow::run start"<<endl;
 #ifdef DEBUG_OUTPUT
 	setThreadName("OpenGLWindow");
@@ -2514,19 +2512,15 @@ void OpenGLWindow::run(){
 //		Thread::msleep(500);
 	}
 
-	cerr <<"----------------EEEE: OpenGl thread quitting"<<endl;
-	
-	cerr <<"EEEE: TTF_Quit running by thread "<<hex<<Thread::getCurrent().asLongInt()<<dec<<endl;
 
 	TTF_Quit();
 	if (menuMode==MENU_HIDDEN){
-		cerr <<"----------------------------->EEEE: SDL_Quit running by thread "<<hex<<Thread::getCurrent().asLongInt()<<dec<<endl;
 		SDL_Quit();
 	}
 } 
 
 
-void OpenGLWindow::start(){
+void OpenGLWindow::start(){ //NOTE: this method is used from external thread
 	cerr << "EEEE: doing OpenGLWindow::start()"<<endl;
 	lock.lock();
 	bool useSem=false;
@@ -2552,7 +2546,7 @@ void OpenGLWindow::start(){
 	cerr << "EEEE: after OpenGLWindow::start() runCount="<<runCount<<endl;
 }
 
-void OpenGLWindow::stop(){
+void OpenGLWindow::stop(){ //NOTE: this method is used from external thread
 	cerr << "EEEE: doing OpenGLWindow::stop()"<<endl;
 	lock.lock();
 	runCount--;
@@ -2576,7 +2570,7 @@ MRef<OpenGLWindow*> OpenGLWindow::getWindow(bool fullscreen){
 
 }
 
-void OpenGLWindow::init(){
+void OpenGLWindow::init(){ //NOTE: must be called by internal thread
 
 	if (!initialized){
 		initialized=true;
@@ -2589,8 +2583,8 @@ void OpenGLWindow::init(){
 typedef GLvoid (*glXSwapIntervalSGIFunc) (GLint);
 typedef GLvoid (*glXSwapIntervalMESAFunc) (GLint);
 
-void OpenGLWindow::initSdl(){
-	cerr <<"---------------------> EEEE: initSdl running by thread "<<hex<<Thread::getCurrent().asLongInt()<<dec<<endl;
+void OpenGLWindow::initSdl(){ //NOTE: must be called by internal thread
+	//cerr <<"---------------------> EEEE: initSdl running by thread "<<hex<<Thread::getCurrent().asLongInt()<<dec<<endl;
 	// init video system
 	if( SDL_Init(SDL_INIT_VIDEO) < 0 )
 	{
@@ -2691,8 +2685,10 @@ void OpenGLWindow::initSdl(){
 	initSurface( );
 }
 
-void OpenGLWindow::initSurface(){
+void OpenGLWindow::initSurface(){ //NOTE: must be called by internal thread
 	printf("initSurface running\n");
+
+	//cerr <<"EEEE: initSurface running by thread "<<hex<<Thread::getCurrent().asLongInt()<<dec<<endl;
 //	massert(glGetError()==GL_NO_ERROR);
 
 	// get a framebuffer
@@ -2844,10 +2840,13 @@ void OpenGLDisplay::sendCmd(CommandString cmd){
 		callback->handleCommand("gui",cmd);
 }
 
-struct mgl_gfx*  OpenGLDisplay::getTexture(){
+
+struct mgl_gfx*  OpenGLDisplay::getTexture(bool textureUpdate){ //NOTE: if textureUpdate is true this method can only be called by internal thread
+
 	dataLock.lock();
-	if (gfx->texture==-1){
-	massert(glGetError()==GL_NO_ERROR);
+	//cerr <<"EEEE: getTexture running by thread "<<hex<<Thread::getCurrent().asLongInt()<<dec<< " textureUpdate=" << textureUpdate << endl;
+	if (textureUpdate && gfx->texture==-1){
+		massert(glGetError()==GL_NO_ERROR);
 		massert(colorNBytes==3 || colorNBytes==4);
 		int hw_max_dim = window->getTextureMaxSize();
 		int dim = (hw_max_dim>2048) ? 2048 : hw_max_dim;
@@ -2863,10 +2862,10 @@ struct mgl_gfx*  OpenGLDisplay::getTexture(){
 		GLenum pixFormat = colorNBytes==3?GL_RGB:GL_BGRA;
 		glTexImage2D( GL_TEXTURE_2D, 0, 3, dim, dim, 0, /*pixFormat*/ GL_RGB, GL_UNSIGNED_BYTE, dummy_black );
 		free(dummy_black);
-	massert(glGetError()==GL_NO_ERROR);
+		massert(glGetError()==GL_NO_ERROR);
 	}
 
-	if (newRgbData){
+	if (textureUpdate && newRgbData){
 		//cerr <<"EEEE: uploading new texture"<<endl;
 		massert(gfx->texture>0);
 		newRgbData=false;
@@ -2935,11 +2934,11 @@ void OpenGLDisplay::handle( MImage * mimage){
 
 	massert(rgb);
 
-	saveTime(&times_rcv.displaycopystart);
+//	saveTime(&times_rcv.displaycopystart);
 
 	memcpy(rgb, &mimage->data[0][0], width*height*colorNBytes); //TODO: don't copy since it is in correct format.
 
-	saveTime(&times_rcv.displaycopyend);
+//	saveTime(&times_rcv.displaycopyend);
 
 	newRgbData=true;
 	if (!isLocalVideo)

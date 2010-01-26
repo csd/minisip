@@ -60,9 +60,11 @@ class OpenGLDisplay: public VideoDisplay{
 		virtual void stop();
 
 		/*
-		 * Must only be called by the thread doing OpenGL calls.
+		 * Must only be called by the thread doing OpenGL calls unless
+		 * noTextureUpdate is set to true. This can be used
+		 * to access non-opengl attributes from non-internal threads.
 		 */
-		struct mgl_gfx* getTexture();
+		struct mgl_gfx* getTexture(bool textureUpdate=false);
 
 		virtual void setIsLocalVideo(bool);	
 		
