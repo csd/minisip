@@ -30,6 +30,8 @@
 #include<libminisip/media/video/codec/VideoCodec.h>
 #include<libminisip/media/video/codec/AVCoder.h>
 
+#include<stdio.h>
+
 #define MAX_SOURCE 256
 
 using namespace std;

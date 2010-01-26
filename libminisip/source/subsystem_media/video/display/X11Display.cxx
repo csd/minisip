@@ -29,6 +29,7 @@
 #include<X11/Xatom.h>
 #include<stdlib.h>
 #include<string.h>
+#include<stdio.h>
 
 using namespace std;
 
