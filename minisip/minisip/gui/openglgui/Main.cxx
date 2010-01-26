@@ -77,6 +77,7 @@ int main( int argc, char *argv[] )
 
 	cerr <<"EEEE: ,,,,,,,,,,,,,,,,,,,,,,,, running minisip.exit"<<endl;
 	minisip.exit();
+	Thread::msleep(1000);
 	return 0;
 }
 
