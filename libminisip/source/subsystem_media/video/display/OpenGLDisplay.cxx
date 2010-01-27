@@ -3092,12 +3092,9 @@ bool OpenGLDisplay::handleCommand(CommandString cmd){
 
 	if (cmd.getOp()=="make_proxy"){	//if we will not display any video
 		window->removeDisplay(this);
-		
-
 	}
 
 	if (cmd.getOp()=="wait_quit"){
-		cerr <<"EEEE: ?????????????????????????????????waiting for window quit"<<endl;
 		window->join();
 	}
 

@@ -108,6 +108,9 @@ class DeckLinkGrabber : public Grabber{
 
 	private:
 		void init();
+		void displayLocal(MImage* frame);
+		MImage* localRgb;
+
 		bool doStop;
 
 		DeckLinkCaptureDelegate* capture;

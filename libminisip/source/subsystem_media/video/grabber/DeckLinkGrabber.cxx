@@ -68,6 +68,151 @@ MIL_INT MFTYPE GrabEnd(MIL_INT HookType, MIL_ID EventId, void MPTYPE *UserStruct
 #endif
 
 
+void yuv420p_to_bgra(int width, int height,
+                        const unsigned char *srcy, int linesizey, 
+			const unsigned char *srcu, int linesizeu, 
+			const unsigned char *srcv, int linesizev,
+                        unsigned char *dst)
+{
+        int line, col, linewidth;
+        int y, u, v, yy, vr, ug, vg, ub;
+        int r, g, b;
+        const unsigned char *py, *pu, *pv;
+        unsigned char *origdst=dst;
+
+        linewidth = width >> 1;
+/*
+        py = src;
+        pu = py + (width * height);
+        pv = pu + (width * height) / 4;
+*/
+        py = srcy;
+        pu = srcu;
+        pv = srcv;
+
+        y = *py++;
+        yy = y << 8;
+        u = *pu - 128;
+        ug =   88 * u;
+        ub =  454 * u;
+        v = *pv - 128;
+        vg =  183 * v;
+        vr =  359 * v;
+
+        for (line = 0; line < height; line++) {
+                for (col = 0; col < width; col++) {
+                        r = (yy +      vr) >> 8;
+                        g = (yy - ug - vg) >> 8;
+                        b = (yy + ub     ) >> 8;
+
+                        // Clamp values (truncate)
+                        if (r < 0)   r = 0;
+                        if (r > 255) r = 255;
+                        if (g < 0)   g = 0;
+                        if (g > 255) g = 255;
+                        if (b < 0)   b = 0;
+                        if (b > 255) b = 255;
+
+                        *dst++ = r;
+                        *dst++ = g;
+                        *dst++ = b;
+
+                        y = *py++;
+                        yy = y << 8;
+                        if (col & 1) {
+                                pu++;
+                                pv++;
+
+                                u = *pu - 128;
+                                ug =   88 * u;
+                                ub =  454 * u;
+                                v = *pv - 128;
+                                vg =  183 * v;
+                                vr =  359 * v;
+                        }
+                } /* ..for col */
+                if ((line & 1) == 0) { // even line: rewind
+                        pu -= linewidth;
+                        pv -= linewidth;
+                }else{
+                        pu+=(linesizeu-linewidth);
+                        pv+=(linesizeu-linewidth);
+                }
+                py+=(linesizey-width);
+        } /* ..for line */
+}
+
+
+void yuv2rgb(const unsigned char* y,
+                int linesizey,
+                const unsigned char* u,
+                int linesizeu,
+                const unsigned char* v,
+                int linesizev,
+                int width,
+                int height,
+                unsigned char *rgb){
+//        cerr <<"EEEE: doing yuv2rgb for data of size "<<width<<"x"<<height<<endl;
+        massert(y);
+        massert(u);
+        massert(v);
+        massert(rgb);
+
+
+        static const int precision=32768;
+
+        static const int coefficientY=(int)(1.164*precision+0.5);
+        static const int coefficientRV = (int)(1.596*precision+0.5);
+        static const int coefficientGU = (int)(0.391*precision+0.5);
+        static const int coefficientGV = (int)(0.813*precision+0.5);
+        static const int coefficientBU = (int)(2.018*precision+0.5);
+       // cerr <<"EEEE: doing loop"<<endl;
+
+        for (int h=0; h<height; h++){
+                for (int w=0; w<width; w++){
+
+                        //int k=h*width+w;
+                        int k=h*linesizey+w;
+                        //int i=(h/2)*(width/2)+(w/2);
+                        int i=(h/2)*(linesizeu)+(w/2);
+                        int Y=y[k];
+                        int U=u[i];
+                        int V=v[i];
+
+                        if (!(i&0x0F)){
+                                __builtin_prefetch (&y[k+32], 0); // prefetch for read
+                                __builtin_prefetch (&u[i+32], 0); // prefetch for read
+                                __builtin_prefetch (&v[i+32], 0); // prefetch for read
+                                //__builtin_prefetch (&rgb[(h*width+w)+32], 1); // prefetch for write
+                        }
+
+                        int R = coefficientY*(Y-16)+coefficientRV*(V-128);
+                        int G = coefficientY*(Y-16)-coefficientGU*(U-128)-coefficientGV*(V-128);
+                        int B = coefficientY*(Y-16)+coefficientBU*(U-128);
+
+                        R = (R+precision/2)/precision;
+                        G = (G+precision/2)/precision;
+                        B = (B+precision/2)/precision;
+                        if (R<0) R=0;
+                        if (G<0) G=0;
+                        if (B<0) B=0;
+                        if (R>255) R=255;
+                        if (G>255) G=255;
+                        if (B>255) B=255;
+                        rgb[(h*width+w)*3+0]=R;
+                        rgb[(h*width+w)*3+1]=G;
+                        rgb[(h*width+w)*3+2]=B;
+                        //rgb[k*4+0]=R;
+                        //rgb[k*4+1]=G;
+                        //rgb[k*4+2]=B;
+                        //cerr <<"EEEE: w=" << w <<" h="<<h<<" k3="<<k*3<<" i="<<i<<endl;
+                }
+        }
+//        cerr<<"EEEE: yuv2rgb done!"<<endl;
+}
+
+
+
 void uyvy_to_yuv420p(int w, int h, byte_t *in, byte_t* outy, byte_t* outu, byte_t* outv){
 	int x;
 	int y;
@@ -219,6 +364,7 @@ DeckLinkGrabber::DeckLinkGrabber( string dev ){
 	device=dev;
 	capture=NULL;
 	initialized=false;
+	localRgb=NULL;
 	//	memset(&UserStruct,0,sizeof(UserStruct));
 }
 
@@ -415,6 +561,56 @@ void DeckLinkGrabber::setHandler( ImageHandler * handler ){
 	grabberLock.unlock();
 }
 
+void DeckLinkGrabber::displayLocal(MImage* frame){
+#define SCALE 1
+//	cerr <<"EEEE: displayLocal: running "<<endl;
+	int targetWidth = frame->width/SCALE;
+	int targetHeight = frame->height/SCALE;
+
+	if (!localRgb || localRgb->width!=targetWidth || localRgb->height!=targetHeight){
+//		cerr << "EEEE: displayLocal: allocating size "<< targetWidth<<"x"<<targetHeight<<endl;
+		//FIXME: delete if not NULL
+		localRgb = new MImage;
+
+		localRgb->data[0] = new uint8_t[ targetWidth * targetHeight * 4 ];
+		localRgb->data[1] = NULL;
+		localRgb->data[2] = NULL;
+		localRgb->linesize[0] = targetWidth*3;
+		localRgb->linesize[1] = 0;
+		localRgb->linesize[2] = 0;
+		localRgb->width=targetWidth;
+		localRgb->height=targetHeight;
+		localRgb->chroma = M_CHROMA_RV24;
+	}
+	
+
+//	cerr << "EEEE: starting conversion.."<<endl;
+#if 0
+	yuv420p_to_bgra(frame->width, frame->height,
+			&frame->data[0][0], frame->linesize[0],
+			&frame->data[1][0],frame->linesize[1],
+			&frame->data[2][0],frame->linesize[2],
+			&localRgb->data[0][0]
+		       );
+#endif
+#if 1
+	yuv2rgb(  
+			&frame->data[0][0], frame->linesize[0],
+			&frame->data[1][0],frame->linesize[1],
+			&frame->data[2][0],frame->linesize[2],
+			frame->width,
+			frame->height,
+			&localRgb->data[0][0]
+	       );
+#endif
+//	cerr << "EEEE: conversion done"<<endl;
+
+
+
+	localDisplay->handle(localRgb);
+
+}
+
 void DeckLinkGrabber::read( ImageHandler * handler ){
 	if (localDisplay){
 		localDisplay->setIsLocalVideo(true);
@@ -435,11 +631,14 @@ void DeckLinkGrabber::read( ImageHandler * handler ){
 		//			if (i%50==1){ //grabber does 50fps. We send 25fps.
 
 		MImage*frame = capture->getImage();
-		handler->handle( frame );
-		if (localDisplay){
-			//localDisplay->handle(frame);
-		}
-		//			}
+//		if (i%2==0){
+			handler->handle( frame );
+
+			if (localDisplay){
+				displayLocal(frame);
+				//localDisplay->handle(frame);
+			}
+//		}
 
 		if (i%200==0){
 			static struct timespec last_wallt;
