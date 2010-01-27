@@ -332,6 +332,13 @@ bool Session::addRealtimeMediaToOffer(MRef<SdpPacket*> result, const string &pee
 				ilbc_fmtp->setAttributes("fmtp:" + itoa( payloadType) + " mode=20" );
 				m->addAttribute(*ilbc_fmtp);
 			}
+			if( (*iC)->getCodecName() == "H.264" ) { 
+				MRef<SdpHeaderA*> h264_fmtp = new SdpHeaderA("a=X");
+				//h264_fmtp->setAttributes("fmtp:" + itoa( payloadType) + " profile-level-id=42900b" );
+				h264_fmtp->setAttributes("fmtp:" + itoa( payloadType) + " profile-level-id=42800d" );
+				m->addAttribute(*h264_fmtp);
+			}
+
 		}
 		if (type=="audio"){
 			//added static DTMF SDP headers in INVITE to audio media
