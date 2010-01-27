@@ -68,80 +68,6 @@ MIL_INT MFTYPE GrabEnd(MIL_INT HookType, MIL_ID EventId, void MPTYPE *UserStruct
 #endif
 
 
-void yuv420p_to_bgra(int width, int height,
-                        const unsigned char *srcy, int linesizey, 
-			const unsigned char *srcu, int linesizeu, 
-			const unsigned char *srcv, int linesizev,
-                        unsigned char *dst)
-{
-        int line, col, linewidth;
-        int y, u, v, yy, vr, ug, vg, ub;
-        int r, g, b;
-        const unsigned char *py, *pu, *pv;
-        unsigned char *origdst=dst;
-
-        linewidth = width >> 1;
-/*
-        py = src;
-        pu = py + (width * height);
-        pv = pu + (width * height) / 4;
-*/
-        py = srcy;
-        pu = srcu;
-        pv = srcv;
-
-        y = *py++;
-        yy = y << 8;
-        u = *pu - 128;
-        ug =   88 * u;
-        ub =  454 * u;
-        v = *pv - 128;
-        vg =  183 * v;
-        vr =  359 * v;
-
-        for (line = 0; line < height; line++) {
-                for (col = 0; col < width; col++) {
-                        r = (yy +      vr) >> 8;
-                        g = (yy - ug - vg) >> 8;
-                        b = (yy + ub     ) >> 8;
-
-                        // Clamp values (truncate)
-                        if (r < 0)   r = 0;
-                        if (r > 255) r = 255;
-                        if (g < 0)   g = 0;
-                        if (g > 255) g = 255;
-                        if (b < 0)   b = 0;
-                        if (b > 255) b = 255;
-
-                        *dst++ = r;
-                        *dst++ = g;
-                        *dst++ = b;
-
-                        y = *py++;
-                        yy = y << 8;
-                        if (col & 1) {
-                                pu++;
-                                pv++;
-
-                                u = *pu - 128;
-                                ug =   88 * u;
-                                ub =  454 * u;
-                                v = *pv - 128;
-                                vg =  183 * v;
-                                vr =  359 * v;
-                        }
-                } /* ..for col */
-                if ((line & 1) == 0) { // even line: rewind
-                        pu -= linewidth;
-                        pv -= linewidth;
-                }else{
-                        pu+=(linesizeu-linewidth);
-                        pv+=(linesizeu-linewidth);
-                }
-                py+=(linesizey-width);
-        } /* ..for line */
-}
-
 
 void yuv2rgb(const unsigned char* y,
                 int linesizey,
@@ -249,6 +175,7 @@ DeckLinkCaptureDelegate::DeckLinkCaptureDelegate(){
 	height=0;
 	frame=NULL;
 	filled=false;
+	doStop=false;
 	allocateImage();
 }
 
@@ -277,6 +204,9 @@ void DeckLinkCaptureDelegate::putImage(IDeckLinkVideoInputFrame* videoFrame){
 //	cerr <<"EEEE: doing DeckLinkCaptureDelegate::putImage()"<<endl;
 	int pw = videoFrame->GetWidth();
 	int ph = videoFrame->GetHeight();
+//	if (doStop)
+//		return;
+
 //	cerr <<"EEEE: size: "<<pw<<"x"<<ph<<endl;
 	if (pw!=width || ph!=height){
 		width=pw;
@@ -311,6 +241,8 @@ HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame
 //	cerr <<"EEEE: VideoInputFrameArrived called..."<<endl;
 	void *frameBytes;
 	void *audioFrameBytes;
+//	if (doStop)
+//		return S_OK;
 
 	// Handle Video Frame
 	if(videoFrame)
@@ -396,7 +328,7 @@ void DeckLinkGrabber::init(){
 	deckLinkIterator = CreateDeckLinkIteratorInstance();
 	HRESULT                     result;
 
-	BMDDisplayMode              selectedDisplayMode = bmdModeHD720p50;
+	BMDDisplayMode              selectedDisplayMode = bmdModeHD1080i50;
 	IDeckLinkDisplayMode        *displayMode;
 
 	if (!deckLinkIterator)
@@ -512,6 +444,8 @@ bool DeckLinkGrabber::setImageChroma( uint32_t chroma ){
 void DeckLinkGrabber::start(){
 	//	UserStruct.stopped = false;
 	doStop=false;
+	if (capture)
+		capture->doStop=false;
 	massert(startBlockSem);
 	startBlockSem->inc();
 }
@@ -520,6 +454,8 @@ void DeckLinkGrabber::stop(){
 	//Note: this can be called even if open has not been done.
 	//	UserStruct.stopped = true;
 	doStop=true;
+	if (capture)
+		capture->stop();
 	if (runthread){
 		runthread->join();
 		runthread=NULL;
@@ -585,15 +521,6 @@ void DeckLinkGrabber::displayLocal(MImage* frame){
 	
 
 //	cerr << "EEEE: starting conversion.."<<endl;
-#if 0
-	yuv420p_to_bgra(frame->width, frame->height,
-			&frame->data[0][0], frame->linesize[0],
-			&frame->data[1][0],frame->linesize[1],
-			&frame->data[2][0],frame->linesize[2],
-			&localRgb->data[0][0]
-		       );
-#endif
-#if 1
 	yuv2rgb(  
 			&frame->data[0][0], frame->linesize[0],
 			&frame->data[1][0],frame->linesize[1],
@@ -602,7 +529,6 @@ void DeckLinkGrabber::displayLocal(MImage* frame){
 			frame->height,
 			&localRgb->data[0][0]
 	       );
-#endif
 //	cerr << "EEEE: conversion done"<<endl;
 
 
@@ -665,6 +591,7 @@ void DeckLinkGrabber::read( ImageHandler * handler ){
 
 	result = deckLinkInput->StopStreams();
 	deckLinkInput->FlushStreams();
+	Thread::msleep(100);
 
 	if (localDisplay){
 		localDisplay->stop();

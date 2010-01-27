@@ -76,7 +76,7 @@ dnl Checks for SCTP support in libmnetutil
 	LDFLAGS="$LDFLAGS $LIBMNETUTIL_LDFLAGS"
 	LIBS="$MINISIP_LIBS $LIBS"
 	CPPFLAGS="$CPPFLAGS $MINISIP_CFLAGS"
-	AM_MINISIP_CHECK_WINFUNCS(["new SctpSocket(0,0,0)"],,[mnetutil_sctp_found=no],[dnl
+	AM_MINISIP_CHECK_WINFUNC(["adsfasdfasdf()"],,[mnetutil_sctp_found=no],[dnl
 #include<libmnetutil/SctpSocket.h>
 ])
 	LIBS="$mnetutil_save_LIBS"

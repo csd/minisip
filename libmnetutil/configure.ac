@@ -74,12 +74,12 @@ AC_CHECK_LIB([dnsapi], [main])
 AC_CHECK_LIB([ws2_32], [main])
 
 dnl Check if some WinXP function declarations are present in the header files
-AM_MINISIP_CHECK_WINFUNCS(["getaddrinfo(0,0,0,0)" "freeaddrinfo(0)" "GetAdaptersAddresses(0,0,0,0,0)" "getnameinfo(0,0,0,0,0,0,0)"],,,[dnl
-#define _WIN32_WINNT 0x0501
-#include<windows.h>
-#include<iphlpapi.h>
-#include<ws2tcpip.h>
-])
+dnl AM_MINISIP_CHECK_WINFUNCS(["getaddrinfo(0,0,0,0)" "freeaddrinfo(0)" "GetAdaptersAddresses(0,0,0,0,0)" "getnameinfo(0,0,0,0,0,0,0)"],,,[dnl
+dnl #define _WIN32_WINNT 0x0501
+dnl #include<windows.h>
+dnl #include<iphlpapi.h>
+dnl #include<ws2tcpip.h>
+dnl ])
 else
 AC_CHECK_FUNCS([getifaddrs getnameinfo getaddrinfo freeaddrinfo])
 fi

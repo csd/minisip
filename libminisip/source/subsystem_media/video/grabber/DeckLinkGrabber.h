@@ -63,6 +63,8 @@ class DeckLinkCaptureDelegate : public IDeckLinkInputCallback {
 		MImage* getImage();
 		int getWidth(){return width;}
 		int getHeight(){return height;}
+		void stop(){doStop=true;}
+		bool doStop;
 	private:
 		void allocateImage();
 		long unsigned int frameCount;

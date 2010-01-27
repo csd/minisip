@@ -108,13 +108,13 @@ int main()
 ], [dtls1=yes],[have_dtls=no;dtls1=no])
 AC_MSG_RESULT([$dtls1])
 
-AC_CHECK_FUNC([DTLSv1_method], , [have_dtls=no])
-if test x$have_dtls = xyes; then
-	AC_DEFINE([USE_DTLS], 1, [Define to 1 if you have OpenSSL 0.9.8f or later])
-	ifelse([$1], , :, [$1])
-else
-	ifelse([$2], , :, [$2])
-fi
+ AC_CHECK_FUNC([DTLSv1_method], , [have_dtls=no])
+ if test x$have_dtls = xyes; then
+ 	AC_DEFINE(USE_DTLS, "1", [Define to 1 if you have OpenSSL 0.9.8f or later])dnl
+ 	ifelse([$1], , :, [$1])
+ else
+ 	ifelse([$2], , :, [$2])
+ fi
 
 dnl AM_CONDITIONAL(HAVE_OPENSSL, test "x${HAVE_OPENSSL}" = "x1")
 
@@ -196,9 +196,7 @@ dnl Checks for DTLS support in libmcrypto
 	LDFLAGS="$LDFLAGS $LIBMCRYPTO_LDFLAGS"
 	LIBS="$MINISIP_LIBS $LIBS"
 	CPPFLAGS="$CPPFLAGS $MINISIP_CFLAGS"
-	AM_MINISIP_CHECK_WINFUNCS(["DTLSSocket::create(0,0,0)"],,[mcrypto_dtls_found=no],[dnl
-#include<libmcrypto/DtlsSocket.h>
-])
+	AM_MINISIP_CHECK_WINFUNC(["DTLSSocket::create(0,0,0)"],[mcrypto_dtls_found=yes], [mcrypto_dtls_found=no],[ #include<libmcrypto/DtlsSocket.h> ])
 	LIBS="$mcrypto_save_LIBS"
 	LDFLAGS="$mcrypto_save_LDFLAGS"
 	CPPFLAGS="$mcrypto_save_CPPFLAGS"

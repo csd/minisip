@@ -105,12 +105,18 @@ struct mgl_gfx{
 
 class Notification{
 	public:
-		Notification(string message, Text* _text, int _textureGray){
+		Notification(string message, Text* _text, int _textureGray, int timeout){
 			gfx = new struct mgl_gfx;
 			memset(gfx,0, sizeof(struct mgl_gfx) );
 			gfx->name = strdup(message.c_str());
 			text=_text;
 			textureGray=_textureGray;
+			if (timeout)
+				gfx->alpha = new Animate(5000, 0.7, 0, ANIMATE_EXPONENTIAL);
+			else
+				gfx->alpha = new Animate(0.5);
+			
+			gfx->alpha->start();
 		}
 		~Notification(){
 			delete gfx;
@@ -130,7 +136,7 @@ void Notification::draw(float x1, float y1, float x2, float y2){ //NOTE: must be
 	static const SDL_Color white={255,255,255};
 	static const SDL_Color black={0,0,0};
 
-	glColor4f(1.0,1.0,1.0, 0.3);
+	glColor4f(1.0,1.0,1.0, gfx->alpha->getVal() );
 	glBindTexture( GL_TEXTURE_2D, textureGray);
 	massert(glGetError()==GL_NO_ERROR);
 
@@ -151,8 +157,8 @@ void Notification::draw(float x1, float y1, float x2, float y2){ //NOTE: must be
 	glEnd();
 	massert(glGetError()==GL_NO_ERROR);
 
-	cerr <<"EEEE: doing text->draw3d x1="<<x1<< " x2="<<x2<<" y1="<<y1<<" y2="<<y2<<endl;
-	text->draw3D( x1,0,0,  x2,y2,0, gfx->name, 16, white, black, TEXT_ALIGN_LEFT);
+//	cerr <<"EEEE: doing text->draw3d x1="<<x1<< " x2="<<x2<<" y1="<<y1<<" y2="<<y2<<endl;
+	text->draw3D( x1,y1,0,  x2,y2,0, gfx->name, 16, white, black, TEXT_ALIGN_CENTER);
 }
 
 
@@ -573,7 +579,8 @@ class OpenGLWindow : public Runnable {
 			displaysChanged=true;
 		}
 	
-		void showNotification(string message);
+		void showNotification(string message, int timeout);
+		void clearNotifications();
 
 		void notificationsDraw();
 
@@ -708,10 +715,15 @@ class OpenGLWindow : public Runnable {
 		list<Notification*> notifications;
 };
 
+void OpenGLWindow::clearNotifications(){
+	notificationLock.lock();
+	notifications.clear( );
+	notificationLock.unlock();
+}
 
-void OpenGLWindow::showNotification(string message){
+void OpenGLWindow::showNotification(string message, int timeout){
 
-	Notification* n = new Notification(message, text, textureGray);
+	Notification* n = new Notification(message, text, textureGray, timeout);
 
 	notificationLock.lock();
 	notifications.push_back( n );
@@ -1007,6 +1019,9 @@ void OpenGLWindow::keyPressed(string key, bool isRepeat){ //NOTE: this method is
 			
 		}
 		if (key=="KEY_PLAY"){
+
+			clearNotifications();
+
 			menuLock.lock();
 			string cmd = menuItemCur->command.getOp();
 			cerr <<"EEEE: MENU SELECTED: "<< cmd<<endl;
@@ -1024,6 +1039,7 @@ void OpenGLWindow::keyPressed(string key, bool isRepeat){ //NOTE: this method is
 					//addressBookMenu.keyUp();
 					//addressBookMenu.keyDown();
 				}else{
+					notifications.clear();
 					CommandString cmd = menuItemCur->command;
 					menuLock.unlock();
 					send( menuItemCur->command );
@@ -2179,14 +2195,24 @@ void OpenGLWindow::notificationsDraw(){ //NOTE: must be called by internal(2) th
 	static const SDL_Color black={0,0,0};
 	notificationLock.lock();
 
+	int j=0;
 	for (i=notifications.begin(); i!=notifications.end(); i++){
-		cerr <<"EEEE: Notification draw: " << (*i)->gfx->name << endl;
-		float x1= windowX0;
+//		cerr <<"EEEE: Notification draw: " << (*i)->gfx->name << endl;
+		float x1= windowX0/3;
 		float y1= windowY0;
-		float x2= -windowX0;
+		float x2= -windowX0/3;
 		float y2= -windowY0;
+		float voffset=(y2-y1)/4;
+		float delta=voffset/6;
 
-		(*i)->draw( x1,0, x2,y2/20 );
+
+		(*i)->draw( x1,0+voffset+j*delta, x2,y2/15+voffset+j*delta );
+		j++;
+
+		if ( (*i)->gfx->alpha->ended()){
+			notifications.erase(i);
+			break;
+		}
 
 
 
@@ -2449,7 +2475,7 @@ void OpenGLWindow::run(){ //NOTE: must be called by internal thread
 
 					if (event.key.keysym.sym == SDLK_n){
 						cerr <<"EEEE: showing notification"<<endl;
-						showNotification("hello");
+						showNotification("hello",1000);
 						cerr <<"EEEE: done show notification"<<endl;
 					}
 
@@ -3089,6 +3115,7 @@ void OpenGLDisplay::setIsLocalVideo(bool isLocal){
 
 bool OpenGLDisplay::handleCommand(CommandString cmd){
 	bool handled=false;
+	cerr <<"EEEE: OpenGLDisplay::handleCommand: got: "<< cmd.getString() << endl;
 
 	if (cmd.getOp()=="make_proxy"){	//if we will not display any video
 		window->removeDisplay(this);
@@ -3111,6 +3138,20 @@ bool OpenGLDisplay::handleCommand(CommandString cmd){
 			window->keyPressed(cmd.getParam(), cmd.getParam2()=="REPEAT");
 			handled=true;
 	}
+
+	if (cmd.getOp()=="remote_user_not_found" ){
+		window->showNotification("User not found", 5000);
+	}
+
+	if (cmd.getOp()=="remote_ringing" ){
+		window->showNotification("Ringing", 0);
+	}
+
+	if (cmd.getOp()=="invite_ok" ){
+		window->clearNotifications();
+	}
+
+
 
 	if (cmd.getOp()=="incoming_available"){
 		string fromuri = cmd.getParam();

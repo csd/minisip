@@ -236,6 +236,10 @@ void OpenGlGui::handleCommand(const CommandString &cmd){
 		display->handleCommand(cmd);
 	}
 
+	if (cmd.getOp()=="remote_ringing"){	
+		display->handleCommand(cmd);
+	}
+
 	if (cmd.getOp()=="remote_presence_update"){
 		display->handleCommand(cmd);
 	}
@@ -254,6 +258,7 @@ void OpenGlGui::handleCommand(const CommandString &cmd){
 				MediaCommandString::set_session_sound_settings,
 				"senders", "ON");
 		sendCommand("media", cmdstr);
+		display->handleCommand(cmd);
 	}
 
 
