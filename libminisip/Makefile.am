@@ -479,6 +479,16 @@ mdc1394_la_SOURCES = source/subsystem_media/video/grabber/Dc1394Grabber.cxx \
 mdc1394_la_LIBADD = libminisip_video.la libminisip.la $(MINISIP_LIBS) $(DC1394_LIBS)
 endif
 
+if DECKLINK_VIDEO_GRABBER
+plugins_LTLIBRARIES += decklink.la
+# decklink_la_CPPFLAGS = $(MINISIP_CFLAGS) $(AVCODEC_CPPFLAGS) $(FFMPEG_CFLAGS)
+decklink_la_CPPFLAGS = $(MINISIP_CFLAGS)
+decklink_la_LDFLAGS = $(plugins_LDFLAGS)
+decklink_la_SOURCES = source/subsystem_media/video/grabber/DeckLinkGrabber.cxx \
+			source/subsystem_media/video/grabber/decklinksdk/DeckLinkAPIDispatch.cxx \
+                        source/subsystem_media/video/grabber/DeckLinkGrabber.h
+decklink_la_LIBADD = libminisip_video.la libminisip.la $(MINISIP_LIBS) $(DECKLINK_LIBS)
+endif
 
 if MATROX_VIDEO_GRABBER
 plugins_LTLIBRARIES += matrox.la

@@ -36,6 +36,8 @@
 
 #include<libmutil/CircularBuffer.h>
 
+#include<stdio.h>
+
 //jitter buffer size in units of 20ms
 #define CIRCULAR_BUFFER_SIZE 7
 

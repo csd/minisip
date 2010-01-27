@@ -302,6 +302,20 @@ dnl #############
 dnl VIDEO SUPPORT
 dnl #############
 
+dnl Blackmagic DeckLink capture support
+AC_ARG_ENABLE(decklink,
+    AS_HELP_STRING([--enable-decklink],
+    	[enables Blackmagic support for HD grabbing (default disabled)]),
+    [ if test "${enable_decklink}" = "yes"
+      then
+             VIDEO_GRABBER="${VIDEO_GRABBER} decklink}"
+             DECKLINK_VIDEO_GRABBER="yes"
+             DECKLINK_LIBS="-ldl"
+             AC_DEFINE(DECKLINK_SUPPORT, [], [Compile DeckLink grabber support.])
+             AC_SUBST(DECKLINK_LIBS)
+      fi ])
+
+
 
 dnl compile for Matrox Imaging library
 AC_ARG_ENABLE(mil,
@@ -550,6 +564,7 @@ AM_CONDITIONAL(VIDEO_SUPPORT, test "${enable_video}" = "yes")
 AM_CONDITIONAL(V4L_VIDEO_GRABBER, test "${V4L_VIDEO_GRABBER}" = "yes")
 AM_CONDITIONAL(DC1394_VIDEO_GRABBER, test "${DC1394_VIDEO_GRABBER}" = "yes")
 AM_CONDITIONAL(MATROX_VIDEO_GRABBER, test "${MATROX_VIDEO_GRABBER}" = "yes")
+AM_CONDITIONAL(DECKLINK_VIDEO_GRABBER, test "${DECKLINK_VIDEO_GRABBER}" = "yes")
 AM_CONDITIONAL(XV_VIDEO_DISPLAY, test "${XV_VIDEO_DISPLAY}" = "yes")
 AM_CONDITIONAL(SDL_VIDEO_DISPLAY, test "${SDL_VIDEO_DISPLAY}" = "yes")
 AM_CONDITIONAL(OPENGL_VIDEO_DISPLAY, test "${OPENGL_VIDEO_DISPLAY}" = "yes")
