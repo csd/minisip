@@ -37,8 +37,12 @@
 
 #include<string>
 #include<libmutil/MemObject.h>
+#include<libmutil/Exception.h>
 
-class LIBMUTIL_API SemaphoreException{};
+class LIBMUTIL_API SemaphoreException : public Exception{
+	public:
+		SemaphoreException(std::string what);
+};
 
 class LIBMUTIL_API Semaphore : public MObject{
     public:

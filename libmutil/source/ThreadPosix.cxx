@@ -49,7 +49,7 @@
 #include<stdio.h>
 
 #include<sys/types.h>
-#include<linux/unistd.h>
+//#include<linux/unistd.h> Not available on OSX
 
 using namespace std;
 
@@ -408,6 +408,8 @@ Thread::Thread(MRef<Runnable *> runnable){
 	massert(runnable);
         MRef<Runnable *> *self = new MRef<Runnable *>(runnable);
 
+	cerr << "EEEE: size of pthread_t: "<< sizeof(pthread_t)<<endl;
+	massert(sizeof(pthread_t)<=8);
 	//handle_ptr = malloc(sizeof(pthread_t));
 	//handle_ptr = new pthread_t;
 	int ret;

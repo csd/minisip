@@ -40,12 +40,19 @@ using namespace std;
 #define SEMHANDLE (*((HANDLE*)(handlePtr)))
 
 
+SemaphoreException::SemaphoreException(std::string w)
+	: Exception(w)
+{
+
+}
+
+
 Semaphore::Semaphore(){
 	handlePtr = (void*) new HANDLE;
 	SEMHANDLE = CreateSemaphore(NULL, 0, 1000, NULL);
 	if (SEMHANDLE == NULL){
 		merror("Semaphore::Semaphore: CreateSemaphore");
-		throw SemaphoreException();
+		throw SemaphoreException("CreateSemaphore failed");
 	}
 }
  
@@ -59,7 +66,7 @@ Semaphore::~Semaphore(){
 void Semaphore::inc(){
 	if (!ReleaseSemaphore(SEMHANDLE, 1, NULL)){
 		merror("Semaphore::inc: ReleaseSemaphore");
-		throw SemaphoreException();
+		throw SemaphoreException("ReleaseSemaphore failed");
 	}
 }
 
@@ -76,7 +83,7 @@ void Semaphore::dec(){
 
 	case WAIT_TIMEOUT: 
 		merror("Semaphore::dec: WaitForSingleObject");
-		throw SemaphoreException();
+		throw SemaphoreException("WaitForSingleObject failed");
 		break; 
 	}
 }

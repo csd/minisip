@@ -40,25 +40,53 @@ using namespace std;
 #define SEMHANDLE (((sem_t*)(handlePtr)))
 
 
+SemaphoreException::SemaphoreException(std::string w)
+	: Exception(w)
+{
+
+}
+
+static int X=0;
+
 Semaphore::Semaphore(){
+// Unnamed semaphores are not implemented (although the functions exist)
+// on OS X resulting in run-time exception. Use named semaphore instead.
+#ifdef DARWIN
+	X+=1000000;
+	string name="/mutil"+itoa(rand()+X)+itoa(time(NULL));
+	printf("EE: creating semaphore <%s>\n", name.c_str() );
+	if ( (handlePtr=sem_open(name.c_str(), O_CREAT | O_EXCL, 0777, 0 ))==SEM_FAILED){
+
+		merror("Semaphore::Semaphore: sem_open");
+		throw SemaphoreException("Could not create Semaphore (sem_open())");
+
+	}
+#else
 	handlePtr = (void*) new sem_t;
 	if (sem_init( SEMHANDLE, 0, 0)){
-		merror("Semaphore::Semaphore: CreateSemaphore");
-		throw SemaphoreException();
+		merror("Semaphore::Semaphore: sem_init");
+		throw SemaphoreException("Could not create Semaphore (sem_init())");
 	}
+#endif
 }
  
 Semaphore::~Semaphore(){
+#ifdef DARWIN
+	if (sem_close(SEMHANDLE)){
+		merror("Semaphore::~Semaphore: sem_close");
+	}
+#else
 	if (sem_destroy(SEMHANDLE)){
 		merror("Semaphore::~Semaphore: sem_destroy");
 	}
 	delete (sem_t*)handlePtr;
+#endif
 }
 
 void Semaphore::inc(){
 	if( sem_post( SEMHANDLE ) ){
 		merror("Semaphore::inc: sem_post");
-		throw SemaphoreException();
+		throw SemaphoreException("sem_post() failed");
 	}
 }
 
@@ -69,7 +97,7 @@ void Semaphore::dec(){
 				break;
 			default:
 				merror("Semaphore::dec: sem_wait");
-				throw SemaphoreException();
+				throw SemaphoreException("sem_wait() failed");
 		}
 	}
 }
