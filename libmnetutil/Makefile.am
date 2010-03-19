@@ -31,8 +31,9 @@ ipv6_src += \
 		    source/IP6Address.cxx
 endif
 
+sctp_src=
 if ENABLE_SCTP
-sctp_src =	    source/SctpSocket.cxx \
+sctp_src +=	    source/SctpSocket.cxx \
 		    source/SctpServerSocket.cxx
 endif ENABLE_SCTP
 

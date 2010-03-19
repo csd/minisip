@@ -1,3 +1,9 @@
+sctp_src=
+if ENABLE_SCTP
+sctp_src += libmnetutil/SctpServerSocket.h \
+		libmnetutil/SctpSocket.h
+endif ENABLE_SCTP
+
 ldap_src = \
 			libmnetutil/LdapConnection.h \
 			libmnetutil/LdapCredentials.h \
@@ -10,6 +16,7 @@ ldap_src = \
 pkginclude_HEADERS =    \
 			$(ldap_src) \
 			libmnetutil/init.h \
+			$(sctp_src) \
 			libmnetutil/DnsNaptr.h \
 			libmnetutil/IPAddress.h \
 			libmnetutil/NetworkException.h \
@@ -20,8 +27,6 @@ pkginclude_HEADERS =    \
 			libmnetutil/StreamSocket.h \
 			libmnetutil/TCPSocket.h \
 			libmnetutil/TcpServerSocket.h \
-			libmnetutil/SctpSocket.h \
-			libmnetutil/SctpServerSocket.h \
 			libmnetutil/NetUtil.h \
 			libmnetutil/UDPSocket.h \
 			libmnetutil/DatagramSocket.h \

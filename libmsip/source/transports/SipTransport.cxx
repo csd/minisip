@@ -27,8 +27,11 @@
 #include"SipTransportTcp.h"
 #include"SipTransportTls.h"
 #include"SipTransportDtlsUdp.h"
+
+#ifdef HAVE_SCTP
 #include"SipTransportSctp.h"
 #include"SipTransportTlsSctp.h"
+#endif
 
 #include<algorithm>
 
