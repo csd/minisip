@@ -49,7 +49,9 @@
 #include<stdio.h>
 
 #include<sys/types.h>
-//#include<linux/unistd.h> Not available on OSX
+#ifndef DARWIN
+#include<linux/unistd.h>
+#endif
 
 using namespace std;
 
