@@ -2624,7 +2624,7 @@ void OpenGLWindow::initSdl(){ //NOTE: must be called by internal thread
 		exit(1);
 	}
 
-	text = new Text("/home/erik/FreeSans.ttf");
+	text = new Text("/usr/share/fonts/truetype/freefont/FreeSans.ttf");
 #endif
 
 
