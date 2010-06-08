@@ -357,7 +357,7 @@ void DeckLinkGrabber::init(){
 		d--;
 	if (result != S_OK)
 	{
-		fprintf(stderr, "Card number &d not found.\n",deviceno);
+		fprintf(stderr, "Card number %d not found.\n",deviceno);
 		initialized=false;
 		return;
 	}
