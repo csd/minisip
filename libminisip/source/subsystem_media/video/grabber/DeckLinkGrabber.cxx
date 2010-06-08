@@ -319,6 +319,12 @@ uint32_t DeckLinkGrabber::getWidth(){
 }
 
 void DeckLinkGrabber::init(){
+	int deviceno = 0;
+
+	if (device.size()>0)
+		deviceno = device[0]-'0';
+	massert(deviceno >=0 && deviceno <=9);
+	cerr << "EEEE: Decklink: using device number "<< deviceno<<endl;
 
 	doStop=false;
 	initialized=true;
@@ -328,7 +334,7 @@ void DeckLinkGrabber::init(){
 	deckLinkIterator = CreateDeckLinkIteratorInstance();
 	HRESULT                     result;
 
-	BMDDisplayMode              selectedDisplayMode = bmdModeHD1080i50;
+	BMDDisplayMode              selectedDisplayMode = bmdModeHD720p50;
 	IDeckLinkDisplayMode        *displayMode;
 
 	if (!deckLinkIterator)
@@ -346,6 +352,18 @@ void DeckLinkGrabber::init(){
 		initialized=false;
 		return;
 	}
+	int d=deviceno;
+	while (d>0 && (result = deckLinkIterator->Next(&deckLink)) ==S_OK)
+		d--;
+	if (result != S_OK)
+	{
+		fprintf(stderr, "Card number &d not found.\n",deviceno);
+		initialized=false;
+		return;
+	}
+
+
+
 
 	if (deckLink->QueryInterface(IID_IDeckLinkInput, (void**)&deckLinkInput) != S_OK){
 		fprintf(stderr, "DeckLink error.\n");
@@ -560,7 +578,7 @@ void DeckLinkGrabber::read( ImageHandler * handler ){
 //		if (i%2==0){
 			handler->handle( frame );
 
-			if (localDisplay){
+			if (localDisplay && i%2==0){
 				displayLocal(frame);
 				//localDisplay->handle(frame);
 			}
