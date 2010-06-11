@@ -356,7 +356,7 @@ int rtpSeqDiff(int prev, int now){
 }
 
 void VideoMediaSource::enqueueRtp( const MRef<RtpPacket*> & rtp){
-	cerr << "EEEE: VideoMediaSource::enqueueRtp seq="<< rtp->getHeader().getSeqNo()<<endl;
+//	cerr << "EEEE: VideoMediaSource::enqueueRtp seq="<< rtp->getHeader().getSeqNo()<<endl;
 	if (rtpReorderBuf.size()==0){
 		rtpReorderBuf.push_front(rtp);
 	}else{
