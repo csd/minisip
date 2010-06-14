@@ -115,9 +115,17 @@ class CameraClientMgr : public Runnable{
 			//speed=1;
 		}
 
+		void setIp(string toIp){
+			dataLock.lock();
+			toip=IPAddress::create(toIp);
+			dataLock.unlock();
+		}
+
 		void sendCommand(string cmd){
 			cmd=cmd+"\n";
+			dataLock.lock();
 			sock->sendTo(**toip, 3333, cmd.c_str(),cmd.length() );
+			dataLock.unlock();
 		}
 
 		void setState(int s){
@@ -867,6 +875,8 @@ class OpenGLWindow : public Runnable {
 
 		void zoomKey(string key, bool isRepeat);
 
+		void setRemoteCamera(string toip);
+
 
 	private:
 		std::map<string, string> id_uri;
@@ -1129,6 +1139,11 @@ void IrInput::run(){
 	quitSignal->inc();
 }
 
+void OpenGLWindow::setRemoteCamera(string toip)
+{
+	if (camClient)
+		camClient->setIp(toip);
+}
 
 
 void OpenGLWindow::clearNotifications(){
@@ -3759,7 +3774,11 @@ bool OpenGLDisplay::handleCommand(CommandString cmd){
 
 void OpenGLDisplay::setCallId(string id){
 	massert(gfx);
+	cerr << "*********************call id "<< id << endl;
 	gfx->callId=strdup(id.c_str());
+	cerr << "**************************** remote ip <"<< id.substr(id.find("@")+1) <<">"<<endl;
+	window->setRemoteCamera(id.substr(id.find("@")+1));
+
 }
 
 OpenGLPlugin::OpenGLPlugin( MRef<Library *> lib ): VideoDisplayPlugin( lib ){
