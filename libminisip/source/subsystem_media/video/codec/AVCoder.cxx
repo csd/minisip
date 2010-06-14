@@ -88,7 +88,10 @@ extern volatile int globalBitRate;
 void AVEncoder::init( uint32_t width, uint32_t height ){
 	cerr << "=========================== doing AVEncoder::init============================"<<endl;
 	cerr << "AVEncoder::init("<<width<<","<<height<<endl;
-
+	if (width>4000||height>4000){
+		width=1280;
+		height=720;
+	}
 
 	Video *video = (Video*)this->video;
 	VideoCodec *videoCodec = (VideoCodec*)this->videoCodec;
@@ -210,14 +213,14 @@ void AVEncoder::handle( MImage * image ){
 
 		switch( image->chroma ){
 		case M_CHROMA_RV32:
-			srcFormat = PIX_FMT_RGBA32;
+			srcFormat = PIX_FMT_RGB32;
 			break;
 		case M_CHROMA_RV24:
 			srcFormat = PIX_FMT_BGR24;
 			break;
 		default:
 			/* FIXME: handle other formats */
-			srcFormat = PIX_FMT_RGBA32;
+			srcFormat = PIX_FMT_RGB32;
 			break;
 		}
 
