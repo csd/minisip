@@ -219,7 +219,7 @@ void DeckLinkCaptureDelegate::putImage(IDeckLinkVideoInputFrame* videoFrame){
 	bufferLock.lock();
 	if (filled){
 		bufferSem.dec();
-		cerr <<"EEEE: Warning: dropping grabbed frame. Low CPU?"<<endl;
+		//cerr <<"EEEE: Warning: dropping grabbed frame. Low CPU?"<<endl;
 	}
 //	cerr <<"EEEE: start convert to 420p"<<endl;
 	uyvy_to_yuv420p(pw,ph, vbytes, frame->data[0], frame->data[1], frame->data[2]  );
@@ -260,8 +260,7 @@ HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame
 			if (videoOutputFile != -1)
 			{
 				videoFrame->GetBytes(&frameBytes);
-				w
-rite(videoOutputFile, frameBytes, videoFrame->GetRowBytes() * videoFrame->GetHeight());
+				write(videoOutputFile, frameBytes, videoFrame->GetRowBytes() * videoFrame->GetHeight());
 			}
 #endif
 		}
@@ -320,11 +319,42 @@ uint32_t DeckLinkGrabber::getWidth(){
 
 void DeckLinkGrabber::init(){
 	int deviceno = 0;
-
+	// Example of format: 0/1080i60
 	if (device.size()>0)
 		deviceno = device[0]-'0';
 	massert(deviceno >=0 && deviceno <=9);
-	cerr << "EEEE: Decklink: using device number "<< deviceno<<endl;
+
+	string mode="720p50";
+
+	if (device.size() > 2)
+		mode=device.substr(2);
+
+	BMDDisplayMode              selectedDisplayMode = bmdModeHD720p50;
+
+	bool modeok=false;
+	if (mode=="720p50")
+		selectedDisplayMode = bmdModeHD720p50, modeok=true;	
+
+	if (mode=="720p60")
+		selectedDisplayMode = bmdModeHD720p60, modeok=true;	
+
+	if (mode=="1080i60")
+		selectedDisplayMode = bmdModeHD1080i6000, modeok=true;	
+
+	if (mode=="1080p60")
+		selectedDisplayMode = bmdModeHD1080p6000, modeok=true;	
+
+	if (mode=="1080p30")
+		selectedDisplayMode = bmdModeHD1080p30, modeok=true;	
+
+	if (mode=="1080p25")
+		selectedDisplayMode = bmdModeHD1080p25, modeok=true;	
+
+	if (!modeok){
+		merr << "ERROR: Grabber video input format not supported: " << mode << endl;
+		massert(modeok);
+	}
+		
 
 	doStop=false;
 	initialized=true;
@@ -334,7 +364,7 @@ void DeckLinkGrabber::init(){
 	deckLinkIterator = CreateDeckLinkIteratorInstance();
 	HRESULT                     result;
 
-	BMDDisplayMode              selectedDisplayMode = bmdModeHD720p50;
+
 	IDeckLinkDisplayMode        *displayMode;
 
 	if (!deckLinkIterator)
@@ -461,6 +491,7 @@ bool DeckLinkGrabber::setImageChroma( uint32_t chroma ){
 }
 
 void DeckLinkGrabber::start(){
+
 	//	UserStruct.stopped = false;
 	doStop=false;
 	if (capture)
