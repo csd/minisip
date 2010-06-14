@@ -53,7 +53,7 @@ typedef struct {
 
 class DeckLinkCaptureDelegate : public IDeckLinkInputCallback {
 	public:
-		DeckLinkCaptureDelegate();
+		DeckLinkCaptureDelegate(int fps);
 		
 		virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid, LPVOID *ppv) { return E_NOINTERFACE; }
 		virtual ULONG STDMETHODCALLTYPE AddRef(void) { return 1; }
@@ -80,6 +80,9 @@ class DeckLinkCaptureDelegate : public IDeckLinkInputCallback {
 		int width;
 		int height;
 		MImage *frame;
+
+		int fps;
+		uint64_t nextTimeGrab;
 };
 
 
@@ -139,6 +142,7 @@ class DeckLinkGrabber : public Grabber{
 		MRef<Thread*> runthread;
 		MRef<Semaphore*> startBlockSem;
 		MRef<Semaphore*> initBlockSem;
+		int fps;
 };
 
 class DeckLinkPlugin : public GrabberPlugin{

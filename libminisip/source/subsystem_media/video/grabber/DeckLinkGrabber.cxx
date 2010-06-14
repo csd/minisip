@@ -170,7 +170,9 @@ void uyvy_to_yuv420p(int w, int h, byte_t *in, byte_t* outy, byte_t* outu, byte_
 	}
 }
 
-DeckLinkCaptureDelegate::DeckLinkCaptureDelegate(){
+DeckLinkCaptureDelegate::DeckLinkCaptureDelegate(int _fps){
+	nextTimeGrab=0;
+	fps=_fps;
 	width=0;
 	height=0;
 	frame=NULL;
@@ -206,7 +208,18 @@ void DeckLinkCaptureDelegate::putImage(IDeckLinkVideoInputFrame* videoFrame){
 	int ph = videoFrame->GetHeight();
 //	if (doStop)
 //		return;
+	uint64_t now = mtime()*1000;
 
+	if (nextTimeGrab==0)
+		nextTimeGrab=now;
+	
+	if (now<nextTimeGrab){
+//		cerr << "######################## PICTURE DROP"<< endl;
+		return;
+	}else{
+//		cerr << "######################## PICTURE MATCH"<< endl;
+		nextTimeGrab=nextTimeGrab + 1000000/fps; 
+	}
 //	cerr <<"EEEE: size: "<<pw<<"x"<<ph<<endl;
 	if (pw!=width || ph!=height){
 		width=pw;
@@ -319,7 +332,7 @@ uint32_t DeckLinkGrabber::getWidth(){
 
 void DeckLinkGrabber::init(){
 	int deviceno = 0;
-	// Example of format: 0/1080i60
+	// Example of format: 0/1080i60@30  First camera, 1080i, 60FPS, use only 30FPS
 	if (device.size()>0)
 		deviceno = device[0]-'0';
 	massert(deviceno >=0 && deviceno <=9);
@@ -329,6 +342,18 @@ void DeckLinkGrabber::init(){
 	if (device.size() > 2)
 		mode=device.substr(2);
 
+	fps=30;
+
+	cerr << "------------------ device="<<device << endl;
+	if (mode.find("@")!=string::npos){
+		mode=mode.substr(0,mode.find("@"));
+		string fpsstr=device.substr(device.find("@")+1, device.size()-(device.find("@")+1));
+		cerr << "EEEE: mode: <" << mode << "> and fps <" << fpsstr <<">" << endl;
+		fps=atoi( fpsstr.c_str() );
+		if (fps<=0)
+			fps=30;
+	}
+ 
 	BMDDisplayMode              selectedDisplayMode = bmdModeHD720p50;
 
 	bool modeok=false;
@@ -359,7 +384,7 @@ void DeckLinkGrabber::init(){
 	doStop=false;
 	initialized=true;
 	//width=height=-1;
-	capture = new DeckLinkCaptureDelegate;
+	capture = new DeckLinkCaptureDelegate(fps);
 
 	deckLinkIterator = CreateDeckLinkIteratorInstance();
 	HRESULT                     result;
