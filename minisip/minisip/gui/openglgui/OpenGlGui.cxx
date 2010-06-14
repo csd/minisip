@@ -41,6 +41,7 @@
 
 using namespace std;
 
+#if 0
 
 class IrInput : public Runnable{
 	public:
@@ -169,14 +170,15 @@ void IrInput::run(){
 	quitSignal->inc();
 }
 
+#endif
 
 OpenGlGui::OpenGlGui(bool fullscreen) {
 	startFullscreen=fullscreen;
 	thread=NULL;
 //	inCall=false;
 	quitSem = new Semaphore();
-	IrInput* ir = new IrInput(this);
-	ir->start();
+//	IrInput* ir = new IrInput(this);
+//	ir->start();
 }
 
 void OpenGlGui::start(){
