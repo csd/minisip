@@ -45,6 +45,14 @@
 #include<map>
 
 #include<libmutil/Timestamp.h>
+#include<libmnetutil/UDPSocket.h>
+#include<libmnetutil/IPAddress.h>
+
+
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/un.h>
 
 
 #include<libmutil/mtime.h>
@@ -83,6 +91,271 @@ MPlugin * mopengl_LTX_getPlugin( MRef<Library*> lib ){
 
 
 #define DRAW_Z -20.0F
+
+
+
+#define CAM_IDLE      0
+#define CAM_ZOOMIN    1
+#define CAM_ZOOMOUT   2
+#define CAM_PANLEFT  3
+#define CAM_PANRIGHT 4
+#define CAM_TILTUP   5
+#define CAM_TILTDOWN 6
+
+class CameraClientMgr : public Runnable{
+	public:
+		CameraClientMgr(string remotehost, int remoteport){
+			sock = new UDPSocket();
+			tohost = remotehost;
+			toip = IPAddress::create(tohost);
+			toport = remoteport;
+			state=CAM_IDLE;
+			doStop=false;
+			cmdTime=0;
+			//speed=1;
+		}
+
+		void sendCommand(string cmd){
+			cmd=cmd+"\n";
+			sock->sendTo(**toip, 3333, cmd.c_str(),cmd.length() );
+		}
+
+		void setState(int s){
+			state=s;
+			cmdTime=mtime();
+		}
+
+		bool cmdExpired(){
+			uint64_t now = mtime();
+			if (cmdTime!=0 && now>cmdTime && (now-cmdTime) > 250){ //0.25s
+				return true;
+			}else{
+				return false;
+			}
+		}
+
+		void zoomStop( ){
+			//speed=1;
+			switch (state){
+				case CAM_ZOOMIN:
+				case CAM_ZOOMOUT:
+					sendCommand("set_zoom_stop");
+					setState(CAM_IDLE);
+					break;
+			}
+
+		}
+
+		void zoomIn( bool isRepeat ){
+/*			if (!isRepeat)
+				speed=1;
+			else{
+				if (speed<10)
+					speed++;
+			}
+*/
+			switch (state){
+				case CAM_IDLE:
+					sendCommand("set_zoom_tele_speed 4" );
+				case CAM_ZOOMIN:
+					setState(CAM_ZOOMIN);	//Update cmdTime for repetitive calls
+					break;
+
+				default:
+					break;
+			}
+		}
+
+		void zoomOut( bool isRepeat ){
+/*
+			if (!isRepeat)
+				speed=1;
+			else{
+				if (speed<10)
+					speed++;
+			}
+*/
+			switch (state){
+				case CAM_IDLE:
+					sendCommand("set_zoom_wide_speed 4");
+				case CAM_ZOOMOUT:
+					setState(CAM_ZOOMOUT);	//Update cmdTime for repetitive calls
+					break;
+
+				default:
+					break;
+			}
+
+		}
+
+		void panStop( ){
+//			speed=1;
+			switch (state){
+				case CAM_TILTUP:
+				case CAM_TILTDOWN:
+				case CAM_PANLEFT:
+				case CAM_PANRIGHT:
+					sendCommand("set_pantilt_stop 1 1");
+					setState(CAM_IDLE);
+					break;
+			}
+
+
+
+		}
+
+		void panLeft( bool isRepeat ){
+/*			if (!isRepeat)
+				speed=1;
+			else{
+				if (speed<10)
+					speed++;
+			}
+*/
+			switch (state){
+				case CAM_IDLE:
+					sendCommand("set_pantilt_left 4 4");
+				case CAM_PANLEFT:
+					setState(CAM_PANLEFT);	//Update cmdTime for repetitive calls
+					break;
+				default:
+					break;
+			}
+
+
+		}
+
+
+		void panRight( bool isRepeat ){
+/*			if (!isRepeat)
+				speed=1;
+			else{
+				if (speed<10)
+					speed++;
+			}
+*/
+			switch (state){
+				case CAM_IDLE:
+					sendCommand("set_pantilt_right 4 4");
+				case CAM_PANRIGHT:
+					setState(CAM_PANRIGHT);	//Update cmdTime for repetitive calls
+					break;
+				default:
+					break;
+			}
+
+
+
+		}
+
+		void tiltStop(){
+//			speed=1;
+			switch (state){
+				case CAM_TILTUP:
+				case CAM_TILTDOWN:
+					sendCommand("set_pantilt_stop 1 1");
+					setState(CAM_IDLE);
+					break;
+			}
+
+			panStop();
+
+		}
+
+		void tiltUp( bool isRepeat ){
+/*			if (!isRepeat)
+				speed=1;
+			else{
+				if (speed<10)
+					speed++;
+			}
+*/
+			switch (state){
+				case CAM_IDLE:
+					sendCommand("set_pantilt_up 4 4");
+				case CAM_TILTUP:
+					setState(CAM_TILTUP);	//Update cmdTime for repetitive calls
+					break;
+				default:
+					break;
+			}
+
+
+
+		}
+
+		void tiltDown( bool isRepeat ){
+/*			if (!isRepeat)
+				speed=1;
+			else{
+				if (speed<10)
+					speed++;
+			}
+*/
+			switch (state){
+				case CAM_IDLE:
+					sendCommand("set_pantilt_down 4 4");
+				case CAM_TILTDOWN:
+					setState(CAM_TILTDOWN);	//Update cmdTime for repetitive calls
+					break;
+				default:
+					break;
+			}
+
+
+
+		}
+
+		void start(){
+			Thread t(this);
+		}
+
+		void run(){
+
+			while (!doStop){
+				msleep(20);
+				if (cmdExpired()){
+					switch (state){
+						case CAM_ZOOMIN:
+						case CAM_ZOOMOUT:
+							zoomStop();
+							cmdTime=0;
+							break;
+						case CAM_PANLEFT:
+						case CAM_PANRIGHT:
+							panStop();
+							cmdTime=0;
+							break;
+						case CAM_TILTUP:
+						case CAM_TILTDOWN:
+							tiltStop();
+							cmdTime=0;
+							break;
+
+
+						default:
+							cerr <<"EEEE: WARNING: COMMAND TIMER EXPIRED FOR UNKNOWN STATE "<<state<<endl;
+							//massert(1==0);
+							break;
+					};
+
+				}
+			}
+
+		}
+
+
+	private:
+		int speed;
+		bool doStop;
+		int state;
+		uint64_t cmdTime;
+		Mutex dataLock;
+		string tohost;
+		MRef<IPAddress*> toip;
+		string toport;
+		MRef<UDPSocket*> sock;
+};
 
 
 
@@ -490,6 +763,10 @@ class AddressBookMenu {
 };
 
 
+#define ZOOM_MODE_OFF 0
+#define ZOOM_MODE_ON 1
+
+
 
 
 #define MENU_HIDDEN      1
@@ -504,6 +781,8 @@ class AddressBookMenu {
 
 #define LOCAL_VIDEO_OFF 1
 #define LOCAL_VIDEO_TRANSPARENT 2
+
+class IrInput;
 
 class OpenGLWindow : public Runnable {
 	public:
@@ -585,6 +864,9 @@ class OpenGLWindow : public Runnable {
 		void notificationsDraw();
 
 		int nVisibleDisplays();
+
+		void zoomKey(string key, bool isRepeat);
+
 
 	private:
 		std::map<string, string> id_uri;
@@ -713,7 +995,141 @@ class OpenGLWindow : public Runnable {
 
 		Mutex notificationLock;
 		list<Notification*> notifications;
+
+		MRef<CameraClientMgr*> camClient;
+		int zoomMode;
+		bool zoomLocal;
+		int zoomEscapeCount; 
+
+		IrInput *ir;
 };
+
+
+
+class IrInput : public Runnable{
+	public:
+		IrInput(OpenGLWindow* handler);
+		void start();
+		void stop();
+		void run();
+		
+
+	private:
+		bool doStop;
+		MRef<Semaphore*> quitSignal;
+		Thread *thread;
+		OpenGLWindow* handler;
+
+
+
+};
+
+IrInput::IrInput(OpenGLWindow* h){
+	quitSignal=new Semaphore();
+	thread=NULL;
+	doStop=false;
+	handler=h;
+}
+
+
+void IrInput::start(){
+	doStop=false;
+	thread=new Thread(this);
+}
+
+void IrInput::stop(){
+
+	quitSignal->dec();
+}
+
+
+static int iropen(){
+	struct sockaddr_un addr;
+	addr.sun_family=AF_UNIX;
+	strcpy(addr.sun_path,"/dev/lircd");
+	int fd=socket(AF_UNIX,SOCK_STREAM,0);
+	if(fd==-1)  {
+		cerr <<"EEEE: COULD NOT CREATE SOCKET"<<endl;
+		return -1;
+	};
+	if(connect(fd,(struct sockaddr *)&addr,sizeof(addr))==-1)  {
+		close(fd);
+		return -1;
+	};
+	return fd;
+
+}
+
+static string parseBuf(string s, bool &isRepeat){
+	int len=s.size();
+
+	int i=0;
+	while (i<len && s[i]!=' ')	//pass first digits
+		i++;
+
+	i++;				//pass space
+
+	if (len>i+2 && s[i]=='0' && s[i+1]=='0')
+		isRepeat=false;
+	else
+		isRepeat=true;
+
+	while (i<len && s[i]!=' ')	//pass repeat counter
+		i++;
+
+	i++;				//pass space
+
+	string ret;
+	
+	while (i<len && s[i]!=' ')
+		ret=ret+s[i++];
+		
+	return ret;
+
+}
+
+void IrInput::run(){
+
+	int fd=-1;
+
+	do{
+		if (fd==-1)	
+			fd=iropen();
+		if (fd>0){
+		}
+
+
+
+		
+		if (fd!=-1){
+			int n;
+			char buf[129];
+			n=read(fd,buf,128);
+			if(n==-1 || n==0)  {
+				fd=-1;
+			};
+			buf[n]=0;
+			string s(buf);
+			//cerr <<"------------> DATA <"<<s<<">"<<endl;
+			bool repeat=false;
+			string key=parseBuf(s, repeat);
+			if (key.size()>0){
+				handler->keyPressed(key, repeat);
+			}
+		}
+
+		if (!doStop&&fd==-1){	//Sleep 10s and then re-try to open
+			for (int i=0; i<20 && !doStop; i++)
+				Thread::msleep(500);
+		}
+
+
+	}while(!doStop);
+
+	quitSignal->inc();
+}
+
+
 
 void OpenGLWindow::clearNotifications(){
 	notificationLock.lock();
@@ -738,6 +1154,10 @@ MRef<OpenGLWindow*> OpenGLWindow::globalWindowObj=NULL;
 
 OpenGLWindow::OpenGLWindow(int w, int h, bool fullscreen){
 	cerr<<"EEEE: ------------------------ CREATING OPENGL WINDOW---------------"<<endl;
+
+	ir = new IrInput(this);
+
+
 	menuMode=MENU_HIDDEN;
 	videoMode=VIDEO_EQUAL;
 	localVideoMode=LOCAL_VIDEO_TRANSPARENT;
@@ -780,6 +1200,13 @@ OpenGLWindow::OpenGLWindow(int w, int h, bool fullscreen){
 
 	bpp=0;
 
+	zoomMode=ZOOM_MODE_OFF;
+	zoomEscapeCount=0;
+
+	camClient = new CameraClientMgr("192.16.126.158", 3333);
+	camClient->start();
+
+
 }
 
 void OpenGLWindow::setPhoneConfig(MRef<SipSoftPhoneConfiguration*> conf){ //NOTE: this method is used from external thread
@@ -817,7 +1244,6 @@ void OpenGLWindow::hideAcceptCallMenu(bool hideAll){
 }
 
 void OpenGLWindow::incomingCall(string callid, string uri, bool unprotected){ //NOTE: this method is used from external thread
-	cerr <<"OpenGLWindow::incomingCall: trying to display accept call menu"<<endl;
 	menuLock.lock();
 	list<Menu*>::iterator i=menuAcceptCall->mitems.begin();
 	(*i)->command=CommandString(callid, "accept_invite");	//command for yes button
@@ -853,11 +1279,16 @@ OpenGLDisplay* OpenGLWindow::getSelectedDisplay(){
 }
 
 void OpenGLWindow::videoSelect(string key){ //NOTE: this method is indirectly used from external thread
-	cerr <<"EEEE: videoSelect("<<key<<")"<<endl;
+	//cerr <<"EEEE: videoSelect("<<key<<")"<<endl;
 
 	if (key=="KEY_PLAY"){
 		OpenGLDisplay* selected = getSelectedDisplay();
 		if (selected){
+
+			zoomMode=ZOOM_MODE_ON;
+                        zoomLocal = selected->getIsLocalVideo();
+                        selected->setShowZoomIcons(true);
+
 			float lastrot=0;
 			if (selected->getTexture()->rotate){
 				lastrot=selected->getTexture()->rotate->getVal();
@@ -869,9 +1300,9 @@ void OpenGLWindow::videoSelect(string key){ //NOTE: this method is indirectly us
 	}
 
 	if (key=="KEY_CHANNELUP"){
-		cerr <<"EEEE: selecting row up"<<endl;
-		cerr <<"EEEE: video_nrows="<<video_nrows<<endl;
-		cerr <<"EEEE: video_ncols="<<video_ncols<<endl;
+		//cerr <<"EEEE: selecting row up"<<endl;
+		//cerr <<"EEEE: video_nrows="<<video_nrows<<endl;
+		//cerr <<"EEEE: video_ncols="<<video_ncols<<endl;
 		menuLock.lock();
 		localVideoSelected=false;
 
@@ -885,7 +1316,7 @@ void OpenGLWindow::videoSelect(string key){ //NOTE: this method is indirectly us
 		updateVideoPositions(false);
 	}
 	if (key=="KEY_CHANNELDOWN"){
-		cerr <<"EEEE: selecting row down"<<endl;
+		//cerr <<"EEEE: selecting row down"<<endl;
 		menuLock.lock();
 		localVideoSelected=false;
 
@@ -899,9 +1330,9 @@ void OpenGLWindow::videoSelect(string key){ //NOTE: this method is indirectly us
 		updateVideoPositions(false);
 	}
 	if (key=="BTN_RIGHT"){
-		cerr <<"EEEE: selecting row right"<<endl;
-		cerr <<"EEEE: video_nrows="<<video_nrows<<endl;
-		cerr <<"EEEE: video_ncols="<<video_ncols<<endl;
+		//cerr <<"EEEE: selecting row right"<<endl;
+		//cerr <<"EEEE: video_nrows="<<video_nrows<<endl;
+		//cerr <<"EEEE: video_ncols="<<video_ncols<<endl;
 		menuLock.lock();
 		if (video_select_col==video_ncols-1 && video_select_row==0){
 			localVideoSelected=true;
@@ -920,7 +1351,7 @@ void OpenGLWindow::videoSelect(string key){ //NOTE: this method is indirectly us
 		updateVideoPositions(false);
 	}
 	if (key=="BTN_LEFT"){
-		cerr <<"EEEE: selecting row down"<<endl;
+		//cerr <<"EEEE: selecting row down"<<endl;
 		menuLock.lock();
 		localVideoSelected=false;
 		video_select_col--;
@@ -935,13 +1366,51 @@ void OpenGLWindow::videoSelect(string key){ //NOTE: this method is indirectly us
 
 }
 
-void OpenGLWindow::keyPressed(string key, bool isRepeat){ //NOTE: this method is used from external thread
-//	cerr <<"EEEE: OpenGLWindow::keyPressed: "<<key<<endl;
 
-	if (isRepeat)
+void OpenGLWindow::zoomKey(string key, bool isRepeat){
+	//cerr <<"EEEE: zoomKey: "<< key<<" repeat="<<isRepeat<<endl;
+	if (isRepeat || key!="KEY_MENU")
+		zoomEscapeCount=0;
+	else
+		zoomEscapeCount++;
+
+	if (zoomEscapeCount>=2){
+		zoomEscapeCount=0;
+		zoomMode=ZOOM_MODE_OFF;
+	}
+
+	if (zoomMode==ZOOM_MODE_ON){
+
+		if (key=="KEY_PLAY")
+			camClient->zoomIn(isRepeat);
+		if (key=="KEY_MENU")
+			camClient->zoomOut(isRepeat);
+		if (key=="KEY_CHANNELUP")
+			camClient->tiltUp(isRepeat);
+		if (key=="KEY_CHANNELDOWN")
+			camClient->tiltDown(isRepeat);
+		if (key=="BTN_LEFT")
+			camClient->panLeft(isRepeat);
+		if (key=="BTN_RIGHT")
+			camClient->panRight(isRepeat);
+	}
+
+}
+
+
+void OpenGLWindow::keyPressed(string key, bool isRepeat){ //NOTE: this method is used from external thread
+	//cerr <<"EEEE: OpenGLWindow::keyPressed: <"<< key <<"> repeat="<< isRepeat<<endl;
+
+	if (isRepeat){
+		if (zoomMode==ZOOM_MODE_ON)
+			zoomKey(key, isRepeat);
 		return;
 
-	if (key=="KEY_MENU"){
+	}
+
+
+
+	if (key=="KEY_MENU"  && !zoomMode==ZOOM_MODE_ON){
 		if (menuMode==MENU_ADDRESSBOOK){
 			menuItemCur=menuActions->select(0);
 			menuMode=MENU_MAIN;
@@ -957,7 +1426,10 @@ void OpenGLWindow::keyPressed(string key, bool isRepeat){ //NOTE: this method is
 	}
 
 	if (menuMode==MENU_HIDDEN){
-		videoSelect(key);
+		if (zoomMode==ZOOM_MODE_OFF)
+			videoSelect(key);
+		else
+			zoomKey(key, isRepeat);
 	}
 
 	if (menuMode==MENU_ADDRESSBOOK){
@@ -1024,7 +1496,7 @@ void OpenGLWindow::keyPressed(string key, bool isRepeat){ //NOTE: this method is
 
 			menuLock.lock();
 			string cmd = menuItemCur->command.getOp();
-			cerr <<"EEEE: MENU SELECTED: "<< cmd<<endl;
+			//cerr <<"EEEE: MENU SELECTED: "<< cmd<<endl;
 			
 			if (cmd!=""){
 				if (cmd=="exit"){
@@ -1075,15 +1547,15 @@ struct mgl_gfx* OpenGLWindow::getIcon(string name){
 #define ICON_DIM 256
 bool OpenGLWindow::loadTexture(string fname){ //NOTE: must be called by internal thread
 	texturesLoaded=true;
-	cerr <<"EEEE: OpenGLWindow::loadTexture: trying to load "<<fname<<endl;
+	//cerr <<"EEEE: OpenGLWindow::loadTexture: trying to load "<<fname<<endl;
 
-	string path = "/home/erik/share/minisip/"+fname+".raw";
+	string path = "/home/hdviaosn/share/minisip/"+fname+".raw";
 	int len=ICON_DIM*ICON_DIM*4;
 	byte_t *tmp = new byte_t[len+16];
-	cerr <<"EEEE: opening file <"<<path<<">"<<endl;
+	//cerr <<"EEEE: opening file <"<<path<<">"<<endl;
 	ifstream inf;
 	inf.open(path.c_str(), ios::binary);
-	cerr <<"EEEE: reading file..."<<endl;
+	//cerr <<"EEEE: reading file..."<<endl;
 	inf.read((char*)tmp,len);
 
 	struct mgl_gfx* t = new struct mgl_gfx;
@@ -1095,14 +1567,14 @@ bool OpenGLWindow::loadTexture(string fname){ //NOTE: must be called by internal
 
 	glGenTextures( 1, (GLuint*)&(t->texture));
 	massert(glGetError()==GL_NO_ERROR);
-	cerr <<"EEEE: generated texture id "<< t->texture<<endl;
+	//cerr <<"EEEE: generated texture id "<< t->texture<<endl;
 	massert(t->texture > 0);
 	glBindTexture( GL_TEXTURE_2D, t->texture);
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	cerr <<"EEEE: uploading to GL..."<<endl;
+	//cerr <<"EEEE: uploading to GL..."<<endl;
 	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, ICON_DIM, ICON_DIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, tmp);
 	massert(glGetError()==GL_NO_ERROR);
 
@@ -1111,7 +1583,7 @@ bool OpenGLWindow::loadTexture(string fname){ //NOTE: must be called by internal
 	icons.push_back(t);
 
 	delete[] tmp;
-	cerr <<"EEEE: done loading texture"<<endl;
+	//cerr <<"EEEE: done loading texture"<<endl;
 
 	if (textureGray==0){
 		byte_t* gray=(byte_t*)malloc(8*3*8*3+16);
@@ -1124,7 +1596,6 @@ bool OpenGLWindow::loadTexture(string fname){ //NOTE: must be called by internal
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		cerr <<"EEEE: uploading to GL..."<<endl;
 		glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, 8, 8, 0, GL_RGB, GL_UNSIGNED_BYTE, gray);
 
 	}
@@ -1192,7 +1663,6 @@ void OpenGLWindow::setupMenu(){
 }
 
 void OpenGLWindow::enableMenu(){ //NOTE: this method is used from external thread
-	cerr<<"EEEE: called enableMenu()"<<endl;
 	massert(texturePath.size()>0);
 	/*showMenu=true;*/
 
@@ -1251,7 +1721,7 @@ void OpenGLWindow::findScreenCoords() { //NOTE: must be called by internal threa
 	windowY0=y;
 	massert(glGetError()==GL_NO_ERROR);
 
-	cerr << "EEEE: findScreenCoords: window 0,0 is at coord "<<windowX0 << ","<< windowY0 <<",-20"<<endl;
+	//cerr << "EEEE: findScreenCoords: window 0,0 is at coord "<<windowX0 << ","<< windowY0 <<",-20"<<endl;
 
 
 }
@@ -1349,10 +1819,10 @@ void OpenGLWindow::findVideoArea(int video_n, int ntot, float &x1, float&y1, flo
 
 	if (selectedptr){
 		if (row==video_select_row && (col==video_select_col) && !localVideoSelected){
-			cerr <<"EEEE: Video SELECTED: row="<<row<<" col="<<col<<" video_select_row="<<video_select_row<<" video_select_col="<<video_select_col<<endl;
+			//cerr <<"EEEE: Video SELECTED: row="<<row<<" col="<<col<<" video_select_row="<<video_select_row<<" video_select_col="<<video_select_col<<endl;
 			*selectedptr=true;
 		}else{
-			cerr <<"EEEE: Video not selected: row="<<row<<" col="<<col<<" video_select_row="<<video_select_row<<" video_select_col="<<video_select_col<<endl;
+			//cerr <<"EEEE: Video not selected: row="<<row<<" col="<<col<<" video_select_row="<<video_select_row<<" video_select_col="<<video_select_col<<endl;
 			*selectedptr=false;	
 		}
 	}
@@ -1393,14 +1863,14 @@ void OpenGLWindow::deadVideoProcessing(){
 			}
 			if ( alpha>=0.999999){
 				
-				cerr <<"EEEE: dead video: creating alpha animation"<<endl;
+				//cerr <<"EEEE: dead video: creating alpha animation"<<endl;
 				if (gfx->alpha)
 					delete gfx->alpha;
 				gfx->alpha=new Animate(500,1.0,0.0,ANIMATE_LINEAR);
 				gfx->alpha->start();
 			}
 			if (alpha<0.01){
-				cerr <<"EEEE: alpha is zero - disabling video"<<endl;
+				//cerr <<"EEEE: alpha is zero - disabling video"<<endl;
 				//displayListLock.unlock();
 				//removeDisplay(*i);
 				//displayListLock.lock();
@@ -1430,7 +1900,7 @@ int OpenGLWindow::nVisibleDisplays(){
 
 void OpenGLWindow::updateVideoPositions(bool doAnimate){ //NOTE: this method is indirectly used from external thread
 
-	cerr << "EEEE: doing updateVideoPositions()"<<endl;
+	//cerr << "EEEE: doing updateVideoPositions()"<<endl;
 	displayListLock.lock();
 	int n_videos = /*displays.size()*/ nVisibleDisplays();
 
@@ -1548,8 +2018,8 @@ void OpenGLWindow::updateVideoPositions(bool doAnimate){ //NOTE: this method is 
 		}
 
 
-		cerr << "EEEE: setting position of video "<< global_n <<" to " << tex_x1<<","<<tex_y1<<" "<<tex_x2<<","<<tex_y2<<" alpha="<<alpha<<endl;
-		cerr<<"EEEE: !!!!!!! laying out video with aratio="<<gfx->aratio<<endl;
+		//cerr << "EEEE: setting position of video "<< global_n <<" to " << tex_x1<<","<<tex_y1<<" "<<tex_x2<<","<<tex_y2<<" alpha="<<alpha<<endl;
+		//cerr<<"EEEE: !!!!!!! laying out video with aratio="<<gfx->aratio<<endl;
 
 		if (!doAnimate){
 			gfx->x1= new Animate(tex_x1);
@@ -1578,11 +2048,11 @@ void OpenGLWindow::updateVideoPositions(bool doAnimate){ //NOTE: this method is 
 
 void OpenGLWindow::addDisplay(OpenGLDisplay* displ){ //NOTE: this method is used from external thread
 	inCall=true;
-	cerr << "EEEE: doing addDisplay()"<<endl;
+	//cerr << "EEEE: doing addDisplay()"<<endl;
 	displayListLock.lock();
 	displays.push_back(displ);
 	displaysChanged=true;
-	cerr<<"EEEE: --------------------------------- after add ndisplays="<< displays.size()<<endl;
+	//cerr<<"EEEE: --------------------------------- after add ndisplays="<< displays.size()<<endl;
 	displayListLock.unlock();
 
 	menuLock.lock();
@@ -1593,7 +2063,7 @@ void OpenGLWindow::addDisplay(OpenGLDisplay* displ){ //NOTE: this method is used
 }
 
 void OpenGLWindow::removeDisplay(OpenGLDisplay* displ){ //NOTE: this method is used from external thread
-	cerr <<"EEEE: removeDisplay() running"<<endl;
+	//cerr <<"EEEE: removeDisplay() running"<<endl;
 	displayListLock.lock();
 	displays.remove(displ);
 	inCall=displays.size()>0;
@@ -1606,7 +2076,7 @@ void OpenGLWindow::removeDisplay(OpenGLDisplay* displ){ //NOTE: this method is u
 		menuLock.unlock();
 	}
 
-	cerr<<"EEEE: --------------------------------- after remove ndisplays="<< displays.size()<<endl;
+	//cerr<<"EEEE: --------------------------------- after remove ndisplays="<< displays.size()<<endl;
 	displayListLock.unlock();
 	if (useGui){
 		menuLock.lock();
@@ -1644,16 +2114,16 @@ bool lessthan_addritem(MRef<AddressItem*> a, MRef<AddressItem*> b){
 
 void OpenGLWindow::layoutAddressBook(bool doAnimate){
 
-	cerr <<"EEEE: started layoutAddressBook"<<endl;
+	//cerr <<"EEEE: started layoutAddressBook"<<endl;
 	int nonline=0;
 	std::list<MRef<PhoneBook *> >::iterator i;
 
-	cerr <<"EEEE: nphonebooks="<<pconf->phonebooks.size()<<endl;
+	//cerr <<"EEEE: nphonebooks="<<pconf->phonebooks.size()<<endl;
 
 	MRef<AddressItemList*> onlinelist= addressBookMenu.getList( "Online" );
 
 	if (!onlinelist){
-		cerr <<"EEEE: adding online list"<<endl;
+		//cerr <<"EEEE: adding online list"<<endl;
 		onlinelist=new AddressItemList("Online");
 		addressBookMenu.menuLists.push_front(onlinelist);
 	}else{
@@ -1665,26 +2135,26 @@ void OpenGLWindow::layoutAddressBook(bool doAnimate){
 		list< MRef<PhoneBookPerson *> >::iterator j;
 		MRef<AddressItemList*> alist = addressBookMenu.getList( (*i)->getName() );
 		if (!alist){
-			cerr <<"EEEE: adding list"<< (*i)->getName() <<endl;
+			//cerr <<"EEEE: adding list"<< (*i)->getName() <<endl;
 			alist=new AddressItemList((*i)->getName() );
 			addressBookMenu.menuLists.push_back(alist);
 		}
- 		cerr <<"EEEE: persons in book="<<persons.size()<<endl;
+ 		//cerr <<"EEEE: persons in book="<<persons.size()<<endl;
 
 		for (j=persons.begin(); j!=persons.end(); j++){
 			list< MRef<ContactEntry *> > entries = (*j)->getEntries();
 			list< MRef<ContactEntry *> >::iterator ent;
-			cerr <<"EEEE: contacts per person: "<<entries.size()<<endl;;
+			//cerr <<"EEEE: contacts per person: "<<entries.size()<<endl;;
 			for (ent=entries.begin(); ent!=entries.end(); ent++){
 				if (!alist->contains( (*ent)->getUri() ) ){ // do uri comparison and not string
-					cerr <<"EEEE: adding user "<< (*ent)->getUri() <<" to list"<<endl;
+					//cerr <<"EEEE: adding user "<< (*ent)->getUri() <<" to list"<<endl;
 					alist->addresses.push_back(new AddressItem( (*ent)->getName(), (*ent)->getUri() ));
 					
 				}
 				if ((*ent)->isOnline()){
 					if (!onlinelist->contains((*ent)->getUri() )){
 						//TODO: push sorted, and not at end
-						cerr <<"EEEE: online user "<< (*ent)->getUri() <<" to list"<<endl;
+						//cerr <<"EEEE: online user "<< (*ent)->getUri() <<" to list"<<endl;
 						onlinelist->addresses.push_front(new AddressItem( (*ent)->getName(), (*ent)->getUri() ));
 						onlinelist->addresses.sort(lessthan_addritem);
 					}
@@ -1697,7 +2167,7 @@ void OpenGLWindow::layoutAddressBook(bool doAnimate){
 		}
 	}
 
-	cerr << "EEEE: address lists:"<<endl;
+	//cerr << "EEEE: address lists:"<<endl;
 	list<MRef<AddressItemList*> >::iterator k;
 
 	int nlists = addressBookMenu.menuLists.size();
@@ -1879,7 +2349,7 @@ void OpenGLWindow::menuDrawAddressBook(){ //NOTE: must be called by internal thr
 
 
 void OpenGLWindow::menuLayout(bool animate){ //NOTE: this method is indirectly used from external thread
-	cerr <<"EEEE: menuLayout called"<<endl;
+	//cerr <<"EEEE: menuLayout called"<<endl;
 	int nicons=menuRoot->nVisible();
 	float x1= windowX0;
 	float y1= windowY0;
@@ -2249,8 +2719,8 @@ void OpenGLWindow::drawSurface(){ //NOTE: must be called by internal thread
 	massert(glGetError()==GL_NO_ERROR);
 
 
-	if (/*showMenu*/ menuMode!=MENU_HIDDEN && !texturesLoaded){
-		cerr <<"EEEE: drawSurface: SHOW MENU: loading icons"<<endl;
+	if (/*showMenu*/ /*menuMode!=MENU_HIDDEN &&*/ !texturesLoaded){
+		//cerr <<"EEEE: drawSurface: SHOW MENU: loading icons"<<endl;
 		loadTexture("person");
 		loadTexture("invite");
 		loadTexture("hangup");
@@ -2258,8 +2728,9 @@ void OpenGLWindow::drawSurface(){ //NOTE: must be called by internal thread
 		loadTexture("exit");
 		loadTexture("yes");
 		loadTexture("no");
+		loadTexture("rightarrow");
 		setupMenu();
-		cerr <<"EEEE: drawSurface: done loading textures"<<endl;
+		//cerr <<"EEEE: drawSurface: done loading textures"<<endl;
 	massert(glGetError()==GL_NO_ERROR);
 	}
 
@@ -2330,14 +2801,109 @@ void OpenGLWindow::drawSurface(){ //NOTE: must be called by internal thread
 			glEnd();
 
 			if (gfx->isSelected || (*video)->getIsLocalVideo() &&localVideoSelected){
-				float bwidth=(y2-y1)/20.0;
-				glColor4f(0.0, 0.0, 0.7, 0.5); 
-				glRectf( x1, y1, x2, y1+bwidth );             // _
-				glRectf( x1, y2-bwidth, x2, y2 );             // - X
-				glRectf( x1, y1+bwidth, x1+bwidth, y2-bwidth);//|
-				glRectf( x2-bwidth, y1+bwidth, x2, y2-bwidth);//  |X
+				if (zoomMode==ZOOM_MODE_ON){
+					float iwidth=(y2-y1)/12.0;
+					mgl_gfx* arrow = getIcon("rightarrow");
+					massert(arrow);
+
+					glColor4f(1.0,1.0,1.0, 0.5 );
+					glBindTexture( GL_TEXTURE_2D, arrow->texture);
+
+					//cerr << "y1="<<y1<<" y2="<<y2<<endl;
+				
+					float ix1=x1;
+					float iy1=y1+(y2-y1)/2.0-iwidth /* /2.0 */;
+					float ix2=x1+iwidth;
+					float iy2=iy1+iwidth*2;
+				
+					//LEFT
+					glBegin( GL_QUADS );
+					glTexCoord2f( 1.0, 0 );
+					glVertex3f(  ix1, iy1, 0.0f );
+
+					glTexCoord2f( 0.0, 0.0 );
+					glVertex3f( ix2, iy1, 0.0f );
+
+					glTexCoord2f( 0.0, 1.0 );
+					glVertex3f( ix2, iy2, 0.0f );
+
+					glTexCoord2f( 1.0, 1.0 );
+					glVertex3f( ix1, iy2, 0.0f );
+					glEnd();
+
+					//RIGHT
+					ix2=x2;
+					ix1=x2-iwidth;
+					iy1=y1+(y2-y1)/2.0-iwidth /* /2.0 */;
+					iy2=iy1+iwidth*2;
+
+					glBegin( GL_QUADS );
+					glTexCoord2f( 0, 1.0 );
+					glVertex3f(  ix1, iy1, 0.0f );
+
+					glTexCoord2f( 1.0, 1.0 );
+					glVertex3f( ix2, iy1, 0.0f );
+
+					glTexCoord2f( 1.0, 0 );
+					glVertex3f( ix2, iy2, 0.0f );
+
+					glTexCoord2f( 0, 0 );
+					glVertex3f( ix1, iy2, 0.0f );
+					glEnd();
+
+					//TOP
+					
+					iy2=y2;
+					iy1=y2-iwidth;
+
+					ix1=x1+(x2-x1)/2-iwidth /* /2.0 */;
+					ix2=ix1+iwidth*2;
+					
+					glBegin( GL_QUADS );
+					glTexCoord2f( 0.0, 0.0 );
+					glVertex3f(  ix1, iy1, 0.0f );
+
+					glTexCoord2f( 0.0, 1.0 );
+					glVertex3f( ix2, iy1, 0.0f );
+
+					glTexCoord2f( 1.0, 1.0 );
+					glVertex3f( ix2, iy2, 0.0f );
+
+					glTexCoord2f( 1.0, 0.0 );
+					glVertex3f( ix1, iy2, 0.0f );
+					glEnd();
+
+					//BOTTOM
+					iy1=y1;
+					iy2=y1+iwidth;
+					ix1=x1+(x2-x1)/2-iwidth /* /2.0 */;
+					ix2=ix1+iwidth*2;
+					
+					glBegin( GL_QUADS );
+					glTexCoord2f( 1.0, 1.0 );
+					glVertex3f(  ix1, iy1, 0.0f );
+
+					glTexCoord2f( 1.0, 0.0 );
+					glVertex3f( ix2, iy1, 0.0f );
+
+					glTexCoord2f( 0.0, 0.0 );
+					glVertex3f( ix2, iy2, 0.0f );
+
+					glTexCoord2f( 0.0, 1.0 );
+					glVertex3f( ix1, iy2, 0.0f );
+					glEnd();
+
+
+				}else{
+					float bwidth=(y2-y1)/20.0;
+					glColor4f(0.0, 0.0, 0.7, 0.5); 
+					glRectf( x1, y1, x2, y1+bwidth );             // _
+					glRectf( x1, y2-bwidth, x2, y2 );             // - X
+					glRectf( x1, y1+bwidth, x1+bwidth, y2-bwidth);//|
+					glRectf( x2-bwidth, y1+bwidth, x2, y2-bwidth);//  |X
+				}
 			}
-			if (gfx->callId){
+			if (/*gfx->callId*/ false){
 				//cerr <<"EEEE: drawing callid <"<<gfx->callId<<">"<<endl;
 				
 				if (id_uri.count(gfx->callId) > 0){
@@ -2419,7 +2985,7 @@ void OpenGLWindow::toggleFullscreen(){ //NOTE: must be called by internal thread
 
 
 void OpenGLWindow::windowResized(int w, int h){ //NOTE: must be called by internal thread
-	cerr<<"EEEE: doing OpenGLWindow::windowResized("<<w<<","<<h<<")"<<endl;
+	//cerr<<"EEEE: doing OpenGLWindow::windowResized("<<w<<","<<h<<")"<<endl;
 	windowed_width=w;
 	windowed_height=h;
 
@@ -2436,7 +3002,7 @@ void OpenGLWindow::windowResized(int w, int h){ //NOTE: must be called by intern
 
 
 void OpenGLWindow::run(){ //NOTE: must be called by internal thread
-	cerr << "EEEE: OpenGLWindow::run start"<<endl;
+	//cerr << "EEEE: OpenGLWindow::run start"<<endl;
 #ifdef DEBUG_OUTPUT
 	setThreadName("OpenGLWindow");
 #endif
@@ -2474,9 +3040,9 @@ void OpenGLWindow::run(){ //NOTE: must be called by internal thread
 				case SDL_KEYDOWN:
 
 					if (event.key.keysym.sym == SDLK_n){
-						cerr <<"EEEE: showing notification"<<endl;
+						//cerr <<"EEEE: showing notification"<<endl;
 						showNotification("hello",1000);
-						cerr <<"EEEE: done show notification"<<endl;
+						//cerr <<"EEEE: done show notification"<<endl;
 					}
 
 					//trap quit and fullscreen events. Forward everything else
@@ -2548,6 +3114,7 @@ void OpenGLWindow::run(){ //NOTE: must be called by internal thread
 
 void OpenGLWindow::start(){ //NOTE: this method is used from external thread
 	cerr << "EEEE: doing OpenGLWindow::start()"<<endl;
+	ir->start();
 	lock.lock();
 	bool useSem=false;
 	if (runCount<=0){
@@ -2569,11 +3136,12 @@ void OpenGLWindow::start(){ //NOTE: this method is used from external thread
 		startWaitSem->dec();
 	//cerr << "EEEE: done waiting for startWaitSem->dec()"<<endl;
 
-	cerr << "EEEE: after OpenGLWindow::start() runCount="<<runCount<<endl;
+	//cerr << "EEEE: after OpenGLWindow::start() runCount="<<runCount<<endl;
 }
 
 void OpenGLWindow::stop(){ //NOTE: this method is used from external thread
-	cerr << "EEEE: doing OpenGLWindow::stop()"<<endl;
+	//cerr << "EEEE: doing OpenGLWindow::stop()"<<endl;
+	ir->stop();
 	lock.lock();
 	runCount--;
 	if (runCount==0){
@@ -2586,7 +3154,7 @@ void OpenGLWindow::stop(){ //NOTE: this method is used from external thread
 	initialized=false;
 	lock.unlock();
 
-	cerr << "EEEE: after OpenGLWindow::stop() runCount="<<runCount<<endl;
+	//cerr << "EEEE: after OpenGLWindow::stop() runCount="<<runCount<<endl;
 }
 
 MRef<OpenGLWindow*> OpenGLWindow::getWindow(bool fullscreen){
@@ -2644,13 +3212,13 @@ void OpenGLWindow::initSdl(){ //NOTE: must be called by internal thread
 		native_width=vidinfo->current_w;
 		native_height=vidinfo->current_h;
 	}
-	cerr << "EEEE: OpenGL: native screen dimension is "<< native_width<<"x"<<native_height<<endl;
+	//cerr << "EEEE: OpenGL: native screen dimension is "<< native_width<<"x"<<native_height<<endl;
 
-	cerr  <<"EEEE: doing glGetError"<<endl;
+	//cerr  <<"EEEE: doing glGetError"<<endl;
 
 //	massert(glGetError()==GL_NO_ERROR);
 	// set opengl attributes
-	cerr<<"EEEE: setting attributes..."<<endl;
+	//cerr<<"EEEE: setting attributes..."<<endl;
 	SDL_GL_SetAttribute(SDL_GL_RED_SIZE,        5);
 	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE,      5);
 	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE,       5);
@@ -2669,10 +3237,10 @@ void OpenGLWindow::initSdl(){ //NOTE: must be called by internal thread
  	 * use GL extensions.
  	 */
 
-	cerr<<"EEEE: get swap attributes..."<<endl;
+	//cerr<<"EEEE: get swap attributes..."<<endl;
 	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL,    1);
 
-	cerr<<"EEEE: setting environment..."<<endl;
+	//cerr<<"EEEE: setting environment..."<<endl;
 	SDL_putenv((char*)"__GL_SYNC_TO_VBLANK=1");
 
 
@@ -2707,7 +3275,7 @@ void OpenGLWindow::initSdl(){ //NOTE: must be called by internal thread
 
 	bpp = vidinfo->vfmt->BitsPerPixel; //attribute used by initSurface
 
-	cerr<<"EEEE: will run initsurface"<<endl;
+	//cerr<<"EEEE: will run initsurface"<<endl;
 	initSurface( );
 }
 
@@ -2719,21 +3287,21 @@ void OpenGLWindow::initSurface(){ //NOTE: must be called by internal thread
 
 	// get a framebuffer
 	int w,h;
-	cerr <<"EEEE: sdlFlags="<<sdlFlags<<endl;
-	cerr <<"EEEE: SDL_FULLSCREEN="<<SDL_FULLSCREEN<<endl;
+	//cerr <<"EEEE: sdlFlags="<<sdlFlags<<endl;
+	//cerr <<"EEEE: SDL_FULLSCREEN="<<SDL_FULLSCREEN<<endl;
 	if (sdlFlags & SDL_FULLSCREEN){
 		w=native_width;
 		h=native_height;
-		cerr << "EEEE: initializing to fullscreen dimensions "<< w <<"x"<<h<<endl;
+		//cerr << "EEEE: initializing to fullscreen dimensions "<< w <<"x"<<h<<endl;
 	}else{
 		w=windowed_width;
 		h=windowed_height;
-		cerr << "EEEE: initializing to windowed dimensions "<< w <<"x"<<h<<endl;
+		//cerr << "EEEE: initializing to windowed dimensions "<< w <<"x"<<h<<endl;
 	}
 	cur_width=w;
 	cur_height=h;
 
-	cerr << "EEEE: setting video mode to " << w << "x" << h << endl;
+	//cerr << "EEEE: setting video mode to " << w << "x" << h << endl;
 	gDrawSurface = SDL_SetVideoMode(w,h, bpp, sdlFlags);
 
 	if( !gDrawSurface )
@@ -2811,7 +3379,7 @@ void OpenGLWindow::initSurface(){ //NOTE: must be called by internal thread
 
 
 OpenGLDisplay::OpenGLDisplay( uint32_t width, uint32_t height, bool _fullscreen):VideoDisplay(){
-	cerr << "EEEE: OpenGLDisplay::OpenGLDisplay("<< width<<","<<height<<","<<_fullscreen<<") running"<<endl;
+	//cerr << "EEEE: OpenGLDisplay::OpenGLDisplay("<< width<<","<<height<<","<<_fullscreen<<") running"<<endl;
 	hidden=false;
 	hidden=false;
 	this->width = width;
@@ -2946,13 +3514,13 @@ void OpenGLDisplay::handle( MImage * mimage){
 //	cerr <<"EEEE: colorNBytes="<<colorNBytes<<endl;
 	dataLock.lock();
 	if (!rgb || width!=mimage->width || height!=mimage->height){
-		cerr << "EEEE: allocating RGB of size "<<mimage->width<<"x"<<mimage->height<<endl;
+		//cerr << "EEEE: allocating RGB of size "<<mimage->width<<"x"<<mimage->height<<endl;
 		if (rgb)
 			delete [] rgb;
 		width=mimage->width;
 		height=mimage->height;
 		gfx->aratio=(float)width/(float)height;
-		cerr <<"EEEE: aratio for new size: "<< gfx->aratio<<endl;
+		//cerr <<"EEEE: aratio for new size: "<< gfx->aratio<<endl;
 		rgb = new uint8_t[width*height*colorNBytes+16]; // +16 to avoid mesa bug
 		window->updateVideoLayout();
 	
@@ -2986,7 +3554,7 @@ void OpenGLDisplay::handle( MImage * mimage){
 
 
 void OpenGLDisplay::start(){
-	cerr <<"EEEE: doing OpenGLDisplay::start"<<endl;
+	//cerr <<"EEEE: doing OpenGLDisplay::start"<<endl;
 	massert(window);
 	window->start();
 	window->addDisplay(this);
@@ -2994,7 +3562,7 @@ void OpenGLDisplay::start(){
 }
 
 void OpenGLDisplay::stop(){
-	cerr <<"EEEE: doing OpenGLDisplay::stop"<<endl;
+	//cerr <<"EEEE: doing OpenGLDisplay::stop"<<endl;
 	window->removeDisplay(this);
 	window->stop();
 	gfx->texture=-1;
@@ -3008,29 +3576,29 @@ void OpenGLDisplay::setIsSelected(bool is){
 	gfx->isSelected=is;
 }
 void OpenGLDisplay::openDisplay(){
-	cerr <<"EEEE: doing OpenGLDisplay::openDisplay"<<endl;
+	//cerr <<"EEEE: doing OpenGLDisplay::openDisplay"<<endl;
 
 }
 
 void OpenGLDisplay::init( uint32_t width, uint32_t height ){
-	cerr <<"EEEE: doing OpenGLDisplay::init("<<width<<","<<height<<")"<<endl;
+	//cerr <<"EEEE: doing OpenGLDisplay::init("<<width<<","<<height<<")"<<endl;
 	this->width = width;
 	this->height=height;
 }
 
 void OpenGLDisplay::createWindow(){
-	cerr <<"EEEE: doing OpenGLDisplay::createWindow"<<endl;
+	//cerr <<"EEEE: doing OpenGLDisplay::createWindow"<<endl;
 }
 
 void OpenGLDisplay::resize(int w, int h){
-	cerr << "EEEE: doing OpenGLDisplay::resize("<<w<<","<<h<<") old size="<<width<<"x"<<height<<endl;
+	//cerr << "EEEE: doing OpenGLDisplay::resize("<<w<<","<<h<<") old size="<<width<<"x"<<height<<endl;
 	this->width=w;
 	this->height=h;
 	newRgbData=false;
 	delete [] rgb;
 	rgb=NULL;
 	gfx->aratio=(float)w/(float)h;
-	cerr <<"EEEE: new aratio="<< gfx->aratio<<endl;
+	//cerr <<"EEEE: new aratio="<< gfx->aratio<<endl;
 	window->sizeHint(w,h);
 	delete [] rgb;
 	rgb=NULL;
@@ -3039,7 +3607,7 @@ void OpenGLDisplay::resize(int w, int h){
 }
 
 void OpenGLDisplay::destroyWindow(){
-	cerr << "EEEE: doing OpenGLDisplay::destroyWindow()"<<endl;
+	//cerr << "EEEE: doing OpenGLDisplay::destroyWindow()"<<endl;
 }
 
 MImage * OpenGLDisplay::provideImage(){
@@ -3061,7 +3629,7 @@ MImage * OpenGLDisplay::provideImage(){
 }
 
 MImage * OpenGLDisplay::allocateImage(){
-	cerr << "EEEE: doing OpenGLDisplay::allocateImage of size "<< width<<"x"<<height<<endl;
+	//cerr << "EEEE: doing OpenGLDisplay::allocateImage of size "<< width<<"x"<<height<<endl;
 	MImage * mimage = new MImage;
 	nallocated++;
 
@@ -3079,30 +3647,30 @@ MImage * OpenGLDisplay::allocateImage(){
 
 	mimage->privateData = NULL;
 
-	cerr << "EEEE: done doing OpenGLDisplay::allocateImage of size "<< width<<"x"<<height<<endl;
+	//cerr << "EEEE: done doing OpenGLDisplay::allocateImage of size "<< width<<"x"<<height<<endl;
 	return mimage;
 }
 
 void OpenGLDisplay::deallocateImage( MImage * mimage ){
-	cerr << "EEEE: doing OpenGLDisplay::deallocateImage()"<<endl;
+	//cerr << "EEEE: doing OpenGLDisplay::deallocateImage()"<<endl;
 	free(mimage->data[0]);
 	delete mimage;
 }
 
 bool OpenGLDisplay::handlesChroma( uint32_t chroma ){
-	cerr << "EEEE: doing OpenGLDisplay::handlesChroma "<<chroma<<endl;
+	//cerr << "EEEE: doing OpenGLDisplay::handlesChroma "<<chroma<<endl;
 	return chroma == M_CHROMA_RV24;
 }
 
 void OpenGLDisplay::displayImage( MImage * mimage ){
-	cerr <<"EEEE: doing OpenGLDisplay::displayImage"<<endl;
+	//cerr <<"EEEE: doing OpenGLDisplay::displayImage"<<endl;
 
 	massert(1==0); //This should not be called?!
 
 }
 
 void OpenGLDisplay::handleEvents(){
-	cerr <<"EEEE: doing OpenGLDisplay::handleEvents"<<endl;
+	//cerr <<"EEEE: doing OpenGLDisplay::handleEvents"<<endl;
 }
 
 void OpenGLDisplay::setIsLocalVideo(bool isLocal){
@@ -3115,7 +3683,7 @@ void OpenGLDisplay::setIsLocalVideo(bool isLocal){
 
 bool OpenGLDisplay::handleCommand(CommandString cmd){
 	bool handled=false;
-	cerr <<"EEEE: OpenGLDisplay::handleCommand: got: "<< cmd.getString() << endl;
+	//cerr <<"EEEE: OpenGLDisplay::handleCommand: got: "<< cmd.getString() << endl;
 
 	if (cmd.getOp()=="make_proxy"){	//if we will not display any video
 		window->removeDisplay(this);

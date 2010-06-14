@@ -89,14 +89,20 @@ class OpenGLDisplay: public VideoDisplay{
 		void setHidden(bool h){
 			hidden=h;
 		}
-		
-		
+
+		void setShowZoomIcons(bool s){
+			showZoomIcons=s;
+		}
+
+
+
 		uint64_t timeLastReceive;
 
 
 		Mutex dataLock;
 	private:
 		bool hidden;
+		bool showZoomIcons;
 		int colorNBytes;
 		mgl_gfx *gfx;
 		

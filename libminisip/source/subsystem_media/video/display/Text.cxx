@@ -20,7 +20,7 @@ static float colorDiff(int r1, int g1, int b1,  int r2, int g2, int b2){
 }
 
 TextTexture::TextTexture(TTF_Font* font, std::string t, int size, SDL_Color fgcolor, SDL_Color bgcolor){
-	cerr <<"EEEE: TextTexture::TextTexture started"<<endl;
+	//cerr <<"EEEE: TextTexture::TextTexture started"<<endl;
 	fgColor=fgcolor;
 	bgColor=bgcolor;
 
@@ -121,7 +121,7 @@ GLuint TextTexture::getTexture(){
 
 
 Text::Text(std::string fontpath){
-	cerr << "EE: Text() opening font"<<endl;
+	//cerr << "EE: Text() opening font"<<endl;
 	fontPath=fontpath;
 }
 
