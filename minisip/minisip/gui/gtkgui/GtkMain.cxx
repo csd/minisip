@@ -32,8 +32,11 @@
 using namespace std;
 
 static bool redirectOutput(const char *logName){
-	freopen(logName, "a", stdout);
-	freopen(logName, "a", stderr);
+	FILE *ret;
+	ret=freopen(logName, "a", stdout);
+	massert(ret!=NULL);
+	ret=freopen(logName, "a", stderr);
+	massert(ret!=NULL);
  	cerr << "Created log file" << endl;
 
 	return true;
