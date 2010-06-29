@@ -78,7 +78,7 @@ GnutlsSocket::GnutlsSocket( MRef<StreamSocket *> tcp_socket,
 			    gnutls_session_t session )
 		: sock(tcp_socket)
 {
-	type = SOCKET_TYPE_TLS;
+	type = MSOCKET_TYPE_TLS;
 	peerPort = tcp_socket->getPeerPort();
 	peerAddress = tcp_socket->getPeerAddress()->clone();
  	fd = tcp_socket->getFd();
@@ -197,7 +197,7 @@ void GnutlsSocket::GnutlsSocket_init( MRef<StreamSocket*> ssock,
 	fd = ssock->getFd();
 	peerPort = ssock->getPeerPort();
 	peerAddress = ssock->getPeerAddress();
-	type = SOCKET_TYPE_TLS;
+	type = MSOCKET_TYPE_TLS;
 
 	return;
 }

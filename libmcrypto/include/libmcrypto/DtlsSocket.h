@@ -27,7 +27,7 @@
 #include<libmnetutil/DatagramSocket.h>
 #include<libmcrypto/cert.h>
 
-#define SOCKET_TYPE_DTLS_UDP     0x21
+#define MSOCKET_TYPE_DTLS_UDP     0x21
 
 class LIBMCRYPTO_API DTLSSocket : public DatagramSocket {
 	public:

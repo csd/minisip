@@ -41,7 +41,7 @@ class SipTransportDtlsUdp: public SipTransport{
 
 		virtual std::string getViaProtocol() const { return "DTLS-UDP"; }
 
-		virtual int32_t getSocketType() const { return SOCKET_TYPE_DTLS_UDP; }
+		virtual int32_t getSocketType() const { return MSOCKET_TYPE_DTLS_UDP; }
 
 		virtual std::string getNaptrService() const { return "SIPS+D2U"; }
 

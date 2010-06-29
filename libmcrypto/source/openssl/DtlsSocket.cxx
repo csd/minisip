@@ -433,7 +433,7 @@ int32_t SSLSession::send(const void *buf, int len)
 bool OdtlsSocket::initDtlsSocket( void * &ctx,
 				 MRef<OsslCertificate *> cert,
 				 MRef<OsslCertificateSet *> cert_db ) {
-	type = SOCKET_TYPE_DTLS_UDP;
+	type = MSOCKET_TYPE_DTLS_UDP;
 	
 	SSL_library_init();
 	SSL_load_error_strings();

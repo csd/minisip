@@ -716,13 +716,13 @@ bool SipLayerTransport::getDestination(MRef<SipMessage*> pack, string &destAddr,
 					if( secure )
 						destTransport = registry->findTransport( "tcp", true );
 					else{
-						if (findServerSocket(SOCKET_TYPE_UDP, false)){
+						if (findServerSocket(MSOCKET_TYPE_UDP, false)){
 							destTransport = registry->findTransport( "udp" );
 						}else
-						if (findServerSocket(SOCKET_TYPE_TCP, false)){
+						if (findServerSocket(MSOCKET_TYPE_TCP, false)){
 							destTransport = registry->findTransport( "tcp" );
 						}else
-						if (findServerSocket(SOCKET_TYPE_TLS, false)){
+						if (findServerSocket(MSOCKET_TYPE_TLS, false)){
 							destTransport = registry->findTransport( "tcp", true );
 						}else{
 							// this should not happen
@@ -786,7 +786,7 @@ bool SipLayerTransport::findSocket(MRef<SipTransport*> transport,
 	server = findServer(type, ipv6);
 	serversLock.unlock();
 
-	if( type & SOCKET_TYPE_STREAM ){
+	if( type & MSOCKET_TYPE_STREAM ){
 		MRef<StreamSocket*> ssocket = findStreamSocket(destAddr, port);
 		if( ssocket.isNull() ) {
 			/* No existing StreamSocket to that host,
@@ -890,7 +890,7 @@ void SipLayerTransport::updateContact(MRef<SipMessage*> pack,
 //the contact uri will not have the correct port if we run on any port
 //except 5060.
 //
-//		if(ipv6 || socket->getType() != SOCKET_TYPE_UDP){
+//		if(ipv6 || socket->getType() != MSOCKET_TYPE_UDP){
 
 			// Update port if not UDP and IPv4
 			contactUri.setPort( port );

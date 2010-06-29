@@ -41,7 +41,7 @@ class SipTransportSctp: public SipTransport{
 
 		virtual std::string getViaProtocol() const { return "SCTP"; }
 
-		virtual int32_t getSocketType() const { return SOCKET_TYPE_SCTP; }
+		virtual int32_t getSocketType() const { return MSOCKET_TYPE_SCTP; }
 
 		virtual std::string getNaptrService() const { return "SIP+D2S"; }
 

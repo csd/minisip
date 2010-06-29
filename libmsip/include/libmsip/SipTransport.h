@@ -68,7 +68,7 @@ class LIBMSIP_API SipTransport: public MPlugin{
 		virtual std::string getNaptrService() const=0;
 
 		/**
-		 * One of SOCKET_TYPE_*
+		 * One of MSOCKET_TYPE_*
 		 */
 		virtual int32_t getSocketType() const=0;
 

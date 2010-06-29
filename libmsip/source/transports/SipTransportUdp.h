@@ -40,7 +40,7 @@ class SipTransportUdp: public SipTransport{
 
 		virtual std::string getViaProtocol() const { return "UDP"; }
 
-		virtual int32_t getSocketType() const { return SOCKET_TYPE_UDP; }
+		virtual int32_t getSocketType() const { return MSOCKET_TYPE_UDP; }
 
 		virtual std::string getNaptrService() const { return "SIP+D2U"; }
 

@@ -42,7 +42,7 @@ using namespace std;
 TcpServerSocket::TcpServerSocket( int32_t domain ):
 		ServerSocket( domain, SOCK_STREAM, IPPROTO_TCP )
 {
-	type = SOCKET_TYPE_TCP;
+	type = MSOCKET_TYPE_TCP;
 }
 
 TcpServerSocket *TcpServerSocket::create( int32_t listenport, bool useIpv6,

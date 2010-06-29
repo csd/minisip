@@ -31,7 +31,7 @@ SctpServerSocket::SctpServerSocket( const IPAddress &addr ):
 		ServerSocket( addr.getAddressFamily(),
 			      SOCK_STREAM, IPPROTO_SCTP )
 {
-	type = SOCKET_TYPE_SCTP;
+	type = MSOCKET_TYPE_SCTP;
 }
 
 SctpServerSocket *SctpServerSocket::create( int32_t listenport, bool useIpv6,

@@ -98,7 +98,7 @@ void GnutlsServerSocket::init( MRef<ServerSocket*> sock,
 			       MRef<GtlsCertificate *> cert,
 			       MRef<GtlsCertificateSet *> cert_db)
 {
-	type = SOCKET_TYPE_TLS;
+	type = MSOCKET_TYPE_TLS;
 	this->sock = sock;
 	cerr << "GnutlsServerSocket::init" << endl;
 	m_cert = cert;

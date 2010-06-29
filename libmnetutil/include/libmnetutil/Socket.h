@@ -26,14 +26,14 @@
 
 #include<libmnetutil/libmnetutil_config.h>
 
-#define SOCKET_TYPE_STREAM      0x10
-#define SOCKET_TYPE_TCP         0x11
-#define SOCKET_TYPE_TLS         0x12
-#define SOCKET_TYPE_TLSSRP      0x13
-#define SOCKET_TYPE_SCTP        0x14
-#define SOCKET_TYPE_TLS_SCTP    0x15
+#define MSOCKET_TYPE_STREAM      0x10
+#define MSOCKET_TYPE_TCP         0x11
+#define MSOCKET_TYPE_TLS         0x12
+#define MSOCKET_TYPE_TLSSRP      0x13
+#define MSOCKET_TYPE_SCTP        0x14
+#define MSOCKET_TYPE_TLS_SCTP    0x15
 
-#define SOCKET_TYPE_UDP         0x20
+#define MSOCKET_TYPE_UDP         0x20
 
 #include<libmutil/MemObject.h>
 #include<libmutil/mtypes.h>

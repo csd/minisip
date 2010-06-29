@@ -72,7 +72,7 @@ void TCPSocket::initTCPSocket(const IPAddress &ipaddress, int32_t port){
 	peerAddress = ipaddress.clone();
 	peerPort = port;
 
-	type = SOCKET_TYPE_TCP;
+	type = MSOCKET_TYPE_TCP;
 	if ((fd = (int32_t)::socket(ipaddress.getProtocolFamily(), SOCK_STREAM, IPPROTO_TCP ))<0){
 		throw SocketFailed( errno );
 	}
@@ -87,14 +87,14 @@ void TCPSocket::initTCPSocket(const IPAddress &ipaddress, int32_t port){
 }
 
 TCPSocket::TCPSocket(int32_t fd_, struct sockaddr * addr, int32_t addr_len){
-	type = SOCKET_TYPE_TCP;
+	type = MSOCKET_TYPE_TCP;
 	this->fd=fd_;
 	peerAddress = IPAddress::create( addr, addr_len );
 	peerPort = peerAddress->getPort();
 }
 
 TCPSocket::TCPSocket(TCPSocket &sock){
-	type = SOCKET_TYPE_TCP;
+	type = MSOCKET_TYPE_TCP;
 
 #ifdef _WIN32_WCE
 #	pragma message("LIBMUTIL::TCPSocket - COMPILATION Warning: dup(int fd) replacement not found for POCKET PC in EVC")

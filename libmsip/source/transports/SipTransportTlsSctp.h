@@ -41,7 +41,7 @@ class SipTransportTlsSctp: public SipTransport{
 
 		virtual std::string getViaProtocol() const { return "TLS-SCTP"; }
 
-		virtual int32_t getSocketType() const { return SOCKET_TYPE_TLS_SCTP; }
+		virtual int32_t getSocketType() const { return MSOCKET_TYPE_TLS_SCTP; }
 
 		virtual std::string getNaptrService() const { return "SIPS+D2S"; }
 

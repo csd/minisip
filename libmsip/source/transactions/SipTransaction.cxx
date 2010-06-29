@@ -216,7 +216,7 @@ bool SipTransaction::isUnreliable() {
 		mdbg("signaling/sip") << "FIXME: SipTransaction::isUnrealiable: socket not initialized. Returning _unreliable_transport_ by default" << endl;
 		return true;
 	}
-	if( socket->getType() == SOCKET_TYPE_UDP )
+	if( socket->getType() == MSOCKET_TYPE_UDP )
 		return true;
 	else return false;
 }

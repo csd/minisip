@@ -63,7 +63,7 @@ const int kx_priority[] =
 /* constructor*/
 TlsSrpSocket::TlsSrpSocket(string addrs, int32_t port, string user, string pass)
 {
-	type = SOCKET_TYPE_TLSSRP;
+	type = MSOCKET_TYPE_TLSSRP;
 	TlsSrpSocket::TlsSrpSocketSrp_init(addrs, port, user, pass);
 }
 

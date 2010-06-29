@@ -86,7 +86,7 @@ void OsslServerSocket::init( MRef<ServerSocket*> sock,
 			    MRef<OsslCertificate *> cert,
 			    MRef<OsslCertificateSet *> cert_db_)
 {
-	type = SOCKET_TYPE_TLS;
+	type = MSOCKET_TYPE_TLS;
 	this->cert_db = cert_db_;
 	this->sock = sock;
 	SSL_METHOD * meth;

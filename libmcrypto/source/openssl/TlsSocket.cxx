@@ -86,7 +86,7 @@ int8_t OsslSocket::sslCipherListIndex = 0; /* Set default value ... DEFAULT ciph
 // When created by a TLS Server
 OsslSocket::OsslSocket( MRef<StreamSocket *> tcp_socket, SSL_CTX * ssl_ctx_ ):
 		sock(tcp_socket){
-	type = SOCKET_TYPE_TLS;
+	type = MSOCKET_TYPE_TLS;
 	peerPort = tcp_socket->getPeerPort();
 	peerAddress = tcp_socket->getPeerAddress()->clone();
 
@@ -118,7 +118,7 @@ OsslSocket::OsslSocket( MRef<StreamSocket*> ssock, void * &ssl_ctx_,
 void OsslSocket::OsslSocket_init( MRef<StreamSocket*> ssock, void * &ssl_ctx_,
 					MRef<OsslCertificate *> cert,
 					MRef<OsslCertificateSet *> cert_db_ ){
-	type = SOCKET_TYPE_TLS;
+	type = MSOCKET_TYPE_TLS;
 	const unsigned char * sid_ctx = (const unsigned char *)"Minisip TLS";
 	SSLeay_add_ssl_algorithms();
 	SSL_METHOD *meth = SSLv23_client_method();

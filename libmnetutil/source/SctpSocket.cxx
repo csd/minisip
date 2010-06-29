@@ -28,7 +28,7 @@
 using namespace std;
 
 SctpSocket::SctpSocket( const IPAddress &addr, int32_t port ){
-	type = SOCKET_TYPE_SCTP;
+	type = MSOCKET_TYPE_SCTP;
 	peerAddress = addr.clone();
 	peerPort = port;
 
@@ -46,7 +46,7 @@ SctpSocket::SctpSocket( const IPAddress &addr, int32_t port ){
 }
 
 SctpSocket::SctpSocket(int32_t fd_, struct sockaddr * addr, int32_t addr_len){
-	type = SOCKET_TYPE_SCTP;
+	type = MSOCKET_TYPE_SCTP;
 	fd = fd_;
 	peerAddress = IPAddress::create( addr, addr_len );
 	peerPort = peerAddress->getPort();
