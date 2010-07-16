@@ -1,4 +1,4 @@
-/*
+/* 
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation; either version 2 of the License, or
@@ -66,6 +66,14 @@ CallWidget::CallWidget( string callId, string remoteUri,
 		Gtk::ICON_SIZE_DIALOG ),
 		acceptButton( Gtk::Stock::OK, "Accept" ),
 		rejectButton( Gtk::Stock::CANCEL, "Reject" ),
+/***************************************************************************/
+		addCameraButton(Gtk::Stock::ADD,"Add Camera"),
+		addScreenButton(Gtk::Stock::ADD,"Stream Screen"),
+		cancelCameraButton(Gtk::Stock::CANCEL,"Stop additional camera"),
+		cancelScreenButton(Gtk::Stock::CANCEL,"Stop streaming screen"),		
+
+
+
 		bell(),
 		mainCallId( callId )
 {
@@ -147,9 +155,14 @@ CallWidget::CallWidget( string callId, string remoteUri,
 	pack_start( transferArrow, false, false, 4 );
 
 #endif
-
 	buttonBox.add( acceptButton );
 	buttonBox.add( rejectButton );
+/*************************************************/
+	buttonBox.add( addCameraButton );
+	buttonBox.add( addScreenButton );
+	buttonBox.add( cancelCameraButton );
+	buttonBox.add( cancelScreenButton );
+
 
 //	status.show();
 //	secStatus.show();
@@ -160,6 +173,15 @@ CallWidget::CallWidget( string callId, string remoteUri,
 
 	acceptButton.signal_clicked().connect( SLOT( *this, &CallWidget::accept ) );
 	rejectButton.signal_clicked().connect( SLOT( *this, &CallWidget::reject ) );
+/******************************************************************************************/
+	addCameraButton.signal_clicked().connect( SLOT( *this, &CallWidget::addCamera ) );
+	addScreenButton.signal_clicked().connect( SLOT( *this, &CallWidget::addScreen ) );
+	cancelCameraButton.signal_clicked().connect( SLOT( *this, &CallWidget::cancelCamera ) );
+	cancelScreenButton.signal_clicked().connect( SLOT( *this, &CallWidget::cancelScreen ) );	
+
+	cancelCameraButton.hide();
+        cancelScreenButton.hide();
+
 
 	if( incoming ){
 		state = CALL_WIDGET_STATE_INCOMING;
@@ -221,6 +243,7 @@ void CallWidget::reject(){
 	CommandString cmdstr("","");
 	stopRinging();
 
+
 	switch( state ){
 		case CALL_WIDGET_STATE_TERMINATED:
 			mainWindow->removeCall( mainCallId );
@@ -248,6 +271,54 @@ void CallWidget::reject(){
 			break;
 	}
 }
+
+/**************************************************************************/
+void CallWidget:: addCamera(){
+
+//printf("=========================================> add Camera button pressed\n");
+ 	CommandString cmdstr = CommandString( "" , MediaCommandString::start_camera , mainCallId );
+        mainWindow->getCallback()->handleCommand("media", cmdstr );
+	addCameraButton.hide();
+        cancelCameraButton.show();
+}
+
+
+void CallWidget:: cancelCamera(){
+
+//printf("=========================================> cancel Camera button pressed\n");
+ 	
+
+	CommandString cmdstr = CommandString( "", MediaCommandString::stop_camera , mainCallId );
+        mainWindow->getCallback()->handleCommand("media", cmdstr );
+	addCameraButton.show();
+        cancelCameraButton.hide();
+
+}
+
+void CallWidget:: addScreen(){
+
+//printf("=========================================> add Screen  button pressed\n");
+	CommandString cmdstr = CommandString( "", MediaCommandString::start_screen , mainCallId);
+        mainWindow->getCallback()->handleCommand("media", cmdstr );
+        addScreenButton.hide();
+        cancelScreenButton.show();
+
+
+
+}
+
+void CallWidget:: cancelScreen(){
+
+//printf("=========================================> cancel Screen button pressed\n");
+ 	CommandString cmdstr = CommandString( "", MediaCommandString::stop_screen , mainCallId);
+        mainWindow->getCallback()->handleCommand("media", cmdstr );
+       addScreenButton.show();
+        cancelScreenButton.hide();
+
+
+}
+
+
 
 void CallWidget::monitorButtonToggled () {
 #ifndef OLDLIBGLADEMM

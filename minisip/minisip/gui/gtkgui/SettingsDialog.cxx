@@ -391,6 +391,11 @@ string MediaSettings::apply(){
 DeviceSettings::DeviceSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 	
 	refXml->get_widget( "videoEntry", videoEntry );
+	 refXml->get_widget ( "videoEntry2", videoEntry2 );
+
+	 refXml->get_widget ( "displayFrameSize", displayFrameSize );
+	 refXml->get_widget ( "displayFrameRate", displayFrameRate );
+	
 	
 	refXml->get_widget( "soundInputEntry", soundInputEntry );
 	refXml->get_widget( "soundOutputEntry", soundOutputEntry );
@@ -401,10 +406,13 @@ DeviceSettings::DeviceSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 	refXml->get_widget( "videoLabel", videoLabel );
 	refXml->get_widget( "videoDeviceLabel", videoDeviceLabel );
 	
+
+
 	refXml->get_widget( "spaudioCheck", spaudioCheck );
 
 #ifndef VIDEO_SUPPORT
 	videoEntry->hide();
+	videoEntry2->hide();
 	videoLabel->hide();
 	videoDeviceLabel->hide();
 #endif
@@ -442,7 +450,17 @@ void DeviceSettings::setConfig( MRef<SipSoftPhoneConfiguration *> config ){
 	Gtk::TreeModel::iterator listIterator;
 	this->config = config;
 #ifdef VIDEO_SUPPORT
+
+//cout <<"===========================================================================================> setting gui videoDevices :: "<< config->videoDevice << " , "<< config->videoDevice2 <<endl;  
+
 	videoEntry->set_text( config->videoDevice );
+
+
+	videoEntry2->set_text(config->videoDevice2);
+
+	displayFrameSize->set_text(config->displayFrameSize);
+	displayFrameRate->set_text(config->displayFrameRate);
+
 #endif
 
 	if( config->soundIOmixerType == "spatial" ){
@@ -539,6 +557,12 @@ string DeviceSettings::apply(){
 	
 #ifdef VIDEO_SUPPORT
 	config->videoDevice = videoEntry->get_text();
+	config->videoDevice2 = videoEntry2->get_text();
+
+	config->displayFrameSize = displayFrameSize->get_text();
+	config->displayFrameRate = displayFrameRate->get_text();
+
+	cout << "========================================================================= "<< config->videoDevice2 ;
 #endif
 	return "";	
 }

@@ -168,6 +168,11 @@ class DeviceSettings
 		void soundOutputChange();
 
 		Gtk::Entry * videoEntry;
+	
+		Gtk::Entry * videoEntry2;
+		Gtk::Entry * displayFrameSize;		
+		 Gtk::Entry * displayFrameRate;
+
 
 		Gtk::Entry * soundInputEntry;
 		Gtk::Entry * soundOutputEntry;

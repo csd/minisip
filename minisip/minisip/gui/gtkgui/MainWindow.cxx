@@ -425,6 +425,11 @@ void MainWindow::hideSlot(){
 
 void MainWindow::handleCommand(const CommandString &command ){
 
+
+string ptr;
+ptr = command.getString();
+
+	
 	commandsLock.lock();
 	commands.push_front( command );
 	commandsLock.unlock();
@@ -476,6 +481,7 @@ void MainWindow::gotCommand(){
 			return;
 		}
 	}
+
 	if (command.getOp() == SipCommandString::incoming_im){
 
 		list<ImWidget *>::iterator i;
@@ -828,7 +834,8 @@ void MainWindow::accountListSelect() {
 }
 
 void MainWindow::inviteClick() {
-	invite( uriEntry->get_text() );
+//-------------------------------------------
+ invite( uriEntry->get_text() );
 }
 
 void MainWindow::invite( string uri ){
@@ -843,7 +850,8 @@ void MainWindow::invite( string uri ){
 			Gtk::MessageDialog dialog( "The SIP address you specified is not valid", Gtk::MESSAGE_WARNING );
 			dialog.show();
 		}
-		
+
+
 		addCall( id, uri, false );
 	}
 }
@@ -1003,6 +1011,8 @@ void MainWindow::viewToggle( uint8_t w ){
 }
 
 void MainWindow::setCallback( MRef<CommandReceiver*> callback ){
+
+
 	statusWidget->setCallback( callback );
 	settingsDialog->setCallback( callback );
 	handleCommand( CommandString( "", "sip_ready" ) );

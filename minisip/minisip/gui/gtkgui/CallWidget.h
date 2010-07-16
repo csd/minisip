@@ -1,4 +1,4 @@
-/*
+/* 
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation; either version 2 of the License, or
@@ -80,6 +80,11 @@ class CallWidget : public Gtk::VBox
 
 		void accept();
 		void reject();
+/***********************************************************************/
+		void addCamera();
+		void addScreen();
+		void cancelCamera();
+		void cancelScreen();
 
 		 std::string getMainCallId();
 		bool handlesCallId(  std::string callId );
@@ -151,6 +156,15 @@ class CallWidget : public Gtk::VBox
 		Gtk::Image insecureImage;
 		StockButton acceptButton;
 		StockButton rejectButton;
+		
+/****************************************************/
+		StockButton addCameraButton;
+		StockButton addScreenButton;
+		StockButton cancelCameraButton;
+		StockButton cancelScreenButton;
+
+
+
 		
 		//Gtk::Image secIcon;
 		//Gtk::HBox secBox;
