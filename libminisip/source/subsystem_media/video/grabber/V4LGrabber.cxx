@@ -62,6 +62,9 @@ V4LGrabber::V4LGrabber( string device ):device(device){
 }
 
 void V4LGrabber::open(){
+	
+
+
 	fd = ::open( device.c_str(), O_RDWR );
 
 	mdbg << "V4LGrabber: opened " << fd << endl;
@@ -75,7 +78,6 @@ void V4LGrabber::open(){
 
 	getCapabilities();
 	getImageFormat();
-
 }
 
 void V4LGrabber::getCapabilities(){
@@ -364,6 +366,7 @@ void V4LGrabber::setHandler( ImageHandler * handler ){
 }
 
 void V4LGrabber::read( ImageHandler * handler ){
+
 	mdbg << "Start read( handler )" << endl;
 	grabberLock.lock();
 	int i;
@@ -388,7 +391,6 @@ void V4LGrabber::read( ImageHandler * handler ){
                 merr << "Grabber size: " << width << "x" << height << endl;
         }
         
-
 
         mdbg << "ImageFormat->palette " << imageFormat->palette << endl;
         
@@ -478,7 +480,6 @@ void V4LGrabber::read( ImageHandler * handler ){
                         /* FIXME get it from the camera */
 
                         image->mTime = mtime();
-
 			if( handler ){
 				handler->handle( image );
 			}
@@ -490,6 +491,7 @@ void V4LGrabber::read( ImageHandler * handler ){
 }
 
 void V4LGrabber::close(){
+
 	mdbg << "V4LGrabber: Close" << endl;
 
 	stop();

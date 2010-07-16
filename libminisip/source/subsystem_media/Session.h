@@ -144,6 +144,8 @@ class LIBMINISIP_API Session : public MObject{
 		 */
 		void addRealtimeMediaStreamSender( MRef<RealtimeMediaStreamSender *> s );
 
+		void removeRealtimeMediaStreamSender( MRef<RealtimeMediaStreamSender *> realtimeMediaStream );
+
 		/**
 		 * Returns an error description suitable for use
 		 * in a SIP Warning: header, to explain why the
@@ -260,6 +262,16 @@ class LIBMINISIP_API Session : public MObject{
 		header file dependency problems when building. No comment.
 		*/
 		MRef<MObject *> callRecorder;
+///////////////////////////////////////////////////////
+		void setDestinationPort ( int port){ DestinationPort = port;};
+		void setDestinationIp (  MRef<IPAddress *> s ) { DestinationIP = s ;}; 
+		int getDestinationPort ( ){ return DestinationPort;};
+                MRef<IPAddress *> getDestinationIp ( ) { return DestinationIP;};
+		void setUDPSocket ( MRef<UDPSocket *> sock ) { this->sock = sock;}  ;		
+		void setUDPSocket6 ( MRef<UDPSocket *> sock ) { this->sock6 = sock;}  ;
+		MRef<UDPSocket *> getUDPSocket(){return sock;};
+		MRef<UDPSocket *> getUDPSocket6(){return sock6;};		
+
 
 	private:
 		/**
@@ -273,6 +285,13 @@ class LIBMINISIP_API Session : public MObject{
 		void addStreams();
 
 		std::string peerUri;
+////////////////////////////////////////////////
+		int DestinationPort;
+		MRef<IPAddress *> DestinationIP;
+                MRef<UDPSocket *> sock;
+                MRef<UDPSocket *> sock6;
+
+
 
 
 		MRef<SdpPacket *> emptySdp();

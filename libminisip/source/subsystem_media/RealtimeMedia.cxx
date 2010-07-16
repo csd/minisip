@@ -46,6 +46,8 @@ list< MRef<Codec *> >  RealtimeMedia::getAvailableCodecs(){
 }
 
 void RealtimeMedia::registerRealtimeMediaSender( MRef<RealtimeMediaStreamSender *> sender ){
+
+
 	sendersLock.lock();
 	senders.push_back( sender );
 	sendersLock.unlock();
@@ -80,6 +82,7 @@ MRef<CodecState *> RealtimeMedia::createCodecInstance( uint8_t payloadType ){
 
 	for( iC = codecList.begin(); iC != codecList.end(); iC ++ ){
 		if( (*iC)->getSdpMediaType() == payloadType ){
+			MRef<CodecState *> tmp  = (*iC)->newInstance();
 			return (*iC)->newInstance();
 		}
 	}

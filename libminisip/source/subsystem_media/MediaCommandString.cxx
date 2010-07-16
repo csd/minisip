@@ -44,3 +44,10 @@ const string MediaCommandString::video_forwarding_enable="video_forwarding_enabl
 const string MediaCommandString::video_forwarding_disable="video_forwarding_disable";
 
 const string MediaCommandString::send_dtmf="send_dtmf";
+
+/********************************************************/
+const string MediaCommandString:: start_camera = "start_camera";
+const string MediaCommandString:: start_screen="start_screen";
+const string MediaCommandString:: stop_camera="stop_camera";
+const string MediaCommandString:: stop_screen="stop_screen";
+

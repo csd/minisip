@@ -143,6 +143,7 @@ class DeckLinkGrabber : public Grabber{
 		MRef<Semaphore*> startBlockSem;
 		MRef<Semaphore*> initBlockSem;
 		int fps;
+		int deviceno;
 };
 
 class DeckLinkPlugin : public GrabberPlugin{

@@ -69,7 +69,11 @@ class LIBMINISIP_API AudioMedia : public RealtimeMedia, public SoundRecorderCall
 		* @returns the media type as a string
 		*/
 		virtual std::string getSdpMediaType();
+		
+		uint8_t  getCodecgetSdpMediaType(){};
 
+///////
+		  MRef<CodecState *> getCodecInstance (){};
 
 		/**
 		* Play the given RTP packet on this medium. This includes

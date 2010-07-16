@@ -67,6 +67,7 @@ RtpPacket::RtpPacket(unsigned char *content_, int cl,
     header.SSRC = ssrc;
 
     if( content_length ){
+	massert(content_length>0 && content_length<0xFFFF);
 	this->content = new unsigned char[content_length];
 	memcpy(this->content, content_, content_length);
     }
@@ -137,6 +138,7 @@ RtpPacket::~RtpPacket(){
 }
 
 void RtpPacket::sendTo(UDPSocket &udp_sock, IPAddress &to_addr, int port){
+   //  printf("---------------------------------------- RtpPacket sendTo  test 7  \n");
     char *bytes = getBytes();
     udp_sock.sendTo(to_addr, port, bytes, size());
     delete [] bytes;

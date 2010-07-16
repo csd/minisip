@@ -87,6 +87,9 @@ SipSoftPhoneConfiguration::SipSoftPhoneConfiguration():
 	soundDeviceIn(""),
 	soundDeviceOut(""),
 	videoDevice(""),
+	videoDevice2(""),
+	displayFrameSize(""),
+	displayFrameRate(""),
 	usePSTNProxy(false),
 	ringtone(""),
 	p2tGroupListServerPort(0)
@@ -377,6 +380,11 @@ void SipSoftPhoneConfiguration::save(){
 	}
 
 	backend->save( "video_device", videoDevice );
+////
+	backend->save("video_device2", videoDevice2);
+	backend->save("display_frame_size",displayFrameSize);
+	backend->save("display_frame_rate",displayFrameRate);
+	
 	backend->save( "frame_width", frameWidth );
 	backend->save( "frame_height", frameHeight );
 
@@ -844,6 +852,11 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 	}while( true );
 
 	videoDevice = backend->loadString( "video_device", "" );
+///
+	videoDevice2 = backend->loadString( "video_device2","");	
+	displayFrameSize = backend->loadString("display_frame_size","");
+	displayFrameRate = backend->loadString("display_frame_rate","");
+
 	//Even if we can't send video, we might be able to display it.
 	//Therefore this is not within the VIDEO_SUPPORT ifdef
 	frameWidth = backend->loadInt( "frame_width", 176 );

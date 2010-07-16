@@ -2093,7 +2093,7 @@ void OpenGLWindow::removeDisplay(OpenGLDisplay* displ){ //NOTE: this method is u
 		menuLock.unlock();
 	}
 
-	//cerr<<"EEEE: --------------------------------- after remove ndisplays="<< displays.size()<<endl;
+	cerr<<"EEEE: --------------------------------- after remove ndisplays="<< displays.size()<<endl;
 	displayListLock.unlock();
 	if (useGui){
 		menuLock.lock();
@@ -3177,15 +3177,15 @@ void OpenGLWindow::stop(){ //NOTE: this method is used from external thread
 	runCount--;
 	if (runCount==0){
 		doStop=true;
-		//		cerr <<"EEEE: waiting for OpenGLWindow thread..."<<endl;
+		cerr <<"EEEE: waiting for OpenGLWindow thread..."<<endl;
 		thread->join();
-		//		cerr <<"EEEE: done waiting for OpenGLWindow thread..."<<endl;
+		cerr <<"EEEE: done waiting for OpenGLWindow thread..."<<endl;
 		thread=NULL;
 	}
 	initialized=false;
 	lock.unlock();
 
-	//cerr << "EEEE: after OpenGLWindow::stop() runCount="<<runCount<<endl;
+	cerr << "EEEE: after OpenGLWindow::stop() runCount="<<runCount<<endl;
 }
 
 	MRef<OpenGLWindow*> OpenGLWindow::getWindow(bool fullscreen){

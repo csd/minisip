@@ -36,6 +36,8 @@ class AudioPlugin : public MediaPlugin{
 		virtual ~AudioPlugin();
 
 		virtual MRef<Media*> createMedia( MRef<SipSoftPhoneConfiguration *> config );
+///////////////////
+		virtual MRef<Media*> createMedia2stream( MRef<SipSoftPhoneConfiguration *> config){};
 
 		virtual std::string getMemObjectType() const { return "AudioPlugin"; }
 		virtual std::string getName() const{ return "audio"; }

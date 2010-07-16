@@ -27,9 +27,9 @@
 
 #include<libminisip/libminisip_config.h>
 
-#include<libmutil/Mutex.h>
-#include<libmutil/MPlugin.h>
-#include<libmutil/MSingleton.h>
+#include<libmutil/Mutex.h> include<libmutil/MPlugin.h> include<libmutil/MSingleton.h> include <Codec.h>
+#include<libminisip/media/codecs/Codec.h>
+
 
 class SdpHeaderM;
 class SipSoftPhoneConfiguration;
@@ -80,6 +80,10 @@ public:
 	 */
 	virtual void handleMHeader( MRef<SdpHeaderM *> m );
 
+	////
+	virtual uint8_t  getCodecgetSdpMediaType()=0;
+	virtual MRef<CodecState *> getCodecInstance ()=0;
+
 protected:
 	Media();
 
@@ -94,7 +98,8 @@ class LIBMINISIP_API MediaPlugin : public MPlugin{
 		virtual ~MediaPlugin();
 
 		virtual MRef<Media*> createMedia( MRef<SipSoftPhoneConfiguration *> config ) = 0;
-
+		virtual MRef<Media*> createMedia2stream (  MRef<SipSoftPhoneConfiguration *> config) = 0;	
+	
 		virtual std::string getPluginType() const{ return "Media"; }
 
 };

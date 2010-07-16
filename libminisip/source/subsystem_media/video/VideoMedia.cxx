@@ -48,6 +48,8 @@ using namespace std;
 VideoMedia::VideoMedia( MRef<Codec *> codec, MRef<VideoDisplay *> display, MRef<ImageMixer *> mixer, MRef<Grabber *> grabber, uint32_t receivingWidth, uint32_t receivingHeight ):
                 RealtimeMedia( codec ),grabber(grabber),display(display),mixer(mixer),receivingWidth(receivingWidth),receivingHeight(receivingHeight){
 
+
+
         this->codec = dynamic_cast<MVideoCodec *>(*codec);
         massert( this->codec );
         receive = true;         
@@ -63,6 +65,7 @@ VideoMedia::VideoMedia( MRef<Codec *> codec, MRef<VideoDisplay *> display, MRef<
         sendingHeight = 144;
 
 #if 1
+
 	//cerr <<"EEEE: VideoDisplay::VideoMedia: start creating display..."<<endl;
 	MRef<VideoDisplay *> localVideoDisplay = VideoDisplayRegistry::getInstance()->createDisplay( receivingWidth, receivingHeight, false, false );
 	//cerr <<"EEEE: VideoDisplay::VideoMedia: start setting local display..."<<endl;
@@ -78,6 +81,20 @@ string VideoMedia::getSdpMediaType(){
 
         return "video";
 }
+
+uint8_t VideoMedia:: getCodecgetSdpMediaType(){
+return this->codec->getSdpMediaType();
+}
+
+MRef <CodecState *> VideoMedia:: getCodecInstance(){
+
+
+MRef <CodecState *> tmp = codec ->newInstance();
+MRef <CodecState *> tmp1 = (*codec) ->newInstance();
+return (*codec)->newInstance();
+}
+
+
 
 void VideoMedia::handleMHeader( MRef< SdpHeaderM * > m ){
         string framesizeString = m->getAttribute( "framesize", 0 );
@@ -119,7 +136,7 @@ void VideoMedia::playData( const MRef<RtpPacket *> & packet ){
 
 
 void VideoMedia::sendVideoData( byte_t * data, uint32_t length, uint32_t ts, bool marker ){
-        sendData( data, length, 90000, ts, marker );
+	sendData( data, length, 90000, ts, marker );
 }
 
 void VideoMedia::registerMediaSource( uint32_t ssrc, string callId ){
@@ -166,7 +183,6 @@ void VideoMedia::registerMediaSource( uint32_t ssrc, string callId ){
 
 void VideoMedia::unregisterMediaSource( uint32_t ssrc ){
 	MRef<VideoMediaSource *> source = getSource( ssrc );
-
 	if( source ){
 		sourcesLock.lock();
 		sources.remove( source );
@@ -212,7 +228,7 @@ void VideoMedia::registerRealtimeMediaSender( MRef<RealtimeMediaStreamSender *> 
 
 
 void VideoMedia::unregisterRealtimeMediaSender( MRef<RealtimeMediaStreamSender *> sender ){
-        sendersLock.lock();
+	sendersLock.lock();
         senders.remove( sender );
         sendersLock.unlock();
 
@@ -221,7 +237,7 @@ void VideoMedia::unregisterRealtimeMediaSender( MRef<RealtimeMediaStreamSender *
         }
 }
 
-void VideoMedia::getImagesFromSources( MImage ** images, uint32_t & nImagesToMix,                                        uint32_t mainSource ){
+void VideoMedia::getImagesFromSources( MImage ** images, uint32_t & nImagesToMix,uint32_t mainSource ){
 	list< MRef<VideoMediaSource *> >::iterator i;
 	uint32_t j = 0;
 
@@ -492,9 +508,8 @@ void VideoMediaSource::addPacketToFrame( const MRef<RtpPacket *> & packet, bool 
 		//cerr <<"EEEE: addPacketToFrame: flushing"<<endl;
 		decoder->decodeFrame( frame, index);
 		index=0;
+
 	}
-
-
 	unsigned char *content = packet->getContent();
 	uint32_t clen = packet->getContentLength();
 	bool marker= packet->getHeader().marker;

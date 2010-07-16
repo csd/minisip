@@ -26,7 +26,7 @@
 
 #include<libminisip/media/Media.h>
 
-#include<libminisip/media/codecs/Codec.h>
+//#include<libminisip/media/codecs/Codec.h>
 #include<libminisip/media/soundcard/SoundIO.h>
 #include<libminisip/ipprovider/IpProvider.h>
 #include<libminisip/media/MediaStream.h>

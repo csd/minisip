@@ -500,7 +500,7 @@ int Minisip::startSip() {
 		   SipSMCommand sipcmd2(subscribe, SipSMCommand::remote, SipSMCommand::TU);
 		   sip->getSipStack()->handleCommand(sipcmd2);
 		   */
-
+printf("---------------------- Minisip startSip Message Router setCallBack ");
 		gui->setCallback(*messageRouter);
 		gui->setConfCallback(*confMessageRouter);
 

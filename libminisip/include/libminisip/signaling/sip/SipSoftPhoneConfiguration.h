@@ -121,6 +121,13 @@ class LIBMINISIP_API SipSoftPhoneConfiguration : public MObject{
 		std::string soundDeviceIn;
 		std::string soundDeviceOut;
 		std::string videoDevice;
+
+///////////////
+		
+		std::string videoDevice2;		
+		std::string displayFrameSize;
+		std::string displayFrameRate;
+
 		uint32_t frameWidth;
 		uint32_t frameHeight;
 

@@ -475,10 +475,12 @@ RealtimeMediaStreamSender::RealtimeMediaStreamSender( string callid, MRef<Realti
 	remotePort = 0;
 	seqNo = (uint16_t)rand();
 	ssrc = rand();
+//cerr<<" ------------------------- streamSender ssrc --------------------:"<<ssrc<<endl;
 	lastTs = rand();
         payloadType = "255";
 	setMuted( true );
 	muteCounter = 0;
+//	senderSockHack = new UDPSocket();
 	if( senderSocket ){
 		this->senderSock = senderSocket;
 	}
@@ -488,6 +490,15 @@ RealtimeMediaStreamSender::RealtimeMediaStreamSender( string callid, MRef<Realti
 	}
 
 	this->sender6Sock = sender6Socket;
+}
+
+
+void RealtimeMediaStreamSender:: setSelectedCodecHacked( MRef <RealtimeMedia*> m){
+       
+	
+	 selectedCodec = m-> getCodecInstance() ;
+	
+	
 }
 
 void RealtimeMediaStreamSender::start(){
@@ -562,6 +573,8 @@ void RealtimeMediaStreamSender::sendZrtp(unsigned char* data, int length,
 #endif // ZRTP_SUPPORT
 
 void RealtimeMediaStreamSender::send( byte_t * data, uint32_t length, uint32_t * givenTs, bool marker, bool dtmf ){
+	 
+
 	if (this->remoteAddress.isNull()) {
 		mdbg("media") << " RealtimeMediaStreamSender::send called before " <<
 			"setRemoteAddress!" << endl;
@@ -574,7 +587,7 @@ void RealtimeMediaStreamSender::send( byte_t * data, uint32_t length, uint32_t *
 #endif
 		first=false;
 	}
-
+	
 	senderLock.lock();
 	if( !(*givenTs) ){
 		//FIXME! get it from the CODEC,
@@ -586,28 +599,35 @@ void RealtimeMediaStreamSender::send( byte_t * data, uint32_t length, uint32_t *
 	else{
 		lastTs = *givenTs;
 	}
-
 	packet = new SRtpPacket( data, length, seqNo++, lastTs, ssrc );
-	
 	if( dtmf ){
 		packet->getHeader().setPayloadType( 101 );
 	}
 	else{
-		if( payloadType != "255" )
+		if( payloadType != "255" ){
 			packet->getHeader().setPayloadType( atoi(payloadType.c_str() ) );
-		else
-			packet->getHeader().setPayloadType( selectedCodec->getSdpMediaType() );
+		}
+		else{
+			//packet->getHeader().setPayloadType( selectedCodec->getSdpMediaType() );
+			 packet->getHeader().setPayloadType( 99 );
+		}
 	}
-
 	if( marker ){
 		packet->getHeader().setMarker( marker );
 	}
 
 	packet->protect( getCryptoContext( ssrc, seqNo - 1 ) );
+	if( remoteAddress->getAddressFamily() == AF_INET && senderSock ){
+		int t = packet->getHeader().getPayloadType();
+//		if (primarySsrcHack==0 && t==99)
+//			primarySsrcHack =ssrc;
+//
+//		if (t==99 && ssrc!=primarySsrcHack)
+//			packet->sendTo( **senderSockHack, **remoteAddress, remotePort );
+//		else
+			packet->sendTo( **senderSock, **remoteAddress, remotePort );
 
-	if( remoteAddress->getAddressFamily() == AF_INET && senderSock )
-		packet->sendTo( **senderSock, **remoteAddress, remotePort );
-	else if( remoteAddress->getAddressFamily() == AF_INET6 && sender6Sock )
+	}else if( remoteAddress->getAddressFamily() == AF_INET6 && sender6Sock )
 		packet->sendTo( **sender6Sock, **remoteAddress, remotePort );
 
 	delete packet;
@@ -701,7 +721,6 @@ bool RealtimeMediaStreamSender::muteKeepAlive( uint32_t max ) {
 
 bool RealtimeMediaStreamSender::matches( MRef<SdpHeaderM *> m, uint32_t formatIndex ){
 	bool result = RealtimeMediaStream::matches( m, formatIndex );
-
 	
 	if( result && !selectedCodec ){
 		selectedCodec = realtimeMedia->createCodecInstance(

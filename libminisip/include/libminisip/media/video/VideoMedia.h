@@ -72,6 +72,12 @@ class LIBMINISIP_API VideoMedia : public RealtimeMedia,
 		virtual void handleMHeader( MRef<SdpHeaderM *> m );
 
 
+
+		uint8_t  getCodecgetSdpMediaType();
+		  MRef<CodecState *> getCodecInstance ();
+		
+
+
 		MRef<VideoMediaSource *> getSource( uint32_t ssrc );
 		void getImagesFromSources( MImage ** images, 
 					uint32_t & nImagesToMix,

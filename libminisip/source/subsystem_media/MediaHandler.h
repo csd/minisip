@@ -64,6 +64,12 @@ class LIBMINISIP_API MediaHandler : public virtual MObject, public SessionRegist
 		 */
 		MRef<Session *> createSession( MRef<SipIdentity*> ident, std::string callId );
 		
+		//////////////////////////////////////////////////
+		void addSession ( MRef<Session *> session );
+		void parse_screen_command(char * buf, char **args);
+
+		MRef<Session *> getSession (std::string callId);
+
 		/**
 		 * Registers a new media type (audio or video
 		 * @param media a reference to the representation of the
@@ -127,12 +133,17 @@ class LIBMINISIP_API MediaHandler : public virtual MObject, public SessionRegist
 
 		MRef<Media*> getMedia(std::string sdpType);
 
+
 	private:
 		void init();
 
 		std::list< MRef<Media *> > media;
+		
+		 std::list< MRef<Session *> > sessionList; 
 
 		std::string ringtoneFile;
+	
+		MRef<RealtimeMediaStreamSender *> sStream;			
 
 		MRef<AudioMedia *> audioMedia;
 		MRef<IpProvider *> ipProvider;
@@ -140,7 +151,6 @@ class LIBMINISIP_API MediaHandler : public virtual MObject, public SessionRegist
 		MRef<SipSoftPhoneConfiguration *> config;
                 
                 MRef<CommandReceiver*> messageRouterCallback;
-
 		
 		/**
 		Looks for a Session with callid. If found, set the audio settings

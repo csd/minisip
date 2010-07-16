@@ -62,6 +62,7 @@ std::string MVideoCodec::getCodecDescription(){
 }
 
 uint8_t MVideoCodec::getSdpMediaType(){
+// printf("---------------------------------------- codec   test 1  \n");
 	return 99;
 }
 
@@ -117,8 +118,10 @@ void MVideoCodec::startSend( uint32_t width, uint32_t height){
 }
 
 void MVideoCodec::stopSend(){
+ cout <<"--------------------------------------------------------------------------------- stopSend \n";
 	if( grabber ){
                 try{
+cout <<"--------------------------------------------------------------------------------- stopSend   2  \n";
 		grabber->close();
                 }
                 catch( VideoException & exc ){
@@ -127,6 +130,7 @@ void MVideoCodec::stopSend(){
                 }
 	}
 	coder->close();
+
 
 }
 

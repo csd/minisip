@@ -448,7 +448,7 @@ bool Session::addReliableMediaToOffer(MRef<SdpPacket*> result, const string &pee
 		if( anat ){
 			MRef<SdpHeaderM*> m4 = m;
 			MRef<SdpHeaderM*> m6 = new SdpHeaderM( **m );
-
+///////////
 			// IPv4
 			m4->setPort( (*i)->getPort("IP4") );
 
@@ -713,7 +713,17 @@ MRef<RealtimeMediaStreamReceiver *> Session::matchFormat( MRef<SdpHeaderM *> m, 
 #ifdef DEBUG_OUTPUT	
 			cerr << "Set remote: " << remoteAddress->getString() << "," << m->getPort() << endl;
 #endif
-	
+	///////////////////////////////////////////////
+		
+cout<< "--------------------------------------------------Match Format ------------------------\n";
+cout<< "-------- Storing destination's ip and port. Is it correct to do it here ?? ------------\n";
+cout << "destinationIp and port " << remoteAddress->getString() << "," << m->getPort() << "\n";
+cout << "Stream Sender type ::: " << (*iSStream)->getSdpMediaType()<< endl;
+cout<< "------------------------------------------------------------------------------------\n";
+		if (  (*iSStream)->getSdpMediaType().compare("video")==0 ){ 
+			this->setDestinationPort((uint16_t)m->getPort() );
+			this->setDestinationIp ( remoteAddress );   
+		}
 			(*iSStream)->setPort( (uint16_t)m->getPort() );
 			(*iSStream)->setRemoteAddress( remoteAddress );
 		}
@@ -991,22 +1001,26 @@ void Session::start(){
 }
 
 void Session::stop(){
+	cerr <<"ZZZZ: doing Session::stop"<<endl;
 	started=false;
 	list< MRef<RealtimeMediaStreamSender * > >::iterator iS;
 	list< MRef<RealtimeMediaStreamReceiver * > >::iterator iR;
 
+	cerr <<"ZZZZ: Session::stop stopping all receivers"<<endl;
 	for( iR = realtimeMediaStreamReceivers.begin(); iR != realtimeMediaStreamReceivers.end(); iR++ ){
 		if( ! (*iR)->disabled ){
 			(*iR)->stop();
 		}
 	}
 	
+	cerr <<"ZZZZ: Session::stop stopping all senders"<<endl;
 	realtimeMediaStreamSendersLock.lock();
 	for( iS = realtimeMediaStreamSenders.begin(); iS != realtimeMediaStreamSenders.end(); iS++ ){
 		if( (*iS)->getPort() ){
 			(*iS)->stop();
 		}
 	}
+	cerr <<"ZZZZ: Session::stop done stopping all senders"<<endl;
 	MRef<CallRecorder *> cr;
 	if (callRecorder)
 		cr = dynamic_cast<CallRecorder *>(*callRecorder);
@@ -1035,6 +1049,13 @@ void Session::addRealtimeMediaStreamSender( MRef<RealtimeMediaStreamSender *> re
 	realtimeMediaStream->setMuted( mutedSenders );
 	realtimeMediaStreamSenders.push_back( *realtimeMediaStream );
 	realtimeMediaStreamSendersLock.unlock();
+}
+
+
+void Session::removeRealtimeMediaStreamSender( MRef<RealtimeMediaStreamSender *> realtimeMediaStream ){
+        realtimeMediaStreamSendersLock.lock();
+        realtimeMediaStreamSenders.remove( realtimeMediaStream );
+        realtimeMediaStreamSendersLock.unlock();
 }
 
 string Session::getErrorString(){

@@ -89,6 +89,8 @@ CommandString SubsystemMedia::handleCommandResp(string, const CommandString& c){
 
 void SubsystemMedia::handleCommand(string subsystem, const CommandString& command ){
 	assert(subsystem=="media");
+
+
 	return MH->handleCommand(subsystem, command);
 
 }

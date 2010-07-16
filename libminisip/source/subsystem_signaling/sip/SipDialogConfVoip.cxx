@@ -283,6 +283,9 @@ bool SipDialogConfVoip::a5_incall_termwait_BYE( const SipSMCommand &command)
 
 bool SipDialogConfVoip::a6_incall_termwait_hangup( const SipSMCommand &command)
 {
+
+
+printf("1 ------------------------------------------------ SipDialogConfVoip.cxx \n");
 	if (transitionMatch(command, 
 				SipCommandString::hang_up,
 				SipSMCommand::dialog_layer,
@@ -317,6 +320,8 @@ bool SipDialogConfVoip::a7_callingnoauth_termwait_CANCEL( const SipSMCommand &co
 
 bool SipDialogConfVoip::a8_callingnoauth_termwait_cancel( const SipSMCommand &command)
 {
+
+printf("2 ------------------------------------------------ SipDialogConfVoip.cxx \n");
 	if (		transitionMatch(command, 
 				SipCommandString::cancel,
 				SipSMCommand::dialog_layer,
@@ -540,6 +545,8 @@ bool SipDialogConfVoip::a12_ringing_termwait_CANCEL( const SipSMCommand &command
 
 bool SipDialogConfVoip::a13_ringing_termwait_reject( const SipSMCommand &command)
 {
+
+printf("3 ------------------------------------------------ SipDialogConfVoip.cxx \n");
 	
 	if (		transitionMatch(command, 
 				SipCommandString::reject_invite,
@@ -720,6 +727,8 @@ bool SipDialogConfVoip::a26_callingnoauth_termwait_transporterror( const SipSMCo
 //Copy of a8!
 bool SipDialogConfVoip::a26_callingauth_termwait_cancel( const SipSMCommand &command)
 {
+
+printf("5 ------------------------------------------------ SipDialogConfVoip.cxx \n");
 	if (		transitionMatch(command, 
 				SipCommandString::cancel,
 				SipSMCommand::dialog_layer,

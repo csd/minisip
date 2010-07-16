@@ -52,6 +52,7 @@ GrabberRegistry::GrabberRegistry(){
 
 MRef<Grabber *> GrabberRegistry::createGrabber( string device ){
 	MRef<Grabber *> result;
+
         try{
 		size_t pos = device.find(':');
 		string name;

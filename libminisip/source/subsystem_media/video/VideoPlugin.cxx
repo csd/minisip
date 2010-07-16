@@ -38,6 +38,8 @@ class VideoPlugin : public MediaPlugin{
 		virtual ~VideoPlugin();
 
 		virtual MRef<Media*> createMedia( MRef<SipSoftPhoneConfiguration *> config );
+		///////
+		virtual MRef<Media*> createMedia2stream(  MRef<SipSoftPhoneConfiguration *> config );
 
 		virtual std::string getMemObjectType() const{ return "VideoPlugin"; }
 		virtual std::string getName() const;
@@ -76,6 +78,9 @@ VideoPlugin::~VideoPlugin(){
 }
 
 MRef<Media*> VideoPlugin::createMedia( MRef<SipSoftPhoneConfiguration *> config ){
+	
+
+	//cout << "-------------------- VideoPlugin createGrabber :: for device " << config->videoDevice <<endl;
 	MRef<Grabber *> grabber = GrabberRegistry::getInstance()->createGrabber( config->videoDevice );
 	MRef<MVideoCodec *> videoCodec = new MVideoCodec();
 	MRef<ImageMixer *> mixer = NULL;//new ImageMixer();
@@ -86,6 +91,21 @@ MRef<Media*> VideoPlugin::createMedia( MRef<SipSoftPhoneConfiguration *> config 
 
 	return *videoMedia;
 }
+
+MRef<Media*> VideoPlugin::createMedia2stream(  MRef<SipSoftPhoneConfiguration *> config ){
+
+        //cout << "-------------------- VideoPlugin createMedia2stream  createGrabber :: for device " << config->videoDevice2 <<endl;
+        MRef<Grabber *> grabber = GrabberRegistry::getInstance()->createGrabber( config->videoDevice2 );
+        MRef<MVideoCodec *> videoCodec = new MVideoCodec();
+        MRef<ImageMixer *> mixer = NULL;//new ImageMixer();
+        MRef<VideoMedia *> videoMedia = new VideoMedia( *videoCodec, NULL/*display*/, mixer, grabber, config->frameWidth, config->frameHeight );
+        if( mixer ){
+                mixer->setMedia( videoMedia );
+        }
+	grabber->setLocalDisplay(NULL);
+        return *videoMedia;
+}
+
 
 std::string VideoPlugin::getName() const{
 	return "video";

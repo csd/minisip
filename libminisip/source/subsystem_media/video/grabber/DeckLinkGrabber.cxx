@@ -251,7 +251,7 @@ MImage* DeckLinkCaptureDelegate::getImage(){
 
 HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame* videoFrame, IDeckLinkAudioInputPacket* audioFrame)
 {
-//	cerr <<"EEEE: VideoInputFrameArrived called..."<<endl;
+	//cerr <<"EEEE: VideoInputFrameArrived called..."<<endl;
 	void *frameBytes;
 	void *audioFrameBytes;
 //	if (doStop)
@@ -305,6 +305,7 @@ HRESULT DeckLinkCaptureDelegate::VideoInputFormatChanged(BMDVideoInputFormatChan
 ////
 
 DeckLinkGrabber::DeckLinkGrabber( string dev ){
+//	cerr << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& creating grabber <"<< dev <<">"<< endl;
 	device=dev;
 	capture=NULL;
 	initialized=false;
@@ -331,7 +332,8 @@ uint32_t DeckLinkGrabber::getWidth(){
 }
 
 void DeckLinkGrabber::init(){
-	int deviceno = 0;
+	 cerr << "------------------ device="<<device << endl;
+	deviceno = 0;
 	// Example of format: 0/1080i60@30  First camera, 1080i, 60FPS, use only 30FPS
 	if (device.size()>0)
 		deviceno = device[0]-'0';
@@ -494,7 +496,7 @@ void DeckLinkGrabber::init(){
 	height= MdigInquire(UserStruct.MilDigitizer, M_SIZE_Y, M_NULL);
 	cerr << "DeckLinkGrabber: Info: grabber dimensions are "<< width<<"x"<<height<<endl;
 #endif
-
+cerr << "------------------------- end of init decklinkgrabber !! \n";
 }
 
 void DeckLinkGrabber::open(){
@@ -517,6 +519,7 @@ bool DeckLinkGrabber::setImageChroma( uint32_t chroma ){
 
 void DeckLinkGrabber::start(){
 
+	cerr << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& start grabber <"<< device <<">"<< endl;
 	//	UserStruct.stopped = false;
 	doStop=false;
 	if (capture)
@@ -526,16 +529,20 @@ void DeckLinkGrabber::start(){
 }
 
 void DeckLinkGrabber::stop(){
+	cerr << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& stop grabber <"<< device <<">"<< endl;
 	//Note: this can be called even if open has not been done.
 	//	UserStruct.stopped = true;
 	doStop=true;
-	if (capture)
+	if (capture){
 		capture->stop();
+		  cerr << "2 &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& stop grabber <"<< device <<">"<< endl;
+	}
 	if (runthread){
 		runthread->join();
 		runthread=NULL;
-
+		  cerr << "3 &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& stop grabber <"<< device <<">"<< endl;
 	}
+	  cerr << "4 &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& stop grabber <"<< device <<">"<< endl;
 }
 
 /*loop that reads from the card (and calls handler->handle()) until stop() is called*/
@@ -573,6 +580,8 @@ void DeckLinkGrabber::setHandler( ImageHandler * handler ){
 }
 
 void DeckLinkGrabber::displayLocal(MImage* frame){
+	if (deviceno!=0)
+		return;
 #define SCALE 1
 //	cerr <<"EEEE: displayLocal: running "<<endl;
 	int targetWidth = frame->width/SCALE;
@@ -607,9 +616,9 @@ void DeckLinkGrabber::displayLocal(MImage* frame){
 //	cerr << "EEEE: conversion done"<<endl;
 
 
-
+ 	if (localDisplay){
 	localDisplay->handle(localRgb);
-
+	}
 }
 
 void DeckLinkGrabber::read( ImageHandler * handler ){
@@ -663,173 +672,47 @@ void DeckLinkGrabber::read( ImageHandler * handler ){
 
 
 	}
+	cerr << "DecklinkGrabber::read quitting"<<endl;
 
+  
+
+	
 	result = deckLinkInput->StopStreams();
 	deckLinkInput->FlushStreams();
 	Thread::msleep(100);
-
 	if (localDisplay){
 		localDisplay->stop();
 	}
 
-
+  
 	if (displayModeIterator != NULL)
 	{
 		displayModeIterator->Release();
 		displayModeIterator = NULL;
 	}
 
+  
 	if (deckLinkInput != NULL)
 	{
 		deckLinkInput->Release();
 		deckLinkInput = NULL;
 	}
-
+  
 	if (deckLink != NULL)
 	{
 		deckLink->Release();
 		deckLink = NULL;
 	}
-
+  
 	if (deckLinkIterator != NULL)
 		deckLinkIterator->Release();
 
-	initialized=false;
-
-#if 0
-	/* Allocate and clear sequence and display images. */
-	MappControl(M_ERROR, M_PRINT_DISABLE);
-	for (UserStruct.NbFrames=0; UserStruct.NbFrames<NB_GRAB_MAX+2; UserStruct.NbFrames++)
-	{
-		MbufAllocColor(UserStruct.MilSystem, 
-				MdigInquire(UserStruct.MilDigitizer, M_SIZE_BAND, M_NULL), 
-				MdigInquire(UserStruct.MilDigitizer, M_SIZE_X, M_NULL), 
-				MdigInquire(UserStruct.MilDigitizer, M_SIZE_Y, M_NULL), 
-				8L+M_UNSIGNED, 
-				M_IMAGE + M_GRAB + M_NON_PAGED + M_BGR32 + M_HOST_MEMORY, 
-				&MilImage[UserStruct.NbFrames]); //Allocate grab buffer with three bands for RGB24 capture
-
-		if (MilImage[UserStruct.NbFrames])
-		{
-			MbufClear(MilImage[UserStruct.NbFrames], 0xFF);
-		}
-		else{
-			cerr << "EEEE: ERROR: could not allocate image buffer"<<endl;
-			break;
-		}	
-	}
-
-
-	MappControl(M_ERROR, M_PRINT_ENABLE);
-
-	/* Free buffers to leave space for possible temporary buffers. */
-	int n;
-	for (n=0; n<2 && UserStruct.NbFrames; n++)
-	{
-		UserStruct.NbFrames--;
-		MbufFree(MilImage[UserStruct.NbFrames]);
-	}
-
-	/* MIL event allocation for grab end hook. */
-	MthrAlloc(UserStruct.MilSystem, M_EVENT, M_DEFAULT, M_NULL, M_NULL, &UserStruct.GrabEndEvent);
-
-	/* Put digitizer in asynchronous mode. */
-	MdigControl(UserStruct.MilDigitizer, M_GRAB_MODE, M_ASYNCHRONOUS);
-	/* Start sequence with a grab in the first buffer. */
-	MdigGrab(UserStruct.MilDigitizer, UserStruct.MilImage[0]);
-
-	MImage *frame = new MImage;
-
-	frame->data[0] = new uint8_t[ width * height * 4 ];
-	frame->data[1] = NULL;
-	frame->data[2] = NULL;
-	frame->linesize[0] = width*4;
-	frame->linesize[1] = 0;
-	frame->linesize[2] = 0;
-	frame->width=width;
-	frame->height=height;
-	frame->chroma = M_CHROMA_RV32;
-	frame->width=width;
-	frame->height=height;
-
-
-	while (!UserStruct.stopped)
-	{
-		/* Wait end of grab event */
-		MthrWait(UserStruct.GrabEndEvent, M_EVENT_WAIT, M_NULL);
-
-		int frameindex = UserStruct.NbGrabStart;
-
-		UserStruct.NbGrabStart = (UserStruct.NbGrabStart+1) % NB_GRAB_MAX;
-
-		MdigGrab(UserStruct.MilDigitizer, UserStruct.MilImage[ UserStruct.NbGrabStart] );
-
-		MIL_INT line_delta=-33;
-		uint8_t *rgb32ptr;
-
-		MbufInquire( UserStruct.MilImage[ frameindex ], M_PITCH_BYTE, &line_delta ); //FIXME: copy from correct index
-		MbufInquire(UserStruct.MilImage[ frameindex ], M_HOST_ADDRESS, &rgb32ptr);
-		memcpy(frame->data[0], rgb32ptr, width * height * 4 );
-		frame->mTime = mtime();
-		if (!UserStruct.stopped){
-			static int i=0;
-			i++;
-			//			if (i%50==1){ //grabber does 50fps. We send 25fps.
-
-			handler->handle( frame );
-			if (localDisplay){
-				localDisplay->handle(frame);
-			}
-			//			}
-
-			if (i%200==0){
-				static struct timespec last_wallt;
-				static struct timespec last_cput;
-
-				struct timespec now_cpu;
-				struct timespec now_wall;
-				clock_gettime(CLOCK_THREAD_CPUTIME_ID, &now_cpu);
-				clock_gettime(CLOCK_REALTIME, &now_wall);
-				cerr <<"cpusec="<<now_cpu.tv_sec<<" lastsec="<<last_cput.tv_sec<<endl;
-				uint64_t delta_cpu = (now_cpu.tv_sec-last_cput.tv_sec)*1000000000LL+(now_cpu.tv_nsec-last_cput.tv_nsec);
-				uint64_t delta_wall = (now_wall.tv_sec-last_wallt.tv_sec)*1000000000LL+(now_wall.tv_nsec-last_wallt.tv_nsec);
-
-				cerr <<"DeckLinkGrabber:: CPU USAGE: "<< now_cpu.tv_sec<<"."<<now_cpu.tv_nsec<<endl;
-				cerr <<"delta_cpu="<<delta_cpu/1000<<" delta_wall="<<delta_wall/1000<<endl;
-				cerr <<"========> DeckLinkGrabber: CPU usage: "<< ((float)delta_cpu/(float)delta_wall)*100.0<<"%"<<endl;
-				last_cput=now_cpu;
-				last_wallt=now_wall;
-
-			}
-
-		}
-	}
-	if (localDisplay){
-		localDisplay->stop();
-	}
-
-	/* Wait for end of last grab. */
-	MdigGrabWait(UserStruct.MilDigitizer, M_GRAB_END);
-
-
-	/* Unhook functions. */
-	//	MdigHookFunction(UserStruct.MilDigitizer, M_GRAB_START+M_UNHOOK, GrabStart, (void *)(&UserStruct));
-	MdigHookFunction(UserStruct.MilDigitizer, M_GRAB_END+M_UNHOOK, GrabEnd, (void *)(&UserStruct));
-
-	/* Free event. */
-	MthrFree(UserStruct.GrabEndEvent);
-
-	/* Free allocations. */
-	for (n=0; n<UserStruct.NbFrames; n++)
-	{
-		MbufFree(UserStruct.MilImage[n]);
-	}
-	//XXX: TODO: free resources
-	MappFreeDefault(UserStruct.MilApplication, UserStruct.MilSystem, M_NULL, UserStruct.MilDigitizer, M_NULL);
+  
 
 	initialized=false;
-#endif
+
 }
+
 
 void DeckLinkGrabber::close(){
 	stop();

@@ -392,6 +392,11 @@ class LIBMINISIP_API RealtimeMediaStreamSender : public RealtimeMediaStream{
 		 * @returns a reference to the CodecState object
 		 */
 		MRef<CodecState *> getSelectedCodec(){return selectedCodec;};
+		
+
+		void setSelectedCodec(MRef<CodecState *> t ){
+			selectedCodec = t ;
+		}
 
 		/**
 		 * Starts the transmission of the stream, by
@@ -436,6 +441,10 @@ class LIBMINISIP_API RealtimeMediaStreamSender : public RealtimeMediaStream{
 		 */
 		void send( byte_t * data, uint32_t length, uint32_t * ts, bool marker = false, bool dtmf = false );
 
+
+		void setSelectedCodecHacked( MRef <RealtimeMedia*> m);
+
+
 #ifdef ZRTP_SUPPORT
 		/**
 		 * Used by the ZRTP host bridge to send ZRTP data.
@@ -457,6 +466,8 @@ class LIBMINISIP_API RealtimeMediaStreamSender : public RealtimeMediaStream{
 		 */
 		void sendZrtp(unsigned char* data, int length,
                               unsigned char* payload, int payLen);
+
+
 
 
 		/**
@@ -534,6 +545,8 @@ class LIBMINISIP_API RealtimeMediaStreamSender : public RealtimeMediaStream{
 	private:
 		uint32_t ssrc;
 		MRef<UDPSocket *> senderSock;
+//		MRef<UDPSocket *> senderSockHack;
+//		uint32_t primarySsrcHack;
 		MRef<UDPSocket *> sender6Sock;
 		uint16_t remotePort;
 		uint16_t seqNo;
