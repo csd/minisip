@@ -232,6 +232,7 @@ void DeckLinkCaptureDelegate::putImage(IDeckLinkVideoInputFrame* videoFrame){
 	bufferLock.lock();
 	if (filled){
 		//bufferSem.dec();
+		bufferLock.unlock();
 		return;
 		//cerr <<"EEEE: Warning: dropping grabbed frame. Low CPU?"<<endl;
 	}
