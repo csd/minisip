@@ -3172,7 +3172,7 @@ void OpenGLWindow::start(){ //NOTE: this method is used from external thread
 
 void OpenGLWindow::stop(){ //NOTE: this method is used from external thread
 	//cerr << "EEEE: doing OpenGLWindow::stop()"<<endl;
-	ir->stop();
+//	ir->stop();
 	lock.lock();
 	runCount--;
 	if (runCount==0){
