@@ -3,6 +3,7 @@ dist_pkgdata_DATA = \
 	FreeSans.ttf \
 	minisip.glade \
 	minisip.png \
+	icon_gnome.png \
 	noplay.png \
 	norecord.png \
 	play.png \
@@ -11,7 +12,7 @@ dist_pkgdata_DATA = \
 	tray_icon.png \
 	exit.raw \
 	hangup.raw \
-        invite.raw \
+	invite.raw \
 	no.raw \
 	person.raw \
 	rightarrow.raw \
