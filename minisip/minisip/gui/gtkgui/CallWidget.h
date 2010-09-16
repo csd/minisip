@@ -133,6 +133,7 @@ class CallWidget : public Gtk::VBox
 
                 Gtk::Label sasData;
 
+		Gtk::HBox buttonBox2;
 		Gtk::HBox buttonBox;
 #ifndef OLDLIBGLADEMM
 		Gtk::Expander dtmfArrow;

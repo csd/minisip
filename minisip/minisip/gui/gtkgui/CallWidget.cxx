@@ -46,6 +46,7 @@ CallWidget::CallWidget( string callId, string remoteUri,
 		mainWindow( mw ),
 		status( "", Gtk::ALIGN_LEFT ),
 		secStatus( "", Gtk::ALIGN_LEFT ),
+		buttonBox2(/*homogenius*/ true ),
 		buttonBox(/*homogenius*/ true ),
 #ifndef OLDLIBGLADEMM
 		dtmfArrow( "Dialpad" ),
@@ -68,9 +69,9 @@ CallWidget::CallWidget( string callId, string remoteUri,
 		rejectButton( Gtk::Stock::CANCEL, "Reject" ),
 /***************************************************************************/
 		addCameraButton(Gtk::Stock::ADD,"Add Camera"),
-		addScreenButton(Gtk::Stock::ADD,"Stream Screen"),
+		addScreenButton(Gtk::Stock::ADD,"Share Screen"),
 		cancelCameraButton(Gtk::Stock::CANCEL,"Stop additional camera"),
-		cancelScreenButton(Gtk::Stock::CANCEL,"Stop streaming screen"),		
+		cancelScreenButton(Gtk::Stock::CANCEL,"Stop screen sharing"),		
 
 
 
@@ -106,6 +107,7 @@ CallWidget::CallWidget( string callId, string remoteUri,
 
 //	add( status );
 //	add( secStatus );
+	pack_end( buttonBox2, false, true );
 	pack_end( buttonBox, false, true );
 
 	//buttonBox.set_expand( false );
@@ -155,18 +157,19 @@ CallWidget::CallWidget( string callId, string remoteUri,
 	pack_start( transferArrow, false, false, 4 );
 
 #endif
+	buttonBox2.add( addCameraButton );
+	buttonBox2.add( cancelCameraButton );
+	buttonBox2.add( addScreenButton );
+	buttonBox2.add( cancelScreenButton );
+/*************************************************/
 	buttonBox.add( acceptButton );
 	buttonBox.add( rejectButton );
-/*************************************************/
-	buttonBox.add( addCameraButton );
-	buttonBox.add( addScreenButton );
-	buttonBox.add( cancelCameraButton );
-	buttonBox.add( cancelScreenButton );
 
 
 //	status.show();
 //	secStatus.show();
 	topBox->show_all();
+	buttonBox2.show_all();
 	buttonBox.show_all();
 //	rejectButton.show();
 //        acceptButton.hide();
