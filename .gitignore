@@ -1,0 +1,143 @@
+# Temporary files
+*~
+*.swp
+
+# Documentation
+INSTALL
+
+# Mac OS X
+.DS_Store
+ehthumbs.db
+Icon?
+Thumbs.db
+
+# Windows
+thumbs.db
+
+# Compilation
+*.o
+*.lo
+*.a
+*.la
+*.pc
+
+# Eclipse
+.project
+.cproject
+Debug
+
+# Configure
+configure
+config.h
+config.h.in
+config.in
+config.log
+config.status
+config.guess
+config.sub
+compilation_config.h
+compilation_config.h.in
+
+# Make and other caches
+Makefile
+Makefile.in
+autom4te.cache
+.deps
+.libs
+
+# m4
+libtool.m4
+aclocal.m4
+libtool.m4
+ltoptions.m4
+ltsugar.m4
+ltversion.m4
+lt~obsolete.m4
+
+# libmcrypto
+libmcrypto/config
+libmcrypto/include/stamp-h1
+libmcrypto/include/version.h
+libmcrypto/libtool
+libmcrypto/tests/000_compile
+libmcrypto/version
+libmcrypto/win32/libmcrypto-res.rc
+
+# libmikey
+libmikey/config
+libmikey/include/stamp-h1
+libmikey/include/version.h
+libmikey/libtool
+libmikey/tests/000_compile
+libmikey/version
+libmikey/win32/libmikey-res.rc
+
+# libminisip
+libminisip/config
+libminisip/include/stamp-h1
+libminisip/include/version.h
+libminisip/libtool
+libminisip/source/win32/libminisip-res.rc
+libminisip/tests/000_compile
+libminisip/tests/000_compile.o
+libminisip/version
+
+# libmnetutil
+libmnetutil/config
+libmnetutil/examples/build-examples.sh
+libmnetutil/examples/run-example.sh
+libmnetutil/examples/tcpclient.cpp
+libmnetutil/examples/tcpserver.cpp
+libmnetutil/include/stamp-h1
+libmnetutil/include/version.h
+libmnetutil/libtool
+libmnetutil/tests/000_compile
+libmnetutil/tests/002_naptr
+libmnetutil/udns/udns_codes.c
+libmnetutil/version
+libmnetutil/win32/libmnetutil-res.rc
+
+# libmsip
+libmsip/config
+libmsip/include/stamp-h1
+libmsip/include/version.h
+libmsip/libtool
+libmsip/tests/000_compile
+libmsip/version
+libmsip/win32/libmsip-res.rc
+
+# libmstun
+libmstun/config
+libmstun/include/stamp-h1
+libmstun/include/version.h
+libmstun/libtool
+libmstun/version
+libmstun/win32/libmstun-res.rc
+
+# libmutil
+libmutil/config
+libmutil/examples/build-examples.sh
+libmutil/examples/mutextest.cpp
+libmutil/examples/run-example.sh
+libmutil/examples/semaphoretest.cpp
+libmutil/examples/threadtest.cpp
+libmutil/include/stamp-h1
+libmutil/include/version.h
+libmutil/libltdl/
+libmutil/libmutil.pc
+libmutil/libtool
+libmutil/m4/argz.m4
+libmutil/m4/ltdl.m4
+libmutil/version
+libmutil/win32/libmutil-res.rc
+
+# minisip
+minisip/config
+minisip/include/stamp-h1
+minisip/include/version.h
+minisip/libtool
+minisip/minisip/gui/gtkgui/minisip_gtkgui
+minisip/minisip/gui/openglgui/minisip_opengl
+minisip/minisip/gui/textui/minisip_textui
+minisip/minisip/win32/minisip-res.rc
+minisip/version
