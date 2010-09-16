@@ -39,8 +39,11 @@ major=0
 config.status: configure
 	dh_testdir
 	# Add here commands to configure the package.
-	CFLAGS="$(CFLAGS)" ./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info
+	CFLAGS="$(CFLAGS)"
+	./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info --enable-debug --enable-video --disable-mil --enable-decklink --enable-opengl --disable-sdl AUTOMATED_INSTALLER_PLACEHOLDER=""
 
+# The placeholder will be replaced by something like this:
+# CPPFLAGS="-I/home/minisip/Desktop/minisip/hdviper/x264 -I/home/minisip/Desktop/minisip/hdviper/x264/test/x264API -I/home/minisip/Desktop/minisip/repository/libminisip/source/subsystem_media/video/grabber  -I/home/minisip/Desktop/minisip/repository/libminisip/source/subsystem_media/video/grabber/decklinksdk" LDFLAGS="/home/minisip/Desktop/minisip/hdviper/x264/test/x264API/libx264api.a /usr/local/lib/libtidx264.a -lpthread -lrt"
 
 build: build-stamp
 build-stamp:  config.status

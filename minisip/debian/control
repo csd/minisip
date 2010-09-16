@@ -7,7 +7,8 @@ Standards-Version: 3.6.1
 
 Package: minisip
 Architecture: any
-Depends: libspeex1 (>=1.1), libmsip0 (>= 0.8.0), libmikey0 (>= 0.8.0), libmnetutil0 (>= 0.8.0), libmutil0 (>= 0.8.0), libssl0.9.7 (>= 0.9.7), libglademm-2.4-1 (>=2.4)
+Depends: libspeex1 (>=1.1), libmsip0 (>= 0.8.0), libmikey0 (>= 0.8.0), libmnetutil0 (>= 0.8.0), libmutil0 (>= 0.8.0), libssl0.9.8 (>= 0.9.8), libglademm-2.4-1c2a (>=2.4)
+
 Description: minisip is a SIP user agent, with security enhancements
  minisip is a soft telephone which uses the SIP protocol. It provides
  additional security, such as encryption and authentication, by using
