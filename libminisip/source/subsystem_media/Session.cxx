@@ -32,6 +32,9 @@
 #include<libminisip/media/MediaStream.h>
 #include<libminisip/media/Media.h>
 #include<libminisip/media/AudioMedia.h>
+#include<libminisip/media/video/VideoMedia.h>
+#include<libminisip/media/video/codec/VideoCodec.h>
+#include<libminisip/media/video/codec/AVCoder.h>
 #include<libminisip/media/DtmfSender.h>
 #include<libminisip/media/codecs/Codec.h>
 #include<libminisip/signaling/sdp/SdpPacket.h>
@@ -124,10 +127,25 @@ Session::Session( string localIp, MRef<SipIdentity*> ident, string localIp6 ):
 
 	mutedSenders = true;
 	silencedSources = false;
+	profile = 1;
+	sendingHeight = 720;
+	sendingWidth = 1280;
 	
 	if( registry ){
 		registry->registerSession( this );
 	}
+}
+
+uint32_t Session::getSendingWidth(){
+	return this->sendingWidth;
+}
+
+uint32_t Session::getSendingHeight(){
+	return this->sendingHeight;
+}
+
+int Session::getProfile(){
+	return this->profile;
 }
 
 void Session::unregister(){
@@ -335,7 +353,7 @@ bool Session::addRealtimeMediaToOffer(MRef<SdpPacket*> result, const string &pee
 			if( (*iC)->getCodecName() == "H.264" ) { 
 				MRef<SdpHeaderA*> h264_fmtp = new SdpHeaderA("a=X");
 				//h264_fmtp->setAttributes("fmtp:" + itoa( payloadType) + " profile-level-id=42900b" );
-				h264_fmtp->setAttributes("fmtp:" + itoa( payloadType) + " profile-level-id=42800d" );
+				h264_fmtp->setAttributes("fmtp:" + itoa( payloadType) + " profile-level-id=4d4033" );
 				m->addAttribute(*h264_fmtp);
 			}
 
@@ -681,9 +699,10 @@ bool Session::setSdpAnswer( MRef<SdpPacket *> answer, string peerUri ){
 	return found;
 }
 
-MRef<RealtimeMediaStreamReceiver *> Session::matchFormat( MRef<SdpHeaderM *> m, uint32_t iFormat, MRef<IPAddress *> &remoteAddress ){
-	list< MRef<RealtimeMediaStreamSender *> >::iterator iSStream;
-	list< MRef<RealtimeMediaStreamReceiver *> >::iterator iRStream;
+MRef<RealtimeMediaStreamReceiver *> Session::matchFormat(MRef<SdpHeaderM *> m,
+		uint32_t iFormat, MRef<IPAddress *> &remoteAddress) {
+	list<MRef<RealtimeMediaStreamSender *> >::iterator iSStream;
+	list<MRef<RealtimeMediaStreamReceiver *> >::iterator iRStream;
 
 	/* If we have a sender for this format, activate it */
 #ifdef DEBUG_OUTPUT
@@ -691,41 +710,64 @@ MRef<RealtimeMediaStreamReceiver *> Session::matchFormat( MRef<SdpHeaderM *> m, 
 #endif
 	uint8_t j = 1;
 	realtimeMediaStreamSendersLock.lock();
-	for( iSStream =  realtimeMediaStreamSenders.begin(); iSStream != realtimeMediaStreamSenders.end(); iSStream++,j++ ){
+	for (iSStream = realtimeMediaStreamSenders.begin(); iSStream
+			!= realtimeMediaStreamSenders.end(); iSStream++, j++) {
 #ifdef DEBUG_OUTPUT
 		mdbg("media") << "Trying a sender"<< endl;
 #endif
-		if( (*iSStream)->matches( m, iFormat ) ){
+		if ((*iSStream)->matches(m, iFormat)) {
 #ifdef DEBUG_OUTPUT
 			mdbg("media") << "Found sender for " << (*iSStream)->getSdpMediaType()<< endl;
 #endif
 
 #if 0
-			if( ka ){
+			if( ka ) {
 				ka->addSrtpStream( (*iStream)->getSsrc(),
-					0, /*ROC */
-					0, /* policy (fix me) */
-					2*j/* CSID */
-					);
+						0, /*ROC */
+						0, /* policy (fix me) */
+						2*j/* CSID */
+				);
 			}
 #endif
 
 #ifdef DEBUG_OUTPUT	
 			cerr << "Set remote: " << remoteAddress->getString() << "," << m->getPort() << endl;
 #endif
-	///////////////////////////////////////////////
-		
-cout<< "--------------------------------------------------Match Format ------------------------\n";
-cout<< "-------- Storing destination's ip and port. Is it correct to do it here ?? ------------\n";
-cout << "destinationIp and port " << remoteAddress->getString() << "," << m->getPort() << "\n";
-cout << "Stream Sender type ::: " << (*iSStream)->getSdpMediaType()<< endl;
-cout<< "------------------------------------------------------------------------------------\n";
-		if (  (*iSStream)->getSdpMediaType().compare("video")==0 ){ 
-			this->setDestinationPort((uint16_t)m->getPort() );
-			this->setDestinationIp ( remoteAddress );   
-		}
-			(*iSStream)->setPort( (uint16_t)m->getPort() );
-			(*iSStream)->setRemoteAddress( remoteAddress );
+			///////////////////////////////////////////////
+
+			cout
+					<< "--------------------------------------------------Match Format ------------------------\n";
+			cout
+					<< "-------- Storing destination's ip and port. Is it correct to do it here ?? ------------\n";
+			cout << "destinationIp and port " << remoteAddress->getString()
+					<< "," << m->getPort() << "\n";
+			cout << "Stream Sender type ::: " << (*iSStream)->getSdpMediaType()
+					<< endl;
+			cout
+					<< "------------------------------------------------------------------------------------\n";
+			if ((*iSStream)->getSdpMediaType().compare("video") == 0) {
+				this->setDestinationPort((uint16_t) m->getPort());
+				this->setDestinationIp(remoteAddress);
+				string fmtpParam = m->getFmtpParam(m->getFormat(iFormat));
+				size_t pos = fmtpParam.find('=');
+
+				cerr<<"TTA fmtpparam = "<<fmtpParam<<" substring = "<< fmtpParam.substr(pos + 1, 2)<<endl;
+				if (fmtpParam.substr(pos + 1, 2).compare("42") == 0)
+				{
+					cerr<<"TTA: Setting Baseline profile"<<endl;
+					this->profile = 0;
+					this->sendingWidth = 1024;
+					this->sendingHeight = 720;
+				}
+				else
+				{
+					this->profile = 1;
+					this->sendingWidth = 1280;
+					this->sendingHeight = 720;
+				}
+			}
+			(*iSStream)->setPort((uint16_t) m->getPort());
+			(*iSStream)->setRemoteAddress(remoteAddress);
 		}
 	}
 	realtimeMediaStreamSendersLock.unlock();
@@ -733,8 +775,9 @@ cout<< "------------------------------------------------------------------------
 #ifdef DEBUG_OUTPUT
 	mdbg("media") << "Starting receivers loop"<< endl;
 #endif
-	for( iRStream =  realtimeMediaStreamReceivers.begin(); iRStream != realtimeMediaStreamReceivers.end(); iRStream ++ ){
-		if( (*iRStream)->matches( m, iFormat ) ){
+	for (iRStream = realtimeMediaStreamReceivers.begin(); iRStream
+			!= realtimeMediaStreamReceivers.end(); iRStream++) {
+		if ((*iRStream)->matches(m, iFormat)) {
 #ifdef DEBUG_OUTPUT
 			mdbg("media") << "Found receiver for " << (*iRStream)->getSdpMediaType()<< endl;
 #endif
@@ -886,16 +929,23 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
 					
 					/* found a receiver, accept the offer */
 					//add the payload type to the offer, as accepted ...
-					string payloadTypeAccepted = offerM->getFormat( j );
+					string payloadTypeAccepted;
+					if(receiver->getMedia()->getSdpMediaType() == "video"){
+						payloadTypeAccepted = "" + itoa(receiver->getMedia()->getCodecInstance()->getSdpMediaType());
+					}
+					else
+						payloadTypeAccepted = offerM->getFormat( j );
+
+					cerr<<"TTA:Payloadtype accepted = "<<payloadTypeAccepted<<endl<<endl;
 					//string payloadStr = itoa( payloadTypeAccepted );
 					answerM->addFormat( payloadTypeAccepted );
 					MRef<SdpHeaderA*> rtpmap = new SdpHeaderA("a=X");
 					MRef<SdpHeaderA*> fmtp = new SdpHeaderA("a=X");
-					       
-					rtpmap->setAttributes( "fmtp:" + /*payloadStr*/ payloadTypeAccepted
-								 + " " + offerM->getRtpMap( payloadTypeAccepted ) );
-					fmtp->setAttributes(   "rtpmap:" + /*payloadStr*/ payloadTypeAccepted
-								+ " " + offerM->getRtpMap( payloadTypeAccepted ) );
+
+					fmtp->setAttributes( "fmtp:" + /*payloadStr*/ payloadTypeAccepted
+								 + " " + offerM->getFmtpParam( offerM->getFormat(j) ) );
+					rtpmap->setAttributes(   "rtpmap:" + /*payloadStr*/ payloadTypeAccepted
+								+ " " + offerM->getRtpMap( offerM->getFormat(j)) );
 					
 					answerM->addAttribute( *rtpmap );
 					answerM->addAttribute( *fmtp );
@@ -909,6 +959,7 @@ bool Session::setSdpOffer( MRef<SdpPacket *> offer, string peerUri ){ // used by
 					}
 
 					found = true;
+					break;
 				}else{
 					//cerr << "EEEE: did not find receiver!"<<endl;
 				}

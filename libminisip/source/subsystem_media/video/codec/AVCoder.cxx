@@ -68,6 +68,7 @@ extern "C"{
 
 #define RTP_PAYLOAD_LEN 1400
 
+#define BASELINE_PROFILE 0
 
 using namespace std;
 
@@ -77,7 +78,9 @@ AVEncoder::AVEncoder() {
 	videoCodec=NULL;
 	swsctx=NULL;
 	N=0;
-
+	profile=1;
+	width=1280;
+	height=720;
 
 }
 
@@ -111,9 +114,18 @@ void AVEncoder::init( uint32_t width, uint32_t height ){
 
 	avcodec_init(); //perhaps needed for img_convert?
 
-	video->width=width;
-	video->height=height;
 	video->fps=30;
+	video->profile = this->profile;
+	if(this->profile == BASELINE_PROFILE)
+	{
+		video->width = this->width;
+		video->height = this->height;
+	}
+	else
+	{
+		video->width= width;
+		video->height= height;
+	}
 
 #ifdef GLOBAL_BANDWIDTH_HACK
 	if (globalBitRate<128)
@@ -144,6 +156,18 @@ void AVEncoder::close(){
 
 void AVEncoder::setLocalDisplay(MRef<VideoDisplay*> d){
 	localDisplay=d;
+}
+
+void AVEncoder::setProfile(int profile){
+	this->profile = profile;
+}
+
+void AVEncoder::setWidth(uint32_t width){
+	this->width = width;
+}
+
+void AVEncoder::setHeight(uint32_t height){
+	this->height = height;
 }
 
 #define REPORT_N 50
@@ -196,8 +220,8 @@ void AVEncoder::handle( MImage * image ){
 
 
 	VideoCodec *videoCodec = (VideoCodec*)this->videoCodec;
-
-	if (!video || image->width!=video->width || image->height!=video->height){
+	if ((!video || image->width != video->width || image->height != video->height) && video->profile != BASELINE_PROFILE){
+	//if (!video || image->width!=video->width || image->height!=video->height){
 		//cerr << "EEEE: AVCoder: doing init("<<image->width<<","<<image->height<<")"<<endl;
 		init(image->width, image->height);
 		video = (Video*)this->video;
@@ -208,41 +232,86 @@ void AVEncoder::handle( MImage * image ){
 	AVFrame frame;
 	bool mustFreeFrame = false;
 
-	if( image->chroma != M_CHROMA_I420 ){
+	if (video->profile == BASELINE_PROFILE) {
 		PixelFormat srcFormat;
+		if (image->chroma != M_CHROMA_I420) {
 
-		switch( image->chroma ){
-		case M_CHROMA_RV32:
-			srcFormat = PIX_FMT_RGB32;
-			break;
-		case M_CHROMA_RV24:
-			srcFormat = PIX_FMT_BGR24;
-			break;
-		default:
-			/* FIXME: handle other formats */
-			srcFormat = PIX_FMT_RGB32;
-			break;
-		}
+			switch (image->chroma) {
+			case M_CHROMA_RV32:
+				srcFormat = PIX_FMT_RGB32;
+				break;
+			case M_CHROMA_RV24:
+				srcFormat = PIX_FMT_BGR24;
+				break;
+			default:
+				/* FIXME: handle other formats */
+				srcFormat = PIX_FMT_RGB32;
+				break;
+			}
+		} else
+			srcFormat = PIX_FMT_YUV420P;
 
 		/* We will need a convertion */
-		avpicture_alloc( (AVPicture*)&frame, 
-				PIX_FMT_YUV420P, image->width,
-				image->height );
+		avpicture_alloc((AVPicture*) &frame, PIX_FMT_YUV420P, video->width,
+				video->height);
 		//cerr << "EEEE: allocated picture of dim "<<video->width<<"x"<<video->height<<endl;
 
 		/* We must free frame ourselves */
 		mustFreeFrame = true;
 
 		if (!swsctx)
-			swsctx = sws_getContext(image->width, image->height, srcFormat, image->width, image->height, PIX_FMT_YUV420P,SWS_FAST_BILINEAR, NULL,NULL,NULL);
-		struct SwsContext* ctx = (struct SwsContext*)swsctx;
+			swsctx = sws_getContext(image->width, image->height, srcFormat,
+					video->width, video->height, PIX_FMT_YUV420P,
+					SWS_FAST_BILINEAR, NULL, NULL, NULL);
+		struct SwsContext* ctx = (struct SwsContext*) swsctx;
 
-		sws_scale( ctx, image->data, image->linesize, 0, image->height, frame.data, frame.linesize);
-//		yuv2rgb(image->data[0], image->data[1], image->data[2], image->width, image->height, frame.data[0]);
+		sws_scale(ctx, image->data, image->linesize, 0, video->height,
+				frame.data, frame.linesize);
+		//		yuv2rgb(image->data[0], image->data[1], image->data[2], image->width, image->height, frame.data[0]);
+		//	}
+		//	else{
+		//		/* We can use the picture as is */
+		//		memcpy( &frame, image, sizeof( MData ) );
+		//	}
 	}
-	else{
-		/* We can use the picture as is */
-		memcpy( &frame, image, sizeof( MData ) );
+	else {
+		if (image->chroma != M_CHROMA_I420) {
+			PixelFormat srcFormat;
+
+			switch (image->chroma) {
+			case M_CHROMA_RV32:
+				srcFormat = PIX_FMT_RGB32;
+				break;
+			case M_CHROMA_RV24:
+				srcFormat = PIX_FMT_BGR24;
+				break;
+			default:
+				/* FIXME: handle other formats */
+				srcFormat = PIX_FMT_RGB32;
+				break;
+			}
+
+			/* We will need a convertion */
+			avpicture_alloc((AVPicture*) &frame, PIX_FMT_YUV420P, image->width,
+					image->height);
+			//cerr << "EEEE: allocated picture of dim "<<video->width<<"x"<<video->height<<endl;
+
+			/* We must free frame ourselves */
+			mustFreeFrame = true;
+
+			if (!swsctx)
+				swsctx = sws_getContext(image->width, image->height, srcFormat,
+						image->width, image->height, PIX_FMT_YUV420P,
+						SWS_FAST_BILINEAR, NULL, NULL, NULL);
+			struct SwsContext* ctx = (struct SwsContext*) swsctx;
+
+			sws_scale(ctx, image->data, image->linesize, 0, image->height,
+					frame.data, frame.linesize);
+			//		yuv2rgb(image->data[0], image->data[1], image->data[2], image->width, image->height, frame.data[0]);
+		} else {
+			/* We can use the picture as is */
+			memcpy(&frame, image, sizeof(MData));
+		}
 	}
 
 	frame.pict_type = 0;

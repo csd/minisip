@@ -40,6 +40,9 @@
 #include<string.h>
 #include<stdio.h>
 
+#include "../Session.h"
+#include "../MediaHandler.h"
+
 #define SOURCE_QUEUE_SIZE 7
 
 
@@ -218,7 +221,11 @@ void VideoMedia::registerRealtimeMediaSender( MRef<RealtimeMediaStreamSender *> 
         sendersLock.lock();
         if( senders.size() == 0 ){
                 sendersLock.unlock();
-                codec->startSend( sendingWidth, sendingHeight );
+                MRef<Session *> session = Session::registry->getSession(sender->getCallId());
+                codec->getEncoder()->setHeight(session->getSendingHeight());
+                codec->getEncoder()->setWidth(session->getSendingWidth());
+                codec->getEncoder()->setProfile(session->getProfile());
+                codec->startSend( sendingWidth, sendingHeight);
                 sendersLock.lock();
         }
 

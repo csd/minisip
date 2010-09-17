@@ -36,13 +36,13 @@ class AVDecoder;
 class Grabber;
 class VideoDisplay;
 class VideoEncoderCallback;
-
+class MVideoCodecState;
 typedef uint8_t byte_t;
 
 class LIBMINISIP_API MVideoCodec : public Codec{
 	public:
 
-		MRef<CodecState *> newInstance(){/*TODO*/ return NULL;};
+		MRef<CodecState *> newInstance();
 		MVideoCodec();
 
 		/* called by the Grabber directly */
@@ -80,4 +80,20 @@ class LIBMINISIP_API MVideoCodec : public Codec{
 		MRef<VideoDisplay *> display;
 };
 
+class MVideoCodecState: public CodecState {
+
+public:
+	MVideoCodecState();
+	/**
+	 * @returns Number of bytes in output buffer
+	 */
+	virtual uint32_t encode(void *in_buf, int32_t in_buf_size, int samplerate,
+			void *out_buf);
+
+	/**
+	 *
+	 * @returns Number of samples in output buffer
+	 */
+	virtual uint32_t decode(void *in_buf, int32_t in_buf_size, void *out_buf);
+};
 #endif

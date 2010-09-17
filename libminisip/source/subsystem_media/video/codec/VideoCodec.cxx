@@ -137,3 +137,21 @@ cout <<"------------------------------------------------------------------------
 uint32_t MVideoCodec::getVersion() const{
 	return 0x00000001;
 }
+
+MVideoCodecState::MVideoCodecState(){
+}
+uint32_t MVideoCodecState::encode(void *in_buf, int32_t in_buf_size, int samplerate,
+			void *out_buf){
+	return 0;
+}
+
+uint32_t MVideoCodecState::decode(void *in_buf, int32_t in_buf_size, void *out_buf){
+	return 0;
+}
+
+MRef<CodecState *> MVideoCodec::newInstance(){
+	MRef<CodecState *> codecState = new MVideoCodecState();
+	cerr<<"CodecState created.";
+	codecState->setCodec(this);
+	return codecState;
+}

@@ -37,6 +37,9 @@
 #include<libminisip/media/MediaStream.h>
 #include<libmsip/SipDialogConfig.h>
 
+#define BASELINE_PROFILE 0
+#define MAIN_PROFILE 1
+
 class RealtimeMediaStreamReceiver;
 class RealtimeMediaStreamSender;
 class SdpHeaderM;
@@ -271,6 +274,9 @@ class LIBMINISIP_API Session : public MObject{
 		void setUDPSocket6 ( MRef<UDPSocket *> sock ) { this->sock6 = sock;}  ;
 		MRef<UDPSocket *> getUDPSocket(){return sock;};
 		MRef<UDPSocket *> getUDPSocket6(){return sock6;};		
+		uint32_t getSendingWidth();
+		uint32_t getSendingHeight();
+		int getProfile();
 
 
 	private:
@@ -319,8 +325,11 @@ class LIBMINISIP_API Session : public MObject{
 
 		std::string callId;
 
-                //DtmfSender dtmfSender;
-                MRef<TimeoutProvider<DtmfEvent *, MRef<DtmfSender *> > *> dtmfTOProvider;
+        //DtmfSender dtmfSender;
+        MRef<TimeoutProvider<DtmfEvent *, MRef<DtmfSender *> > *> dtmfTOProvider;
+        uint32_t sendingWidth;
+        uint32_t sendingHeight;
+        int8_t profile;
 };
 
 

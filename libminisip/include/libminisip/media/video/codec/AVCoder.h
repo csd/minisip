@@ -74,6 +74,9 @@ class LIBMINISIP_API AVEncoder: public ImageHandler, public MObject{
 		void setLocalDisplay(MRef<VideoDisplay*>);
 
 		void close();
+		void setProfile(int profile);
+		void setWidth(uint32_t width);
+		void setHeight(uint32_t height);
 
 	private:
 		/*VideoCodec*/ void *videoCodec;
@@ -91,6 +94,9 @@ class LIBMINISIP_API AVEncoder: public ImageHandler, public MObject{
 
 		void *swsctx;
 		int N;
+		int profile;
+		uint32_t width;
+		uint32_t height;
 };
 
 
