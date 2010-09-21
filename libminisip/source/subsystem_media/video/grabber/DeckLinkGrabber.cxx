@@ -178,6 +178,7 @@ DeckLinkCaptureDelegate::DeckLinkCaptureDelegate(int _fps){
 	frame=NULL;
 	filled=false;
 	doStop=false;
+	noSourceFlag=true;
 	allocateImage();
 }
 
@@ -264,11 +265,19 @@ HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame
 	{
 		if (videoFrame->GetFlags() & bmdFrameHasNoInputSource)
 		{
-			fprintf(stderr, "Frame received (#%lu) - No input signal detected\n", frameCount);
+			if(this->noSourceFlag ==false && filled == false)
+			{
+				filled = true;
+				bufferSem.inc();
+			}
+			//fprintf(stderr, "Frame received (#%lu) - No input signal detected\n", frameCount);
+			this->noSourceFlag=true;
+
 		}
 		else
 		{
-//			fprintf(stderr, "Frame received (#%lu) - Valid Frame (Size: %li bytes)\n", frameCount, videoFrame->GetRowBytes() * videoFrame->GetHeight());
+			this->noSourceFlag=false;
+		//	fprintf(stderr, "Frame received (#%lu) - Valid Frame (Size: %li bytes)\n", frameCount, videoFrame->GetRowBytes() * videoFrame->GetHeight());
 			putImage(videoFrame);
 
 #if 0
@@ -571,7 +580,7 @@ void DeckLinkGrabber::run(){
 
 	startBlockSem->dec(); // wait until start() has been called
 	startBlockSem=NULL; // free
-
+cerr<<"TTA:********************************About to start read."<<endl<<endl;
 	read( handler );
 }
 
@@ -628,22 +637,22 @@ void DeckLinkGrabber::read( ImageHandler * handler ){
 		localDisplay->setIsLocalVideo(true);
 		localDisplay->start();
 	}
-
 	HRESULT result = deckLinkInput->StartStreams();
 	if(result != S_OK)
 	{
 		cerr<<"ERROR: could not start DeckLink capturing"<<endl;
 		return;
 	}
-
 	while (!doStop){
-
 		static int i=0;
 		i++;
 		//			if (i%50==1){ //grabber does 50fps. We send 25fps.
-
+		if(capture->getNoSourceFlag() == true){
+			cerr<<"No Input Signal received"<<endl;
+			continue;
+		}
 		MImage*frame = capture->getImage();
-//		if (i%2==0){
+		//		if (i%2==0){
 			handler->handle( frame );
 
 			if (localDisplay && i%2==0){

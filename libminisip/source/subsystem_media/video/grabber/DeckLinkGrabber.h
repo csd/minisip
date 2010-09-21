@@ -65,6 +65,7 @@ class DeckLinkCaptureDelegate : public IDeckLinkInputCallback {
 		int getHeight(){return height;}
 		void stop(){doStop=true;}
 		bool doStop;
+		bool getNoSourceFlag(){return noSourceFlag;}
 	private:
 		void allocateImage();
 		long unsigned int frameCount;
@@ -83,6 +84,7 @@ class DeckLinkCaptureDelegate : public IDeckLinkInputCallback {
 
 		int fps;
 		uint64_t nextTimeGrab;
+		bool noSourceFlag;
 };
 
 
