@@ -1170,7 +1170,7 @@ MRef<OpenGLWindow*> OpenGLWindow::globalWindowObj=NULL;
 OpenGLWindow::OpenGLWindow(int w, int h, bool fullscreen){
 	cerr<<"EEEE: ------------------------ CREATING OPENGL WINDOW---------------"<<endl;
 
-	ir = new IrInput(this);
+//	ir = new IrInput(this);
 
 
 	menuMode=MENU_HIDDEN;
@@ -1218,8 +1218,8 @@ OpenGLWindow::OpenGLWindow(int w, int h, bool fullscreen){
 	zoomMode=ZOOM_MODE_OFF;
 	zoomEscapeCount=0;
 
-	camClient = new CameraClientMgr("192.16.126.158", 3333);
-	camClient->start();
+//	camClient = new CameraClientMgr("192.16.126.158", 3333);
+//	camClient->start();
 
 
 }
@@ -3145,7 +3145,7 @@ void OpenGLWindow::run(){ //NOTE: must be called by internal thread
 
 void OpenGLWindow::start(){ //NOTE: this method is used from external thread
 	cerr << "EEEE: doing OpenGLWindow::start()"<<endl;
-	ir->start();
+//	ir->start();
 	lock.lock();
 	bool useSem=false;
 	if (runCount<=0){
