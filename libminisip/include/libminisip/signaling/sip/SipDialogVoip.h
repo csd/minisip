@@ -98,6 +98,9 @@ class LIBMINISIP_API SipDialogVoip: public SipDialog{
 		void sendReferReject();
 		void sendRefer(int, const std::string referredUri);
 		
+		/* Re - Invite */
+		bool a1011_incall_incall_REINVITE( const SipSMCommand &command);
+
 		/* Ending a call */
 		bool a1001_incall_termwait_BYE( const SipSMCommand &command);
 		bool a1002_incall_byerequest_hangup( const SipSMCommand &command);

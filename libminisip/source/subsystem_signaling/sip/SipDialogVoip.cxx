@@ -157,6 +157,87 @@ static string getReferredUri(MRef<SipRequest*> req){
 	return referredUri;
 }
 
+
+
+bool SipDialogVoip :: a1011_incall_incall_REINVITE( const SipSMCommand &command){
+     //   cerr << "------------------------------------------- charis re - invite handling charis ------- 1 ---------!!!!!!!! \n"; 
+ if( !transitionMatch("INVITE", 
+                             command, 
+                             SipSMCommand::transaction_layer, 
+                             SipSMCommand::dialog_layer)  ){
+                return false;
+        }
+
+
+
+       // cerr << "------------------------------------------- charis re - invite handling !!!!!!!!----------- 2 --------------- \n";
+
+	  MRef<SipRequest*> inv = (SipRequest *)*command.getCommandPacket();
+
+                if( inv->requires("100rel") ){
+                        // TODO reject unsupported extension
+                        return false;
+                }
+
+                setLastInvite(inv);
+                dialogState.updateState( inv );
+
+                // Build peer uri used for authentication from remote uri,
+                // but containing user and host only.
+                SipUri peer(dialogState.remoteUri);
+                string peerUri = peer.getProtocolId() + ":" + peer.getUserIpString();
+
+                if(!sortMIME(*inv->getContent(), peerUri, 10)){
+                        merr << "No MIME match" << endl;
+                        return false;
+                }
+		// setting SDP answer new 
+		// set the 200 ok response
+	MRef<SipResponse*> ok= new SipResponse(200,"OK", getLastInvite() );     
+        ok->getHeaderValueTo()->setParameter("tag",dialogState.localTag);
+
+        MRef<SipHeaderValue *> contact = 
+                new SipHeaderValueContact( 
+                        getDialogConfig()->getContactUri(useStun),
+                        -1); //set expires to -1, we do not use it (only in register)
+        ok->addHeader( new SipHeader(*contact) );
+
+        if( true  /*!use100Rel*/ ){
+
+        //There might be so that there are no SDP. Check!
+        MRef<SdpPacket *> sdp;
+        if (mediaSession){
+#ifdef ENABLE_TS
+                ts.save("getSdpAnswer");
+#endif
+                sdp = mediaSession->getSdpAnswer();
+#ifdef ENABLE_TS
+                ts.save("getSdpAnswer");
+#endif
+                if( !sdp ){
+                // FIXME: this most probably means that the
+                // creation of the MIKEY message failed, it 
+                // should not happen
+                merr << "Sdp was NULL in sendInviteOk" << endl;
+
+	           return false; 
+                }
+        }
+
+        /* Add the latter to the INVITE message */ // If it exists
+
+
+//-------------------------------------------------------------------------------------------------------------//
+        ok->setContent( *sdp );
+//-------------------------------------------------------------------------------------------------------------//
+        }
+
+        MRef<SipMessage*> pref(*ok);
+        SipSMCommand cmd( pref, SipSMCommand::dialog_layer, SipSMCommand::transaction_layer);
+        getSipStack()->enqueueCommand(cmd, HIGH_PRIO_QUEUE );
+
+}
+
 /**
  *
  * This transaction is also used a a1001_transfpending_termwait_BYE
@@ -505,7 +586,14 @@ void SipDialogVoip::setUpStateMachine(){
 	State<SipSMCommand,string> *s_transferstarted=new State<SipSMCommand,string>(this,"transferstarted");
 	addState(s_transferstarted);
 
-	
+	// Re invite 
+	 new StateTransition<SipSMCommand,string>(this, "transition_incall_incall_REINVITE",
+                        (bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a1011_incall_incall_REINVITE,
+                        s_incall, s_incall); 
+
+
+
+
 	// Ending a call
 	new StateTransition<SipSMCommand,string>(this, "transition_incall_termwait_BYE",
 			(bool (StateMachine<SipSMCommand,string>::*)(const SipSMCommand&)) &SipDialogVoip::a1001_incall_termwait_BYE,
