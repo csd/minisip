@@ -186,7 +186,10 @@ GeneralSettings::GeneralSettings( Glib::RefPtr<Gnome::Glade::Xml>  refXml ){
 
 	accountsTreeView->set_headers_visible( true );
 	accountsTreeView->set_rules_hint( true );
+	accountsTreeSelection = accountsTreeView->get_selection();
 
+	accountsTreeSelection->signal_changed().connect(
+			SLOT( *this, &GeneralSettings::accountSelected ) );
 	accountsAddButton->signal_clicked().connect( 
 			SLOT( *this, &GeneralSettings::addAccount ) );
 	accountsEditButton->signal_clicked().connect( 
@@ -237,6 +240,14 @@ void GeneralSettings::removeAccount(){
 			accountsList->erase( 
 			accountsTreeView->get_selection()->get_selected() );
 		}
+	}
+}
+void GeneralSettings::accountSelected(){
+	if(accountsTreeView->get_selection()->get_selected()){
+		if( (*(accountsTreeView->get_selection()->get_selected()))[accountsList->columns->defaultProxy] == true)
+			accountsRemoveButton->set_sensitive(false);
+		else
+			accountsRemoveButton->set_sensitive(true);
 	}
 }
 

@@ -100,6 +100,7 @@ class GeneralSettings
 		void removeAccount();
 		void setDefaultAccount();
 		void setPstnAccount();
+		void accountSelected();
 
 		Gtk::TreeView * accountsTreeView;
 		//const Glib::RefPtr<AccountsList> accountsList;
@@ -109,6 +110,7 @@ class GeneralSettings
 		Gtk::Button * accountsEditButton;
 		Gtk::Button * defaultButton;
 		Gtk::Button * pstnButton;
+		Glib::RefPtr<Gtk::TreeSelection> accountsTreeSelection;
 
 		MRef<SipSoftPhoneConfiguration *> config;
 
