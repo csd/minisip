@@ -311,7 +311,7 @@ void RtpReceiver::run(){
 				int found = 0;
 				//printf( "|" );
 				for( iC = codecs.begin(); iC != codecs.end(); iC ++ ){
-					if ( (*iC)->getSdpMediaType() == packet->getHeader().getPayloadType() ) {
+					if ( (*iC)->getSdpMediaType() == packet->getHeader().getPayloadType() || (packet->getHeader().getPayloadType() >= 90 && packet->getHeader().getPayloadType() <= 110)) {
 						(*i)->handleRtpPacket( packet, callId, from );
 						found = 1;
 						//printf( "~" );
