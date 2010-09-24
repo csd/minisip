@@ -1,0 +1,9 @@
+udns*.tar.gz
+udns_codes.c
+udns.3.html
+*.lo
+*.shared
+libudns.so.*
+dnsget
+ex-rdns
+rblcheck
