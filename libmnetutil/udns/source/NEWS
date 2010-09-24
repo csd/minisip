@@ -1,0 +1,53 @@
+$Id: NEWS,v 1.6 2005/09/12 12:09:10 mjt Exp $
+
+User-visible changes in udns library.  Recent changes on top.
+
+0.0.8 (12 Sep 2005)
+
+ - added SRV records (rfc2782) parsing,
+   thanks to Thadeu Lima de Souza Cascardo for implementation.
+
+ - bugfixes:
+   o use uninitialized value when no reply, library died with assertion:
+     assert((status < 0 && result == 0) || (status >= 0 && result != 0)).
+   o on some OSes, struct sockaddr_in has additional fields, so
+     memcmp'ing two sockaddresses does not work.
+
+ - rblcheck(.1)
+
+0.0.7 (20 Apr 2005)
+
+ - dnsget.1 manpage and several enhancements to dnsget.
+
+ - allow nameserver names for -n option of dnsget.
+
+ - API change: all dns_submit*() routines now does not expect
+   last `now' argument, since requests aren't sent immediately
+   anymore.
+
+ - API change: different application timer callback mechanism.
+   Udns now uses single per-context timer instead of per-query.
+
+ - don't assume DNS replies only contain backward DN pointers,
+   allow forward pointers too.  Change parsing API.
+
+ - debianize
+
+0.0.6 (08 Apr 2005)
+
+ - use double sorted list for requests (sorted by deadline).
+   This should significantly speed up timeout processing for
+   large number of requests.
+
+ - changed debugging interface, so it is finally useable
+   (still not documented).
+
+ - dnsget routine is now Officially Useable, and sometimes
+   even more useable than `host' from BIND distribution
+   (and sometimes not - dnsget does not have -C option
+   and TCP mode)
+
+ - Debian packaging in debian/ -- udns is now maintained as a
+   native Debian package.
+
+ - alot (and I really mean alot) of code cleanups all over.
