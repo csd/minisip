@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2006  Mikael Magnusson
+ Copyright (C) 2004-2006 the Minisip Team
  
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -14,27 +14,27 @@
  You should have received a copy of the GNU Lesser General Public
  License along with this library; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-*/
+ */
+#include<libmnetutil/TCPSocket.h>
 
 /*
- * Authors: Mikael Magnusson <mikma@users.sourceforge.net>
+ * Crash report sender thread class
  */
+class CrashSender{
 
-#ifndef USER_CONFIG_H
-#define USER_CONFIG_H
+public:
+	CrashSender();
+	~CrashSender();
+	bool run();
+	bool send();	
+	std::string createXML(std::string message,std::string value);	
 
-#include<libminisip/libminisip_config.h>
+private:
+	TCPSocket* crashSenderSocket;			//Socket which send the crash report
 
-#include <string>
-
-class LIBMINISIP_API UserConfig
-{
-	public:
-		static std::string getMiniSIPHomeDirectory(void);
-		static std::string getFileName(std::string baseName);
-
-	protected:
-		UserConfig() {}
+	std::string crashDirectoryPath;			//Path for the crash report directory
+	std::string crashPID;					//Crash PID
+	std::string logServerAddress;			//Log server address
+	std::string logServerPort;				//Log server port
 };
 
-#endif	// USER_CONFIG_H

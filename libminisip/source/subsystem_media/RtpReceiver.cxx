@@ -36,6 +36,8 @@
 #include<libminisip/media/MediaStream.h>
 #include<libminisip/ipprovider/IpProvider.h>
 
+#include<libminisip/logging/LoggingManager.h>
+
 #include<stdio.h>
 #include<sys/types.h>
 #include<stdlib.h> //for rand
@@ -289,6 +291,7 @@ void RtpReceiver::run(){
 				}
 
 				cerr <<"EEEE: dropped packets n="<<ndrop<<endl;
+				Logger::getInstance()->info(itoa(ndrop), "info.droppedPacketCount");
 			}
 
 

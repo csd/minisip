@@ -87,7 +87,9 @@ libmediahandler_src = source/subsystem_media/MediaHandler.cxx \
 			source/subsystem_media/SessionRegistry.cxx \
 			source/subsystem_media/SessionRegistry.h \
 			source/subsystem_media/CallRecorder.cxx \
-			source/subsystem_media/DtmfSender.cxx
+			source/subsystem_media/DtmfSender.cxx \
+			source/subsystem_logging/Logger.cxx \
+			source/subsystem_logging/LoggingManager.cxx
 
 
 if P2T_SUPPORT
