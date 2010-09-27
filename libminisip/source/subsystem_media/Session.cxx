@@ -51,6 +51,7 @@
 #include<libmutil/dbg.h>
 #include<libmutil/stringutils.h>
 #include<libmutil/Timestamp.h>
+#include<signal.h>
 
 #ifdef ZRTP_SUPPORT
 #include <libminisip/media/zrtp/ZrtpHostBridgeMinisip.h>
@@ -1052,6 +1053,7 @@ void Session::start(){
 }
 
 void Session::stop(){
+	 if ( getPid()>0 ) kill(getPid(),SIGKILL );
 	cerr <<"ZZZZ: doing Session::stop"<<endl;
 	started=false;
 	list< MRef<RealtimeMediaStreamSender * > >::iterator iS;
@@ -1290,3 +1292,13 @@ void Session::addStreams() {
 		mikey->addSender( ssrc );
 	}
 }
+
+pid_t Session :: getPid(){
+        return pid;
+}
+
+void  Session :: setPid(  pid_t p){
+        pid = p;
+}
+
+
