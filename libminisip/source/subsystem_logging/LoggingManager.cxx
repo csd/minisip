@@ -100,7 +100,7 @@ LoggingConfiguration::LoggingConfiguration(
 	this->loggingServerPort = phoneConf->logServerPort;
 	this->loggingFlag = phoneConf->loggingFlag;
 	this->currentSipIdentity = phoneConf->defaultIdentity;
-	this->localLoggingFlag = true; //phoneConf->localLoggingFlag;
+	this->localLoggingFlag = phoneConf->localLoggingFlag;
 }
 
 //Sets the logging server address
