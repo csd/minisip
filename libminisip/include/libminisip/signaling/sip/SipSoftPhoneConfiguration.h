@@ -143,6 +143,7 @@ class LIBMINISIP_API SipSoftPhoneConfiguration : public MObject{
 		std::string logServerAddr;
 		std::string logServerPort;
 		bool loggingFlag;
+		bool localLoggingFlag;
 
 		std::list<std::string> audioCodecs;
 		//not used anymore ... it was used in mediahandler ... 

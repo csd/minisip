@@ -100,14 +100,14 @@ Logger::~Logger() {
 void Logger::info(std::string id, std::string message) {
 	if (loggingFlag) {
 		if (level <= INFO) {
-			if (logFilePointer != NULL) {
+			std::string logXMLString = loggerUtils.createLog(id, message);
+			if (logFilePointer != NULL && this->localLoggingFlag) {
 				//Writing into that file
-				std::string logXMLString = loggerUtils.createLog(id, message);
 				fprintf(logFilePointer, "%s\n", logXMLString.c_str());
 				fflush(logFilePointer);
-				//Sends the logs to the Log sender
-				sendLogs(logXMLString);
 			}
+			//Sends the logs to the Log sender
+			sendLogs(logXMLString);
 		}
 	}
 }
@@ -116,14 +116,14 @@ void Logger::info(std::string id, std::string message) {
 void Logger::debug(std::string id, std::string message) {
 	if (loggingFlag) {
 		if (level <= DEBUG) {
-			if (logFilePointer != NULL) {
+			std::string logXMLString = loggerUtils.createLog(id, message);
+			if (logFilePointer != NULL && this->localLoggingFlag) {
 				//Writing into that file
-				std::string logXMLString = loggerUtils.createLog(id, message);
-				fprintf(logFilePointer, "%s\n", message);
+				fprintf(logFilePointer, "%s\n", logXMLString.c_str());
 				fflush(logFilePointer);
-				//Sends the logs to the Log sender
-				sendLogs(logXMLString);
 			}
+			//Sends the logs to the Log sender
+			sendLogs(logXMLString);
 		}
 	}
 }
@@ -132,14 +132,14 @@ void Logger::debug(std::string id, std::string message) {
 void Logger::error(std::string id, std::string message) {
 	if (loggingFlag) {
 		if (level <= ERROR) {
-			if (logFilePointer != NULL) {
+			std::string logXMLString = loggerUtils.createLog(id, message);
+			if (logFilePointer != NULL && this->localLoggingFlag) {
 				//Writing into that file
-				std::string logXMLString = loggerUtils.createLog(id, message);
-				fprintf(logFilePointer, "%s\n", message);
+				fprintf(logFilePointer, "%s\n", logXMLString.c_str());
 				fflush(logFilePointer);
-				//Sends the logs to the Log sender
-				sendLogs(logXMLString);
 			}
+			//Sends the logs to the Log sender
+			sendLogs(logXMLString);
 		}
 	}
 }
@@ -159,7 +159,7 @@ void Logger::setLevel(std::string logLevel) {
 
 //Initilizes the logging version
 void Logger::setLoggingModuleVersion(void) {
-	log_version = "0.0.6";
+	log_version = "0.0.7";
 }
 
 //Sets the logging manger reference
@@ -177,6 +177,11 @@ void Logger::setLoggingFlag(bool flag) {
 	this->loggingFlag = flag;
 }
 
+//Sets the logging flag
+void Logger::setLocalLoggingFlag(bool flag) {
+	this->localLoggingFlag = flag;
+}
+
 //Sets the user ID
 void Logger::setCurrentSipIdentity(MRef<SipIdentity*> currentSipIdentity) {
 	this->currentSipIdentity = currentSipIdentity;
@@ -184,27 +189,8 @@ void Logger::setCurrentSipIdentity(MRef<SipIdentity*> currentSipIdentity) {
 
 //Sends the logs to the sender
 void Logger::sendLogs(std::string log) {
-	//Increments the log Count
-	logCount++;
-	temporaryBuffer.push(log);
-
-	//If ten logs are there send it to the server
-	if (logCount > 1) {
-		//Initializes a new thread to send the logs
-		if (connected && senderSocket != NULL) {
-			logSender = new LogSender(senderSocket);
-
-			//Transfers the logs to the send buffer (duplicates)
-			while (!temporaryBuffer.empty()) {
-				logSender->bufferLogs(temporaryBuffer.front());
-				temporaryBuffer.pop();
-			}
-			logSender->start();
-			logCount = 0;
-		} else {
-			cerr << "Error in connection with the logging server" << endl;
-		}
-
+	if (connected && senderSocket != NULL) {
+		senderSocket->write(log + "\n");
 	}
 }
 
@@ -212,22 +198,24 @@ void Logger::startLogger() {
 	//Creating the folder if it does not exist
 	struct stat st;
 
-	if (stat(logDirectoryPath.c_str(), &st) == 0)
-		cerr << "[Logger] The directory is already present" << endl;
-	else {
-		//Creating a new directory
-		if (mkdir(logDirectoryPath.c_str(), 0777) == -1) {
-			cerr << "[Logger] Error opening the new directory" << endl;
+	if (this->localLoggingFlag) {
+		if (stat(logDirectoryPath.c_str(), &st) == 0)
+			cerr << "[Logger] The directory is already present" << endl;
+		else {
+			//Creating a new directory
+			if (mkdir(logDirectoryPath.c_str(), 0777) == -1) {
+				cerr << "[Logger] Error opening the new directory" << endl;
+			}
 		}
-	}
 
-	//Opening the log file
-	logFilePointer = fopen((logDirectoryPath + logFileName).c_str(), "w");
-	if (logFilePointer == NULL) {
-		cerr << "[Logger] Error opening the log file " << (logDirectoryPath
-				+ logFileName) << endl;
-	} else {
-		cerr << "[Logger] Log file opened successfully\n" << endl;
+		//Opening the log file
+		logFilePointer = fopen((logDirectoryPath + logFileName).c_str(), "w");
+		if (logFilePointer == NULL) {
+			cerr << "[Logger] Error opening the log file " << (logDirectoryPath
+					+ logFileName) << endl;
+		} else {
+			cerr << "[Logger] Log file opened successfully\n" << endl;
+		}
 	}
 
 	//Establishing a TCP connection with the logging server
@@ -256,10 +244,9 @@ void Logger::startLogger() {
 	//sets the user ID in log utils
 	loggerUtils.setCurrentSipIdentity(this->currentSipIdentity);
 
-	//FIXME:Workaround for send crash report immediately
-	FILE *crashFilePointer = fopen(
-			(this->loggingManager->getCrashDirectory() + "/.crash_conf").c_str(), "w");
-	if (!crashFilePointer == NULL) {
+	FILE *crashFilePointer = fopen((this->loggingManager->getCrashDirectory()
+			+ "/.crash_conf").c_str(), "w");
+	if (crashFilePointer != NULL) {
 		fprintf(
 				crashFilePointer,
 				(this->loggingManager->getLoggingServerAddress() + "\n").c_str());
@@ -279,14 +266,15 @@ void Logger::stopLogger() {
 		this->senderSocket->close();
 	}
 
-	//Close the file
-	cerr << "closes the local log file" << endl;
-	if (logFilePointer != NULL) {
-		fclose(logFilePointer);
+	if (this->localLoggingFlag) {
+		//Close the file
+		cerr << "closes the local log file" << endl;
+		if (logFilePointer != NULL) {
+			fclose(logFilePointer);
+		}
 	}
 }
 
-//FIXME: Use proper XML handling
 LoggerUtils::LoggerUtils() {
 	pid_t pid;
 	char procid[100];

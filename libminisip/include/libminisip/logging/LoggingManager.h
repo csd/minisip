@@ -51,6 +51,7 @@ private:
 	std::string logServerAddress;			//Address of the log server
 	std::string logServerPort;				//Port of the log server
 	bool loggingFlag;						//Logging Flag
+	bool localLoggingFlag;					//Flag to indicate storing log files locally
 
 	MRef<SipIdentity*> currentSipIdentity;
 };
@@ -65,16 +66,19 @@ public:
 	void setLoggingServerAddress(std::string address);	//Sets the logging server address
 	void setLoggingServerPort(std::string port);		//Sets the logging server port
 	void setLoggingFlag(bool loggingFlag);				//Sets the logging flag
+	void setLocalLoggingFlag(bool localLoggingFlag);	//Sets the local logging flag
 
 	std::string getLoggingServerAddress();				//Returns the logging server address
 	std::string getLoggingServerPort();					//Returns the logging server port
 	bool getLoggingFlag();								//Returns the logging flag
+	bool getLocalLoggingFlag();							//Returns the local logging flag
 	MRef<SipIdentity*> getCurrentSipIdentity();				//Returns the user id
 
 private:
 	std::string loggingServerAddress;					//Log server address
 	std::string loggingServerPort;						//Log server port
 	bool loggingFlag;									//Flag to on and off logging
+	bool localLoggingFlag;								//Flag to switch the local logging
 
 	MRef<SipIdentity*> currentSipIdentity;			//User Default Identity
 };

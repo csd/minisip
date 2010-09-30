@@ -85,7 +85,7 @@ AVDecoder::AVDecoder():handler(NULL),codec( NULL ),context( NULL ){
 
 	if( codec == NULL ){
 		cerr << "EEEE: Error: libavcodec does not support H264"<<endl;
-		Logger::getInstance()->info(string("libavcodec does not support H264"), "error.decoder");
+		Logger::getInstance()->info(string("libavcodec does not support H.264"), "error.decoder");
 		throw VideoException( "libavcodec does not support H264" );
 	}
 

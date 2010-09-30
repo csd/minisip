@@ -81,6 +81,7 @@ libminisip/source/win32/libminisip-res.rc
 libminisip/tests/000_compile
 libminisip/tests/000_compile.o
 libminisip/version
+libminisip/debian/rules.ai-backup
 
 # libmnetutil
 libmnetutil/config
@@ -141,3 +142,10 @@ minisip/minisip/gui/openglgui/minisip_opengl
 minisip/minisip/gui/textui/minisip_textui
 minisip/minisip/win32/minisip-res.rc
 minisip/version
+
+# mloggingutil
+mloggingutil/depcomp
+mloggingutil/install-sh
+mloggingutil/minisipcrashsender
+mloggingutil/missing
+

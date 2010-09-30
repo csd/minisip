@@ -412,6 +412,7 @@ void SipSoftPhoneConfiguration::save() {
 	backend->save("log_server_addr", logServerAddr);
 	backend->save("log_server_port", logServerPort);
 	backend->saveBool("logging", loggingFlag);
+	backend->saveBool("local_logging", localLoggingFlag);
 
 	list<string>::iterator iCodec;
 	uint8_t iC = 0;
@@ -886,6 +887,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 	logServerAddr = backend->loadString("log_server_addr", "");
 	logServerPort = backend->loadString("log_server_port", "");
 	loggingFlag = backend->loadBool("logging", false);
+	localLoggingFlag = backend->loadBool("local_logging", false);
 
 	//Even if we can't send video, we might be able to display it.
 	//Therefore this is not within the VIDEO_SUPPORT ifdef
@@ -1074,6 +1076,7 @@ void SipSoftPhoneConfiguration::saveDefault( MRef<ConfBackend *> be ){
 	be->save("log_server_addr", "log.carenet-se.se");
 	be->save("log_server_port", "8700");
 	be->saveBool("logging", false);
+	be->saveBool("local_logging", false);
 
 	//we can save startup commands ... but do nothing by default ...
 	//<startup_cmd><command>call</command><params>uri</params></startup_cmd>

@@ -86,6 +86,7 @@ private:
 	int level; 							//Log level
 	int logCount;						//Number of Logs in the buffer
 	bool loggingFlag;
+	bool localLoggingFlag;
 	std::string logDirectoryPath;		//Log Directory path
 	MRef<SipIdentity*> currentSipIdentity;		//User ID
 
@@ -112,6 +113,7 @@ public:
 	void setLoggingManager(LoggingManager* loggingManager);		//Sets the Logging Manager
 	void setLogDirectoryPath(std::string logDirectoryPath);		//Sets the Log Directory path
 	void setLoggingFlag(bool flag);						//Sets the logging flag
+	void setLocalLoggingFlag(bool flag);						//Sets the local logging flag
 	void setCurrentSipIdentity(MRef<SipIdentity*>);			//Sets the SipIdentity
 	void startLogger();									//Starts the logger
 	void stopLogger();									//Stops the logger

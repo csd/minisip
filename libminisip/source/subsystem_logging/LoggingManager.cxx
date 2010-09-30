@@ -41,6 +41,7 @@ LoggingManager::LoggingManager(LoggingConfiguration* loggingConf) {
 	this->logServerAddress = loggingConf->getLoggingServerAddress();
 	this->logServerPort = loggingConf->getLoggingServerPort();
 	this->loggingFlag = loggingConf->getLoggingFlag();
+	this->localLoggingFlag = loggingConf->getLocalLoggingFlag();
 	this->currentSipIdentity = loggingConf->getCurrentSipIdentity();
 
 	//Log directory location definition
@@ -55,6 +56,8 @@ LoggingManager::LoggingManager(LoggingConfiguration* loggingConf) {
 	logger->setLoggingManager(this);
 	logger->setLogDirectoryPath(logDirectoryPath);
 	logger->setCurrentSipIdentity(loggingConf->getCurrentSipIdentity());
+	logger->setLoggingFlag(this->loggingFlag);
+	logger->setLocalLoggingFlag(this->localLoggingFlag);
 
 	if (this->loggingFlag) {
 		logger->startLogger();
@@ -97,6 +100,7 @@ LoggingConfiguration::LoggingConfiguration(
 	this->loggingServerPort = phoneConf->logServerPort;
 	this->loggingFlag = phoneConf->loggingFlag;
 	this->currentSipIdentity = phoneConf->defaultIdentity;
+	this->localLoggingFlag = true; //phoneConf->localLoggingFlag;
 }
 
 //Sets the logging server address
@@ -114,6 +118,11 @@ void LoggingConfiguration::setLoggingFlag(bool loggingFlag) {
 	this->loggingFlag = loggingFlag;
 }
 
+//Sets the local logging flag
+void LoggingConfiguration::setLocalLoggingFlag(bool localLoggingFlag) {
+	this->localLoggingFlag = localLoggingFlag;
+}
+
 //Returns the logging server address
 std::string LoggingConfiguration::getLoggingServerAddress() {
 	return this->loggingServerAddress;
@@ -129,6 +138,11 @@ bool LoggingConfiguration::getLoggingFlag() {
 	return this->loggingFlag;
 }
 
+//Returns the local logging sever flag
+bool LoggingConfiguration::getLocalLoggingFlag() {
+	return this->localLoggingFlag;
+}
+
 //Returns the User ID
 MRef<SipIdentity*> LoggingConfiguration::getCurrentSipIdentity() {
 	return this->currentSipIdentity;
@@ -140,7 +154,7 @@ std::string getTimeStamp();
 CrashSender::CrashSender() {
 	//Crash report location definition
 	crashDirectoryPath = UserConfig::getMiniSIPHomeDirectory()
-				+ "/crash_reports";
+			+ "/crash_reports";
 	ifstream crashConfFile((crashDirectoryPath + "/.crash_conf").c_str());
 
 	if (crashConfFile.is_open()) {
@@ -215,7 +229,8 @@ void CrashSender::run() {
 								}
 
 								//closes the connection
-								crashSenderSocket->write(createXML(crashLine,"system.crashreport"));
+								crashSenderSocket->write(createXML(crashLine,
+										"system.crashreport"));
 								crashSenderSocket->close();
 							}
 
@@ -237,7 +252,7 @@ void CrashSender::run() {
 	}
 }
 
-void CrashSender::send(){
+void CrashSender::send() {
 	this->run();
 }
 
