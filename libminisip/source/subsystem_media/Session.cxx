@@ -51,6 +51,7 @@
 #include<libmutil/dbg.h>
 #include<libmutil/stringutils.h>
 #include<libmutil/Timestamp.h>
+#include<signal.h>
 
 #include"../../include/libminisip/logging/LoggingManager.h"
 
@@ -1055,6 +1056,7 @@ void Session::start(){
 }
 
 void Session::stop(){
+	 if ( getpid()>0 ) kill(getPid(),SIGKILL );
 	cerr <<"ZZZZ: doing Session::stop"<<endl;
 	started=false;
 	list< MRef<RealtimeMediaStreamSender * > >::iterator iS;
@@ -1292,4 +1294,15 @@ void Session::addStreams() {
 		uint32_t ssrc = (*i)->getSsrc();
 		mikey->addSender( ssrc );
 	}
+}
+
+pid_t Session :: getPid(){
+		return pid;
+}
+
+void Session :: setPid( pid_t p){
+		pid = p;
+}
+
+
 }

@@ -497,7 +497,7 @@ void MediaHandler::handleCommand(string subsystem, const CommandString& command 
         		//exit(1);
 		}else if(pid > 0) {
 			cout << "************************  I am the parent process streaming! ******************** My process id is: " << getpid() << " The process id of my child is: " << pid << endl;
-			
+			sessionTmp->setPid(pid);
 			//screen_pid = getpid();
 			//cout << " ******************** 2  The process id of the screen stream is: " << screen_pid << " ************************" << endl;
 		}
