@@ -1305,4 +1305,3 @@ void Session :: setPid( pid_t p){
 }
 
 
-}
