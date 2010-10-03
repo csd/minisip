@@ -828,7 +828,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 	soundDeviceIn = backend->loadString("sound_device_in",soundDevice);
 	soundDeviceOut = backend->loadString("sound_device_out",soundDeviceIn);
 
-	soundIOmixerType = backend->loadString("mixer_type", "spatial");
+	soundIOmixerType = backend->loadString("mixer_type", "simple");
 // 	cerr << "sipconfigfile : soundiomixertype = " << soundIOmixerType << endl << endl;
 
 	//Load the startup commands ... there may be more than one
@@ -1022,7 +1022,7 @@ void SipSoftPhoneConfiguration::saveDefault( MRef<ConfBackend *> be ){
 	be->save( "sound_device_in", soundDeviceIn );
 	be->save( "sound_device_out", soundDeviceOut );
 
-	be->save( "mixer_type", "spatial" );
+	be->save( "mixer_type", "simple" );
 
 #if defined HAS_SPEEX && defined HAS_GSM
 	be->save( "codec[0]", "speex" );
