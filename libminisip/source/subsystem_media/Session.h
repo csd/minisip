@@ -266,6 +266,14 @@ class LIBMINISIP_API Session : public MObject{
 		*/
 		MRef<MObject *> callRecorder;
 ///////////////////////////////////////////////////////
+		pid_t  getPid();
+
+                void  setPid(  pid_t p);
+
+		 pid_t pid ;
+
+
+
 		void setDestinationPort ( int port){ DestinationPort = port;};
 		void setDestinationIp (  MRef<IPAddress *> s ) { DestinationIP = s ;}; 
 		int getDestinationPort ( ){ return DestinationPort;};

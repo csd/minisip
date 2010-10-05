@@ -134,7 +134,7 @@ void AVEncoder::init( uint32_t width, uint32_t height ){
 		globalBitRate=25000;
 	videoCodec->bitrate=globalBitRate;
 #else
-	videoCodec->bitrate=6000;
+	videoCodec->bitrate=2500;
 #endif
 
 
