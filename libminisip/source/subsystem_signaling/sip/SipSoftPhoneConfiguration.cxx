@@ -65,6 +65,8 @@
 #include<libmsip/SipTransport.h>
 #include<libminisip/config/OnlineConfBackend.h>
 
+#include<libminisip/logging/LoggingManager.h>
+
 #include<algorithm>
 
 //update both!!!! the str define is to avoid including itoa.h
@@ -92,6 +94,7 @@ SipSoftPhoneConfiguration::SipSoftPhoneConfiguration():
 	displayFrameRate(""),
 	usePSTNProxy(false),
 	ringtone(""),
+	logServerAddr(""),
 	p2tGroupListServerPort(0)
 {
 	sipStackConfig = new SipStackConfig;
@@ -106,9 +109,27 @@ SipSoftPhoneConfiguration::~SipSoftPhoneConfiguration(){
 	}
 }
 
-void SipSoftPhoneConfiguration::save(){
-	massert(backend); // This will happen if save() is done without first
-			 // having done a load() (bug).
+void SipSoftPhoneConfiguration::logConfigurationDetails(MRef<
+		SipSoftPhoneConfiguration *> phoneConf) {
+	MRef<Logger *> logger = MSingleton<Logger>::getInstance();
+	logger->info(itoa(phoneConf->sipStackConfig->preferedLocalSipPort),
+			"config.sipPort");
+	logger->info(itoa(phoneConf->sipStackConfig->preferedLocalSipsPort),
+			"config.securedSipPort");
+	logger->info(phoneConf->soundDeviceIn, "config.inputSoundDevice");
+	logger->info(phoneConf->soundDeviceOut, "config.outputSoundDevice");
+	logger->info(phoneConf->videoDevice, "config.videoDevice");
+	logger->info(phoneConf->logServerAddr, "config.loggingServerAddress");
+	logger->info(phoneConf->logServerPort, "config.loggingServerPort");
+	logger->info(phoneConf->networkInterfaceName, "config.networkInterfaceName");
+	logger->info(phoneConf->defaultIdentity->identityIdentifier,
+			"config.defaultIdentity");
+}
+
+void SipSoftPhoneConfiguration::save() {
+	massert(backend)
+		; // This will happen if save() is done without first
+	// having done a load() (bug).
 
 	//Set the version of the file ...
 	backend->save( "version", CONFIG_FILE_VERSION_REQUIRED );
@@ -388,6 +409,11 @@ void SipSoftPhoneConfiguration::save(){
 	backend->save( "frame_width", frameWidth );
 	backend->save( "frame_height", frameHeight );
 
+	backend->save("log_server_addr", logServerAddr);
+	backend->save("log_server_port", logServerPort);
+	backend->saveBool("logging", loggingFlag);
+	backend->saveBool("local_logging", localLoggingFlag);
+
 	list<string>::iterator iCodec;
 	uint8_t iC = 0;
 
@@ -452,6 +478,7 @@ void SipSoftPhoneConfiguration::save(){
 	backend->save( "network_interface", networkInterfaceName );
 
 	backend->commit();
+	logConfigurationDetails(this);
 }
 
 void SipSoftPhoneConfiguration::addMissingAudioCodecs( MRef<ConfBackend *> be ){
@@ -857,6 +884,11 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 	displayFrameSize = backend->loadString("display_frame_size","");
 	displayFrameRate = backend->loadString("display_frame_rate","");
 
+	logServerAddr = backend->loadString("log_server_addr", "");
+	logServerPort = backend->loadString("log_server_port", "");
+	loggingFlag = backend->loadBool("logging", false);
+	localLoggingFlag = backend->loadBool("local_logging", false);
+
 	//Even if we can't send video, we might be able to display it.
 	//Therefore this is not within the VIDEO_SUPPORT ifdef
 	frameWidth = backend->loadInt( "frame_width", 176 );
@@ -935,6 +967,7 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 	//<network_interface> into networkInterfaceName
 	networkInterfaceName = backend->loadString("network_interface", "");
 
+	logConfigurationDetails(this);
 	return ret;
 
 }
@@ -1040,8 +1073,13 @@ void SipSoftPhoneConfiguration::saveDefault( MRef<ConfBackend *> be ){
 
 	be->save( "phonebook[0]", "file://" + getDefaultPhoneBookFilename() );
 
-//we can save startup commands ... but do nothing by default ...
-//<startup_cmd><command>call</command><params>uri</params></startup_cmd>
+	be->save("log_server_addr", "log.carenet-se.se");
+	be->save("log_server_port", "8700");
+	be->saveBool("logging", false);
+	be->saveBool("local_logging", false);
+
+	//we can save startup commands ... but do nothing by default ...
+	//<startup_cmd><command>call</command><params>uri</params></startup_cmd>
 
 	be->commit();
 

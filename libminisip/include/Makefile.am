@@ -116,7 +116,9 @@ nobase_include_HEADERS =    libminisip/media/aec/aecfix.h \
 			libminisip/Minisip.h \
 			libminisip/MinisipExceptions.h \
 			libminisip/libminisip_config.h \
-			libminisip/media/zrtp/ZrtpHostBridgeMinisip.h
+			libminisip/media/zrtp/ZrtpHostBridgeMinisip.h \
+			libminisip/logging/Logger.h \
+			libminisip/logging/LoggingManager.h
 
 
 noinst_HEADERS = 	config.h

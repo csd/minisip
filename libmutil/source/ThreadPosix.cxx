@@ -30,6 +30,9 @@
 
 #include <unistd.h>
 
+#include<sys/stat.h>
+#include<fstream>
+
 #ifdef HAVE_PTHREAD_H
 #include<pthread.h>
 #include<signal.h>
@@ -47,6 +50,8 @@
 #include<stdlib.h>
 #include<string.h>
 #include<stdio.h>
+#include<time.h>
+#include<sys/time.h>
 
 #include<sys/types.h>
 #ifndef DARWIN
@@ -228,11 +233,32 @@ typedef struct tmpstruct{
 #else
 #define REGFORMAT "%x"
 #endif	// defined(REG_RIP)
+FILE *crashFilePointer;
+
+static std::string GetFileName() {
+	std::string filename = "MiniSIPCrash-";
+	time_t timestamp;
+	struct tm * timestampStruct;
+	char timestampString[80];
+
+	time(&timestamp);
+	timestampStruct = localtime(&timestamp);
+	strftime(timestampString, 20, "%s", timestampStruct);
+	filename = string("/") + filename + timestampString + string(".report");
+	return (filename);
+}
 
 //Thanks to Jaco Kroon for this function
 //http://tlug.up.ac.za/wiki/index.php/Obtaining_a_stack_trace_in_C_upon_SIGSEGV
 static void signalHandler(int signum, siginfo_t* info, void*ptr) {
-    static const char *si_codes[3] = {"", "SEGV_MAPERR", "SEGV_ACCERR"};
+
+	struct stat st;
+	std::string crashDirectoryName = string(getenv("HOME")) + "/.minisip" + "/crash_reports";
+	std::string crashFileName = GetFileName();
+	pid_t PID;
+	char pathname[] = "/home/minisip/.minisip/minisip_crash";
+
+	static const char *si_codes[3] = {"", "SEGV_MAPERR", "SEGV_ACCERR"};
 
     int f = 0;
     ucontext_t *ucontext = (ucontext_t*)ptr;
@@ -240,16 +266,42 @@ static void signalHandler(int signum, siginfo_t* info, void*ptr) {
     void **bp = 0;
     void *ip = 0;
 
-    fprintf(stderr, "EXCEPTION CAUGHT:\n");
-    fprintf(stderr, "info.si_signo = %d\n", signum);
-    fprintf(stderr, "info.si_errno = %d\n", info->si_errno);
-    fprintf(stderr, "info.si_code  = %d (%s)\n", info->si_code, si_codes[info->si_code]);
-    fprintf(stderr, "info.si_addr  = %p\n", info->si_addr);
-    
-/* For register content, enable the following two lines: 
-    for(i = 0; i < NGREG; i++)
-        fprintf(stderr, "reg[%02d]       = 0x" REGFORMAT "\n", i, ucontext->uc_mcontext.gregs[i]);
-*/
+	if(signum == SIGSEGV) {
+		//Creating the sub folder within /HOME/.minisip folder (if it does not exist)
+		if (stat(crashDirectoryName.c_str(), &st) == 0)
+		cerr << "[Signal Handler] The directory is already present" << endl;
+		else {
+			//Creating a new directory
+			if (mkdir(crashDirectoryName.c_str(), 0777) == -1) {
+				cerr << "[Signal Handler] Error opening the new directory" << endl;
+			}
+		}
+		//Opening the crash file
+		crashFilePointer = fopen((crashDirectoryName + crashFileName).c_str(), "a+");
+		if (crashFilePointer == NULL) {
+			cerr << "[Signal Handler] Error opening the crash file " << (crashDirectoryName
+					+ crashFileName) << endl;
+		} else {
+			cerr << "[Signal Handler] Crash file opened successfully\n" << (crashDirectoryName
+					+ crashFileName) << endl;
+		}
+	}
+
+	fprintf(stderr, "EXCEPTION CAUGHT:\n");
+	fprintf(crashFilePointer,"EXCEPTION CAUGHT:\n");
+	fprintf(stderr, "info.si_signo = %d\n", signum);
+	fprintf(crashFilePointer, "info.si_signo = %d\n", signum);
+	fprintf(stderr, "info.si_errno = %d\n", info->si_errno);
+	fprintf(crashFilePointer, "info.si_errno = %d\n", info->si_errno);
+	fprintf(stderr, "info.si_code  = %d (%s)\n", info->si_code, si_codes[info->si_code]);
+	fprintf(crashFilePointer, "info.si_code  = %d (%s)\n", info->si_code, si_codes[info->si_code]);
+	fprintf(stderr, "info.si_addr  = %p\n", info->si_addr);
+	fprintf(crashFilePointer, "info.si_addr  = %p\n", info->si_addr);
+
+	/* For register content, enable the following two lines:
+	 for(i = 0; i < NGREG; i++)
+	 fprintf(stderr, "reg[%02d]       = 0x" REGFORMAT "\n", i, ucontext->uc_mcontext.gregs[i]);
+	 */
 #if defined(REG_RIP)
     ip = (void*)ucontext->uc_mcontext.gregs[REG_RIP];
     bp = (void**)ucontext->uc_mcontext.gregs[REG_RBP];
@@ -262,35 +314,57 @@ static void signalHandler(int signum, siginfo_t* info, void*ptr) {
 #endif	// defined(REG_RIP)
 
 #ifndef SIGSEGV_NOSTACK
-    fprintf(stderr, "Stack trace:\n");
-    while(bp && ip) {
-        if(!dladdr(ip, &dlinfo))
-            break;
+	fprintf(stderr, "Stack trace:\n");
+	fprintf(crashFilePointer, "Stack trace:\n");
+	while(bp && ip) {
+		if(!dladdr(ip, &dlinfo))
+		break;
 
 #if __WORDSIZE == 64
-        fprintf(stderr, "% 2d: %p <%s+%lu> (%s)\n",
-                ++f,
-                ip,
-                dlinfo.dli_sname,
-                (unsigned long)((unsigned long)ip - (unsigned long)dlinfo.dli_saddr),
-                dlinfo.dli_fname);
+		fprintf(stderr, "% 2d: %p <%s+%lu> (%s)\n",
+				++f,
+				ip,
+				dlinfo.dli_sname,
+				(unsigned long)((unsigned long)ip - (unsigned long)dlinfo.dli_saddr),
+				dlinfo.dli_fname);
+		fprintf(crashFilePointer, "% 2d: %p <%s+%lu> (%s)\n",
+				f,
+				ip,
+				dlinfo.dli_sname,
+				(unsigned long)((unsigned long)ip - (unsigned long)dlinfo.dli_saddr),
+				dlinfo.dli_fname);
 #else
-        fprintf(stderr, "% 2d: %p <%s+%u> (%s)\n",
-                ++f,
-                ip,
-                dlinfo.dli_sname,
-                (unsigned)((unsigned)ip - (unsigned)dlinfo.dli_saddr),
-                dlinfo.dli_fname);
+		fprintf(stderr, "% 2d: %p <%s+%u> (%s)\n",
+				++f,
+				ip,
+				dlinfo.dli_sname,
+				(unsigned)((unsigned)ip - (unsigned)dlinfo.dli_saddr),
+				dlinfo.dli_fname);
+		fprintf(crashFilePointer, "% 2d: %p <%s+%u> (%s)\n",
+				f,
+				ip,
+				dlinfo.dli_sname,
+				(unsigned)((unsigned)ip - (unsigned)dlinfo.dli_saddr),
+				dlinfo.dli_fname);
 
 #endif
         if(dlinfo.dli_sname && !strcmp(dlinfo.dli_sname, "main"))
             break;
 
-        ip = bp[1];
-        bp = (void**)bp[0];
-    }
-    fprintf(stderr, "End of stack trace\n");
-#endif	// SIGSEGV_NOSTACK
+		ip = bp[1];
+		bp = (void**)bp[0];
+	}
+	fprintf(stderr, "End of stack trace\n");
+	fprintf(crashFilePointer, "End of stack trace\n");
+	fclose(crashFilePointer);
+
+	pid_t  pid;
+
+	pid = fork();
+	if (pid == 0){
+		system("minisipcrashsender");
+	}
+	#endif	// SIGSEGV_NOSTACK
 }
 
 #ifndef SA_ONESHOT
