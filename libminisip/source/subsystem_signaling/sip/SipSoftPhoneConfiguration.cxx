@@ -886,8 +886,8 @@ string SipSoftPhoneConfiguration::load( MRef<ConfBackend *> be ){
 
 	logServerAddr = backend->loadString("log_server_addr", "");
 	logServerPort = backend->loadString("log_server_port", "");
-	loggingFlag = backend->loadBool("logging", false);
-	localLoggingFlag = backend->loadBool("local_logging", false);
+	loggingFlag = backend->loadBool("logging",false);
+	localLoggingFlag = backend->loadBool("local_logging",false);
 
 	//Even if we can't send video, we might be able to display it.
 	//Therefore this is not within the VIDEO_SUPPORT ifdef
