@@ -1075,8 +1075,8 @@ void SipSoftPhoneConfiguration::saveDefault( MRef<ConfBackend *> be ){
 
 	be->save("log_server_addr", "log.carenet-se.se");
 	be->save("log_server_port", "8700");
-	be->saveBool("logging", false);
-	be->saveBool("local_logging", false);
+	be->saveBool("logging",false);
+	be->saveBool("local_logging",false);
 
 	//we can save startup commands ... but do nothing by default ...
 	//<startup_cmd><command>call</command><params>uri</params></startup_cmd>
