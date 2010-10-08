@@ -66,6 +66,7 @@ class LIBMINISIP_API SipSoftPhoneConfiguration : public MObject{
 
 		virtual std::string getMemObjectType() const {return "SipSoftPhoneConfig";}
 
+		void logConfigurationDetails(MRef<SipSoftPhoneConfiguration *> phoneConf);
 		void save();
 		std::string load( MRef<ConfBackend *> be );
 		
@@ -138,6 +139,12 @@ class LIBMINISIP_API SipSoftPhoneConfiguration : public MObject{
 
 		std::string ringtone;
 		
+		//Logging parameters
+		std::string logServerAddr;
+		std::string logServerPort;
+		bool loggingFlag;
+		bool localLoggingFlag;
+
 		std::list<std::string> audioCodecs;
 		//not used anymore ... it was used in mediahandler ... 
 // 		bool muteAllButOne;

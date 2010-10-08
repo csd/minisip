@@ -56,6 +56,7 @@
 #include<libminisip/signaling/sip/SipSoftPhoneConfiguration.h>
 #include<libminisip/contacts/ContactDb.h>
 #include<libmsip/SipCommandString.h>
+#include<libminisip/logging/LoggingManager.h>
 
 #ifdef HAVE_LIBGLADEMM_2_6
 #	include<gtkmm/aboutdialog.h>
@@ -829,6 +830,8 @@ void MainWindow::accountListSelect() {
 
 	config->defaultIdentity =
 		(*iter)[accountsList->getColumns()->identity];
+	MRef<Logger *> logger = MSingleton<Logger>::getInstance();
+	logger->loggerUtils.setCurrentSipIdentity(config->defaultIdentity);
 
 	accountLabel->set_label( (*iter)[accountsList->getColumns()->name] );
 }
@@ -1211,6 +1214,8 @@ void MainWindow::onTabChange( GtkNotebookPage * page, guint index ){
 	CallWidget * callWidget = NULL;
 	ConferenceWidget *confWidget = NULL;
 	ImWidget * imWidget = NULL;
+
+	MRef<Logger *> logger = MSingleton<Logger>::getInstance();
 	
 	//cast the current page to the possible media widgets ...
 	callWidget = dynamic_cast< CallWidget *>( currentPage );
@@ -1219,6 +1224,14 @@ void MainWindow::onTabChange( GtkNotebookPage * page, guint index ){
 	if( confWidget == NULL ) 
 		imWidget = dynamic_cast< ImWidget *>( currentPage );
 	
+	//Set the call ID
+	if(callWidget){
+		logger->loggerUtils.setCallId(callWidget->getMainCallId());
+	}
+	else{
+		logger->loggerUtils.setCallId("");
+	}
+
 	//go through all the widgets, notifying them of the change
 	list<CallWidget *>::iterator iterCall;
 	for( iterCall = callWidgets.begin();
